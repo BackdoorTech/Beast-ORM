@@ -2,13 +2,10 @@
 require('dotenv').config()
 
 const port = process.env.PUPPETEER_PORT
-const host = process.env.PUPPETEER_HOST
-const openChrome = process.env.PUPPETEER_OPEN_CHROME
-const chromePath =  process.env.PUPPETEER_CHROME_PATH
 
 module.exports = {
   server: {
-    command: `http-server`,
+    command: `http-server -a 127.0.0.1 --port ${port} ./`,
     port: port,
     launchTimeout: 1000
   },
@@ -21,7 +18,7 @@ module.exports = {
       width:1200,
       height:1080
     },
-    executablePath: chromePath
+    // executablePath: chromePath
   },
   browserContext: 'default',
 }
