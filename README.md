@@ -1,2 +1,2 @@
-# Beast-ORM
-ORM for client web app width indexedDB as storage.
+# Beast ORM
+An ORM wrapper for accessing indexedDB as a promise base api implementation.
