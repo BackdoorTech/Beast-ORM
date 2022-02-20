@@ -33,5 +33,15 @@
   "bugs": {
     "url": "https://github.com/BackdoorTech/Beast-ORM/issues"
   },
+  "keywords": [
+    "indexeddb",
+    "indexed-db",
+    "browser",
+    "database",
+    "model",
+    "storage",
+    "browser",
+    "browsermodel"
+  ],
   "homepage": "https://github.com/BackdoorTech/Beast-ORM#readme"
 }
