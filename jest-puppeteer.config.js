@@ -1,6 +1,6 @@
 // jest-puppeteer.config.js
 require('dotenv').config()
-const chromePath =  process.env.PUPPETEER_CHROME_PATH
+const openChrome = process.env.PUPPETEER_OPEN_CHROME
 const port = process.env.PUPPETEER_PORT
 
 module.exports = {
