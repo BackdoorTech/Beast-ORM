@@ -1,4 +1,4 @@
-import {Fields as _Fields} from './../../dist/src/models/field/fields'
+import {CharField, JsonField} from './../../dist/src/models/field/fields'
 import {Model as _Model} from './../../dist/src/models/model'
 
 const _port = process.env.PUPPETEER_PORT

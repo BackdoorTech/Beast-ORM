@@ -8,3 +8,9 @@ export function CharField(data?: { maxLength?: number; minLength?: number }) {
 export function JsonField(data?: { maxLength?: number; minLength?: number }) {
     return new _JsonField(data)
 };
+
+
+export default {
+    CharField,
+    JsonField
+}
