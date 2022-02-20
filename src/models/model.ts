@@ -1,4 +1,5 @@
 import { CharField } from './field/char-field.js'
+import { getFields } from './get-model-fields-from-string/get-model-field-from-text.js'
 
 new CharField()
 // import "reflect-metadata";

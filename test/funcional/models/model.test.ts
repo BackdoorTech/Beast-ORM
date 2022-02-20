@@ -1,9 +1,9 @@
-import * as _Fields from './../../dist/src/models/field/fields'
-import {Model as _Model} from './../../dist/src/models/model'
+import * as _Fields from '../../../dist/src/models/field/fields'
+import {Model as _Model} from '../../../dist/src/models/model'
 
 const _port = process.env.PUPPETEER_PORT
 
-describe("initial test", () => {
+describe("initial test for model", () => {
   
   beforeAll(async () => {
     await page.goto(`http://127.0.0.1:${_port}/test/index.html`)

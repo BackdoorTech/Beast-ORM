@@ -8,8 +8,3 @@ export declare function JsonField(data?: {
     maxLength?: number;
     minLength?: number;
 }): _JsonField;
-declare const _default: {
-    CharField: typeof CharField;
-    JsonField: typeof JsonField;
-};
-export default _default;

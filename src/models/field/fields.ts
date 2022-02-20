@@ -9,8 +9,3 @@ export function JsonField(data?: { maxLength?: number; minLength?: number }) {
     return new _JsonField(data)
 };
 
-
-export default {
-    CharField,
-    JsonField
-}

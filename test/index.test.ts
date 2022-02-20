@@ -1,7 +1,7 @@
 require('dotenv').config()
 const port = process.env.PUPPETEER_PORT
 
-describe("initial test", () => {
+describe("page load", () => {
   beforeAll(async () => {
     await page.goto(`http://127.0.0.1:${port}/test/index.html`)
   })

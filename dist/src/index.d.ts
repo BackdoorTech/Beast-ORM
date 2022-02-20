@@ -1,3 +1,3 @@
-import { Model } from './models/model.js';
-import * as Fields from './models/field/fields.js';
+import { Model } from './models/model';
+import * as Fields from './models/field/fields';
 export { Model, Fields };

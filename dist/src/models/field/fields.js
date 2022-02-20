@@ -8,7 +8,3 @@ export function JsonField(data) {
     return new _JsonField(data);
 }
 ;
-export default {
-    CharField,
-    JsonField
-};
