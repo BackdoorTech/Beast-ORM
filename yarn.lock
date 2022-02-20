@@ -1570,6 +1570,16 @@ commondir@^1.0.1:
   resolved "https://registry.yarnpkg.com/commondir/-/commondir-1.0.1.tgz#ddd800da0c66127393cca5950ea968a3aaf1253b"
   integrity sha1-3dgA2gxmEnOTzKWVDqloo6rxJTs=
 
+complexion-js@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/complexion-js/-/complexion-js-0.2.2.tgz#ed6191ba655638f56ca5df8d5da8a1f0fbb09734"
+  integrity sha512-qxqJq0nEBwSEZtoqK8bHIR2VwzbPatjtlU+ZH9IPObitTQqa2xMEryoAlCsjOH+ATgIScHt0aiCUBabPG2Mmcg==
+
+complexion@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/complexion/-/complexion-0.2.2.tgz#c52bd37ad92b3b5cb4d383a240acf4b6bfe32517"
+  integrity sha512-YAfDsYc27CsPQPzZU4i1OklMCyigN7VHPylWba0AWf5VmVr34NpLhHjJm0gumFh9m2aX8fYGCTTgne7oLfXXug==
+
 component-emitter@^1.2.1:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/component-emitter/-/component-emitter-1.3.0.tgz#16e4070fba8ae29b679f2215853ee181ab2eabc0"
@@ -3860,6 +3870,11 @@ onetime@^5.1.2:
   dependencies:
     mimic-fn "^2.1.0"
 
+option-parser@^1.0.0:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/option-parser/-/option-parser-1.0.2.tgz#f2b872f5dfb0bb84f082ad1103e978a1152f70dc"
+  integrity sha512-Q56FmRi6TZX+S9jAl9f0Tnrk7W8faAZULf6Y0IgJR6Cy7/MxhzvBFoyL1Sz2DD7WbOY2Fxtkz2S/3kzlbn/VsQ==
+
 optionator@^0.8.1:
   version "0.8.3"
   resolved "https://registry.yarnpkg.com/optionator/-/optionator-0.8.3.tgz#84fa1d036fe9d3c7e21d99884b601167ec8fb495"
@@ -4028,6 +4043,21 @@ pretty-format@^27.0.0, pretty-format@^27.5.1:
     ansi-regex "^5.0.1"
     ansi-styles "^5.0.0"
     react-is "^17.0.1"
+
+pretty-js@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/pretty-js/-/pretty-js-0.2.2.tgz#b67e6765bf1189f110036b7043c8789d18ca13f4"
+  integrity sha512-SJIz4tGlSC4LBqSAb82yf1911C4HGILMiDoNn4aoYuHetdFbefdIyMHZ9c1mDsiv0CNSn9ac/kNM1xXdujZ/AA==
+  dependencies:
+    complexion "^0.2.2"
+    complexion-js "^0.2.2"
+    option-parser "^1.0.0"
+    process-files "^1.0.0"
+
+process-files@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/process-files/-/process-files-1.0.0.tgz#2d1ab8487675221841aa2bfdf22085614d588f23"
+  integrity sha1-LRq4SHZ1IhhBqiv98iCFYU1YjyM=
 
 progress@2.0.3:
   version "2.0.3"

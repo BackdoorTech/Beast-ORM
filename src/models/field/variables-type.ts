@@ -1,7 +1,7 @@
-import { CharField } from './field/char-field.js'
+export class variablesType {
+    
+}
 
-new CharField()
-// import "reflect-metadata";
 export var Model = /** @class */ (function () {
     function Model(obj_data) {
         //Instance Model Events
@@ -14,15 +14,13 @@ export var Model = /** @class */ (function () {
     Model.prototype.getModelName = function () {
         return this.static.getModelName();
     };
-    
-    //***************************************
-    //*********** STATIC ********************
-    //***************************************
+
+
     Model.getModelName = function () {
         if (!this.model_name)
             this.model_name = this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
         return this.model_name;
     };
-
+   
     return Model;
 }());

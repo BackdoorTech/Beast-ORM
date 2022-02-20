@@ -4,9 +4,10 @@
   "version": "1.0.0",
   "main": "./dist/src/index.js",
   "scripts": {
-    "build:development": "tsc --build tsconfig.json",
-    "build:production": "webpack --config=webpack.config.js --mode=production",
-    "test": "jest"
+    "build:development": "cp src/models/model.* ./dist/src/models/  && cp src/****.d.ts ./dist/src/ && tsc --build tsconfig.json",
+    "build:production": "webpack --config=webpack.config.js --mode=development",
+    "test": "jest",
+    "test:fast": "yarn build:development && yarn build:production && yarn test"
   },
   "dependencies": {
     "@babel/core": "^7.17.5",
@@ -15,6 +16,7 @@
     "dotenv": "^16.0.0",
     "jest": "^27.5.1",
     "jest-puppeteer": "^6.1.0",
+    "pretty-js": "^0.2.2",
     "puppeteer": "^13.3.2",
     "ts-jest": "^27.1.3",
     "ts-jest-puppeteer": "^0.0.5",

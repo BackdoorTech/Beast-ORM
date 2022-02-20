@@ -7,11 +7,11 @@ module.exports = {
   server: {
     command: `http-server -a 127.0.0.1 --port ${port} ./`,
     port: port,
-    launchTimeout: 1000
+    launchTimeout: 3000
   },
   launch: {
     dumpio: true,
-    headless: true,
+    headless: false,
     product: 'chrome',
     args: [`--window-size=1200,1080`],
     defaultViewport: {
