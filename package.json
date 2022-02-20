@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "./dist/src/index.js",
   "scripts": {
-    "build:development": "cp src/models/model.* ./dist/src/models/  && cp src/****.d.ts ./dist/src/ && tsc --build tsconfig.json",
+    "build:development": "tsc --build tsconfig.json",
     "build:production": "webpack --config=webpack.config.js --mode=development",
     "test": "jest",
     "test:fast": "yarn build:development && yarn build:production && yarn test"

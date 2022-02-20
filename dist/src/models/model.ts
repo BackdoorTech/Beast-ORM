@@ -8,7 +8,7 @@ export class Model  {
     model_name: any
     
     constructor(obj_data) {
-        Object.assign(this, obj_data || {});   
+        Object.assign(this, obj_data || {});
     }
 
     getModelName () {
