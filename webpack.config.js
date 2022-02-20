@@ -2,9 +2,12 @@ const path = require('path');
 const webpack = require("webpack");
 
 module.exports = {
-  entry: './dist/src/index.js',
+  entry: {
+    'beast-orm': './dist/src/index.js',
+    'beast-orm-test': './dist/src/test.js',
+  },
   output: {
-    filename: './beast-orm.js',
+    filename: '[name].js',
   },
   optimization: {
     minimize: true

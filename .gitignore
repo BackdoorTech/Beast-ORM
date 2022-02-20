@@ -5,3 +5,5 @@ dist/**/**.js
 dist/**/**.d.ts
 dist/****.js
 dist/****.d.ts
+dist/****.txt
+dist/****.map
