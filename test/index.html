@@ -11,7 +11,15 @@
     <script type="module">
 
       import './../dist/beast-orm-test.js'
-      
+
+      class Person extends Model {
+        username = '1111111'
+        sername = '222222';
+        name = '33333333';
+      }
+
+      window.txt = Person.toString().replace(/\r/g, "").replace(/\n/g, "")
+      window.result = Person.toString().replace(/\r/g, "").replace(/\n/g, "").match(/(\w*)\s*=/g)
 
     </script>
 

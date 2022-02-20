@@ -1,6 +1,7 @@
 node_modules
 .env
 
+dist/src/tsconfig.tsbuildinfo
 dist/beast-orm-test**
 dist/beast-orm***
 dist/beast-orm.**

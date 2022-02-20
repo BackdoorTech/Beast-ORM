@@ -1,7 +1,7 @@
 export declare class Model {
-    static model_name: string;
-    constructor(obj_data?: any);
+    static model_name: any;
+    model_name: any;
+    constructor(obj_data: any);
     getModelName(): any;
-    static getModelName(): string;
+    static getModelName(): any;
 }
-export declare let Col: (options?: any) => any;
