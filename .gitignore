@@ -1,9 +1,8 @@
 node_modules
 .env
 
-dist/**/**.js
-dist/**/**.d.ts
-dist/****.js
-dist/****.d.ts
+dist/beast-orm-test**
+dist/beast-orm***
+dist/beast-orm.**
 dist/****.txt
 dist/****.map
