@@ -4,10 +4,9 @@
   "version": "1.0.0",
   "main": "./dist/src/index.js",
   "scripts": {
-    "build:development": "tsc --build tsconfig.json",
-    "build:production": "webpack --config=webpack.config.js --mode=development",
+    "build": "tsc --build tsconfig.json && webpack --config=webpack.config.js --mode=development",
     "test": "jest",
-    "test:fast": "yarn build:development && yarn build:production && yarn test"
+    "test:fast": "yarn build && yarn test"
   },
   "dependencies": {
   },

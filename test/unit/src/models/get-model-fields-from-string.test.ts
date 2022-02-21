@@ -57,7 +57,36 @@ describe("src/models/get-model-fields-from-string/FieldsInText.ts", () => {
   
       // debugger
   
-      await page.waitForFunction(() => '["this.username = CharField({ maxLength: 90 });"]');
+      await page.waitForFunction(() => '["this.username=CharField({ maxLength: 90 });"]');
+  
+      expect('time not exceeded').toBe('time not exceeded')
+    }, 20000)
+
+
+    it('getMatchAllField', async () => {
+
+      await page.waitForFunction(() => 'Model' in window);
+  
+      await page.evaluate(() => {
+  
+        const Model: typeof _Model = window['Model']
+        const { CharField, JsonField }: typeof _Fields = window['Fields']
+        const FieldsInText = window['FieldsInText']
+  
+        class Person extends Model {
+          username = CharField({maxLength: 90})
+          firstName = CharField({maxLength: 90})
+        } 
+  
+        const oneLineText = FieldsInText.textToOneLine(Person.toString())
+        const matchFields = FieldsInText.getMatchAllField(oneLineText)
+
+        document.body.innerHTML = JSON.stringify(matchFields)
+      })
+  
+      debugger
+  
+      await page.waitForFunction(() => '["this.username = CharField({ maxLength: 90 })"," this.firstName = CharField({ maxLength: 90 })"]');
   
       expect('time not exceeded').toBe('time not exceeded')
     }, 20000)
@@ -86,11 +115,41 @@ describe("src/models/get-model-fields-from-string/FieldsInText.ts", () => {
         document.body.innerHTML = JSON.stringify(declaration)
       })
   
-      // debugger
+      debugger
   
-      await page.waitForFunction(() => '{"username ":" CharField({ maxLength: 90 })"}');
+      await page.waitForFunction(() => '{sdfsdfsd');
   
       expect('time not exceeded').toBe('time not exceeded')
-    }, 20000)
+    }, 40000)
+
+
+    it('getDeclarations 2 fields', async () => {
+
+      await page.waitForFunction(() => 'Model' in window);
+  
+      await page.evaluate(() => {
+  
+        const Model: typeof _Model = window['Model']
+        const { CharField, JsonField }: typeof _Fields = window['Fields']
+        const FieldsInText = window['FieldsInText']
+  
+        class Person extends Model {
+          username = CharField({maxLength: 90})
+          first = CharField({maxLength: 90,minLength:0})
+        } 
+  
+        const oneLineText = FieldsInText.textToOneLine(Person.toString())
+        const matchFields = FieldsInText.getMatchAllField(oneLineText)
+        const declaration = FieldsInText.getDeclarations(matchFields)
+
+        document.body.innerHTML = JSON.stringify(declaration)
+      })
+  
+      debugger
+  
+      await page.waitForFunction(() => '{"username":{"maxLength":90},"first":{"maxLength":90,"minLength":0}}');
+  
+      expect('time not exceeded').toBe('time not exceeded')
+    }, 40000)
 
 })
