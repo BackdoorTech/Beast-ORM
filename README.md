@@ -42,8 +42,8 @@ export class User extends Model {
     username = CharField({maxLength: 100})
     email = CharField({require: true})
 
-    fullName() {
-        return this.first + ' ' + this.last;
+    hello() {
+        return 'hello' + this.username;
     }
 
 }
@@ -59,7 +59,7 @@ const userFound = User.find({username:'Peter', email:'Peter@gmail.com'}).first()
 
 // true
 if(CreatedUser.username == userFound.username )  {
-    console.log(userFound.fullName())
+    console.log(userFound.hello())
 }
 
 ```
