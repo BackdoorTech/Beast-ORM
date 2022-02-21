@@ -1,22 +1,24 @@
 import * as Fields from './../field/fields.js';
 export class FieldsInText {
+    // this method was created to be private
     static textToOneLine(text) {
         return text.replace(/\r/g, "").replace(/\n/g, "");
     }
+    // this method was created to be private
     static getMatchAllField(oneLineString) {
-        let Fields = oneLineString.toString()
+        let fields = oneLineString.toString()
             .match(/this.(\w*\s*)=.+([)];)/g).map((e) => {
             return e.split(';');
         })[0] || [];
-        Fields.map((e) => {
+        fields.map((e) => {
             return e.split(';');
         });
-        Fields = Fields.slice(0, -1);
-        console.log('Fields', Fields);
-        return Fields;
+        fields = fields.slice(0, -1);
+        return fields;
     }
+    // this method was created to be private
     static getDeclarations(matchAllField) {
-        let declarations = {};
+        const declarations = {};
         matchAllField.forEach((declaration) => {
             declaration = declaration
                 .replace('this.', '') // remove this. keyword
@@ -27,13 +29,14 @@ export class FieldsInText {
         });
         return declarations;
     }
+    // this method was created to be private
     static FieldTypeAsStringToObject(FieldTypeAsString) {
         var _a;
         const FieldsType = Object.keys(Fields).find((key) => {
             return FieldTypeAsString.startsWith(key);
         });
         const Field = Fields[FieldsType];
-        var regex = new RegExp(`${FieldsType}[(][{]`);
+        const regex = new RegExp(`${FieldsType}[(][{]`);
         let FieldArguments;
         // has argument
         if (((_a = FieldTypeAsString.match(regex)) === null || _a === void 0 ? void 0 : _a.length) == 1) {
@@ -45,6 +48,7 @@ export class FieldsInText {
         }
         return Field();
     }
+    // this method was created to be private
     static stringArgumentToObject(strFieldArguments) {
         strFieldArguments.replace('{ ', '').split(', ').map((e) => {
             return e.split(':')[0];

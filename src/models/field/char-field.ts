@@ -9,5 +9,5 @@ export class CharField extends variablesType{
         super()
         Object.assign(this, data);
     }
-    
+
 }

@@ -7,7 +7,7 @@ new CharField()
 export class Model  {
     static model_name: any;
     model_name: any
-    
+
     constructor(obj_data) {
         Object.assign(this, obj_data || {});
     }
