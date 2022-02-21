@@ -7,8 +7,7 @@
     "build": "tsc --build tsconfig.json && webpack --config=webpack.config.js --mode=development",
     "test": "jest",
     "test:fast": "yarn build && yarn test",
-    "lint": "tslint --fix --config ./tslint.json --project ./tsconfig.json ",
-    "lint:prod": "tslint --config ./tslint.json --project ./tsconfig.json " 
+    "lint:fix": "tslint --fix --config ./tslint.json --project ./tsconfig.json "
   },
   "dependencies": {},
   "devDependencies": {

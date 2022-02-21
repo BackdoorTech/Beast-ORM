@@ -1,24 +1,24 @@
 import { CharField } from './field/char-field.js'
 import { getFields } from './get-model-fields-from-string/get-model-field-from-text.js'
 
-new CharField()
+
 // import "reflect-metadata";
 
 export class Model  {
-    static model_name: any;
-    model_name: any
+    static modelName: any;
+    modelName: any
 
-    constructor(obj_data) {
-        Object.assign(this, obj_data || {});
+    constructor(objData:any) {
+        Object.assign(this, objData || {});
     }
 
     getModelName () {
-        return this.model_name = Model.getModelName();
+        return this.modelName = Model.getModelName();
     }
 
     static getModelName() {
-        if (!this.model_name)
-        this.model_name = this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
-        return this.model_name;
+        if (!this.modelName)
+        this.modelName = this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
+        return this.modelName;
     }
 }

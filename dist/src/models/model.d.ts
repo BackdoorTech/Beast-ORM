@@ -1,7 +1,7 @@
 export declare class Model {
-    static model_name: any;
-    model_name: any;
-    constructor(obj_data: any);
+    static modelName: any;
+    modelName: any;
+    constructor(objData: any);
     getModelName(): any;
     static getModelName(): any;
 }

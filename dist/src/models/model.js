@@ -1,16 +1,14 @@
-import { CharField } from './field/char-field.js';
-new CharField();
 // import "reflect-metadata";
 export class Model {
-    constructor(obj_data) {
-        Object.assign(this, obj_data || {});
+    constructor(objData) {
+        Object.assign(this, objData || {});
     }
     getModelName() {
-        return this.model_name = Model.getModelName();
+        return this.modelName = Model.getModelName();
     }
     static getModelName() {
-        if (!this.model_name)
-            this.model_name = this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
-        return this.model_name;
+        if (!this.modelName)
+            this.modelName = this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
+        return this.modelName;
     }
 }
