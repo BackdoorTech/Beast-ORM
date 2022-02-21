@@ -10,6 +10,8 @@
     "test:fast": "yarn build:development && yarn build:production && yarn test"
   },
   "dependencies": {
+  },
+  "devDependencies": {
     "@babel/core": "^7.17.5",
     "@types/jest": "^27.4.0",
     "babel-loader": "^8.2.3",
@@ -23,15 +25,14 @@
     "webpack": "^5.69.1",
     "webpack-cli": "^4.9.2"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BackdoorTech/Beast-ORM.git"
   },
-  "author": "",
+  "author": "Peter Maquiran <petermaquiran29@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/BackdoorTech/Beast-ORM/issues"
+    "url": "https://github.com/BackdoorTech/Beast-ORM/isgsues"
   },
   "keywords": [
     "indexeddb",
