@@ -58,7 +58,7 @@ const CreatedUser = User.create({username:'Peter', email:'Peter@gmail.com'})
 const userFound = User.find({username:'Peter', email:'Peter@gmail.com'}).first()
 
 // true
-if(CreatedUser.name == userFound.name )  {
+if(CreatedUser.username == userFound.username )  {
     console.log(userFound.fullName())
 }
 
