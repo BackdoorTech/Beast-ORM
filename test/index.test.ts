@@ -8,7 +8,7 @@ describe("page load", () => {
  
   it('load page', async () => {
     await page.waitForSelector('h1')
-    expect(4).toBe(4)
+    expect('time not exceeded').toBe('time not exceeded')
   }, 10000)
 
 })

@@ -3,24 +3,24 @@ export class FieldsInText {
         return text.replace(/\r/g, "").replace(/\n/g, "");
     }
     static getMatchAllField(oneLineString) {
-        return oneLineString.toString().replace(/\r/g, "").replace(/\n/g, "").match(/(\w*)\s*=/g);
+        return oneLineString.toString()
+            .match(/this.(\w*\s*)=.+([)];)/g); // match all declarations
     }
-    static getDeclarations(matchAllField, oneLineString) {
-        let declarations = [];
-        let from = 0;
-        for (let a = 0; a <= matchAllField.length; a++) {
-            let declarationStart = oneLineString.indexOf(matchAllField[a], from);
-            let equal = oneLineString.indexOf("=", declarationStart);
-            let declarationEnd = oneLineString.indexOf(matchAllField[a + 1], equal);
-            from = declarationEnd;
-            const declaration = oneLineString.slice(declarationStart, declarationEnd);
-            declarations.push(declaration);
-        }
+    static getDeclarations(matchAllField) {
+        let declarations = {};
+        matchAllField.forEach((declaration) => {
+            declaration = declaration
+                .replace('this.', '') // remove this. keyword
+                .slice(0, -1); //remove ; the last element on the string
+            const [FieldName, FieldTypeAsString] = declaration.split('=');
+            declarations[FieldName] = FieldTypeAsString;
+        });
+        return declarations;
     }
     static getFieldsAndType(ModelInstance) {
         const oneLineText = this.textToOneLine(ModelInstance.toString());
         const matchFields = this.getMatchAllField(oneLineText);
-        const declaration = this.getDeclarations(matchFields, oneLineText);
+        const declaration = this.getDeclarations(matchFields);
         return declaration;
     }
 }

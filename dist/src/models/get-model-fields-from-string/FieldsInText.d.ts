@@ -1,6 +1,6 @@
 export declare class FieldsInText {
-    private static textToOneLine;
-    private static getMatchAllField;
-    private static getDeclarations;
-    static getFieldsAndType(ModelInstance: any): void;
+    static textToOneLine(text: string): string;
+    static getMatchAllField(oneLineString: string): RegExpMatchArray;
+    static getDeclarations(matchAllField: string[]): {};
+    static getFieldsAndType(ModelInstance: any): {};
 }
