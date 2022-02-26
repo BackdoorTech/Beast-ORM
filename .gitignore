@@ -1,2 +1,4 @@
 node_modules
 dist/src/tsconfig.tsbuildinfo
+test/config/test.json
+.env
