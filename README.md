@@ -45,7 +45,7 @@ User.create({username:'kobe', email:'kobe.bryant@lakers.com'})
 ### Retrieving all objects
 The simplest way to retrieve objects from a table is to get all of them. To do this, use the all() 
 ```javascript
-User.filter({username:'kobe'}).all()
+User.all()
 ```
 
 ### Retrieving specific objects with filters
@@ -58,7 +58,7 @@ User.filter({username:'kobe'}).all()
 
 ```javascript
 
-const user = User.filter({username:'kobe',}).first()
+const user = User.filter({username:'kobe'}).first()
 
 console.log(user.username) // kobe
 
