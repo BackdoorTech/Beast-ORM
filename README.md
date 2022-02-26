@@ -41,7 +41,6 @@ User.create({username:'kobe', email:'kobe.bryant@lakers.com'})
 ```
 
 
-
 ## Retrieving objects
 ### Retrieving all objects
 The simplest way to retrieve objects from a table is to get all of them. To do this, use the all() 
@@ -53,9 +52,9 @@ User.filter({username:'kobe',}).all()
 
 #### 
 
-**Filter** returns objects that match the given lookup parameters.
+**Filter**  - returns objects that match the given lookup parameters.
 
-**Exclude** returns objects that do not match the given lookup parameters.
+**Exclude** - returns objects that do not match the given lookup parameters.
 
 ```javascript
 
