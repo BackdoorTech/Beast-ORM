@@ -10,9 +10,8 @@ A model is a representation of a database table. Feel free to place your models 
 import { models } from 'beast-orm';
 
 class User extends models.Model {
-    
-    username = models.CharField({maxLength: 100})
-    email = models.CharField({require: true})
+  username = models.CharField({maxLength: 100})
+  email = models.CharField({require: true})
 }
 
 ```
@@ -23,9 +22,9 @@ Once you’ve register your data models, automatically gives you a database-abst
 import { models } from 'beast-orm';
 
 models.register({
-    databaseName: 'tutorial',
-    version: 0,
-    models: [User]
+  databaseName: 'tutorial',
+  version: 1,
+  models: [User]
 })
 
 ```
@@ -33,7 +32,7 @@ models.register({
 ## Creating objects
 
 
-the Query builder provides a convenient, fluent interface to creating and running database queries. It can be used to perform most database operations in your frontend application
+the Query builder provides a convenient, fluent interface to creating and running database queries. It can be used to perform most database operations in your frontend application.
 ```javascript
 
 User.create({username:'kobe', email:'kobe.bryant@lakers.com'})
@@ -42,6 +41,7 @@ User.create({username:'kobe', email:'kobe.bryant@lakers.com'})
 
 
 ## Retrieving objects
+The query is not executed as soon as the function is called 
 ### Retrieving all objects
 The simplest way to retrieve objects from a table is to get all of them. To do this, use the all() 
 ```javascript
@@ -63,6 +63,19 @@ const user = User.filter({username:'kobe'}).first()
 console.log(user.username) // kobe
 
 ```
+
+Nested query inside another query, every filter corresponds a query but a filter followed by another filter corresponds a nested query
+```javascript
+
+const user = User.filter({username:'kobe'})
+  .filter({email:'kobe.bryant@lakers.com'}})
+  .execute()
+
+console.log([...])
+
+```
+
+
 <br/>
 <br/>
 
@@ -76,6 +89,7 @@ console.log(user.username) // kobe
 - [browser-orm](https://github.com/brianschardt/browser-orm)
 - [indexeddb-orm](https://github.com/maxgaurav/indexeddb-orm)
 - [use-indexeddb](https://github.com/hc-oss/use-indexeddb)
+- [DjORMgo-js](https://github.com/Antman261/DjORMgo-js)
 
 ## 📜 License
 
