@@ -34,6 +34,6 @@ describe("src/models/model.reader.ts", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
 
-  }, 40000)
+  }, 20000)
 
 })
