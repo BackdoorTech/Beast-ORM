@@ -1,0 +1,33 @@
+{
+  "name": "beast-orm",
+  "description": "ORM for accessing indexedDB as a promise base api implementation.",
+  "version": "0.0.0",
+  "main": "",
+  "scripts": {
+  },
+  "devDependencies": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BackdoorTech/Beast-ORM.git"
+  },
+  "author": "Peter Maquiran <petermaquiran29@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BackdoorTech/Beast-ORM/isgsues"
+  },
+  "keywords": [
+    "indexeddb",
+    "indexed-db",
+    "browser",
+    "database",
+    "model",
+    "storage",
+    "browser",
+    "browsermodel",
+    "orm",
+    "offline",
+    "first"
+  ],
+  "homepage": "https://github.com/BackdoorTech/Beast-ORM#readme"
+}
