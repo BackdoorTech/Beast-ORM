@@ -1,9 +1,10 @@
-import { uniqueGenerator } from '../utils.js';
+import { hashCode, uniqueGenerator } from '../utils.js';
 /**
  * @description this variable register all methods called in a single query
  * User.filter(...).filter(...) in this case a single query will contain two filter
  */
 let queries = {} = {};
+let modalSpace = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model {
     constructor(objData) {
@@ -13,6 +14,33 @@ export class Model {
     // this way all methods of the model can be called without creating a new instance of it
     filter(...arg) {
         return Model.filter(arg);
+    }
+    getId() {
+        return Model.getId();
+    }
+    setDBConfig(config) {
+        Model.setDBConfig(config);
+    }
+    getDBSchema() {
+        return Model.getDBSchema();
+    }
+    static getDBSchema() {
+        const id = this.getId();
+        return modalSpace[id].databaseSchema;
+    }
+    // get Model Id, this is the same for every instance
+    static getId() {
+        return hashCode(this.toString());
+    }
+    static setDBConfig(config) {
+        var _a;
+        const id = this.getId();
+        if (((_a = modalSpace[id]) === null || _a === void 0 ? void 0 : _a.databaseSchema) == null) {
+            modalSpace[id] = Object.assign(modalSpace[id] || {}, { databaseSchema: config });
+        }
+        else {
+            throw ('cant register');
+        }
     }
     // filter rows in the tables
     static filter(...arg) {

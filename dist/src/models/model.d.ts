@@ -1,3 +1,4 @@
+import { DatabaseSchema } from './register-modal.interface.js';
 export declare class Model {
     constructor(objData: any);
     filter(...arg: any[]): typeof Model & {
@@ -5,6 +6,12 @@ export declare class Model {
         select: () => void;
         execute(): void;
     };
+    getId(): number;
+    setDBConfig(config: DatabaseSchema): void;
+    getDBSchema(): DatabaseSchema;
+    static getDBSchema(): DatabaseSchema;
+    static getId(): number;
+    static setDBConfig(config: DatabaseSchema): void;
     static filter(...arg: any[]): typeof Model & {
         filter: (a: any, b?: any, c?: any, d?: any) => typeof Model & any;
         select: () => void;

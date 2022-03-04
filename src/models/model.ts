@@ -1,11 +1,16 @@
-import { uniqueGenerator } from '../utils.js'
+import { hashCode, uniqueGenerator } from '../utils.js'
 import { queries } from './model.interface.js'
-
+import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
 /**
  * @description this variable register all methods called in a single query
  * User.filter(...).filter(...) in this case a single query will contain two filter
  */
 let queries : queries = {} = {}
+
+
+let modalSpace: {[key: string]: {
+  databaseSchema : DatabaseSchema 
+}} = {}
 
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model{
@@ -19,6 +24,40 @@ export class Model{
   filter(...arg) {
     return Model.filter(arg)
   }
+
+  getId() {
+    return Model.getId()
+  }
+
+  setDBConfig(config:DatabaseSchema ) {
+    Model.setDBConfig(config)
+  }
+
+  getDBSchema(): DatabaseSchema  {
+    return Model.getDBSchema()
+  }
+  
+  static getDBSchema(): DatabaseSchema  {
+    const id = this.getId()
+    return modalSpace[id].databaseSchema 
+  }
+
+
+  // get Model Id, this is the same for every instance
+  static getId() {
+    return hashCode(this.toString())
+  }
+
+  static setDBConfig(config:DatabaseSchema ) {
+    const id = this.getId() 
+
+    if(modalSpace[id]?.databaseSchema  == null) {  
+      modalSpace[id] = Object.assign(modalSpace[id] || {}, {databaseSchema :config})
+    } else {
+      throw('cant register')
+    }
+  }
+
 
   // filter rows in the tables
   static filter(...arg) {
