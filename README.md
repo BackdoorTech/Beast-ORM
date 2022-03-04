@@ -2,6 +2,19 @@
 
 ORM for accessing indexedDB as a promise base api implementation.
 
+
+## DBMS Support
+
+- indexedDB 
+- Memory
+
+<br/>
+
+## Features
+- Create Models, drop, create, get, filter, remove, count, aggregated functions
+
+<br/>
+
 ## Create model
 
 A model is a representation of a database table. Feel free to place your models anywhere that can be exported
@@ -16,18 +29,25 @@ class User extends models.Model {
 
 ```
 
+<br/>
+
+## Register model
 Once you’ve register your data models, automatically gives you a database-abstraction API for accessing indexedDB as a promise base api implementation that lets you create, retrieve, update and delete objects. Models that belongs to the same database should be register at the same time.
 
 ```javascript
 import { models } from 'beast-orm';
+import { User } from './models/user.js';
 
 models.register({
   databaseName: 'tutorial',
   version: 1,
+  type: 'IndexedDB'
   models: [User]
 })
 
 ```
+
+<br/>
 
 ## Creating objects
 
@@ -39,6 +59,7 @@ User.create({username:'kobe', email:'kobe.bryant@lakers.com'})
 
 ```
 
+<br/>
 
 ## Retrieving objects
 The query is not executed as soon as the function is called 
@@ -48,21 +69,28 @@ The simplest way to retrieve objects from a table is to get all of them. To do t
 User.all()
 ```
 
+<br/>
+
 ### Retrieving specific objects with filters
 
 #### 
 
 **Filter**  - returns objects that match the given lookup parameters.
 
-**Exclude** - returns objects that do not match the given lookup parameters.
+**Exclude** - returns objects that do not match the given lookup 
+
+**get** - return object that match the given lookup 
+
+parameters.
 
 ```javascript
 
-const user = User.filter({username:'kobe'}).first()
+const user = User.get({username:'kobe'})
 
 console.log(user.username) // kobe
 
 ```
+get only works with unique fields
 
 Nested query inside another query, every filter corresponds a query but a filter followed by another filter corresponds a nested query
 ```javascript
