@@ -1,7 +1,7 @@
 import { Model } from './model.js';
 import { ModelReader } from './model.reader.js'
 import { DatabaseSchema  } from './register-modal.interface.js'
-
+import { indexedDB  } from './../connection/indexedDb/indexedb.js'
 interface register {
   databaseName: string,
   version: number,
@@ -45,6 +45,9 @@ export class registerModel {
       
     })
 
+    if(databaseSchema.type =='indexeddb') {
+      indexedDB.migrate(databaseSchema)
+    }
         
     entries.models.forEach((modelClassRepresentations) => {
       modelClassRepresentations.setDBConfig(databaseSchema )

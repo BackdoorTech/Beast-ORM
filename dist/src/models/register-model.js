@@ -1,4 +1,5 @@
 import { ModelReader } from './model.reader.js';
+import { indexedDB } from './../connection/indexedDb/indexedb.js';
 export class registerModel {
     static register(entries) {
         const databaseSchema = {
@@ -29,6 +30,9 @@ export class registerModel {
                 });
             });
         });
+        if (databaseSchema.type == 'indexeddb') {
+            indexedDB.migrate(databaseSchema);
+        }
         entries.models.forEach((modelClassRepresentations) => {
             modelClassRepresentations.setDBConfig(databaseSchema);
         });
