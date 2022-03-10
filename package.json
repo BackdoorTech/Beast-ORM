@@ -1,7 +1,7 @@
 {
   "name": "beast-orm",
   "description": "ORM for accessing indexedDB as a promise base api implementation.",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "./dist/src/index.js",
   "scripts": {
     "watch": "rimraf dist/src && tsc  --watch",
