@@ -19,20 +19,8 @@ export declare class Model extends ModelManager {
     save(): Promise<void>;
     create(arg: any): Promise<any>;
     delete(): Promise<void>;
-    all(): Promise<{
-        filter: (...args: any[]) => typeof Model & any;
-        execute: () => Promise<any>;
-        update: (args: any) => Promise<any>;
-        delete: () => Promise<any>;
-        all: () => Promise<any>;
-    }>;
-    static all(): Promise<{
-        filter: (...args: any[]) => typeof Model & any;
-        execute: () => Promise<any>;
-        update: (args: any) => Promise<any>;
-        delete: () => Promise<any>;
-        all: () => Promise<any>;
-    }>;
+    all(): Promise<any>;
+    static all(): Promise<any>;
     static get(arg: getParams): Promise<any>;
     private static getId;
     static getModelName(): string;
@@ -48,6 +36,7 @@ export declare class Model extends ModelManager {
     static getTableSchema(): TableSchema;
     static create(arg: any): Promise<any>;
     static updateOrCreate(argToFind: any, argsToUpdate: any): Promise<any>;
+    static update(arg: any): Promise<any>;
     static object: ({ queryId, some, DBconfig, TableSchema }: {
         queryId?: string;
         some?: any;

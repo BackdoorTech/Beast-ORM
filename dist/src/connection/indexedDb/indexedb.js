@@ -153,7 +153,7 @@ class _indexedDB {
             return {
                 select: async (methods) => {
                     if (methods[0].methodName == 'all') {
-                        this.getActions(TableSchema.name, config).getAll();
+                        return await this.getActions(TableSchema.name, config).getAll();
                     }
                     else if (methods[0].methodName == 'get') {
                         const args = methods[0].arguments;
@@ -198,7 +198,7 @@ class _indexedDB {
                             await this.getActions(TableSchema.name, config).update(args, idValue);
                         }
                     }
-                    else if (methods[methods.length - 1].methodName == 'update') {
+                    else if (methods[0].methodName != 'update' && methods[methods.length - 1].methodName == 'update') {
                         const argsToUpdate = methods[methods.length - 1].arguments;
                         const customMethods = Object.create(methods);
                         customMethods[methods.length - 1].methodName = 'execute';
@@ -207,6 +207,10 @@ class _indexedDB {
                             const updateRow = Object.assign(row, argsToUpdate);
                             await this.getActions(TableSchema.name, config).update(updateRow);
                         }
+                    }
+                    else if (methods[0].methodName == 'update') {
+                        const argsToUpdate = methods[0].arguments;
+                        await this.getActions(TableSchema.name, config).update(argsToUpdate);
                     }
                 },
                 delete: async (methods) => {

@@ -83,13 +83,13 @@ export class Model extends ModelManager{
   async all() {
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
-    return await Model.object({DBconfig, TableSchema,some:['all', null]})
+    return await Model.object({DBconfig, TableSchema}).all()
   }
   
   static async all() {
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
-    return await Model.object({DBconfig, TableSchema,some:['all', null]})
+    return await Model.object({DBconfig, TableSchema}).all()
   }
   
   static async get(arg: getParams) {
@@ -204,6 +204,16 @@ export class Model extends ModelManager{
     }
   }
 
+
+  static async update(arg) {
+
+    const DBconfig = this.getDBSchema()
+    const TableSchema = this.getTableSchema()
+    const _methods: Method[] = [{methodName: 'update', arguments: arg}]
+
+    return  await super.obj(DBconfig, TableSchema).update(_methods)
+  }
+
   static object = ({queryId=uniqueGenerator(), some = null, DBconfig, TableSchema}) => {
 
     if(!methods[queryId]) {
@@ -240,7 +250,8 @@ export class Model extends ModelManager{
         methods[queryId] = []
         return await super.obj(DBconfig, TableSchema).delete(_methods)
 
-      }, all: async() => {
+      },
+      all: async() => {
 
         methods[queryId].push({methodName: 'all', arguments: null})
         const _methods: Method[] = methods[queryId]

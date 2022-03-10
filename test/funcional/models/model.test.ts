@@ -14,7 +14,7 @@ describe("initial test for model", () => {
   
     await page.waitForFunction(() => 'models' in window);
 
-    await page.evaluate(() => {
+    await page.evaluate(async() => {
 
       const models: typeof modelsType = window['models']
 
@@ -22,7 +22,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      models.register({
+      await models.register({
         databaseName:'jest-test',
         type: 'indexeddb',
         version: 1,
@@ -53,7 +53,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      models.register({
+      await models.register({
         databaseName:'jest-test',
         type: 'indexeddb',
         version: 1,
@@ -86,7 +86,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      models.register({
+      await models.register({
         databaseName:'jest-test',
         type: 'indexeddb',
         version: 1,
@@ -119,7 +119,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      models.register({
+      await models.register({
         databaseName:'jest-test',
         type: 'indexeddb',
         version: 1,
@@ -159,7 +159,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      models.register({
+      await models.register({
         databaseName:'jest-test',
         type: 'indexeddb',
         version: 1,
@@ -196,7 +196,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      models.register({
+      await models.register({
         databaseName:'jest-test',
         type: 'indexeddb',
         version: 1,
@@ -234,7 +234,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      models.register({
+      await models.register({
         databaseName:'jest-test',
         type: 'indexeddb',
         version: 1,
@@ -275,7 +275,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      models.register({
+      await models.register({
         databaseName:'jest-test-model create([{...}])',
         type: 'indexeddb',
         version: 1,
@@ -319,7 +319,7 @@ describe("initial test for model", () => {
         userId = models.AutoField({primaryKey:true})
       } 
 
-      models.register({
+      await models.register({
         databaseName:'jest-test',
         type: 'indexeddb',
         version: 1,
@@ -344,5 +344,78 @@ describe("initial test for model", () => {
     
   }, 10000)
 
+
+
+  it('static update', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      class Person extends models.Model {
+        username =  models.CharField({maxLength:0})
+        userId = models.AutoField({primaryKey:true})
+      } 
+
+      await models.register({
+        databaseName:'jest-test',
+        type: 'indexeddb',
+        version: 1,
+        models: [Person]
+      })
+
+      const createdUser = await Person.create({username:'Peter'})
+
+      createdUser.username = 'nice'
+
+      await Person.update(createdUser)
+
+      const rows = await Person.filter({username:'nice'}).execute()
+
+      document.body.innerHTML = JSON.stringify(rows)
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"username":"nice","userId":1}]')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+
+  it('all()', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      class Person extends models.Model {
+        username =  models.CharField({maxLength:0})
+        userId = models.AutoField({primaryKey:true})
+      } 
+
+      await models.register({
+        databaseName:'jest-test',
+        type: 'indexeddb',
+        version: 1,
+        models: [Person]
+      })
+
+      const createdUser = await Person.create({username:'Peter'})
+
+      const rows = await Person.all()
+      document.body.innerHTML = JSON.stringify(rows)
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"username":"nice","userId":1}]')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
 
 })

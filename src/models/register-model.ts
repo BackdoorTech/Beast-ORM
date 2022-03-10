@@ -12,7 +12,7 @@ interface register {
 export const models = {}
 
 export class registerModel {
-  static register(entries: register) {
+  static async register(entries: register) {
     
     const databaseSchema : DatabaseSchema  = {
       databaseName: entries.databaseName,
@@ -21,7 +21,7 @@ export class registerModel {
       stores: []
     };
 
-    entries.models.forEach((modelClassRepresentations, index) => {
+    await entries.models.forEach(async(modelClassRepresentations, index) => {
       const {fields, modelName, attributes , fieldTypes} = ModelReader.read(modelClassRepresentations)
       
       const idFieldName = attributes?.primaryKey?.shift()
@@ -35,7 +35,7 @@ export class registerModel {
         fields: [],
       })
 
-      Object.entries(fields).forEach(([fieldName, Field]) => {
+      await Object.entries(fields).forEach(async([fieldName, Field]) => {
         // dont register fields that is primary key and auto increment
         if(!(Field?.primaryKey && Field?.autoIncrement)) {
           
@@ -57,7 +57,7 @@ export class registerModel {
       indexedDB.migrate(databaseSchema)
     }
 
-    entries.models.forEach((modelClassRepresentations) => {
+    await entries.models.forEach(async(modelClassRepresentations) => {
       modelClassRepresentations.setDBConfig(databaseSchema )
       
       const ModelName = modelClassRepresentations.getModelName()
