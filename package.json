@@ -5,6 +5,7 @@
   "main": "./dist/src/index.js",
   "scripts": {
     "watch": "rimraf dist/src && tsc  --watch",
+    "install": "tsc",
     "test": "jest"
   },
   "devDependencies": {
