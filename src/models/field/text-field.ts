@@ -1,18 +1,16 @@
-
 import { FieldType } from '../../sql/query/interface.js'
 import { field } from './field.js'
-import { CharFieldParams } from './interface.js'
-export class CharField extends field{
+import { TextFieldParams } from './interface.js'
+
+export class TextField  extends field{
 	maxLength?:number | undefined
 	minLength?:number | undefined
-	choices?: any[] | undefined
 	primaryKey?: boolean
 
-	type = FieldType.DATE
+	type: FieldType.TEXT
 	
-	constructor(data?:CharFieldParams) {
+	constructor(data?:TextFieldParams) {
 		super()
 		Object.assign(this, data);
 	}
-
 }

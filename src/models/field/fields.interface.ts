@@ -1,8 +1,14 @@
 import * as Fields from './fields.js'
 
 export const FieldKeysArray = [
-    'CharField',
+    'CharField', 
     'JsonField',
+    'AutoField',
+    'BigIntegerField',
+    'DateField',
+    'IntegerField',
+    'TextField',
+    'BooleanField'
 ] as const; // TS3.4 syntax
 
 

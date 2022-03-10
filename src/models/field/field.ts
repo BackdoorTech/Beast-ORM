@@ -1,4 +1,4 @@
-export class field {
+export class field{
     
 	primaryKey?
 	maxLength?:number | undefined
