@@ -1,3 +1,3 @@
 import {Model} from './model.js'
 
-export type queries = {[key: string]: {methodName:string, arguments: Array<any> }[] }
+export type Methods = {[key: string]: {methodName:string, arguments: Array<any> }[] }

@@ -1,6 +1,12 @@
 export const FieldKeysArray = [
     'CharField',
     'JsonField',
+    'AutoField',
+    'BigIntegerField',
+    'DateField',
+    'IntegerField',
+    'TextField',
+    'BooleanField'
 ]; // TS3.4 syntax
 export const AttributesArray = [
     'maxLength',

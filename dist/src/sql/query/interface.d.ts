@@ -6,5 +6,6 @@ export declare enum FieldType {
     VARCHAR = 4,
     DATE = 5,
     BOOL = 6,
-    CHAR = 7
+    CHAR = 7,
+    JSON = 8
 }

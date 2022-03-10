@@ -4,7 +4,7 @@ import { ModelManager } from './model-manager.js';
  * @description this variable register all methods called in a single query
  * User.filter(...).filter(...) in this case a single query will contain two filter
  */
-let queries = {} = {};
+let methods = {} = {};
 let modalSpace = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model extends ModelManager {
@@ -69,8 +69,8 @@ export class Model extends ModelManager {
  * @returns all method that can be executed again on this class after executing one like
  */
 Model.object = (queryId, some) => {
-    if (!queries[queryId]) {
-        queries[queryId] = [];
+    if (!methods[queryId]) {
+        methods[queryId] = [];
     }
     // all first method called execute this 
     // User."filter()".filter()
@@ -84,7 +84,7 @@ Model.object = (queryId, some) => {
     return {
         filter: (a, b, c, d) => {
             // register the function name is the query
-            queries[queryId].push({ methodName: 'filter', arguments: [a, b, c, d] });
+            methods[queryId].push({ methodName: 'filter', arguments: [a, b, c, d] });
             // return self and merge all method of the property object to self
             return Object.assign(Model, Model.object(queryId));
         },

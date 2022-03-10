@@ -8,5 +8,6 @@ export var FieldType;
     FieldType[FieldType["DATE"] = 5] = "DATE";
     FieldType[FieldType["BOOL"] = 6] = "BOOL";
     FieldType[FieldType["CHAR"] = 7] = "CHAR";
+    FieldType[FieldType["JSON"] = 8] = "JSON";
 })(FieldType || (FieldType = {}));
 //

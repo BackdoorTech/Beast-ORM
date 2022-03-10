@@ -71,6 +71,7 @@ class _indexedDB {
                             this.validateBeforeTransaction(db, currentStore, reject);
                             let tx = this.createTransaction(db, "readwrite", currentStore, resolve, reject);
                             let objectStore = tx.objectStore(currentStore);
+                            console.log(value, key);
                             let request = objectStore.add(value, key);
                             request.onsuccess = (e) => {
                                 var _a, _b;

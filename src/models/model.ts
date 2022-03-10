@@ -1,12 +1,12 @@
 import { hashCode, uniqueGenerator } from '../utils.js'
-import { queries } from './model.interface.js'
+import { Methods } from './model.interface.js'
 import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
 import { ModelManager } from './model-manager.js';
 /**
  * @description this variable register all methods called in a single query
  * User.filter(...).filter(...) in this case a single query will contain two filter
  */
-let queries : queries = {} = {}
+let methods : Methods = {} = {}
 
 
 let modalSpace: {[key: string]: {
@@ -92,8 +92,8 @@ export class Model extends ModelManager{
    */
   static object = (queryId, some?) => {
 
-    if(!queries[queryId]) {
-      queries[queryId] = []
+    if(!methods[queryId]) {
+      methods[queryId] = []
     }
 
     // all first method called execute this 
@@ -109,7 +109,7 @@ export class Model extends ModelManager{
     return {
       filter: (a, b?, c?, d?)=> {
         // register the function name is the query
-        queries[queryId].push({methodName: 'filter', arguments: [a, b, c, d]})
+        methods[queryId].push({methodName: 'filter', arguments: [a, b, c, d]})
 
         // return self and merge all method of the property object to self
         return Object.assign(Model, Model.object(queryId))

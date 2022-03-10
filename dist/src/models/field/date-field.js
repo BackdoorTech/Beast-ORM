@@ -1,9 +1,8 @@
 import { FieldType } from '../../sql/query/interface.js';
 import { field } from './field.js';
-export class CharField extends field {
-    constructor(data) {
+export class DateField extends field {
+    constructor() {
         super();
         this.type = FieldType.DATE;
-        Object.assign(this, data);
     }
 }
