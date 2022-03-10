@@ -1,0 +1,33 @@
+const FilterFunction = [
+    'exact',
+    'iexact',
+    'contains',
+    'icontains',
+    'in',
+    'gt',
+    'gte',
+    'lt',
+    'lte',
+    'startswith',
+    'istartswith',
+    'endswith',
+    'iendswith',
+    'range',
+    'year',
+    'iso_year',
+    'month',
+    'day',
+    'week',
+    'week_day',
+    'iso_week_day',
+    'quarter',
+    'time',
+    'hour',
+    'minute',
+    'second',
+    'isnull',
+    'regex',
+    'iregex'
+] as const;
+
+export type FilterFunctionKey = typeof FilterFunction[number]; 
