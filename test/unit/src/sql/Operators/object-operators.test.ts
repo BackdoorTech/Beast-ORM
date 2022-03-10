@@ -20,7 +20,7 @@ describe("comparisonOperator", () => {
 				username =  models.CharField({maxLength:0})
 			} 
 
-			models.register({
+			await models.register({
         databaseName:'jest-test',
         type: 'indexeddb',
         version: 1,
@@ -56,7 +56,7 @@ describe("comparisonOperator", () => {
 				username =  models.CharField({maxLength:0})
 			} 
 
-			models.register({
+			await models.register({
         databaseName:'jest-test',
         type: 'indexeddb',
         version: 1,
@@ -93,7 +93,7 @@ describe("comparisonOperator", () => {
 				username =  models.CharField({maxLength:0})
 			} 
 
-			models.register({
+			await models.register({
         databaseName:'jest-test',
         type: 'indexeddb',
         version: 1,
@@ -130,7 +130,7 @@ describe("comparisonOperator", () => {
 				username =  models.CharField({maxLength:0})
 			} 
 
-			models.register({
+			await models.register({
         databaseName:'jest-test',
         type: 'indexeddb',
         version: 1,
@@ -169,7 +169,7 @@ describe("comparisonOperator", () => {
 				username =  models.CharField({maxLength:0})
 			} 
 
-			models.register({
+			await models.register({
         databaseName:'jest-test',
         type: 'indexeddb',
         version: 1,
@@ -207,7 +207,7 @@ describe("comparisonOperator", () => {
 				username =  models.CharField({maxLength:0})
 			} 
 
-			models.register({
+			await models.register({
         databaseName:'jest-test',
         type: 'indexeddb',
         version: 1,

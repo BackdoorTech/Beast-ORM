@@ -7,6 +7,6 @@ interface register {
 }
 export declare const models: {};
 export declare class registerModel {
-    static register(entries: register): void;
+    static register(entries: register): Promise<void>;
 }
 export {};

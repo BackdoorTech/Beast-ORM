@@ -5,7 +5,6 @@ ORM for accessing indexedDB as a promise base api implementation.
 ## DBMS Support
 
 - IndexedDB
-- Memory **(Upcoming next version)**
 - Sqlite **(Will be publish in version 2.0.0)**
 
 <br/>
@@ -45,7 +44,7 @@ import { User } from './models/user.js';
 models.register({
   databaseName: 'tutorial',
   version: 1,
-  type: 'IndexedDB'
+  type: 'IndexedDB',
   models: [User]
 })
 

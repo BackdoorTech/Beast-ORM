@@ -6,7 +6,8 @@ export const FieldKeysArray = [
     'DateField',
     'IntegerField',
     'TextField',
-    'BooleanField'
+    'BooleanField',
+    'IndDbJsonField'
 ]; // TS3.4 syntax
 export const AttributesArray = [
     'maxLength',

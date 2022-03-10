@@ -9,7 +9,6 @@ export class filter {
 		const operationsResult = await operator.run(this.arg)
 
 		if(operationsResult == true) {
-			console.log('add row', row)
 			this.rows.push(row)
 		}
 	}

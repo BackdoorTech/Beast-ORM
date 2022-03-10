@@ -56,12 +56,12 @@ export class Model extends (_b = ModelManager) {
     async all() {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
-        return await Model.object({ DBconfig, TableSchema, some: ['all', null] });
+        return await Model.object({ DBconfig, TableSchema }).all();
     }
     static async all() {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
-        return await Model.object({ DBconfig, TableSchema, some: ['all', null] });
+        return await Model.object({ DBconfig, TableSchema }).all();
     }
     static async get(arg) {
         const _methods = [{ methodName: 'get', arguments: arg }];
@@ -147,6 +147,12 @@ export class Model extends (_b = ModelManager) {
             return newInstance;
         }
     }
+    static async update(arg) {
+        const DBconfig = this.getDBSchema();
+        const TableSchema = this.getTableSchema();
+        const _methods = [{ methodName: 'update', arguments: arg }];
+        return await super.obj(DBconfig, TableSchema).update(_methods);
+    }
 }
 _a = Model;
 Model.object = ({ queryId = uniqueGenerator(), some = null, DBconfig, TableSchema }) => {
@@ -180,7 +186,8 @@ Model.object = ({ queryId = uniqueGenerator(), some = null, DBconfig, TableSchem
             const _methods = methods[queryId];
             methods[queryId] = [];
             return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).delete(_methods);
-        }, all: async () => {
+        },
+        all: async () => {
             methods[queryId].push({ methodName: 'all', arguments: null });
             const _methods = methods[queryId];
             methods[queryId] = [];
