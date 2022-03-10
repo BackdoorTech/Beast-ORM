@@ -24,24 +24,31 @@ export class registerModel {
     entries.models.forEach((modelClassRepresentations, index) => {
       const {fields, modelName, attributes , fieldTypes} = ModelReader.read(modelClassRepresentations)
       
+      const idFieldName = attributes?.primaryKey?.shift()
+
       databaseSchema.stores.push({
         name: modelName,
         id: { 
-          keyPath: attributes?.primaryKey?.shift() || 'id',
-          autoIncrement: attributes?.primaryKey?.shift() == undefined 
+          keyPath: idFieldName || 'id', //by default primary key is id
+          autoIncrement:   fields[idFieldName]? fields[idFieldName]?.primaryKey == true: true
         },
         fields: [],
       })
 
       Object.entries(fields).forEach(([fieldName, Field]) => {
-        databaseSchema.stores[index].fields.push({
-          name: fieldName,
-          keyPath: fieldName,
-          options: { 
-            unique: Field?.unique || false,
-            type:  Field.type
-          }
-        })
+        // dont register fields that is primary key and auto increment
+        if(!(Field?.primaryKey && Field?.autoIncrement)) {
+          
+          databaseSchema.stores[index].fields.push({
+            name: fieldName,
+            keyPath: fieldName,
+            options: { 
+              unique: Field?.unique || false,
+              type:  Field.type
+            }
+          })
+
+        }
       })
       
     })
