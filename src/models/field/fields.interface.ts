@@ -8,7 +8,8 @@ export const FieldKeysArray = [
     'DateField',
     'IntegerField',
     'TextField',
-    'BooleanField'
+    'BooleanField',
+    'IndDbJsonField'
 ] as const; // TS3.4 syntax
 
 
