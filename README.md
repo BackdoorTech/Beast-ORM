@@ -2,6 +2,19 @@
 
 ORM for accessing indexedDB as a promise base api implementation.
 
+## DBMS Support
+
+- IndexedDB
+- Memory **(Upcoming next version)**
+- Sqlite **(Will be publish in version 2.0.0)**
+
+<br/>
+
+## Features
+- Create Models, drop, create, get, filter, remove, aggregated functions
+
+<br/>
+
 ## Create model
 
 A model is a representation of a database table. Feel free to place your models anywhere that can be exported
@@ -10,24 +23,35 @@ A model is a representation of a database table. Feel free to place your models 
 import { models } from 'beast-orm';
 
 class User extends models.Model {
+
+  userId = models.AutoField({primaryKey:true})
   username = models.CharField({maxLength: 100})
-  email = models.CharField({require: true})
+  email = models.CharField({blank: true, maxLength: 100})
+  age = models.IntegerField()
+
 }
 
 ```
 
+<br/>
+
+## Register model
 Once you’ve register your data models, automatically gives you a database-abstraction API for accessing indexedDB as a promise base api implementation that lets you create, retrieve, update and delete objects. Models that belongs to the same database should be register at the same time.
 
 ```javascript
 import { models } from 'beast-orm';
+import { User } from './models/user.js';
 
 models.register({
   databaseName: 'tutorial',
   version: 1,
+  type: 'IndexedDB'
   models: [User]
 })
 
 ```
+
+<br/>
 
 ## Creating objects
 
@@ -35,10 +59,13 @@ models.register({
 the Query builder provides a convenient, fluent interface to creating and running database queries. It can be used to perform most database operations in your frontend application.
 ```javascript
 
-User.create({username:'kobe', email:'kobe.bryant@lakers.com'})
+const user = await User.create({username:'kobe', email:'kobe.bryant@lakers.com'})
+// or
+const rows = User.create(arrayUser)
 
 ```
 
+<br/>
 
 ## Retrieving objects
 The query is not executed as soon as the function is called 
@@ -48,33 +75,85 @@ The simplest way to retrieve objects from a table is to get all of them. To do t
 User.all()
 ```
 
+<br/>
+
 ### Retrieving specific objects with filters
 
 #### 
 
 **Filter**  - returns objects that match the given lookup parameters.
 
-**Exclude** - returns objects that do not match the given lookup parameters.
+**get** - return object that match the given lookup 
+
+parameters.
 
 ```javascript
 
-const user = User.filter({username:'kobe'}).first()
+const user = await User.get({username:'kobe'})
 
 console.log(user.username) // kobe
 
 ```
+**get** only works with unique fields
 
-Nested query inside another query, every filter corresponds a query but a filter followed by another filter corresponds a nested query
+
+Filter can have complex lookup parameters
 ```javascript
 
-const user = User.filter({username:'kobe'})
-  .filter({email:'kobe.bryant@lakers.com'}})
-  .execute()
+const users = await User.filter({age:10}).execute()
 
-console.log([...])
 
 ```
+**Field lookup**
 
+- **gt** - greater
+- **gte** - greater or equal
+- **lt** - less
+- **lte** - less or equal
+- **not** - different
+
+Example:
+
+```javascript
+
+const users = await User.filter({age__gt: 10}).execute()
+// sql Select * from User Where age > 10
+
+const users = await User.filter({age__gt: 10, age__lt: 50}).execute()
+// sql Select * from User Where age > 10 AND  age < 50
+
+const users = await User.filter({age: 10, age__lt: 50}, {username: 'kobe'}).execute()
+// sql Select * from User Where age = 10 AND  age < 50 OR username = 'kobe'
+
+const users = await User.filter({age__not: 10}, [{age: 20},{username:'james'}]).execute()
+// sql Select * from User Where not age = 10  OR (age = 20 OR username = 'james')
+
+```
+### Saving changes to objects
+To save changes to an object that’s already in the database, use save().
+```javascript
+
+  const user = await User.get({username:'kobe'})
+  user.username = 'james'
+  user.save()
+```
+### Updating multiple objects at once
+Sometimes you want to set a field to a particular value for all the objects 
+You can do this with the update() method. For example:
+```javascript
+
+  await User.filter({age:10}).update({age:11})
+```
+### Deleting objects
+
+The delete method, conveniently, is named delete(). This method immediately deletes the object and returns the number of objects deleted and a dictionary with the number of deletions per object type. Example:
+
+```javascript
+  const deleteRowsCount = await User.filter({age: 10}).delete()
+	// or
+  const userJames = await User.get({username:'kobe'})
+  userJames.delete()
+```
 
 <br/>
 <br/>
