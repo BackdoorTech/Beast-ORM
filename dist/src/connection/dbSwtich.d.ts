@@ -1,4 +1,5 @@
-import { DatabaseSchema } from '../models/register-modal.interface.js';
+import { DatabaseSchema, TableSchema } from '../models/register-modal.interface.js';
+import { actionParam, dbType } from './intreface.js';
 export declare class DBSwitch {
-    static requestHandler(tableName: string, DBconfig: DatabaseSchema, dbType: "indexeddb", action: 'insert' | 'update' | 'delete', arg: any): Promise<any>;
+    static requestHandler(TableSchema: TableSchema, DBconfig: DatabaseSchema, dbType: dbType, action: actionParam, arg: any): Promise<any>;
 }

@@ -1,5 +1,6 @@
 import { ModelReader } from './model.reader.js';
 import { indexedDB } from './../connection/indexedDb/indexedb.js';
+export const models = {};
 export class registerModel {
     static register(entries) {
         const databaseSchema = {
@@ -35,6 +36,8 @@ export class registerModel {
         }
         entries.models.forEach((modelClassRepresentations) => {
             modelClassRepresentations.setDBConfig(databaseSchema);
+            const ModelName = modelClassRepresentations.getModelName();
+            models[ModelName] = modelClassRepresentations;
         });
     }
 }

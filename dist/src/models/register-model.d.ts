@@ -5,6 +5,7 @@ interface register {
     type: 'indexeddb' | 'memory';
     models: typeof Model[];
 }
+export declare const models: {};
 export declare class registerModel {
     static register(entries: register): void;
 }

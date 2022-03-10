@@ -40,4 +40,83 @@ describe("initial test for model", () => {
   }, 10000)
 
 
+
+  it('model create object', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      
+      class Person extends models.Model {
+        username =  models.CharField({maxLength:0})
+      } 
+
+      models.register({
+        databaseName:'jest-test',
+        type: 'indexeddb',
+        version: 1,
+        models: [Person]
+      })
+
+      const james = await Person.create({username:'james'})
+
+      document.body.innerHTML = JSON.stringify({username:james.username, id:james.id})
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('{"username":"james","id":1}')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+
+  it('model create([{...}])', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      
+      class Person extends models.Model {
+        username =  models.CharField({maxLength:0})
+      } 
+
+      models.register({
+        databaseName:'jest-test-model create([{...}])',
+        type: 'indexeddb',
+        version: 1,
+        models: [Person]
+      })
+
+
+      await Person.create([
+        {username:'Peter'},
+        {username:'Peter'},
+        {username:'Peter'},
+        {username:'Peter'},
+        {username:'Peter'},
+        {username:'Peter'}]
+      )
+
+
+      const rows = await Person.filter({username:'Peter'}).execute()
+
+
+      document.body.innerHTML = JSON.stringify(rows)
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"username":"Peter","id":1},{"username":"Peter","id":2},{"username":"Peter","id":3},{"username":"Peter","id":4},{"username":"Peter","id":5},{"username":"Peter","id":6}]')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+
 })

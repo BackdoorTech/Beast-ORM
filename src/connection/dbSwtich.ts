@@ -1,12 +1,12 @@
-import { DatabaseSchema } from '../models/register-modal.interface.js';
+import { DatabaseSchema, TableSchema } from '../models/register-modal.interface.js';
 import { indexedDB } from './indexedDb/indexedb.js'
-
+import { actionParam, dbType } from './intreface.js';
 
 export class DBSwitch {
 
-	static async requestHandler(tableName: string, DBconfig:DatabaseSchema, dbType : "indexeddb", action: 'insert' | 'update' | 'delete', arg: any) {
+	static async requestHandler(TableSchema: TableSchema, DBconfig:DatabaseSchema, dbType : dbType, action: actionParam, arg: any) {
 		if(dbType == 'indexeddb') {
-			return await indexedDB.requestHandler(tableName, DBconfig)[action](arg)
+			return await indexedDB.requestHandler(TableSchema, DBconfig)[action](arg)
 		}
 	}
 

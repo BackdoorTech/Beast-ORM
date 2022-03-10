@@ -1,8 +1,8 @@
-import { DatabaseSchema } from './register-modal.interface.js';
+import { Method } from './model.interface.js';
+import { DatabaseSchema, TableSchema } from './register-modal.interface.js';
 export declare class ModelManager {
     constructor();
-    private obj;
-    static obj: (config: DatabaseSchema) => {
-        create: (arg: any) => Promise<any>;
+    static obj: (DatabaseSchema: DatabaseSchema, TableSchema: TableSchema) => {
+        create: (arg: Method[]) => Promise<any>;
     };
 }

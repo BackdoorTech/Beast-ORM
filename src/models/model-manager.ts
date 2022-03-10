@@ -1,23 +1,15 @@
-import { DatabaseSchema  } from './register-modal.interface.js';
+import { Methods, Method } from './model.interface.js'
+import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
 import { DBSwitch } from '../connection/dbSwtich.js'
 
 export class ModelManager {
     
 	constructor() {}
 
-	private obj = (config) => {
+	static obj = (DatabaseSchema :DatabaseSchema, TableSchema: TableSchema) => {
 		return {
-			create:(arg) => {
-				return ModelManager.obj(config).create(arg)
-			}
-		}
-	}
-
-	static obj = (config :DatabaseSchema) => {
-		return {
-			create: async (arg) => {
-
-				return await DBSwitch.requestHandler('Person', config, 'indexeddb' ,'insert' , arg)
+			create: async (arg:Method[]) => {
+				return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type ,'insert' , arg)
 			}
 		}
 	}

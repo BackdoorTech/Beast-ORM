@@ -149,23 +149,25 @@ class _indexedDB {
                 },
             };
         };
-        this.requestHandler = (currentStore, config) => {
+        this.requestHandler = (TableSchema, config) => {
             return {
                 select: () => {
                 },
                 update: () => { },
                 delete: () => { },
-                insert: async (rows) => {
+                insert: async (methods) => {
                     const createdObjKeys = [];
+                    const rows = methods[0].arguments;
                     for (let insert of rows) {
-                        const id = await this.getActions(currentStore, config).add(insert);
+                        const id = await this.getActions(TableSchema.name, config).add(insert);
                         createdObjKeys.push(id);
                     }
                     // return first element
                     if (rows.length == 1) {
-                        return await this.getActions(currentStore, config).getByID(createdObjKeys[0]);
+                        return await this.getActions(TableSchema.name, config).getByID(createdObjKeys[0]);
                     }
                     else {
+                        return createdObjKeys;
                     }
                 }
             };

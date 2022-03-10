@@ -1,21 +1,13 @@
 var _a;
 import { DBSwitch } from '../connection/dbSwtich.js';
 export class ModelManager {
-    constructor() {
-        this.obj = (config) => {
-            return {
-                create: (arg) => {
-                    return ModelManager.obj(config).create(arg);
-                }
-            };
-        };
-    }
+    constructor() { }
 }
 _a = ModelManager;
-ModelManager.obj = (config) => {
+ModelManager.obj = (DatabaseSchema, TableSchema) => {
     return {
         create: async (arg) => {
-            return await DBSwitch.requestHandler('Person', config, 'indexeddb', 'insert', arg);
+            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'insert', arg);
         }
     };
 };

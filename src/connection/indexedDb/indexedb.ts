@@ -1,5 +1,6 @@
 import { IndexedDBConnection } from "./connector.js";
-import { DatabaseSchema } from "../../models/register-modal.interface.js";
+import { DatabaseSchema, TableSchema } from "../../models/register-modal.interface.js";
+import { Method } from "../../models/model.interface.js";
 
 // inspire by https://github.com/hc-oss/use-indexeddb
 class _indexedDB {
@@ -187,27 +188,28 @@ class _indexedDB {
     }
   }
 
-  requestHandler = (currentStore, config) => {
+  requestHandler = (TableSchema:TableSchema, config:DatabaseSchema) => {
     return {
       select: () => {
         
       },
       update: () => {},
       delete: () => {},
-      insert: async (rows: any[]) => {
+      insert: async (methods: Method[]) => {
 
         const createdObjKeys = []
+        const rows = methods[0].arguments
 
         for( let insert of rows) {
-          const id = await this.getActions(currentStore, config).add(insert)
+          const id = await this.getActions(TableSchema.name, config).add(insert)
           createdObjKeys.push(id)
         }
 
         // return first element
         if(rows.length == 1) {
-          return await this.getActions(currentStore, config).getByID(createdObjKeys[0])
+          return await this.getActions(TableSchema.name, config).getByID(createdObjKeys[0])
         } else {
-
+          return createdObjKeys
         }
 
       }

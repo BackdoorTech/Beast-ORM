@@ -9,6 +9,7 @@ interface register {
   models: typeof Model[]
 }
 
+export const models = {}
 
 export class registerModel {
   static register(entries: register) {
@@ -22,7 +23,7 @@ export class registerModel {
 
     entries.models.forEach((modelClassRepresentations, index) => {
       const {fields, modelName, attributes , fieldTypes} = ModelReader.read(modelClassRepresentations)
-
+      
       databaseSchema.stores.push({
         name: modelName,
         id: { 
@@ -48,9 +49,12 @@ export class registerModel {
     if(databaseSchema.type =='indexeddb') {
       indexedDB.migrate(databaseSchema)
     }
-        
+
     entries.models.forEach((modelClassRepresentations) => {
       modelClassRepresentations.setDBConfig(databaseSchema )
+      
+      const ModelName = modelClassRepresentations.getModelName()
+      models[ModelName] = modelClassRepresentations
     })
 
   }

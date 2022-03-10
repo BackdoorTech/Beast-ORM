@@ -1,11 +1,13 @@
 import { hashCode, uniqueGenerator } from '../utils.js';
 import { ModelManager } from './model-manager.js';
+import { models } from './register-model.js';
 /**
  * @description this variable register all methods called in a single query
  * User.filter(...).filter(...) in this case a single query will contain two filter
  */
 let methods = {} = {};
 let modalSpace = {};
+const constNewInstate = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model extends ModelManager {
     constructor(objData) {
@@ -27,11 +29,13 @@ export class Model extends ModelManager {
         Model.setDBConfig(config);
     }
     getDBSchema() {
-        return Model.getDBSchema();
+        return constNewInstate[this.BeastOrmId].DBconfig;
     }
-    static getDBSchema() {
-        const id = this.getId();
-        return modalSpace[id].databaseSchema;
+    getModelName() {
+        return constNewInstate[this.BeastOrmId].ModelName;
+    }
+    getTableSchema() {
+        return constNewInstate[this.BeastOrmId].TableSchema;
     }
     // get Model Id, this is the same for every instance
     static getId() {
@@ -48,11 +52,37 @@ export class Model extends ModelManager {
         }
     }
     static async create(arg) {
+        if (arg.constructor.name != 'Array') {
+            arg = [arg];
+        }
+        const _methods = [{ methodName: 'create', arguments: arg }];
         const DBconfig = this.getDBSchema();
-        const createObject = await super.obj(DBconfig).create(arg);
-        const newInstance = Object.assign(new this({ DBconfig }), createObject);
-        delete newInstance.obj;
-        return newInstance;
+        const TableSchema = this.getTableSchema();
+        const createObject = await super.obj(DBconfig, TableSchema).create(_methods);
+        if (createObject) {
+            const ModelName = this.getModelName();
+            const BeastOrmId = uniqueGenerator();
+            constNewInstate[BeastOrmId] = { TableSchema, DBconfig, ModelName };
+            let newInstance = new models[ModelName]();
+            Object.assign(newInstance, createObject);
+            delete newInstance.obj;
+            return newInstance;
+        }
+        else {
+        }
+    }
+    static getDBSchema() {
+        const id = this.getId();
+        return modalSpace[id].databaseSchema;
+    }
+    static getTableSchema() {
+        const id = this.getId();
+        const databaseSchema = modalSpace[id].databaseSchema;
+        const tableSchema = databaseSchema.stores.find((e) => e.name == this.getModelName());
+        return tableSchema;
+    }
+    static getModelName() {
+        return this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
     }
     // filter rows in the tables
     static filter(...arg) {

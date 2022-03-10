@@ -1,4 +1,5 @@
-import { DatabaseSchema } from "../../models/register-modal.interface.js";
+import { DatabaseSchema, TableSchema } from "../../models/register-modal.interface.js";
+import { Method } from "../../models/model.interface.js";
 declare class _indexedDB {
     private validateStore;
     private validateBeforeTransaction;
@@ -16,11 +17,11 @@ declare class _indexedDB {
         deleteAll: () => Promise<any>;
         openCursor: (cursorCallback: any, keyRange?: IDBKeyRange) => Promise<void | IDBCursorWithValue>;
     };
-    requestHandler: (currentStore: any, config: any) => {
+    requestHandler: (TableSchema: TableSchema, config: DatabaseSchema) => {
         select: () => void;
         update: () => void;
         delete: () => void;
-        insert: (rows: any[]) => Promise<any>;
+        insert: (methods: Method[]) => Promise<any>;
     };
 }
 export declare const indexedDB: _indexedDB;

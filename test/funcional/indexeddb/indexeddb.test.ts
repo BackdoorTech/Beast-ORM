@@ -39,7 +39,7 @@ describe("initial test for model", () => {
     })
     debugger
     // Check to see if text exists on the page
-    await page.waitForFunction('[]')
+    // await page.waitForFunction('[]')
     
     expect('time not exceeded').toBe('time not exceeded')
     

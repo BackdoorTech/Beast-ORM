@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "main": "./dist/src/index.js",
   "scripts": {
-    "watch": "rimraf dist && tsc  --watch",
+    "watch": "rimraf dist/src && tsc  --watch",
     "test": "jest"
   },
   "devDependencies": {
