@@ -1,17 +1,20 @@
 import { DatabaseSchema } from './register-modal.interface.js';
-export declare class Model {
+import { ModelManager } from './model-manager.js';
+export declare class Model extends ModelManager {
     constructor(objData: any);
     filter(...arg: any[]): typeof Model & {
         filter: (a: any, b?: any, c?: any, d?: any) => typeof Model & any;
         select: () => void;
         execute(): void;
     };
+    create(arg: any): Promise<any>;
     getId(): number;
     setDBConfig(config: DatabaseSchema): void;
     getDBSchema(): DatabaseSchema;
     static getDBSchema(): DatabaseSchema;
     static getId(): number;
     static setDBConfig(config: DatabaseSchema): void;
+    static create(arg: any): Promise<any>;
     static filter(...arg: any[]): typeof Model & {
         filter: (a: any, b?: any, c?: any, d?: any) => typeof Model & any;
         select: () => void;

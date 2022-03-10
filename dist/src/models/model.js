@@ -1,4 +1,5 @@
 import { hashCode, uniqueGenerator } from '../utils.js';
+import { ModelManager } from './model-manager.js';
 /**
  * @description this variable register all methods called in a single query
  * User.filter(...).filter(...) in this case a single query will contain two filter
@@ -6,14 +7,18 @@ import { hashCode, uniqueGenerator } from '../utils.js';
 let queries = {} = {};
 let modalSpace = {};
 // inspire by https://github.com/brianschardt/browser-orm
-export class Model {
+export class Model extends ModelManager {
     constructor(objData) {
+        super();
         Object.assign(this, objData || {});
     }
     // all non static method call a static method that contain all the logic
     // this way all methods of the model can be called without creating a new instance of it
     filter(...arg) {
         return Model.filter(arg);
+    }
+    async create(arg) {
+        return await Model.create(arg);
     }
     getId() {
         return Model.getId();
@@ -41,6 +46,13 @@ export class Model {
         else {
             throw ('cant register');
         }
+    }
+    static async create(arg) {
+        const DBconfig = this.getDBSchema();
+        const createObject = await super.obj(DBconfig).create(arg);
+        const newInstance = Object.assign(new this({ DBconfig }), createObject);
+        delete newInstance.obj;
+        return newInstance;
     }
     // filter rows in the tables
     static filter(...arg) {

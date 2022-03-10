@@ -1,6 +1,7 @@
 import { hashCode, uniqueGenerator } from '../utils.js'
 import { queries } from './model.interface.js'
 import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
+import { ModelManager } from './model-manager.js';
 /**
  * @description this variable register all methods called in a single query
  * User.filter(...).filter(...) in this case a single query will contain two filter
@@ -13,9 +14,10 @@ let modalSpace: {[key: string]: {
 }} = {}
 
 // inspire by https://github.com/brianschardt/browser-orm
-export class Model{
+export class Model extends ModelManager{
 
   constructor(objData:any) {
+    super()
     Object.assign(this, objData || {});
   }
 
@@ -23,6 +25,10 @@ export class Model{
   // this way all methods of the model can be called without creating a new instance of it
   filter(...arg) {
     return Model.filter(arg)
+  }
+
+  async create(arg) {
+    return await Model.create(arg)
   }
 
   getId() {
@@ -56,6 +62,16 @@ export class Model{
     } else {
       throw('cant register')
     }
+  }
+
+  static async create(arg) {
+
+    const DBconfig = this.getDBSchema()
+    const createObject = await super.obj(DBconfig).create(arg)
+    const newInstance = Object.assign(new this({DBconfig}), createObject)
+    delete newInstance.obj
+
+    return  newInstance
   }
 
 

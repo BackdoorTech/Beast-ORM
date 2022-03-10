@@ -154,7 +154,7 @@ class _indexedDB {
                 },
                 update: () => { },
                 delete: () => { },
-                insert: async (...rows) => {
+                insert: async (rows) => {
                     const createdObjKeys = [];
                     for (let insert of rows) {
                         const id = await this.getActions(currentStore, config).add(insert);

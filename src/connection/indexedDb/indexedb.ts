@@ -110,6 +110,9 @@ class _indexedDB {
             this.validateBeforeTransaction(db, currentStore, reject);
             let tx = this.createTransaction(db, "readwrite", currentStore, resolve, reject);
             let objectStore = tx.objectStore(currentStore);
+            
+            console.log(value, key)
+
             let request = objectStore.add(value, key);
             request.onsuccess = (e: any) => {
               (tx as any)?.commit?.();
@@ -191,7 +194,7 @@ class _indexedDB {
       },
       update: () => {},
       delete: () => {},
-      insert: async (...rows) => {
+      insert: async (rows: any[]) => {
 
         const createdObjKeys = []
 

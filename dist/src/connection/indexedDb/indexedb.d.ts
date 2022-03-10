@@ -20,7 +20,7 @@ declare class _indexedDB {
         select: () => void;
         update: () => void;
         delete: () => void;
-        insert: (...rows: any[]) => Promise<any>;
+        insert: (rows: any[]) => Promise<any>;
     };
 }
 export declare const indexedDB: _indexedDB;
