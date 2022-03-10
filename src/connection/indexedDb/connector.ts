@@ -58,7 +58,6 @@ export class IndexedDBConnection {
   }
 
   private async runMigrations(db:IDBDatabase, config: DatabaseSchema) {
-    console.log('running migrations ==', false)
     await config.stores.forEach( async (storeSchema) => {
       if (!db.objectStoreNames.contains(storeSchema.name)) {
         const ObjectStore = db.createObjectStore(storeSchema.name, storeSchema.id);
