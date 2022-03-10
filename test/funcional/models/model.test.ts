@@ -119,4 +119,42 @@ describe("initial test for model", () => {
   }, 10000)
 
 
+  it('model autoField', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      class Person extends models.Model {
+        username =  models.CharField({maxLength:0})
+        userId = models.AutoField({primaryKey:true})
+      } 
+
+      models.register({
+        databaseName:'jest-test',
+        type: 'indexeddb',
+        version: 1,
+        models: [Person]
+      })
+
+      await Person.create([
+        {username:'Peter'},
+        {username:'Peter'}]
+      )
+
+      const rows = await Person.filter({username:'Peter'}).execute()
+
+      document.body.innerHTML = JSON.stringify(rows)
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"username":"Peter","userId":1},{"username":"Peter","userId":2}]')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+
 })
