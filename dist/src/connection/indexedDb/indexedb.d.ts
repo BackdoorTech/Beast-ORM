@@ -18,9 +18,9 @@ declare class _indexedDB {
         openCursor: (cursorCallback: any, keyRange?: IDBKeyRange) => Promise<void | IDBCursorWithValue>;
     };
     requestHandler: (TableSchema: TableSchema, config: DatabaseSchema) => {
-        select: () => void;
-        update: () => void;
-        delete: () => void;
+        select: (methods: Method[]) => Promise<any>;
+        update: (methods: Method[]) => Promise<void>;
+        delete: (methods: Method[]) => Promise<void>;
         insert: (methods: Method[]) => Promise<any>;
     };
 }

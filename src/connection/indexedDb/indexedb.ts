@@ -1,6 +1,7 @@
 import { IndexedDBConnection } from "./connector.js";
 import { DatabaseSchema, TableSchema } from "../../models/register-modal.interface.js";
 import { Method } from "../../models/model.interface.js";
+import { SqlObject } from "../../sql/sqlObject/sqlObject.js";
 
 // inspire by https://github.com/hc-oss/use-indexeddb
 class _indexedDB {
@@ -190,11 +191,95 @@ class _indexedDB {
 
   requestHandler = (TableSchema:TableSchema, config:DatabaseSchema) => {
     return {
-      select: () => {
-        
+      select: async (methods: Method[]) => {
+        if(methods[0].methodName == 'all') {
+          this.getActions(TableSchema.name, config).getAll()
+        }
+        else if(methods[0].methodName == 'get') {
+          const args = methods[0].arguments
+
+          if(Object.keys(args).length == 1) {
+            const key = Object.keys(args)[0]
+            const value = args[key]
+            if(TableSchema.id.keyPath == key) {
+              return await this.getActions(TableSchema.name, config).getByID(value)
+            } else {
+              return await this.getActions(TableSchema.name, config).getOneByIndex(key, value)
+            }
+          }
+        } else if (methods[methods.length - 1].methodName == 'execute') {
+          return new Promise(async(resolve, reject) => {
+            const sqlObject =  new SqlObject(TableSchema, methods)
+            await this.getActions(TableSchema.name, config).openCursor(async(event: any) => {
+              var cursor = event.target.result;
+              if(cursor) {
+                const row = cursor.value
+                await sqlObject.runFirstMethod(row)
+                cursor.continue();
+              } else {
+                sqlObject.run()
+                resolve(sqlObject.firstMethod.rows)
+              }
+            })
+          })
+        }
+
       },
-      update: () => {},
-      delete: () => {},
+      update: async (methods: Method[]) => {
+
+        if(methods[0].methodName == 'save') {
+          
+          const args = methods[0].arguments
+          const idFieldName = TableSchema.id.keyPath
+          const idValue = args[idFieldName]
+
+          if(idValue) {
+            await this.getActions(TableSchema.name, config).update(args)
+          }  else {
+            await this.getActions(TableSchema.name, config).update(args, idValue)
+          }
+      
+        } else if(methods[methods.length - 1].methodName == 'update') {
+
+          const argsToUpdate = methods[methods.length - 1].arguments
+
+          const customMethods: Method[] = Object.create(methods)
+          customMethods[methods.length - 1].methodName = 'execute'
+
+          const rows = await this.requestHandler(TableSchema, config).select(customMethods)
+
+          for(let row of rows) {
+            const updateRow = Object.assign(row, argsToUpdate)
+            await this.getActions(TableSchema.name, config).update(updateRow)
+          }
+
+        }
+      },
+      delete: async (methods: Method[]) => {
+
+        if(methods[methods.length - 1].methodName == 'delete' && 
+        methods[methods.length - 1].arguments == null) {
+
+          const customMethods: Method[] = Object.create(methods)
+          customMethods[methods.length - 1].methodName = 'execute'
+
+          const rows = await this.requestHandler(TableSchema, config).select(customMethods)
+
+          for(let row of rows) {
+
+            const id = row[TableSchema.id.keyPath]
+            await this.getActions(TableSchema.name, config).deleteByID(id)
+          }
+
+        } else if ( methods[methods.length - 1].methodName == 'delete' && 
+        typeof methods[methods.length - 1].arguments == 'object') {
+
+          const IdInObject = methods[methods.length - 1].arguments
+          const idValue = IdInObject[TableSchema.id.keyPath]
+
+          await this.getActions(TableSchema.name, config).deleteByID(idValue)
+        }
+      },
       insert: async (methods: Method[]) => {
 
         const createdObjKeys = []

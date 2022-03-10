@@ -1,4 +1,10 @@
 export const MethodNameArray = [
+    'save',
     'filter',
-    'create'
+    'get',
+    'create',
+    'execute',
+    'update',
+    'delete',
+    'all'
 ]; // TS3.4 syntax

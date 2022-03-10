@@ -1,15 +1,11 @@
 import { hashCode, uniqueGenerator } from '../utils.js'
-import { Method, Methods } from './model.interface.js'
+import { Methods, getParams, Method } from './model.interface.js'
 import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
 import { ModelManager } from './model-manager.js';
 import { models } from './register-model.js'
 
-/**
- * @description this variable register all methods called in a single query
- * User.filter(...).filter(...) in this case a single query will contain two filter
- */
-let methods : Methods = {} = {}
 
+let methods : Methods = {} = {}
 
 let modalSpace: {[key: string]: {
   databaseSchema : DatabaseSchema 
@@ -22,23 +18,13 @@ export class Model extends ModelManager{
 
   BeastOrmId
 
-  constructor(objData:any) {
+  constructor(obg?) {
     super()
-    Object.assign(this, objData || {});
+    Object.assign(this, obg)
   }
 
-  // all non static method call a static method that contain all the logic
-  // this way all methods of the model can be called without creating a new instance of it
-  filter(...arg) {
-    return Model.filter(arg)
-  }
-
-  async create(arg) {
-    return await Model.create(arg)
-  }
-
-  getId() {
-    return Model.getId()
+  get(arg) {
+    return Model.get(arg)
   }
 
   setDBConfig(config:DatabaseSchema ) {
@@ -52,23 +38,121 @@ export class Model extends ModelManager{
   getModelName() {
     return constNewInstate[this.BeastOrmId].ModelName
   }
+  
+  filter(...arg) {
+    return Model.filter(arg)
+  }
+
   getTableSchema(): TableSchema {
     return constNewInstate[this.BeastOrmId].TableSchema
   }
+  async save() {
+    const DBconfig = this.getDBSchema()
+    const tableSchema = this.getTableSchema()
 
-  // get Model Id, this is the same for every instance
-  static getId() {
+    const fiendsName = tableSchema.fields.map((field)=> field.name)
+    fiendsName.push(tableSchema.id.keyPath)
+
+    const Fields = {}
+    for(let name of fiendsName) {
+      Fields[name] = this[name]
+    }
+
+    const methods:  Method[]  = [{methodName: 'save', arguments: Fields}]
+    await Model.obj(DBconfig, tableSchema).save(methods)
+  }
+
+  async create(arg) {
+    return await Model.create(arg)
+  }
+
+
+  async delete() {
+    const DBconfig = this.getDBSchema()
+    const TableSchema = this.getTableSchema()
+
+    const idFieldName = TableSchema.id.keyPath
+
+    const createArg = {}
+    createArg[idFieldName] = this[idFieldName]
+
+    const _methods: Method[] = [{methodName: 'delete', arguments: createArg}]
+    await Model.obj(DBconfig, TableSchema).delete(_methods)
+  }
+
+  async all() {
+    const DBconfig = this.getDBSchema()
+    const TableSchema = this.getTableSchema()
+    return await Model.object({DBconfig, TableSchema,some:['all', null]})
+  }
+  
+  static async all() {
+    const DBconfig = this.getDBSchema()
+    const TableSchema = this.getTableSchema()
+    return await Model.object({DBconfig, TableSchema,some:['all', null]})
+  }
+  
+  static async get(arg: getParams) {
+    const _methods:  Method[] = [{methodName: 'get', arguments: arg}]
+    const DBconfig = this.getDBSchema()
+    const TableSchema = this.getTableSchema()
+
+    const foundObj = await super.obj(DBconfig, TableSchema).get(_methods)
+
+    if(!foundObj) {
+      console.log('Object not found param')
+    }
+
+    const ModelName = this.getModelName()
+    const BeastOrmId = uniqueGenerator()
+    constNewInstate[BeastOrmId] = {TableSchema, DBconfig, ModelName}
+    
+    let newInstance = new models[ModelName]()
+    Object.assign(newInstance, {...foundObj, BeastOrmId})
+    
+    delete newInstance.obj
+    return  newInstance
+  }
+  
+
+  private static getId() {
     return hashCode(this.toString())
   }
 
+  static getModelName () {
+    return this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
+  }
+
+  static filter(...arg) {
+    const queryId =  uniqueGenerator()
+    const DBconfig = this.getDBSchema()
+    const TableSchema = this.getTableSchema()
+
+    return  Object.assign(this, this.object({queryId, DBconfig, TableSchema, some:['filter', arg]}))
+  }
+  
   static setDBConfig(config:DatabaseSchema ) {
     const id = this.getId() 
 
     if(modalSpace[id]?.databaseSchema  == null) {  
       modalSpace[id] = Object.assign(modalSpace[id] || {}, {databaseSchema :config})
-    } else {
-      throw('cant register')
     }
+  }
+
+  static getDBSchema(): DatabaseSchema  {
+
+    const id = this.getId()
+    return modalSpace[id].databaseSchema 
+  }
+
+  static getTableSchema(): TableSchema {
+
+    const id = this.getId()
+    const databaseSchema = modalSpace[id].databaseSchema;
+    const tableSchema = databaseSchema.stores.find((e)=> e.name == this.getModelName())
+
+    return tableSchema
+
   }
 
   static async create(arg): Promise<any> {
@@ -97,69 +181,73 @@ export class Model extends ModelManager{
   }
 
 
-  static getDBSchema(): DatabaseSchema  {
+  static async updateOrCreate(argToFind, argsToUpdate) {
+    
+    const keys = Object.keys(argToFind)
+    let row
 
-    const id = this.getId()
-    return modalSpace[id].databaseSchema 
+    if(keys.length == 1) {
+      row = await this.get(argToFind)
+    } else if(keys.length >= 2) {
+      [row] = await this.filter(argToFind).execute()
+    }
+    
+
+    if(!row) {
+      return await this.create(row)
+    } else {
+      const newInstance = await this.get(row)
+      Object.assign(newInstance, argsToUpdate)
+      await newInstance.save()
+
+      return newInstance
+    }
   }
 
-  static getTableSchema(): TableSchema {
-
-    const id = this.getId()
-    const databaseSchema = modalSpace[id].databaseSchema;
-    const tableSchema = databaseSchema.stores.find((e)=> e.name == this.getModelName())
-
-    return tableSchema
-
-  }
-
-
-  static getModelName () {
-    return this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
-  }
-
-  // filter rows in the tables
-  static filter(...arg) {
-    // generate a unique id to associate methods in a query
-    const queryId =  uniqueGenerator() // id = [filter,filter,execute]
-    const object = Model.object(queryId, ['filter', arg])
-
-    // this Object.assign return a new similar instance
-    return  Object.assign(this, object)
-  }
-
-  /**
-   * @param queryId
-   * @param some is present when object is being called by that static and non static method
-   * @returns all method that can be executed again on this class after executing one like 
-   */
-  static object = (queryId, some?) => {
+  static object = ({queryId=uniqueGenerator(), some = null, DBconfig, TableSchema}) => {
 
     if(!methods[queryId]) {
       methods[queryId] = []
     }
 
-    // all first method called execute this 
-    // User."filter()".filter()
     if(some) {
       const methodName = some[0]
       const methodArgs = some[1]
-      Model.object(queryId)[methodName](...methodArgs)
+      this.object({queryId, DBconfig, TableSchema})[methodName](...methodArgs)
     }
 
-    // all second method and beyond will execute from this return
-    // User.filter()."filter()"
     return {
-      filter: (a, b?, c?, d?)=> {
-        // register the function name is the query
-        methods[queryId].push({methodName: 'filter', arguments: [a, b, c, d]})
-
-        // return self and merge all method of the property object to self
-        return Object.assign(Model, Model.object(queryId))
+      filter: (...args) => {
+        methods[queryId].push({methodName: 'filter', arguments: args})
+        return Object.assign(this, this.object({queryId, DBconfig, TableSchema}))
       },
-      select:() => {},
-      execute() {}
+      execute: async () => {
+        methods[queryId].push({methodName: 'execute', arguments: null})
+
+        const _methods: Method[] = methods[queryId]
+        methods[queryId] = []
+        return  await super.obj(DBconfig, TableSchema).execute(_methods)
+      }, 
+      update: async(args) => {
+        methods[queryId].push({methodName: 'update', arguments: args})
+        const _methods: Method[] = methods[queryId]
+        methods[queryId] = []
+        return  await super.obj(DBconfig, TableSchema).update(_methods)
+      },
+      delete: async() => {
+        methods[queryId].push({methodName: 'delete', arguments: null})
+        const _methods: Method[] = methods[queryId]
+        methods[queryId] = []
+        return await super.obj(DBconfig, TableSchema).delete(_methods)
+
+      }, all: async() => {
+
+        methods[queryId].push({methodName: 'all', arguments: null})
+        const _methods: Method[] = methods[queryId]
+        methods[queryId] = []
+        return await super.obj(DBconfig, TableSchema).all(_methods)
+
+      }
     }
   }
-
 }

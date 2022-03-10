@@ -74,6 +74,195 @@ describe("initial test for model", () => {
   }, 10000)
 
 
+  it('model create object', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      
+      class Person extends models.Model {
+        username =  models.CharField({maxLength:0})
+      } 
+
+      models.register({
+        databaseName:'jest-test',
+        type: 'indexeddb',
+        version: 1,
+        models: [Person]
+      })
+
+      const james = await Person.create({username:'james'})
+
+      document.body.innerHTML = JSON.stringify({username:james.username, id:james.id})
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('{"username":"james","id":1}')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+
+  it('model save()', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      
+      class Person extends models.Model {
+        username =  models.CharField({maxLength:0})
+      } 
+
+      models.register({
+        databaseName:'jest-test',
+        type: 'indexeddb',
+        version: 1,
+        models: [Person]
+      })
+
+      const james = await Person.create({username:'james'})
+
+      let getJames = await Person.get({id:james.id})
+
+      getJames.username = "Peter"
+      await getJames.save()
+
+      let getJames1 = await Person.get({id:getJames.id})
+
+      document.body.innerHTML = JSON.stringify({username:getJames1.username, id:getJames1.id})
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('{"username":"Peter","id":1}')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+
+  it('model filter save()', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      
+      class Person extends models.Model {
+        username =  models.CharField({maxLength:0})
+      } 
+
+      models.register({
+        databaseName:'jest-test',
+        type: 'indexeddb',
+        version: 1,
+        models: [Person]
+      })
+
+      await Person.create({username:'james'})
+      await Person.create({username:'Peter'})
+      await Person.create({username:'Peter'})
+
+      await Person.filter({username:'Peter'}).update({username:'police'})
+      const rows = await Person.filter({username:'police'}).execute()
+
+      document.body.innerHTML = JSON.stringify(rows)
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"username":"police","id":2},{"username":"police","id":3}]')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+  it('model delete()', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      
+      class Person extends models.Model {
+        username =  models.CharField({maxLength:0})
+      } 
+
+      models.register({
+        databaseName:'jest-test',
+        type: 'indexeddb',
+        version: 1,
+        models: [Person]
+      })
+
+      await Person.create({username:'james'})
+      await Person.create({username:'Peter'})
+      await Person.create({username:'Peter'})
+
+      await Person.filter({username:'Peter'}).update({username:'police'})
+      const rows = await Person.filter({username:'police'}).execute()
+
+      document.body.innerHTML = JSON.stringify(rows)
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"username":"police","id":2},{"username":"police","id":3}]')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+
+  it('model filter delete()', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      
+      class Person extends models.Model {
+        username =  models.CharField({maxLength:0})
+      } 
+
+      models.register({
+        databaseName:'jest-test',
+        type: 'indexeddb',
+        version: 1,
+        models: [Person]
+      })
+
+      await Person.create({username:'james'})
+      await Person.create({username:'Peter'})
+      await Person.create({username:'Peter'})
+
+
+      await Person.filter({username:'james'}).delete()
+
+      const rows = await Person.filter({username:'james'}).delete()
+
+      document.body.innerHTML = JSON.stringify(rows)
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[]')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+
+
   it('model create([{...}])', async () => {
   
     await page.waitForFunction(() => 'models' in window);
@@ -117,7 +306,6 @@ describe("initial test for model", () => {
     expect('time not exceeded').toBe('time not exceeded')
     
   }, 10000)
-
 
   it('model autoField', async () => {
   

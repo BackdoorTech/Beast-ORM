@@ -1,8 +1,14 @@
 import {Model} from './model.js'
 
 export const MethodNameArray = [
+    'save',
     'filter',
-    'create'
+    'get',
+    'create',
+	'execute',
+	'update',
+	'delete',
+	'all'
 ] as const; // TS3.4 syntax
 
 
@@ -12,3 +18,4 @@ export interface  Method {
 	arguments: any
 }
 export type Methods = {[key: string]: Method [] }
+export declare type getParams =  Object
