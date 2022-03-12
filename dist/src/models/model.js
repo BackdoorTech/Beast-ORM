@@ -41,9 +41,6 @@ export class Model extends (_b = ModelManager) {
         const methods = [{ methodName: 'save', arguments: Fields }];
         await Model.obj(DBconfig, tableSchema).save(methods);
     }
-    async create(arg) {
-        return await Model.create(arg);
-    }
     async delete() {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
@@ -108,14 +105,31 @@ export class Model extends (_b = ModelManager) {
         const tableSchema = databaseSchema.stores.find((e) => e.name == this.getModelName());
         return tableSchema;
     }
+    static async getEmptyFields() {
+        const TableSchema = this.getTableSchema();
+        const emptyFields = {};
+        const fieldsName = TableSchema.fields.map((field) => field.name);
+        for (let fieldName of fieldsName) {
+            emptyFields[fieldName] = '';
+        }
+        return emptyFields;
+    }
     static async create(arg) {
         if (arg.constructor.name != 'Array') {
             arg = [arg];
         }
+        const emptyFields = await this.getEmptyFields();
+        for (let i in arg) {
+            Object.assign(arg[i], emptyFields);
+        }
+
+        console.log(arg)
+        
+        const TableSchema = this.getTableSchema();
         const _methods = [{ methodName: 'create', arguments: arg }];
         const DBconfig = this.getDBSchema();
-        const TableSchema = this.getTableSchema();
         const createObject = await super.obj(DBconfig, TableSchema).create(_methods);
+        console.log('createObject', createObject);
         if (createObject) {
             const ModelName = this.getModelName();
             const BeastOrmId = uniqueGenerator();

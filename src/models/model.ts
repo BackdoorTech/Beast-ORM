@@ -3,6 +3,7 @@ import { Methods, getParams, Method } from './model.interface.js'
 import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
 import { ModelManager } from './model-manager.js';
 import { models } from './register-model.js'
+import { field } from './field/field.js';
 
 
 let methods : Methods = {} = {}
@@ -60,10 +61,6 @@ export class Model extends ModelManager{
 
     const methods:  Method[]  = [{methodName: 'save', arguments: Fields}]
     await Model.obj(DBconfig, tableSchema).save(methods)
-  }
-
-  async create(arg) {
-    return await Model.create(arg)
   }
 
 
@@ -155,16 +152,39 @@ export class Model extends ModelManager{
 
   }
 
+
+  private static async getEmptyFields () {
+    const TableSchema = this.getTableSchema()
+    const emptyFields = {}
+
+    const fieldsName = TableSchema.fields.map((field)=>field.name)
+
+    for(let fieldName of fieldsName) {
+      emptyFields[fieldName] = ''
+    }
+
+    return emptyFields
+  }
+
   static async create(arg): Promise<any> {
 
     if (arg.constructor.name != 'Array') {
       arg = [arg]
     }
 
+    const emptyFields = await this.getEmptyFields()
+
+    for(let i in arg) {
+      Object.assign(arg[i], emptyFields)
+    }
+
+    const TableSchema = this.getTableSchema()
     const _methods: Method[] = [{methodName: 'create', arguments: arg}]
     const DBconfig = this.getDBSchema()
-    const TableSchema = this.getTableSchema()
+    
     const createObject = await super.obj(DBconfig, TableSchema).create(_methods)
+
+    console.log('createObject', createObject)
 
     if(createObject) {
       const ModelName = this.getModelName();
