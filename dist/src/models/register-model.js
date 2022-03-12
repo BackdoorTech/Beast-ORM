@@ -1,6 +1,7 @@
 import { ModelReader } from './model.reader.js';
 import { indexedDB } from './../connection/indexedDb/indexedb.js';
 export const models = {};
+export const modelsConfig = {};
 export class registerModel {
     static async register(entries) {
         const databaseSchema = {
@@ -39,9 +40,13 @@ export class registerModel {
             await indexedDB.migrate(databaseSchema);
         }
         await entries.models.forEach(async (modelClassRepresentations) => {
-            modelClassRepresentations.setDBConfig(databaseSchema);
             const ModelName = modelClassRepresentations.getModelName();
             models[ModelName] = modelClassRepresentations;
+            const tableSchema = databaseSchema.stores.find((e) => e.name == ModelName);
+            modelsConfig[ModelName] = {
+                DatabaseSchema: databaseSchema,
+                TableSchema: tableSchema
+            };
         });
     }
 }
