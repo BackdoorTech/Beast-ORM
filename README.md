@@ -44,7 +44,7 @@ import { User } from './models/user.js';
 models.register({
   databaseName: 'tutorial',
   version: 1,
-  type: 'IndexedDB',
+  type: 'indexeddb',
   models: [User]
 })
 
