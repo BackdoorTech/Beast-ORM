@@ -1,6 +1,6 @@
 import { Model } from './model.js';
 import { ModelReader } from './model.reader.js'
-import { DatabaseSchema  } from './register-modal.interface.js'
+import { DatabaseSchema, TableSchema  } from './register-modal.interface.js'
 import { indexedDB  } from './../connection/indexedDb/indexedb.js'
 interface register {
   databaseName: string,
@@ -10,6 +10,8 @@ interface register {
 }
 
 export const models = {}
+export const modelsConfig: {[key:string]: { DatabaseSchema:DatabaseSchema, TableSchema:TableSchema}} = {}
+
 
 export class registerModel {
   static async register(entries: register) {
@@ -62,6 +64,14 @@ export class registerModel {
       
       const ModelName = modelClassRepresentations.getModelName()
       models[ModelName] = modelClassRepresentations
+
+      const tableSchema = databaseSchema.stores.find((e)=> e.name == ModelName)
+
+      modelsConfig[ModelName] = {
+        DatabaseSchema: databaseSchema,
+        TableSchema: tableSchema
+      }
+
     })
 
   }

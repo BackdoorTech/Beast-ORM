@@ -2,7 +2,7 @@ import { hashCode, uniqueGenerator } from '../utils.js'
 import { Methods, getParams, Method } from './model.interface.js'
 import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
 import { ModelManager } from './model-manager.js';
-import { models } from './register-model.js'
+import { models, modelsConfig } from './register-model.js'
 import { field } from './field/field.js';
 
 
@@ -12,7 +12,6 @@ let modalSpace: {[key: string]: {
   databaseSchema : DatabaseSchema 
 }} = {}
 
-const constNewInstate = {}
 
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model extends ModelManager{
@@ -33,12 +32,11 @@ export class Model extends ModelManager{
 
   getDBSchema(): DatabaseSchema  {
     const modelName = this.constructor.name
-    return constNewInstate[modelName].DBconfig
+    return modelsConfig[modelName].DatabaseSchema
   }
 
   getModelName() {
-    const modelName = this.constructor.name
-    return constNewInstate[modelName].ModelName
+    return this.constructor.name
   }
   
   filter(...arg) {
@@ -48,7 +46,7 @@ export class Model extends ModelManager{
   getTableSchema(): TableSchema {
     const modelName = this.constructor.name
     console.log(this.constructor)
-    return constNewInstate[modelName].TableSchema
+    return modelsConfig[modelName].TableSchema
   }
 
   async save() {
@@ -105,7 +103,6 @@ export class Model extends ModelManager{
     }
 
     const ModelName = this.getModelName()
-    constNewInstate[ModelName] = {TableSchema, DBconfig, ModelName}
     
     let newInstance = new models[ModelName]()
     Object.assign(newInstance, {...foundObj})
@@ -192,7 +189,6 @@ export class Model extends ModelManager{
 
     if(createObject) {
       const ModelName = this.getModelName();
-      constNewInstate[ModelName] = { TableSchema, DBconfig, ModelName };
       let newInstance = new models[ModelName]();
       Object.assign(newInstance, createObject);
       delete newInstance.obj;
@@ -205,7 +201,6 @@ export class Model extends ModelManager{
 
 
   private static newInstance({ TableSchema, DBconfig, ModelName, dataToMerge }) {
-    constNewInstate[ModelName] = { TableSchema, DBconfig, ModelName };
     let newInstance = new models[ModelName]();
     Object.assign(newInstance, {...dataToMerge});
     delete newInstance.obj;
