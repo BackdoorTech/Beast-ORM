@@ -3,7 +3,6 @@ import { hashCode, uniqueGenerator } from '../utils.js';
 import { ModelManager } from './model-manager.js';
 import { models, modelsConfig } from './register-model.js';
 let methods = {} = {};
-let modalSpace = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model extends (_b = ModelManager) {
     constructor(obg) {
@@ -12,9 +11,6 @@ export class Model extends (_b = ModelManager) {
     }
     get(arg) {
         return Model.get(arg);
-    }
-    setDBConfig(config) {
-        Model.setDBConfig(config);
     }
     getDBSchema() {
         const modelName = this.constructor.name;
@@ -28,7 +24,6 @@ export class Model extends (_b = ModelManager) {
     }
     getTableSchema() {
         const modelName = this.constructor.name;
-        console.log(this.constructor);
         return modelsConfig[modelName].TableSchema;
     }
     async save() {
@@ -88,23 +83,13 @@ export class Model extends (_b = ModelManager) {
         const TableSchema = this.getTableSchema();
         return Object.assign(this, this.object({ queryId, DBconfig, TableSchema, some: ['filter', arg] }));
     }
-    static setDBConfig(config) {
-        var _c;
-        const id = this.getId();
-        const modalName = this.getModelName();
-        if (((_c = modalSpace[modalName]) === null || _c === void 0 ? void 0 : _c.databaseSchema) == null) {
-            modalSpace[modalName] = Object.assign(modalSpace[modalName] || {}, { databaseSchema: config });
-        }
-    }
     static getDBSchema() {
         const modalName = this.getModelName();
-        return modalSpace[modalName].databaseSchema;
+        return modelsConfig[modalName].DatabaseSchema;
     }
     static getTableSchema() {
         const modalName = this.getModelName();
-        const databaseSchema = modalSpace[modalName].databaseSchema;
-        const tableSchema = databaseSchema.stores.find((e) => e.name == this.getModelName());
-        return tableSchema;
+        return modelsConfig[modalName].TableSchema;
     }
     static async getEmptyFields() {
         const TableSchema = this.getTableSchema();

@@ -60,7 +60,6 @@ export class registerModel {
     }
 
     await entries.models.forEach(async(modelClassRepresentations) => {
-      modelClassRepresentations.setDBConfig(databaseSchema )
       
       const ModelName = modelClassRepresentations.getModelName()
       models[ModelName] = modelClassRepresentations

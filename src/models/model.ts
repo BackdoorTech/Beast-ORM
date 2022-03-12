@@ -8,10 +8,6 @@ import { field } from './field/field.js';
 
 let methods : Methods = {} = {}
 
-let modalSpace: {[key: string]: {
-  databaseSchema : DatabaseSchema 
-}} = {}
-
 
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model extends ModelManager{
@@ -24,10 +20,6 @@ export class Model extends ModelManager{
 
   get(arg) {
     return Model.get(arg)
-  }
-
-  setDBConfig(config:DatabaseSchema ) {
-    Model.setDBConfig(config)
   }
 
   getDBSchema(): DatabaseSchema  {
@@ -45,7 +37,6 @@ export class Model extends ModelManager{
 
   getTableSchema(): TableSchema {
     const modelName = this.constructor.name
-    console.log(this.constructor)
     return modelsConfig[modelName].TableSchema
   }
 
@@ -127,31 +118,17 @@ export class Model extends ModelManager{
 
     return  Object.assign(this, this.object({queryId, DBconfig, TableSchema, some:['filter', arg]}))
   }
-  
-  static setDBConfig(config:DatabaseSchema ) {
-    const id = this.getId() 
-    
-    const modalName = this.getModelName()
-
-    if(modalSpace[modalName]?.databaseSchema  == null) {  
-      modalSpace[modalName] = Object.assign(modalSpace[modalName] || {}, {databaseSchema :config})
-    }
-  }
 
   static getDBSchema(): DatabaseSchema  {
 
     const modalName = this.getModelName()
-    return modalSpace[modalName].databaseSchema 
+    return modelsConfig[modalName].DatabaseSchema 
   }
 
   static getTableSchema(): TableSchema {
 
     const modalName = this.getModelName()
-    const databaseSchema = modalSpace[modalName].databaseSchema;
-    const tableSchema = databaseSchema.stores.find((e)=> e.name == this.getModelName())
-
-    return tableSchema
-
+    return modelsConfig[modalName].TableSchema;
   }
 
 
