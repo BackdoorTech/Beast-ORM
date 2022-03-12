@@ -97,7 +97,7 @@ export class Model extends ModelManager{
     const foundObj = await super.obj(DBconfig, TableSchema).get(_methods)
 
     if(!foundObj) {
-      console.log('Object not found param')
+      // console.log('Object not found param')
     }
 
     const ModelName = this.getModelName()
@@ -175,7 +175,7 @@ export class Model extends ModelManager{
     const emptyFields = await this.getEmptyFields()
 
     for(let i in arg) {
-      Object.assign(arg[i], emptyFields)
+      arg[i] = Object.assign({...emptyFields} , arg[i])
     }
 
     const TableSchema = this.getTableSchema()
@@ -184,7 +184,6 @@ export class Model extends ModelManager{
     
     const createObject = await super.obj(DBconfig, TableSchema).create(_methods)
 
-    console.log('createObject', createObject)
 
     if(createObject) {
       const ModelName = this.getModelName();

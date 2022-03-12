@@ -66,7 +66,7 @@ export class Model extends (_b = ModelManager) {
         const TableSchema = this.getTableSchema();
         const foundObj = await super.obj(DBconfig, TableSchema).get(_methods);
         if (!foundObj) {
-            console.log('Object not found param');
+            // console.log('Object not found param')
         }
         const ModelName = this.getModelName();
         const BeastOrmId = uniqueGenerator();
@@ -120,16 +120,12 @@ export class Model extends (_b = ModelManager) {
         }
         const emptyFields = await this.getEmptyFields();
         for (let i in arg) {
-            Object.assign(arg[i], emptyFields);
+            arg[i] = Object.assign(Object.assign({}, emptyFields), arg[i]);
         }
-
-        console.log(arg)
-        
         const TableSchema = this.getTableSchema();
         const _methods = [{ methodName: 'create', arguments: arg }];
         const DBconfig = this.getDBSchema();
         const createObject = await super.obj(DBconfig, TableSchema).create(_methods);
-        console.log('createObject', createObject);
         if (createObject) {
             const ModelName = this.getModelName();
             const BeastOrmId = uniqueGenerator();
