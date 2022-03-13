@@ -30,20 +30,7 @@ export class eq {
 }
 export class contains {
     static validate(field, arg, fieldValue, row) {
-        if (fieldValue.contractor.name == 'Array' &&
-            fieldValue.contractor.arg == 'Array') {
-            return fieldValue.some(r => arg.includes(r));
-        }
-        else if (fieldValue.contractor.name == 'Object' &&
-            fieldValue.contractor.arg == 'Object') {
-            const fieldNames = Object.keys(arg);
-            for (let fieldName of fieldNames) {
-                if (!fieldValue[fieldName]) {
-                    return false;
-                }
-            }
-            return true;
-        }
+        return fieldValue.some(r => arg.includes(r));
     }
 }
 /**

@@ -1,3 +1,5 @@
+import * as Fields from './allFields.js'
+
 export interface CharFieldParams {
 	maxLength?: number
 	minLength?: number 
@@ -26,4 +28,35 @@ export interface BigIntegerFieldParams {
 
 export interface AutoFieldParams {
 	primaryKey?:boolean
+}
+
+
+export interface IndexedDBJsonFieldParams {
+	unique?: boolean
+	blank?: boolean
+}
+
+
+export interface IndexedDBArrayFieldParams {
+	unique?: boolean
+	blank?: boolean
+	type?: any
+}
+
+
+export interface DateTimeFieldParams {
+	unique?: boolean
+	blank?: boolean
+}
+
+
+export interface DateFieldParams {
+	unique?: boolean
+	blank?: boolean
+}
+
+
+export interface BooleanFieldParams {
+	unique?: boolean
+	blank?: boolean
 }

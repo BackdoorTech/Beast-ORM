@@ -1,27 +1,15 @@
-import { CharField as _CharField } from './char-field.js';
-import { JsonField as _JsonField } from './json-field.js';
-import { BooleanField as _BooleanField } from './boolean-field.js';
-import { TextField as _TextField } from './text-field.js';
-import { IntegerField as _IntegerField } from './integer-field.js';
-import { DateField as _DateField } from './date-field.js';
-import { BigIntegerField as _BigIntegerField } from './big-integer-field.js';
-import { AutoFieldParams, CharFieldParams, IntegerFieldParams, TextFieldParams } from './interface.js';
-import { AutoField as _AutoField } from './auto-field.js';
-import { indexedDBJsonField } from './indexedDB-json-field.js';
-import { indexedDBArrayField } from './indexedDB-array-field.js';
-export declare function CharField(data?: CharFieldParams): _CharField;
-export declare function JsonField(): _JsonField;
-export declare function BooleanField(): _BooleanField;
-export declare function TextField(data?: TextFieldParams): _TextField;
-export declare function IntegerField(data?: IntegerFieldParams): _IntegerField;
-export declare function DateField(): _DateField;
-export declare function BigIntegerField(): _BigIntegerField;
-export declare function AutoField(data: AutoFieldParams): _AutoField;
+import { AutoFieldParams, BigIntegerFieldParams, BooleanFieldParams, CharFieldParams, DateFieldParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, TextFieldParams } from './interface.js';
+import * as Fields from './allFields.js';
+export declare function CharField(data?: CharFieldParams): Fields.CharField;
+export declare function BooleanField(data?: BooleanFieldParams): Fields.BooleanField;
+export declare function TextField(data?: TextFieldParams): Fields.TextField;
+export declare function IntegerField(data?: IntegerFieldParams): Fields.IntegerField;
+export declare function DateField(data?: DateFieldParams): Fields.DateField;
+export declare function BigIntegerField(data?: BigIntegerFieldParams): Fields.BigIntegerField;
+export declare function AutoField(data?: AutoFieldParams): Fields.AutoField;
 export declare const indexedDB: {
     fields: {
-        JsonField: () => indexedDBJsonField;
-        ArrayField: ({ type }: {
-            type?: any;
-        }) => indexedDBArrayField;
+        JsonField: (data?: IndexedDBJsonFieldParams) => Fields.indexedDBJsonField;
+        ArrayField: (data?: IndexedDBArrayFieldParams) => Fields.indexedDBArrayField;
     };
 };
