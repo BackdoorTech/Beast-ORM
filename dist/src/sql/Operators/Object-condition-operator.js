@@ -1,8 +1,9 @@
 import { operator } from './object-operator.js';
+import { getDeep } from '../../utils.js';
 export class ObjectConditionOperator {
-    constructor(row, tableSchema) {
+    constructor(row, TableSchema) {
         this.row = row;
-        this.tableSchema = tableSchema;
+        this.TableSchema = TableSchema;
     }
     async run(args) {
         return new Promise(async (resolve, reject) => {
@@ -35,10 +36,10 @@ export class ObjectConditionOperator {
             const operation = element.pop();
             const fieldName = element.join('.');
             if (operator[operation]) {
-                const rowFieldValue = this.row[fieldName];
+                const rowFieldValue = getDeep(this.row, fieldName);
                 const arg = objOperator[field];
-                // console.log(this.row)
-                const operationResult = await operator[operation](field, arg, rowFieldValue, this.row);
+                const operationResult = await operator[operation](field, arg, rowFieldValue, this.row, this.TableSchema);
+                console.log(operation, operationResult);
                 if (!operationResult) {
                     return false;
                 }

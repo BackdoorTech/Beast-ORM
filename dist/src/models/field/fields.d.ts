@@ -7,7 +7,8 @@ import { DateField as _DateField } from './date-field.js';
 import { BigIntegerField as _BigIntegerField } from './big-integer-field.js';
 import { AutoFieldParams, CharFieldParams, IntegerFieldParams, TextFieldParams } from './interface.js';
 import { AutoField as _AutoField } from './auto-field.js';
-import { IndDbJsonField as _IndDbJsonField } from './IndDb-json-field.js';
+import { indexedDBJsonField } from './indexedDB-json-field.js';
+import { indexedDBArrayField } from './indexedDB-array-field.js';
 export declare function CharField(data?: CharFieldParams): _CharField;
 export declare function JsonField(): _JsonField;
 export declare function BooleanField(): _BooleanField;
@@ -16,4 +17,11 @@ export declare function IntegerField(data?: IntegerFieldParams): _IntegerField;
 export declare function DateField(): _DateField;
 export declare function BigIntegerField(): _BigIntegerField;
 export declare function AutoField(data: AutoFieldParams): _AutoField;
-export declare function IndDbJsonField(): _IndDbJsonField;
+export declare const indexedDB: {
+    fields: {
+        JsonField: () => indexedDBJsonField;
+        ArrayField: ({ type }: {
+            type?: any;
+        }) => indexedDBArrayField;
+    };
+};

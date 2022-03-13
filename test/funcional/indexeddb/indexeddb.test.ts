@@ -24,7 +24,7 @@ describe("initial test for model", () => {
 
 			models.register({
 				databaseName:'jest-test',
-				type: 'indexeddb',
+				type: 'indexedDB',
 				version: 1,
 				models: [Person]
 			})

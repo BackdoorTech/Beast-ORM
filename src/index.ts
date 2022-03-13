@@ -8,5 +8,6 @@ export const models = {
 	Model,
 	read: ModelReader.read,
 	register: registerModel.register,
+	migrate: registerModel.register,
 	...Fields,
 }

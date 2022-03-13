@@ -27,7 +27,13 @@ const FilterFunction = [
     'second',
     'isnull',
     'regex',
-    'iregex'
+    'iregex',
+    //
+    'has_any_keys',
+    'has_keys',
+    'has_key',
+    'contained_by',
+    'overlap'
 ] as const;
 
 export type FilterFunctionKey = typeof FilterFunction[number]; 

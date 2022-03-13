@@ -6,7 +6,8 @@ import { IntegerField as _IntegerField } from './integer-field.js';
 import { DateField as _DateField } from './date-field.js';
 import { BigIntegerField as _BigIntegerField } from './big-integer-field.js';
 import { AutoField as _AutoField } from './auto-field.js';
-import { IndDbJsonField as _IndDbJsonField } from './IndDb-json-field.js';
+import { indexedDBJsonField } from './indexedDB-json-field.js';
+import { indexedDBArrayField } from './indexedDB-array-field.js';
 export function CharField(data) {
     return new _CharField(data);
 }
@@ -31,6 +32,9 @@ export function BigIntegerField() {
 export function AutoField(data) {
     return new _AutoField(data);
 }
-export function IndDbJsonField() {
-    return new _IndDbJsonField();
-}
+export const indexedDB = {
+    fields: {
+        JsonField: () => new indexedDBJsonField(),
+        ArrayField: ({ type = null }) => new indexedDBArrayField({ type })
+    }
+};

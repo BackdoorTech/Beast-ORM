@@ -5,7 +5,7 @@ import { indexedDB  } from './../connection/indexedDb/indexedb.js'
 interface register {
   databaseName: string,
   version: number,
-  type: 'indexeddb' | 'memory'
+  type: 'indexedDB'
   models: typeof Model[]
 }
 
@@ -55,7 +55,7 @@ export class registerModel {
       
     })
 
-    if(databaseSchema.type =='indexeddb') {
+    if(databaseSchema.type =='indexedDB') {
       await indexedDB.migrate(databaseSchema)
     }
 

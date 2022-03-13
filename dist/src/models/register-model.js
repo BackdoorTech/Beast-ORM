@@ -36,7 +36,7 @@ export class registerModel {
                 }
             });
         });
-        if (databaseSchema.type == 'indexeddb') {
+        if (databaseSchema.type == 'indexedDB') {
             await indexedDB.migrate(databaseSchema);
         }
         await entries.models.forEach(async (modelClassRepresentations) => {

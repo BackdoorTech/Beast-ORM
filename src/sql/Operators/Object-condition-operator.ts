@@ -1,8 +1,10 @@
+import { TableSchema } from '../../models/register-modal.interface.js';
 import { operator } from './object-operator.js'
+import { getDeep } from '../../utils.js'
 
 export class ObjectConditionOperator {
 
-	constructor(private row, private tableSchema) {}
+	constructor(private row, private TableSchema:TableSchema) {}
 
 	async run(args): Promise<boolean| any> {
 		
@@ -43,11 +45,13 @@ export class ObjectConditionOperator {
 			const fieldName = element.join('.')
 			
 			if(operator[operation]) {
-				const rowFieldValue = this.row[fieldName]
+				const rowFieldValue = getDeep(this.row, fieldName)
 				const arg = objOperator[field];
-				// console.log(this.row)
-				const operationResult: boolean = await operator[operation](field, arg, rowFieldValue, this.row)
+
+				const operationResult: boolean = await operator[operation](field, arg, rowFieldValue, this.row, this.TableSchema)
+				console.log(operation, operationResult)
 				if(!operationResult) {
+					
 					return false
 				}
 			}

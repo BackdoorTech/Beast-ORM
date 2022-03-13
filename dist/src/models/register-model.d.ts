@@ -3,7 +3,7 @@ import { DatabaseSchema, TableSchema } from './register-modal.interface.js';
 interface register {
     databaseName: string;
     version: number;
-    type: 'indexeddb' | 'memory';
+    type: 'indexedDB';
     models: typeof Model[];
 }
 export declare const models: {};

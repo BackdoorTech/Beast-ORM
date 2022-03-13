@@ -1,3 +1,3 @@
 
 export declare type actionParam =  'insert' | 'update' | 'delete' | 'select'
-export declare type  dbType = 'indexeddb' | 'memory'
+export declare type  dbType = 'indexedDB' 

@@ -24,7 +24,7 @@ describe("initial test for model", () => {
 
       await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -55,7 +55,7 @@ describe("initial test for model", () => {
 
       await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -88,7 +88,7 @@ describe("initial test for model", () => {
 
       await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -121,7 +121,7 @@ describe("initial test for model", () => {
 
       await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -161,7 +161,7 @@ describe("initial test for model", () => {
 
       await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -198,7 +198,7 @@ describe("initial test for model", () => {
 
       await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -236,7 +236,7 @@ describe("initial test for model", () => {
 
       await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -277,7 +277,7 @@ describe("initial test for model", () => {
 
       await models.register({
         databaseName:'jest-test-model create([{...}])',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -321,7 +321,7 @@ describe("initial test for model", () => {
 
       await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -360,7 +360,7 @@ describe("initial test for model", () => {
 
       await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -399,7 +399,7 @@ describe("initial test for model", () => {
 
       await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -417,5 +417,227 @@ describe("initial test for model", () => {
     expect('time not exceeded').toBe('time not exceeded')
     
   }, 10000)
+
+  it('model createOrFind case find', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      class User extends models.Model {
+
+        userId = models.AutoField({primaryKey:true})
+        username = models.CharField({maxLength: 100})
+        email = models.CharField({blank: true, maxLength: 100})
+        age = models.IntegerField()
+      
+      }
+
+      await models.register({
+        databaseName:'jest-test-documentation first example',
+        type: 'indexedDB',
+        version: 1,
+        models: [User]
+      })
+
+      const user = await User.create({username:'kobe', email:'kobe.bryant@lakers.com'})
+      
+      const result = await User.createOrFind(
+        {userId:user.userId},
+        {username:'kobe', email:'kobe.bryant@lakers.com'}
+      )
+
+      document.body.innerHTML = JSON.stringify(result)
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"userId":1,"username":"kobe","email":"kobe.bryant@lakers.com","age":""},false]')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+
+
+  it('model createOrFind case create', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      class User extends models.Model {
+
+        userId = models.AutoField({primaryKey:true})
+        username = models.CharField({maxLength: 100})
+        email = models.CharField({blank: true, maxLength: 100})
+        age = models.IntegerField()
+      
+      }
+
+      await models.register({
+        databaseName:'jest-test-model createOrFind case create',
+        type: 'indexedDB',
+        version: 1,
+        models: [User]
+      })
+
+      await User.create({username:'jame', email:'jame.mark@lakers.com'})
+      
+      const result = await User.createOrFind(
+        {email:'kobe.bryant@lakers.com'},
+        {username:'kobe', email:'kobe.bryant@lakers.com'}
+      )
+
+      document.body.innerHTML = JSON.stringify(result)
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"userId":2,"username":"kobe","email":"kobe.bryant@lakers.com","age":""},true]')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+
+  it('model updateOrCreate case create', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      class User extends models.Model {
+
+        userId = models.AutoField({primaryKey:true})
+        username = models.CharField({maxLength: 100})
+        email = models.CharField({blank: true, maxLength: 100})
+        age = models.IntegerField()
+      
+      }
+
+      await models.register({
+        databaseName:'jest-test-model updateOrCreate case create',
+        type: 'indexedDB',
+        version: 1,
+        models: [User]
+      })
+
+      await User.create({username:'jame', email:'jame.mark@lakers.com'})
+      
+      const result = await User.updateOrCreate(
+        {email:'kobe.bryant@lakers.com'},
+        {username:'kobe', email:'kobe.bryant@lakers.com'}
+      )
+
+      document.body.innerHTML = JSON.stringify(result)
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"userId":2,"username":"kobe","email":"kobe.bryant@lakers.com","age":""},true]')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+
+  it('model updateOrCreate case update', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      class User extends models.Model {
+
+        userId = models.AutoField({primaryKey:true})
+        username = models.CharField({maxLength: 100})
+        email = models.CharField({blank: true, maxLength: 100})
+        age = models.IntegerField()
+      
+      }
+
+      await models.register({
+        databaseName:'jest-test-model-updateOrCreate-case-update',
+        type: 'indexedDB',
+        version: 1,
+        models: [User]
+      })
+
+      await User.create({username:'jame', email:'kobe.bryant@lakers.com'})
+      
+      const result = await User.updateOrCreate(
+        {email:'kobe.bryant@lakers.com'},
+        {username:'kobe', email:'kobe.bryant@lakers.com'}
+      )
+
+      document.body.innerHTML = JSON.stringify(result)
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('{"userId":1,"username":"kobe","email":"kobe.bryant@lakers.com","age":""}')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+})
+
+
+
+describe("operators", () => {
+  
+  beforeEach(async () => {
+    await page.goto(`http://127.0.0.1:${Port}/test/index.html`)
+  })
+
+
+  it('operator contains', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const {ArrayField, JsonField } = models.indexedDB.fields
+
+      class User extends models.Model {
+
+        userId = models.AutoField({primaryKey:true})
+        username = models.CharField({maxLength: 100})
+        email = models.CharField({blank: true, maxLength: 100})
+        age = models.IntegerField()
+        pets = ArrayField({type: models.CharField()})
+      
+      }
+
+      await models.register({
+        databaseName:'jest-test-operator-contains-include',
+        type: 'indexedDB',
+        version: 1,
+        models: [User]
+      })
+
+
+      await User.create({username:'James', email:'', age:'', pets:['ashe','meggie']})
+
+      const user = await User.filter({pets__contains:['ashe']}).execute()
+
+      document.body.innerHTML = JSON.stringify(user)
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"username":"James","email":"","age":"","pets":["ashe","meggie"],"userId":1}]')
+    
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+
 
 })

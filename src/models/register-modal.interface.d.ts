@@ -17,7 +17,7 @@ export interface TableSchema {
 
 export interface DatabaseSchema {
 	databaseName: string;
-	type: 'memory' | 'indexeddb'
+	type: 'indexedDB'
 	version: number;
 	stores: TableSchema[]
 }

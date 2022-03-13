@@ -43,7 +43,10 @@
     "browsermodel",
     "orm",
     "offline",
-    "first"
+    "first",
+    "transaction",
+    "promise",
+    "query-builder"
   ],
   "homepage": "https://github.com/BackdoorTech/Beast-ORM#readme",
   "dependencies": {}
