@@ -1,6 +1,8 @@
 import { FieldType } from '../../sql/query/interface.js'
+import { Model } from '../model.js'
+import { modelsConfig } from '../register-model.js'
 import { field } from './field.js'
-import { AutoFieldParams, BooleanFieldParams, DateFieldParams, DateTimeFieldParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams } from './interface.js'
+import { AutoFieldParams, BooleanFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams } from './interface.js'
 import { BigIntegerFieldParams } from './interface.js'
 import { CharFieldParams } from './interface.js'
 import { TextFieldParams } from './interface.js'
@@ -119,5 +121,42 @@ export class IntegerField extends field {
 	constructor(data?:IntegerFieldParams) {
 		super()
 		Object.assign(this, data);
+	}
+}
+
+export class ForeignKey extends field {
+	
+	model
+	foreignKey = true
+
+	constructor(data?: ForeignKeyParams) {
+		super()
+		Object.assign(this, data);
+	}
+}
+
+export class OneToOneField extends field {
+	
+	foreignKey = true
+	model
+
+	constructor(data?: OneToOneFieldParams) {
+		super()
+		Object.assign(this, data);
+	}
+
+	contractor(contractor: any) {
+		throw new Error('Method not implemented.')
+	}
+}
+
+
+export class ManyToManyField {
+
+	model
+	foreignKey = true
+
+	constructor(data?:ManyToManyFieldParams) {
+
 	}
 }

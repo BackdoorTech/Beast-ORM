@@ -9,6 +9,9 @@ export declare const models: {
     DateField(data?: import("./models/field/interface.js").DateFieldParams): import("./models/field/allFields.js").DateField;
     BigIntegerField(data?: import("./models/field/interface.js").BigIntegerFieldParams): import("./models/field/allFields.js").BigIntegerField;
     AutoField(data?: import("./models/field/interface.js").AutoFieldParams): import("./models/field/allFields.js").AutoField;
+    OneToOneField(data: import("./models/field/interface.js").OneToOneFieldParams): import("./models/field/allFields.js").OneToOneField;
+    ForeignKey(data: import("./models/field/interface.js").ForeignKeyParams): import("./models/field/allFields.js").ForeignKey;
+    ManyToManyField(data?: import("./models/field/interface.js").ManyToManyFieldParams): import("./models/field/allFields.js").ManyToManyField;
     indexedDB: {
         fields: {
             JsonField: (data?: import("./models/field/interface.js").IndexedDBJsonFieldParams) => import("./models/field/allFields.js").indexedDBJsonField;

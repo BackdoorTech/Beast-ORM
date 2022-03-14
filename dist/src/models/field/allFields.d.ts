@@ -1,6 +1,6 @@
 import { FieldType } from '../../sql/query/interface.js';
 import { field } from './field.js';
-import { AutoFieldParams, BooleanFieldParams, DateFieldParams, DateTimeFieldParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams } from './interface.js';
+import { AutoFieldParams, BooleanFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams } from './interface.js';
 import { BigIntegerFieldParams } from './interface.js';
 import { CharFieldParams } from './interface.js';
 import { TextFieldParams } from './interface.js';
@@ -56,4 +56,20 @@ export declare class IntegerField extends field {
     primaryKey?: boolean;
     type: FieldType;
     constructor(data?: IntegerFieldParams);
+}
+export declare class ForeignKey extends field {
+    model: any;
+    foreignKey: boolean;
+    constructor(data?: ForeignKeyParams);
+}
+export declare class OneToOneField extends field {
+    foreignKey: boolean;
+    model: any;
+    constructor(data?: OneToOneFieldParams);
+    contractor(contractor: any): void;
+}
+export declare class ManyToManyField {
+    model: any;
+    foreignKey: boolean;
+    constructor(data?: ManyToManyFieldParams);
 }

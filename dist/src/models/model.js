@@ -26,6 +26,11 @@ export class Model extends (_b = ModelManager) {
         const modelName = this.constructor.name;
         return modelsConfig[modelName].TableSchema;
     }
+    getPrimaryKeyValue() {
+        const TableSchema = this.getTableSchema();
+        const idFieldName = TableSchema.id.keyPath;
+        return this[idFieldName];
+    }
     async save() {
         const DBconfig = this.getDBSchema();
         const tableSchema = this.getTableSchema();
@@ -105,10 +110,19 @@ export class Model extends (_b = ModelManager) {
             arg = [arg];
         }
         const emptyFields = await this.getEmptyFields();
+        const TableSchema = this.getTableSchema();
         for (let i in arg) {
             arg[i] = Object.assign(Object.assign({}, emptyFields), arg[i]);
+            console.log(TableSchema.attributes);
+            if (TableSchema.attributes.foreignKey) {
+                for (let field of TableSchema.attributes.foreignKey) {
+                    try {
+                        arg[i][field] = arg[i][field].getPrimaryKeyValue();
+                    }
+                    catch (error) { }
+                }
+            }
         }
-        const TableSchema = this.getTableSchema();
         const _methods = [{ methodName: 'create', arguments: arg }];
         const DBconfig = this.getDBSchema();
         const createObject = await super.obj(DBconfig, TableSchema).create(_methods);
@@ -121,6 +135,11 @@ export class Model extends (_b = ModelManager) {
         }
         else {
         }
+    }
+    static getPrimaryKeyValue() {
+        const TableSchema = this.getTableSchema();
+        const idFieldName = TableSchema.id.keyPath;
+        return this[idFieldName];
     }
     static newInstance({ TableSchema, DBconfig, ModelName, dataToMerge }) {
         let newInstance = new models[ModelName]();

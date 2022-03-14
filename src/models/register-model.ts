@@ -1,7 +1,10 @@
 import { Model } from './model.js';
-import { ModelReader } from './model.reader.js'
-import { DatabaseSchema, TableSchema  } from './register-modal.interface.js'
-import { indexedDB  } from './../connection/indexedDb/indexedb.js'
+import { ModelReader } from './model.reader.js';
+import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
+import { indexedDB  } from './../connection/indexedDb/indexedb.js';
+import { OneToOneField, ForeignKey } from './field/allFields.js';
+import { uncapitalize } from '../utils.js';
+
 interface register {
   databaseName: string,
   version: number,
@@ -10,7 +13,11 @@ interface register {
 }
 
 export const models = {}
-export const modelsConfig: {[key:string]: { DatabaseSchema:DatabaseSchema, TableSchema:TableSchema}} = {}
+export const modelsConfig: {[key:string]: { 
+  DatabaseSchema:DatabaseSchema,
+  TableSchema:TableSchema,
+  OneToOneField?: {[key:string]: {}} 
+  }} = {}
 
 
 export class registerModel {
@@ -34,6 +41,7 @@ export class registerModel {
           keyPath: idFieldName || 'id', //by default primary key is id
           autoIncrement:   fields[idFieldName]? fields[idFieldName]?.primaryKey == true: true
         },
+        attributes: attributes,
         fields: [],
       })
 
@@ -51,6 +59,13 @@ export class registerModel {
           })
 
         }
+
+        if(Field instanceof OneToOneField) {
+          ModelEditor.addMethodOneToOneField(Field, fieldName, modelName)
+        } else if (Field instanceof ForeignKey) {
+          ModelEditor.addMethodForeignKey(Field, fieldName, modelName)
+        }
+
       })
       
     })
@@ -72,6 +87,47 @@ export class registerModel {
       }
 
     })
+
+  }
+}
+
+
+export class ModelEditor {
+  static addMethodOneToOneField(foreignKeyField:OneToOneField, FieldName:string, modelName:string) {
+
+    const foreignKeyFieldModel: Model = foreignKeyField.model
+    const modelNameLowCase = uncapitalize(modelName)
+
+    foreignKeyFieldModel['prototype'][modelNameLowCase] = async function (body) {
+
+      const obj ={}
+      obj[FieldName] = this.getPrimaryKeyValue()
+
+      const foreignModel: Model = models[modelName]
+
+      return await foreignModel.get(obj)
+
+    }
+
+  }
+
+  static addMethodForeignKey(foreignKeyField:ForeignKey, FieldName:string, modelName:string) {
+    
+    const foreignKeyFieldModel: Model = foreignKeyField.model
+    const FunctionName = uncapitalize(modelName)
+
+    foreignKeyFieldModel['prototype'][FunctionName+'SetAll'] = async function () {
+
+      const obj = {}
+      obj[FieldName] = this.getPrimaryKeyValue()
+      
+      const foreignModel: Model = models[modelName]
+
+      console.log(obj, 'obj')
+
+      return await foreignModel.filter(obj).execute()
+
+    }
 
   }
 }

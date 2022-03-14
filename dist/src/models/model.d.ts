@@ -14,6 +14,7 @@ export declare class Model extends ModelManager {
         all: () => Promise<any>;
     };
     getTableSchema(): TableSchema;
+    private getPrimaryKeyValue;
     save(): Promise<void>;
     delete(): Promise<void>;
     all(): Promise<any>;
@@ -32,6 +33,7 @@ export declare class Model extends ModelManager {
     static getTableSchema(): TableSchema;
     private static getEmptyFields;
     static create(arg: any): Promise<any>;
+    private static getPrimaryKeyValue;
     private static newInstance;
     static createOrFind(getArg: any, defaultCreate: any): Promise<any[]>;
     static updateOrCreate(argToFind: any, argsToUpdate: any): Promise<any>;

@@ -70,3 +70,25 @@ export class IntegerField extends field {
         Object.assign(this, data);
     }
 }
+export class ForeignKey extends field {
+    constructor(data) {
+        super();
+        this.foreignKey = true;
+        Object.assign(this, data);
+    }
+}
+export class OneToOneField extends field {
+    constructor(data) {
+        super();
+        this.foreignKey = true;
+        Object.assign(this, data);
+    }
+    contractor(contractor) {
+        throw new Error('Method not implemented.');
+    }
+}
+export class ManyToManyField {
+    constructor(data) {
+        this.foreignKey = true;
+    }
+}

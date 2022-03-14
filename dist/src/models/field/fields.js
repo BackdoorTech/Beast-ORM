@@ -26,3 +26,12 @@ export const indexedDB = {
         ArrayField: (data) => new Fields.indexedDBArrayField(data)
     }
 };
+export function OneToOneField(data) {
+    return new Fields.OneToOneField(data);
+}
+export function ForeignKey(data) {
+    return new Fields.ForeignKey(data);
+}
+export function ManyToManyField(data) {
+    return new Fields.ManyToManyField(data);
+}

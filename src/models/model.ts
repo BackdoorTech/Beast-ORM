@@ -3,7 +3,7 @@ import { Methods, getParams, Method } from './model.interface.js'
 import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
 import { ModelManager } from './model-manager.js';
 import { models, modelsConfig } from './register-model.js'
-import { field } from './field/field.js';
+
 
 
 let methods : Methods = {} = {}
@@ -38,6 +38,12 @@ export class Model extends ModelManager{
   getTableSchema(): TableSchema {
     const modelName = this.constructor.name
     return modelsConfig[modelName].TableSchema
+  }
+
+  private getPrimaryKeyValue() {
+    const TableSchema = this.getTableSchema()
+    const idFieldName = TableSchema.id.keyPath
+    return this[idFieldName]
   }
 
   async save() {
@@ -145,6 +151,7 @@ export class Model extends ModelManager{
     return emptyFields
   }
 
+
   static async create(arg): Promise<any> {
 
     if (arg.constructor.name != 'Array') {
@@ -152,12 +159,26 @@ export class Model extends ModelManager{
     }
 
     const emptyFields = await this.getEmptyFields()
+    const TableSchema = this.getTableSchema()
 
     for(let i in arg) {
       arg[i] = Object.assign({...emptyFields} , arg[i])
-    }
 
-    const TableSchema = this.getTableSchema()
+      console.log(TableSchema.attributes)
+
+      if (TableSchema.attributes.foreignKey) {
+        for (let field of TableSchema.attributes.foreignKey) {
+          
+          try {
+            arg[i][field] = arg[i][field].getPrimaryKeyValue()
+          } catch (error){}
+          
+        }
+      }
+
+    }
+    
+    
     const _methods: Method[] = [{methodName: 'create', arguments: arg}]
     const DBconfig = this.getDBSchema()
     
@@ -174,6 +195,12 @@ export class Model extends ModelManager{
         
     }
 
+  }
+
+  private static getPrimaryKeyValue() {
+    const TableSchema = this.getTableSchema()
+    const idFieldName = TableSchema.id.keyPath
+    return this[idFieldName]
   }
 
 

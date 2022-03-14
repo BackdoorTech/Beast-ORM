@@ -1,4 +1,4 @@
-import { AutoFieldParams, BigIntegerFieldParams, BooleanFieldParams, CharFieldParams, DateFieldParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, TextFieldParams } from './interface.js'
+import { AutoFieldParams, BigIntegerFieldParams, BooleanFieldParams, CharFieldParams, DateFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams, TextFieldParams } from './interface.js'
 
 
 import * as Fields from './allFields.js'
@@ -38,4 +38,19 @@ export const  indexedDB = {
 		JsonField: (data?:IndexedDBJsonFieldParams) => new Fields.indexedDBJsonField(data),
 		ArrayField: (data?:IndexedDBArrayFieldParams) => new Fields.indexedDBArrayField(data)
 	}
+}
+
+
+export  function OneToOneField(data:OneToOneFieldParams) {
+	return new Fields.OneToOneField(data)
+}
+
+
+export  function ForeignKey(data:ForeignKeyParams) {
+	return new Fields.ForeignKey(data)
+}
+
+
+export  function ManyToManyField(data?:ManyToManyFieldParams) {
+	return new Fields.ManyToManyField(data)
 }

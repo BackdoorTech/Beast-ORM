@@ -14,6 +14,7 @@ export class ModelReader {
                     fieldTypes[type] = [];
                 }
                 fieldTypes[type].push(fieldName);
+                console.log(Field);
                 Object.entries(Field).forEach(([FieldProperty, value]) => {
                     if (typeof value != "function") {
                         if (!attributes[FieldProperty]) {

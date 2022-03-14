@@ -1,4 +1,5 @@
 import { FieldType } from '../sql/query/model.js'
+import { FieldsMap, FieldKeys, FieldKeysArray, AttributesMap, FieldAttributesKeys } from './field/fields.interface.js'
 
 export interface FieldSchema {
 	name: string, 
@@ -13,6 +14,7 @@ export interface TableSchema {
 	name: string,
 	id: { keyPath: string , autoIncrement?: boolean },
 	fields: FieldSchema[]
+	attributes: AttributesMap<FieldAttributesKeys, string[]> = {}
 }
 
 export interface DatabaseSchema {
