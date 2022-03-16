@@ -1,6 +1,6 @@
 import { Model } from './model.js';
 import { DatabaseSchema, TableSchema } from './register-modal.interface.js';
-import { OneToOneField, ForeignKey } from './field/allFields.js';
+import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js';
 interface register {
     databaseName: string;
     version: number;
@@ -19,9 +19,11 @@ export declare const modelsConfig: {
 };
 export declare class registerModel {
     static register(entries: register): Promise<void>;
+    static manyToManyRelationShip(foreignKeyField: ManyToManyField, FieldName: string, modelName: string, databaseSchema: DatabaseSchema): void;
 }
 export declare class ModelEditor {
-    static addMethodOneToOneField(foreignKeyField: OneToOneField, FieldName: string, modelName: string): void;
-    static addMethodForeignKey(foreignKeyField: ForeignKey, FieldName: string, modelName: string): void;
+    static addMethodOneToOneField(foreignKeyField: OneToOneField, FieldName: string, modelName: string, databaseSchema: DatabaseSchema): void;
+    static addMethodForeignKey(foreignKeyField: ForeignKey, FieldName: string, modelName: string, databaseSchema: DatabaseSchema): void;
+    static addMethodManyToManyField(foreignKeyField: ManyToManyField, FieldName: string, modelName: string, databaseSchema: DatabaseSchema): Promise<void>;
 }
 export {};

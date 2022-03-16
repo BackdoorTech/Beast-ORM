@@ -151,12 +151,13 @@ export class OneToOneField extends field {
 }
 
 
-export class ManyToManyField {
+export class ManyToManyField extends field {
 
 	model
 	foreignKey = true
 
 	constructor(data?:ManyToManyFieldParams) {
-
+		super()
+		Object.assign(this, data);
 	}
 }

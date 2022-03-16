@@ -87,8 +87,10 @@ export class OneToOneField extends field {
         throw new Error('Method not implemented.');
     }
 }
-export class ManyToManyField {
+export class ManyToManyField extends field {
     constructor(data) {
+        super();
         this.foreignKey = true;
+        Object.assign(this, data);
     }
 }

@@ -68,7 +68,7 @@ export declare class OneToOneField extends field {
     constructor(data?: OneToOneFieldParams);
     contractor(contractor: any): void;
 }
-export declare class ManyToManyField {
+export declare class ManyToManyField extends field {
     model: any;
     foreignKey: boolean;
     constructor(data?: ManyToManyFieldParams);

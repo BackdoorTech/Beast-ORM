@@ -12,7 +12,7 @@ export interface FieldSchema {
 
 export interface TableSchema {
 	name: string,
-	id: { keyPath: string , autoIncrement?: boolean },
+	id: { keyPath: string , autoIncrement?: boolean , type:  FieldType},
 	fields: FieldSchema[]
 	attributes: AttributesMap<FieldAttributesKeys, string[]> = {}
 }

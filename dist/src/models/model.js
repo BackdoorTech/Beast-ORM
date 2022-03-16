@@ -2,6 +2,7 @@ var _a, _b;
 import { hashCode, uniqueGenerator } from '../utils.js';
 import { ModelManager } from './model-manager.js';
 import { models, modelsConfig } from './register-model.js';
+import { FieldType } from '../sql/query/interface.js';
 let methods = {} = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model extends (_b = ModelManager) {
@@ -56,6 +57,24 @@ export class Model extends (_b = ModelManager) {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
         return await Model.object({ DBconfig, TableSchema }).all();
+    }
+    static async getModelsFields(arg) {
+        var _c;
+        const newArgs = {};
+        const TableSchema = this.getTableSchema();
+        if ((_c = TableSchema.id) === null || _c === void 0 ? void 0 : _c.autoIncrement) {
+            TableSchema.fields.push({
+                keyPath: TableSchema.id.keyPath,
+                name: TableSchema.id.keyPath,
+                options: {
+                    type: FieldType.INT,
+                    unique: true
+                }
+            });
+        }
+        for (const fieldName in TableSchema.fields) {
+            newArgs[fieldName] = arg[fieldName];
+        }
     }
     static async all() {
         const DBconfig = this.getDBSchema();

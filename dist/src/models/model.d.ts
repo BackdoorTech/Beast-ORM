@@ -18,6 +18,7 @@ export declare class Model extends ModelManager {
     save(): Promise<void>;
     delete(): Promise<void>;
     all(): Promise<any>;
+    static getModelsFields(arg: any): Promise<void>;
     static all(): Promise<any>;
     static get(arg: getParams): Promise<any>;
     private static getId;

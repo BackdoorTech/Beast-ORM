@@ -2,8 +2,9 @@ import { Model } from './model.js';
 import { ModelReader } from './model.reader.js';
 import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
 import { indexedDB  } from './../connection/indexedDb/indexedb.js';
-import { OneToOneField, ForeignKey } from './field/allFields.js';
+import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js';
 import { uncapitalize } from '../utils.js';
+import { FieldType } from '../sql/query/interface.js';
 
 interface register {
   databaseName: string,
@@ -30,6 +31,14 @@ export class registerModel {
       stores: []
     };
 
+
+    await entries.models.forEach(async(modelClassRepresentations) => {
+      
+      const ModelName = modelClassRepresentations.getModelName()
+      models[ModelName] = modelClassRepresentations
+
+    })
+
     await entries.models.forEach(async(modelClassRepresentations, index) => {
       const {fields, modelName, attributes , fieldTypes} = ModelReader.read(modelClassRepresentations)
       
@@ -37,9 +46,10 @@ export class registerModel {
 
       databaseSchema.stores.push({
         name: modelName,
-        id: { 
+        id: {
           keyPath: idFieldName || 'id', //by default primary key is id
-          autoIncrement:   fields[idFieldName]? fields[idFieldName]?.primaryKey == true: true
+          autoIncrement:   fields[idFieldName]? fields[idFieldName]?.primaryKey == true: true,
+          type: FieldType.INT
         },
         attributes: attributes,
         fields: [],
@@ -60,11 +70,13 @@ export class registerModel {
 
         }
 
-        if(Field instanceof OneToOneField) {
-          ModelEditor.addMethodOneToOneField(Field, fieldName, modelName)
-        } else if (Field instanceof ForeignKey) {
-          ModelEditor.addMethodForeignKey(Field, fieldName, modelName)
-        }
+        // if(Field instanceof OneToOneField) {
+        //   ModelEditor.addMethodOneToOneField(Field, fieldName, modelName, databaseSchema)
+        // } else if (Field instanceof ForeignKey) {
+        //   ModelEditor.addMethodForeignKey(Field, fieldName, modelName, databaseSchema)
+        // } else if (Field instanceof ManyToManyField) {
+        //   await ModelEditor.addMethodManyToManyField(Field, fieldName, modelName, databaseSchema)
+        // }
 
       })
       
@@ -89,11 +101,54 @@ export class registerModel {
     })
 
   }
+
+  static manyToManyRelationShip(foreignKeyField:ManyToManyField, FieldName:string, modelName:string, databaseSchema:DatabaseSchema) {
+    const foreignKeyFieldModel: any = foreignKeyField.model
+    const currentModel: Model = models[modelName]
+
+
+    const foreignKeyFieldModelName = foreignKeyFieldModel.getModelName()
+    const currentModelName = models[modelName].getModelName()
+
+    const tableName = currentModelName+foreignKeyFieldModelName
+
+    const id = databaseSchema.stores.push({
+      name: tableName,
+      id: { keyPath:'id', autoIncrement: true, type: FieldType.INT},
+      fields: [
+        {
+          name: 'iD'+foreignKeyFieldModelName,
+          keyPath: 'iD'+foreignKeyFieldModelName,
+          options: {
+            unique:  false,
+            type:  FieldType.INT
+          }
+        },
+        {
+          name: 'iD'+currentModelName,
+          keyPath: 'iD'+currentModelName,
+          options: {
+            unique:  false,
+            type:  FieldType.INT
+          }
+        }
+      ],
+      attributes: {}
+    })
+
+    models[tableName] = generateGenericModel({
+      DBSchema: databaseSchema,
+      ModelName: tableName,
+      TableSchema: databaseSchema.stores[id]
+    })
+
+  }
+
 }
 
 
 export class ModelEditor {
-  static addMethodOneToOneField(foreignKeyField:OneToOneField, FieldName:string, modelName:string) {
+  static addMethodOneToOneField(foreignKeyField:OneToOneField, FieldName:string, modelName:string, databaseSchema:DatabaseSchema) {
 
     const foreignKeyFieldModel: Model = foreignKeyField.model
     const modelNameLowCase = uncapitalize(modelName)
@@ -111,7 +166,7 @@ export class ModelEditor {
 
   }
 
-  static addMethodForeignKey(foreignKeyField:ForeignKey, FieldName:string, modelName:string) {
+  static addMethodForeignKey(foreignKeyField:ForeignKey, FieldName:string, modelName:string, databaseSchema:DatabaseSchema) {
     
     const foreignKeyFieldModel: Model = foreignKeyField.model
     const FunctionName = uncapitalize(modelName)
@@ -121,13 +176,73 @@ export class ModelEditor {
       const obj = {}
       obj[FieldName] = this.getPrimaryKeyValue()
       
-      const foreignModel: Model = models[modelName]
+      const currentModel: Model = models[modelName]
 
-      console.log(obj, 'obj')
-
-      return await foreignModel.filter(obj).execute()
+      return await currentModel.filter(obj).execute()
 
     }
 
   }
+
+  static  async addMethodManyToManyField(foreignKeyField:ManyToManyField, FieldName:string, modelName:string, databaseSchema:DatabaseSchema) {
+    
+   
+    const foreignKeyFieldModel: any = foreignKeyField.model
+    FieldName = uncapitalize(FieldName)
+
+    const currentModel: Model = models[modelName]
+
+    await registerModel.manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema)
+
+    currentModel['prototype'][FieldName+'Add'] = async function (modelInstance) {
+
+      if(modelInstance instanceof foreignKeyFieldModel) {
+        await foreignKeyFieldModel.create(modelInstance)
+      } else {
+        throw('Need to be instance of '+ foreignKeyFieldModel.getModelName())
+      }
+
+    }
+
+  }
+}
+
+
+
+function generateGenericModel ({DBSchema, ModelName, TableSchema}) {
+  
+  class GenericModel {}
+
+  Object.assign(Model).forEach((Field, value) => {
+    GenericModel[Field] = value
+  })
+  
+  GenericModel.prototype = Model.prototype
+  
+  GenericModel.prototype['getDBSchema'] = () => {
+
+  }
+
+  GenericModel.prototype['getModelName'] = () => {
+
+  }
+
+  GenericModel.prototype['getTableSchema'] = () => {
+
+  }
+
+
+  GenericModel['getDBSchema'] = () => {
+
+  }
+
+  GenericModel['getModelName'] = () => {
+
+  }
+
+  GenericModel['getTableSchema'] = () => {
+
+  }
+
+  return GenericModel
 }

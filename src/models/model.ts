@@ -3,6 +3,8 @@ import { Methods, getParams, Method } from './model.interface.js'
 import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
 import { ModelManager } from './model-manager.js';
 import { models, modelsConfig } from './register-model.js'
+import { field } from './field/field.js';
+import { FieldType } from '../sql/query/interface.js';
 
 
 
@@ -82,6 +84,29 @@ export class Model extends ModelManager{
     return await Model.object({DBconfig, TableSchema}).all()
   }
   
+  static async getModelsFields(arg) {
+    
+    const newArgs = {}
+
+    const TableSchema = this.getTableSchema()
+
+    if(TableSchema.id?.autoIncrement) {
+      TableSchema.fields.push({
+        keyPath: TableSchema.id.keyPath,
+        name: TableSchema.id.keyPath,
+        options: {
+          type: FieldType.INT,
+          unique: true
+        }
+      })
+    }
+
+    for (const fieldName in TableSchema.fields) {
+      newArgs[fieldName] = arg[fieldName]
+    }
+
+  }
+
   static async all() {
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()

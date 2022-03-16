@@ -7,7 +7,7 @@ export class ModelReader {
 
     const classInstance: typeof models.Model = new modelClassRepresentation()
 
-    const modelName = classInstance.constructor.name
+    const modelName = classInstance.getModelName()
     const fieldTypes: FieldsMap<FieldKeys, string[]> = {}
     const fields: {[ key: string]: any} = {}
     const attributes: AttributesMap<FieldAttributesKeys, string[]> = {}
@@ -24,8 +24,6 @@ export class ModelReader {
         }
         
         fieldTypes[type].push(fieldName)
-
-        console.log(Field)
 
         Object.entries(Field).forEach(([FieldProperty, value]) => {
 
