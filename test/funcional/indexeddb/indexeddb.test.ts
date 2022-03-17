@@ -24,14 +24,14 @@ describe("initial test for model", () => {
 
 			models.register({
 				databaseName:'jest-test',
-				type: 'indexeddb',
+				type: 'indexedDB',
 				version: 1,
 				models: [Person]
 			})
 
 			const promise = indexedDB.databases()
 			promise.then(databases => {
-				console.log(databases)
+				// console.log(databases)
 				document.body.innerHTML = JSON.stringify(databases)
 			})
 

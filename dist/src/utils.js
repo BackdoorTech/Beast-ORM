@@ -11,3 +11,19 @@ export function hashCode(str) {
     }
     return hash;
 }
+export function getDeep(obj, path) {
+    for (var i = 0, path = path.split('.'), len = path.length; i < len; i++) {
+        obj = obj[path[i]];
+    }
+    ;
+    return obj;
+}
+;
+/** First Character uppercase */
+export function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+/** First Character lowercase */
+export function uncapitalize(str) {
+    return str.charAt(0).toLowerCase() + str.slice(1);
+}

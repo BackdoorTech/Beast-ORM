@@ -1,10 +1,9 @@
 var _a, _b;
 import { hashCode, uniqueGenerator } from '../utils.js';
 import { ModelManager } from './model-manager.js';
-import { models } from './register-model.js';
+import { models, modelsConfig } from './register-model.js';
+import { FieldType } from '../sql/query/interface.js';
 let methods = {} = {};
-let modalSpace = {};
-const constNewInstate = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model extends (_b = ModelManager) {
     constructor(obg) {
@@ -14,20 +13,24 @@ export class Model extends (_b = ModelManager) {
     get(arg) {
         return Model.get(arg);
     }
-    setDBConfig(config) {
-        Model.setDBConfig(config);
-    }
     getDBSchema() {
-        return constNewInstate[this.BeastOrmId].DBconfig;
+        const modelName = this.constructor.name;
+        return modelsConfig[modelName].DatabaseSchema;
     }
     getModelName() {
-        return constNewInstate[this.BeastOrmId].ModelName;
+        return this.constructor.name;
     }
     filter(...arg) {
         return Model.filter(arg);
     }
     getTableSchema() {
-        return constNewInstate[this.BeastOrmId].TableSchema;
+        const modelName = this.constructor.name;
+        return modelsConfig[modelName].TableSchema;
+    }
+    getPrimaryKeyValue() {
+        const TableSchema = this.getTableSchema();
+        const idFieldName = TableSchema.id.keyPath;
+        return this[idFieldName];
     }
     async save() {
         const DBconfig = this.getDBSchema();
@@ -55,6 +58,24 @@ export class Model extends (_b = ModelManager) {
         const TableSchema = this.getTableSchema();
         return await Model.object({ DBconfig, TableSchema }).all();
     }
+    static async getModelsFields(arg) {
+        var _c;
+        const newArgs = {};
+        const TableSchema = this.getTableSchema();
+        if ((_c = TableSchema.id) === null || _c === void 0 ? void 0 : _c.autoIncrement) {
+            TableSchema.fields.push({
+                keyPath: TableSchema.id.keyPath,
+                name: TableSchema.id.keyPath,
+                options: {
+                    type: FieldType.INT,
+                    unique: true
+                }
+            });
+        }
+        for (const fieldName in TableSchema.fields) {
+            newArgs[fieldName] = arg[fieldName];
+        }
+    }
     static async all() {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
@@ -66,13 +87,11 @@ export class Model extends (_b = ModelManager) {
         const TableSchema = this.getTableSchema();
         const foundObj = await super.obj(DBconfig, TableSchema).get(_methods);
         if (!foundObj) {
-            // console.log('Object not found param')
+            return false;
         }
         const ModelName = this.getModelName();
-        const BeastOrmId = uniqueGenerator();
-        constNewInstate[BeastOrmId] = { TableSchema, DBconfig, ModelName };
         let newInstance = new models[ModelName]();
-        Object.assign(newInstance, Object.assign(Object.assign({}, foundObj), { BeastOrmId }));
+        Object.assign(newInstance, Object.assign({}, foundObj));
         delete newInstance.obj;
         return newInstance;
     }
@@ -86,24 +105,22 @@ export class Model extends (_b = ModelManager) {
         const queryId = uniqueGenerator();
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
-        return Object.assign(this, this.object({ queryId, DBconfig, TableSchema, some: ['filter', arg] }));
+        const newInstanceModel = this.NewModelInstance();
+        return Object.assign(newInstanceModel, this.object({ queryId, DBconfig, TableSchema, some: ['filter', arg] }));
     }
-    static setDBConfig(config) {
-        var _c;
-        const id = this.getId();
-        if (((_c = modalSpace[id]) === null || _c === void 0 ? void 0 : _c.databaseSchema) == null) {
-            modalSpace[id] = Object.assign(modalSpace[id] || {}, { databaseSchema: config });
+    static NewModelInstance() {
+        class newInstanceModel {
         }
+        Object.assign(newInstanceModel, this);
+        return newInstanceModel;
     }
     static getDBSchema() {
-        const id = this.getId();
-        return modalSpace[id].databaseSchema;
+        const modalName = this.getModelName();
+        return modelsConfig[modalName].DatabaseSchema;
     }
     static getTableSchema() {
-        const id = this.getId();
-        const databaseSchema = modalSpace[id].databaseSchema;
-        const tableSchema = databaseSchema.stores.find((e) => e.name == this.getModelName());
-        return tableSchema;
+        const modalName = this.getModelName();
+        return modelsConfig[modalName].TableSchema;
     }
     static async getEmptyFields() {
         const TableSchema = this.getTableSchema();
@@ -119,17 +136,24 @@ export class Model extends (_b = ModelManager) {
             arg = [arg];
         }
         const emptyFields = await this.getEmptyFields();
+        const TableSchema = this.getTableSchema();
         for (let i in arg) {
             arg[i] = Object.assign(Object.assign({}, emptyFields), arg[i]);
+            // console.log(TableSchema.attributes)
+            if (TableSchema.attributes.foreignKey) {
+                for (let field of TableSchema.attributes.foreignKey) {
+                    try {
+                        arg[i][field] = arg[i][field].getPrimaryKeyValue();
+                    }
+                    catch (error) { }
+                }
+            }
         }
-        const TableSchema = this.getTableSchema();
         const _methods = [{ methodName: 'create', arguments: arg }];
         const DBconfig = this.getDBSchema();
         const createObject = await super.obj(DBconfig, TableSchema).create(_methods);
         if (createObject) {
             const ModelName = this.getModelName();
-            const BeastOrmId = uniqueGenerator();
-            constNewInstate[BeastOrmId] = { TableSchema, DBconfig, ModelName };
             let newInstance = new models[ModelName]();
             Object.assign(newInstance, createObject);
             delete newInstance.obj;
@@ -138,24 +162,42 @@ export class Model extends (_b = ModelManager) {
         else {
         }
     }
-    static async updateOrCreate(argToFind, argsToUpdate) {
-        const keys = Object.keys(argToFind);
-        let row;
-        if (keys.length == 1) {
-            row = await this.get(argToFind);
-        }
-        else if (keys.length >= 2) {
-            [row] = await this.filter(argToFind).execute();
-        }
-        if (!row) {
-            return await this.create(row);
+    static getPrimaryKeyValue() {
+        const TableSchema = this.getTableSchema();
+        const idFieldName = TableSchema.id.keyPath;
+        return this[idFieldName];
+    }
+    static newInstance({ TableSchema, DBconfig, ModelName, dataToMerge }) {
+        let newInstance = new models[ModelName]();
+        Object.assign(newInstance, Object.assign({}, dataToMerge));
+        delete newInstance.obj;
+        return newInstance;
+    }
+    static async createOrFind(getArg, defaultCreate) {
+        const result = await this.filter(getArg).execute();
+        const TableSchema = this.getTableSchema();
+        const DBconfig = this.getDBSchema();
+        const ModelName = this.getModelName();
+        let instance;
+        let created;
+        if (result.length == 1) {
+            created = false;
+            instance = await this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[0] });
         }
         else {
-            const newInstance = await this.get(row);
-            Object.assign(newInstance, argsToUpdate);
-            await newInstance.save();
-            return newInstance;
+            created = true;
+            instance = await this.create(Object.assign(defaultCreate, getArg));
         }
+        return [instance, created];
+    }
+    static async updateOrCreate(argToFind, argsToUpdate) {
+        let [instance, created] = await this.createOrFind(argToFind, argsToUpdate);
+        if (!created) {
+            const params = Object.assign(argToFind, argsToUpdate);
+            instance = Object.assign(instance, params);
+            await instance.save();
+        }
+        return instance;
     }
     static async update(arg) {
         const DBconfig = this.getDBSchema();
@@ -165,7 +207,7 @@ export class Model extends (_b = ModelManager) {
     }
 }
 _a = Model;
-Model.object = ({ queryId = uniqueGenerator(), some = null, DBconfig, TableSchema }) => {
+Model.object = ({ queryId = uniqueGenerator(), DBconfig, TableSchema, some = null }) => {
     if (!methods[queryId]) {
         methods[queryId] = [];
     }
@@ -177,7 +219,8 @@ Model.object = ({ queryId = uniqueGenerator(), some = null, DBconfig, TableSchem
     return {
         filter: (...args) => {
             methods[queryId].push({ methodName: 'filter', arguments: args });
-            return Object.assign(_a, _a.object({ queryId, DBconfig, TableSchema }));
+            const newInstanceModel = _a.NewModelInstance();
+            return Object.assign(newInstanceModel, _a.object({ DBconfig, TableSchema, queryId }));
         },
         execute: async () => {
             methods[queryId].push({ methodName: 'execute', arguments: null });

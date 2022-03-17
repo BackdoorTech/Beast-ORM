@@ -1,7 +1,7 @@
 {
   "name": "beast-orm",
   "description": "ORM for accessing indexedDB as a promise base api implementation.",
-  "version": "0.0.7",
+  "version": "1.0.0",
   "main": "./dist/src/index.js",
   "scripts": {
     "watch": "rimraf dist/src && tsc  --watch",
@@ -43,7 +43,10 @@
     "browsermodel",
     "orm",
     "offline",
-    "first"
+    "first",
+    "transaction",
+    "promise",
+    "query-builder"
   ],
   "homepage": "https://github.com/BackdoorTech/Beast-ORM#readme",
   "dependencies": {}

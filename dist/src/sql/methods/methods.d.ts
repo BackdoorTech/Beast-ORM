@@ -8,7 +8,7 @@ export declare class methodFunction {
     private TableSchema;
     rows: any[];
     constructor(arg: any, TableSchema: any);
-    cursor(row: object): Promise<void>;
+    cursor(row: object, resolve?: any, limit?: any): Promise<void>;
     run(rows: any[]): Promise<any[]>;
 }
 export declare const methods: methodsMap<methodsTypeKeys, methodFunction>;

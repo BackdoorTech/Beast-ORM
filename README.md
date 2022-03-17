@@ -1,6 +1,8 @@
 # Beast ORM
 
 ORM for accessing indexedDB as a promise base api implementation.
+**Under develop**
+Underdeveloped
 
 ## DBMS Support
 
@@ -44,7 +46,7 @@ import { User } from './models/user.js';
 models.register({
   databaseName: 'tutorial',
   version: 1,
-  type: 'IndexedDB',
+  type: 'indexedDB',
   models: [User]
 })
 
@@ -55,14 +57,33 @@ models.register({
 ## Creating objects
 
 
-the Query builder provides a convenient, fluent interface to creating and running database queries. It can be used to perform most database operations in your frontend application.
+An instance of that class represents a particular record in the database table
 ```javascript
-
 const user = await User.create({username:'kobe', email:'kobe.bryant@lakers.com'})
-// or
-const rows = User.create(arrayUser)
 
 ```
+
+To add multiple records in one go
+```javascript
+const users = [
+  {username:'kobe', email:'kobe.bryant@forever.com'},
+  {username:'michael', email:'michael.jackson@forever.com'}
+]
+
+const users = await User.create(users)
+
+```
+## Saving changes to objects
+this example changes its name and updates its record in the database
+
+```javascript
+
+const u1 = await User.get({userId:1})
+u1.username = 'New name'
+u1.save()
+
+```
+
 
 <br/>
 

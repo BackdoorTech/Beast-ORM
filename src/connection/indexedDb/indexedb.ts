@@ -220,6 +220,21 @@ class _indexedDB {
               }
             })
           })
+        } else if (methods[methods.length - 1].methodName == 'first') {
+          return new Promise(async(resolve, reject) => {
+            const sqlObject =  new SqlObject(TableSchema, methods)
+            await this.getActions(TableSchema.name, config).openCursor(async(event: any) => {
+              var cursor = event.target.result;
+              if(cursor) {
+                const row = cursor.value
+                await sqlObject.runFirstMethod(row, resolve, 1)
+                cursor.continue();
+              } else {
+                sqlObject.run()
+                resolve(sqlObject.firstMethod.rows)
+              }
+            })
+          })
         }
 
       },

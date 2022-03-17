@@ -1,5 +1,5 @@
 import { models } from "../index.js";
-import { FieldsMap, FieldKeys, FieldKeysArray, AttributesMap, AttributesKeys } from './field/fields.interface.js'
+import { FieldsMap, FieldKeys, FieldKeysArray, AttributesMap, FieldAttributesKeys } from './field/fields.interface.js'
 
 export class ModelReader {
 
@@ -7,10 +7,10 @@ export class ModelReader {
 
     const classInstance: typeof models.Model = new modelClassRepresentation()
 
-    const modelName = classInstance.constructor.name
+    const modelName = classInstance.getModelName()
     const fieldTypes: FieldsMap<FieldKeys, string[]> = {}
     const fields: {[ key: string]: any} = {}
-    const attributes: AttributesMap<AttributesKeys, string[]> = {}
+    const attributes: AttributesMap<FieldAttributesKeys, string[]> = {}
     
     Object.entries(classInstance).forEach(([fieldName, Field]) => {
 
@@ -26,6 +26,7 @@ export class ModelReader {
         fieldTypes[type].push(fieldName)
 
         Object.entries(Field).forEach(([FieldProperty, value]) => {
+
           if( typeof value !="function") {
 
             if(!attributes[FieldProperty]) {

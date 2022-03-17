@@ -2,7 +2,7 @@ import { FieldKeysArray } from './field/fields.interface.js';
 export class ModelReader {
     static read(modelClassRepresentation) {
         const classInstance = new modelClassRepresentation();
-        const modelName = classInstance.constructor.name;
+        const modelName = classInstance.getModelName();
         const fieldTypes = {};
         const fields = {};
         const attributes = {};

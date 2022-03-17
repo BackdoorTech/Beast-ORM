@@ -22,7 +22,7 @@ describe("comparisonOperator", () => {
 
 			await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -39,6 +39,35 @@ describe("comparisonOperator", () => {
 
 		debugger
 		await page.waitForFunction(() => 'true');
+
+
+		await page.evaluate(async() => {
+
+			const models: typeof modelsType = window['models']
+			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			class Person extends models.Model {
+				username =  models.CharField({maxLength:0})
+			} 
+
+			await models.register({
+        databaseName:'jest-test',
+        type: 'indexedDB',
+        version: 1,
+        models: [Person]
+      })
+			
+			const tableSchema = Person.getTableSchema()
+			const row = {name:'peter', age: 22}
+			const filterParams = [{age: 23}]
+
+			const operator = new ObjectOperator(row, tableSchema)
+			const result: Boolean = await operator.run(filterParams)
+			
+			document.body.innerHTML = 'result: '+result
+		})
+
+		debugger
+		await page.waitForFunction(() => 'false');
 
 		expect('time not exceeded').toBe('time not exceeded')
 	}, 20000)
@@ -58,7 +87,7 @@ describe("comparisonOperator", () => {
 
 			await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -95,7 +124,7 @@ describe("comparisonOperator", () => {
 
 			await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -132,7 +161,7 @@ describe("comparisonOperator", () => {
 
 			await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -171,7 +200,7 @@ describe("comparisonOperator", () => {
 
 			await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -209,7 +238,7 @@ describe("comparisonOperator", () => {
 
 			await models.register({
         databaseName:'jest-test',
-        type: 'indexeddb',
+        type: 'indexedDB',
         version: 1,
         models: [Person]
       })
@@ -226,6 +255,209 @@ describe("comparisonOperator", () => {
 
     debugger
 		await page.waitForFunction(() => 'result: true');
+
+    expect('time not exceeded').toBe('time not exceeded')
+	}, 20000)
+
+
+	it('comparisonOperator not', async () => {
+		await page.goto(`http://127.0.0.1:${Port}/test/index.html`)
+
+		await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+			const models: typeof modelsType = window['models']
+			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+
+			class Person extends models.Model {
+				username =  models.CharField({maxLength:0})
+			} 
+
+			await models.register({
+        databaseName:'jest-test',
+        type: 'indexedDB',
+        version: 1,
+        models: [Person]
+      })
+
+			const tableSchema = Person.getTableSchema()
+			const row = {name:'jame', age: 10}
+			const filterParams = [{age__not: 5}]
+
+			const operator = new ObjectOperator(row, tableSchema)
+			const result: Boolean = await operator.run(filterParams)
+			
+			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
+    })
+
+    debugger
+		await page.waitForFunction(() => 'result: true');
+
+    expect('time not exceeded').toBe('time not exceeded')
+	}, 20000)
+
+
+	it('comparisonOperator len', async () => {
+		await page.goto(`http://127.0.0.1:${Port}/test/index.html`)
+
+		await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+			const models: typeof modelsType = window['models']
+			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			
+			const { ArrayField, JsonField} = models.indexedDB.fields
+
+			class Person extends models.Model {
+				username =  models.CharField({maxLength:0})
+				tags =  ArrayField({})
+			}
+
+			await models.register({
+        databaseName:'jest-test',
+        type: 'indexedDB',
+        version: 1,
+        models: [Person]
+      })
+
+			const tableSchema = Person.getTableSchema()
+			const row = {name:'jame', tags: ['django']}
+			const filterParams = [{tags__len:  1}]
+
+			const operator = new ObjectOperator(row, tableSchema)
+			const result: Boolean = await operator.run(filterParams)
+			
+			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
+    })
+
+    debugger
+		await page.waitForFunction(() => 'result: true');
+
+		await page.evaluate(async() => {
+
+			const models: typeof modelsType = window['models']
+			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			
+			const { ArrayField, JsonField} = models.indexedDB.fields
+
+			class Person extends models.Model {
+				username =  models.CharField({maxLength:0})
+				tags =  ArrayField({})
+			}
+
+			await models.register({
+        databaseName:'jest-test',
+        type: 'indexedDB',
+        version: 1,
+        models: [Person]
+      })
+
+			const tableSchema = Person.getTableSchema()
+			const row = {name:'jame', tags: ['django']}
+			const filterParams = [{tags__len:  2}]
+
+			const operator = new ObjectOperator(row, tableSchema)
+			const result: Boolean = await operator.run(filterParams)
+			
+			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
+    })
+
+    debugger
+
+		await page.waitForFunction(() => 'result: false');
+
+    expect('time not exceeded').toBe('time not exceeded')
+	}, 20000)
+
+
+	it('comparisonOperator isNull', async () => {
+		await page.goto(`http://127.0.0.1:${Port}/test/index.html`)
+
+		await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+			const models: typeof modelsType = window['models']
+			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			
+			const { ArrayField, JsonField} = models.indexedDB.fields
+
+			class Person extends models.Model {
+				username =  models.CharField({maxLength:0})
+				data =  JsonField()
+			}
+
+			await models.register({
+        databaseName:'jest-test',
+        type: 'indexedDB',
+        version: 1,
+        models: [Person]
+      })
+
+			const tableSchema = Person.getTableSchema()
+			const row = {
+				name:'jame', 
+				data: {
+					'name': 'Bob',
+					'other_pets': [{
+						'name': 'Fishy',
+					}],
+				}
+			}
+
+			const filterParams = [{data__owner__isNull:  true }]
+
+			const operator = new ObjectOperator(row, tableSchema)
+			const result: Boolean = await operator.run(filterParams)
+			
+			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
+    })
+
+    debugger
+		await page.waitForFunction(() => 'result: true');
+
+		await page.evaluate(async() => {
+
+			const models: typeof modelsType = window['models']
+			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			
+			const { ArrayField, JsonField} = models.indexedDB.fields
+
+			class Person extends models.Model {
+				username =  models.CharField({maxLength:0})
+				tags =  ArrayField({})
+			}
+
+			await models.register({
+        databaseName:'jest-test',
+        type: 'indexedDB',
+        version: 1,
+        models: [Person]
+      })
+
+			const tableSchema = Person.getTableSchema()
+			const row = {
+				name:'jame', 
+				data: {
+					'name': 'Bob',
+					'other_pets': [{
+						'name': 'Fishy',
+					}],
+				}
+			}
+			const filterParams = [{data__name__isNull:  false }]
+
+			const operator = new ObjectOperator(row, tableSchema)
+			const result: Boolean = await operator.run(filterParams)
+			
+			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
+    })
+
+    debugger
+
+		await page.waitForFunction(() => 'result: false');
 
     expect('time not exceeded').toBe('time not exceeded')
 	}, 20000)

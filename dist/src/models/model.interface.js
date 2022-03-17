@@ -6,5 +6,6 @@ export const MethodNameArray = [
     'execute',
     'update',
     'delete',
-    'all'
+    'all',
+    'first'
 ]; // TS3.4 syntax

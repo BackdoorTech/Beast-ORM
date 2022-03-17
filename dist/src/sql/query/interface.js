@@ -9,5 +9,6 @@ export var FieldType;
     FieldType[FieldType["BOOL"] = 6] = "BOOL";
     FieldType[FieldType["CHAR"] = 7] = "CHAR";
     FieldType[FieldType["JSON"] = 8] = "JSON";
+    FieldType[FieldType["ARRAY"] = 9] = "ARRAY";
 })(FieldType || (FieldType = {}));
 //

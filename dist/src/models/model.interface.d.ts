@@ -1,4 +1,4 @@
-export declare const MethodNameArray: readonly ["save", "filter", "get", "create", "execute", "update", "delete", "all"];
+export declare const MethodNameArray: readonly ["save", "filter", "get", "create", "execute", "update", "delete", "all", "first"];
 export declare type MethodName = typeof MethodNameArray[number];
 export interface Method {
     methodName: MethodName;

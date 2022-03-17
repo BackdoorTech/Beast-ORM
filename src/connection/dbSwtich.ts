@@ -5,7 +5,7 @@ import { actionParam, dbType } from './intreface.js';
 export class DBSwitch {
 
 	static async requestHandler(TableSchema: TableSchema, DBconfig:DatabaseSchema, dbType : dbType, action: actionParam, arg: any) {
-		if(dbType == 'indexeddb') {
+		if(dbType == 'indexedDB') {
 			return await indexedDB.requestHandler(TableSchema, DBconfig)[action](arg)
 		}
 	}

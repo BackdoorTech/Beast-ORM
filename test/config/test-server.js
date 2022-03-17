@@ -8,7 +8,7 @@ const staticPath = path.resolve(__dirname, "../../");
 app.use('/', express.static(staticPath))
 
 const server = app.listen(0, () => {
-  console.log('Listening on port:', server.address().port);
+  // console.log('Listening on port:', server.address().port);
 
   const content = {
     'Port': server.address().port

@@ -1,36 +1,37 @@
-import { CharField as _CharField } from './char-field.js';
-import { JsonField as _JsonField } from './json-field.js';
-import { BooleanField as _BooleanField } from './boolean-field.js';
-import { TextField as _TextField } from './text-field.js';
-import { IntegerField as _IntegerField } from './integer-field.js';
-import { DateField as _DateField } from './date-field.js';
-import { BigIntegerField as _BigIntegerField } from './big-integer-field.js';
-import { AutoField as _AutoField } from './auto-field.js';
-import { IndDbJsonField as _IndDbJsonField } from './IndDb-json-field.js';
+import * as Fields from './allFields.js';
 export function CharField(data) {
-    return new _CharField(data);
+    return new Fields.CharField(data);
 }
-export function JsonField() {
-    return new _JsonField();
-}
-export function BooleanField() {
-    return new _BooleanField();
+export function BooleanField(data) {
+    return new Fields.BooleanField(data);
 }
 export function TextField(data) {
-    return new _TextField(data);
+    return new Fields.TextField(data);
 }
 export function IntegerField(data) {
-    return new _IntegerField(data);
+    return new Fields.IntegerField(data);
 }
-export function DateField() {
-    return new _DateField();
+export function DateField(data) {
+    return new Fields.DateField(data);
 }
-export function BigIntegerField() {
-    return new _BigIntegerField();
+export function BigIntegerField(data) {
+    return new Fields.BigIntegerField(data);
 }
 export function AutoField(data) {
-    return new _AutoField(data);
+    return new Fields.AutoField(data);
 }
-export function IndDbJsonField() {
-    return new _IndDbJsonField();
+export const indexedDB = {
+    fields: {
+        JsonField: (data) => new Fields.indexedDBJsonField(data),
+        ArrayField: (data) => new Fields.indexedDBArrayField(data)
+    }
+};
+export function OneToOneField(data) {
+    return new Fields.OneToOneField(data);
+}
+export function ForeignKey(data) {
+    return new Fields.ForeignKey(data);
+}
+export function ManyToManyField(data) {
+    return new Fields.ManyToManyField(data);
 }

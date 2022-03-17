@@ -2,48 +2,39 @@ import { getParams } from './model.interface.js';
 import { DatabaseSchema, TableSchema } from './register-modal.interface.js';
 import { ModelManager } from './model-manager.js';
 export declare class Model extends ModelManager {
-    BeastOrmId: any;
     constructor(obg?: any);
     get(arg: any): Promise<any>;
-    setDBConfig(config: DatabaseSchema): void;
     getDBSchema(): DatabaseSchema;
-    getModelName(): any;
-    filter(...arg: any[]): typeof Model & {
-        filter: (...args: any[]) => typeof Model & any;
-        execute: () => Promise<any>;
-        update: (args: any) => Promise<any>;
-        delete: () => Promise<any>;
-        all: () => Promise<any>;
-    };
+    getModelName(): string;
+    filter(...arg: any[]): any;
     getTableSchema(): TableSchema;
+    private getPrimaryKeyValue;
     save(): Promise<void>;
-    create(arg: any): Promise<any>;
     delete(): Promise<void>;
     all(): Promise<any>;
+    static getModelsFields(arg: any): Promise<void>;
     static all(): Promise<any>;
     static get(arg: getParams): Promise<any>;
     private static getId;
     static getModelName(): string;
-    static filter(...arg: any[]): typeof Model & {
-        filter: (...args: any[]) => typeof Model & any;
-        execute: () => Promise<any>;
-        update: (args: any) => Promise<any>;
-        delete: () => Promise<any>;
-        all: () => Promise<any>;
-    };
-    static setDBConfig(config: DatabaseSchema): void;
+    static filter(...arg: any[]): any;
+    static NewModelInstance(): any;
     static getDBSchema(): DatabaseSchema;
     static getTableSchema(): TableSchema;
+    private static getEmptyFields;
     static create(arg: any): Promise<any>;
+    private static getPrimaryKeyValue;
+    private static newInstance;
+    static createOrFind(getArg: any, defaultCreate: any): Promise<any[]>;
     static updateOrCreate(argToFind: any, argsToUpdate: any): Promise<any>;
     static update(arg: any): Promise<any>;
-    static object: ({ queryId, some, DBconfig, TableSchema }: {
+    static object: ({ queryId, DBconfig, TableSchema, some }: {
         queryId?: string;
-        some?: any;
         DBconfig: any;
         TableSchema: any;
+        some?: any;
     }) => {
-        filter: (...args: any[]) => typeof Model & any;
+        filter: (...args: any[]) => any;
         execute: () => Promise<any>;
         update: (args: any) => Promise<any>;
         delete: () => Promise<any>;

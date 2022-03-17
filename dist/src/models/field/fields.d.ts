@@ -1,19 +1,18 @@
-import { CharField as _CharField } from './char-field.js';
-import { JsonField as _JsonField } from './json-field.js';
-import { BooleanField as _BooleanField } from './boolean-field.js';
-import { TextField as _TextField } from './text-field.js';
-import { IntegerField as _IntegerField } from './integer-field.js';
-import { DateField as _DateField } from './date-field.js';
-import { BigIntegerField as _BigIntegerField } from './big-integer-field.js';
-import { AutoFieldParams, CharFieldParams, IntegerFieldParams, TextFieldParams } from './interface.js';
-import { AutoField as _AutoField } from './auto-field.js';
-import { IndDbJsonField as _IndDbJsonField } from './IndDb-json-field.js';
-export declare function CharField(data?: CharFieldParams): _CharField;
-export declare function JsonField(): _JsonField;
-export declare function BooleanField(): _BooleanField;
-export declare function TextField(data?: TextFieldParams): _TextField;
-export declare function IntegerField(data?: IntegerFieldParams): _IntegerField;
-export declare function DateField(): _DateField;
-export declare function BigIntegerField(): _BigIntegerField;
-export declare function AutoField(data: AutoFieldParams): _AutoField;
-export declare function IndDbJsonField(): _IndDbJsonField;
+import { AutoFieldParams, BigIntegerFieldParams, BooleanFieldParams, CharFieldParams, DateFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams, TextFieldParams } from './interface.js';
+import * as Fields from './allFields.js';
+export declare function CharField(data?: CharFieldParams): Fields.CharField;
+export declare function BooleanField(data?: BooleanFieldParams): Fields.BooleanField;
+export declare function TextField(data?: TextFieldParams): Fields.TextField;
+export declare function IntegerField(data?: IntegerFieldParams): Fields.IntegerField;
+export declare function DateField(data?: DateFieldParams): Fields.DateField;
+export declare function BigIntegerField(data?: BigIntegerFieldParams): Fields.BigIntegerField;
+export declare function AutoField(data?: AutoFieldParams): Fields.AutoField;
+export declare const indexedDB: {
+    fields: {
+        JsonField: (data?: IndexedDBJsonFieldParams) => Fields.indexedDBJsonField;
+        ArrayField: (data?: IndexedDBArrayFieldParams) => Fields.indexedDBArrayField;
+    };
+};
+export declare function OneToOneField(data: OneToOneFieldParams): Fields.OneToOneField;
+export declare function ForeignKey(data: ForeignKeyParams): Fields.ForeignKey;
+export declare function ManyToManyField(data?: ManyToManyFieldParams): Fields.ManyToManyField;

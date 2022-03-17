@@ -16,8 +16,8 @@ export class SqlObject {
 
 	}
 
-	async runFirstMethod (row) {
-		this.firstMethod.cursor(row)
+	async runFirstMethod (row, resolve?, limit?) {
+		this.firstMethod.cursor(row, resolve, limit)
 	}
 
 	async doneRunFirstMethod () {

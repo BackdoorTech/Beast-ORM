@@ -8,7 +8,7 @@ export declare class SqlObject {
     rows: any[];
     firstMethod: methodFunction;
     constructor(TableSchema: TableSchema, Methods: Method[]);
-    runFirstMethod(row: any): Promise<void>;
+    runFirstMethod(row: any, resolve?: any, limit?: any): Promise<void>;
     doneRunFirstMethod(): Promise<void>;
     run(): Promise<void>;
 }

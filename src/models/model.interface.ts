@@ -1,14 +1,15 @@
 import {Model} from './model.js'
 
 export const MethodNameArray = [
-    'save',
-    'filter',
-    'get',
-    'create',
+	'save',
+	'filter',
+	'get',
+	'create',
 	'execute',
 	'update',
 	'delete',
-	'all'
+	'all',
+	'first'
 ] as const; // TS3.4 syntax
 
 

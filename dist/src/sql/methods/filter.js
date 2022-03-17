@@ -5,11 +5,14 @@ export class filter {
         this.TableSchema = TableSchema;
         this.rows = [];
     }
-    async cursor(row) {
+    async cursor(row, resolve, limit) {
         const operator = new ObjectConditionOperator(row, this.TableSchema);
         const operationsResult = await operator.run(this.arg);
         if (operationsResult == true) {
             this.rows.push(row);
+            if (this.rows.length == limit) {
+                resolve(this.rows);
+            }
         }
     }
     async run(rows) {
