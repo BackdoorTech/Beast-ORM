@@ -39,7 +39,6 @@ export class ObjectConditionOperator {
                 const rowFieldValue = getDeep(this.row, fieldName);
                 const arg = objOperator[field];
                 const operationResult = await operator[operation](field, arg, rowFieldValue, this.row, this.TableSchema);
-                console.log(operation, operationResult);
                 if (!operationResult) {
                     return false;
                 }

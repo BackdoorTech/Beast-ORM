@@ -1,6 +1,8 @@
 # Beast ORM
 
 ORM for accessing indexedDB as a promise base api implementation.
+**Under develop**
+Underdeveloped
 
 ## DBMS Support
 

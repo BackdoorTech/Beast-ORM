@@ -6,13 +6,7 @@ export declare class Model extends ModelManager {
     get(arg: any): Promise<any>;
     getDBSchema(): DatabaseSchema;
     getModelName(): string;
-    filter(...arg: any[]): typeof Model & {
-        filter: (...args: any[]) => typeof Model & any;
-        execute: () => Promise<any>;
-        update: (args: any) => Promise<any>;
-        delete: () => Promise<any>;
-        all: () => Promise<any>;
-    };
+    filter(...arg: any[]): any;
     getTableSchema(): TableSchema;
     private getPrimaryKeyValue;
     save(): Promise<void>;
@@ -23,13 +17,8 @@ export declare class Model extends ModelManager {
     static get(arg: getParams): Promise<any>;
     private static getId;
     static getModelName(): string;
-    static filter(...arg: any[]): typeof Model & {
-        filter: (...args: any[]) => typeof Model & any;
-        execute: () => Promise<any>;
-        update: (args: any) => Promise<any>;
-        delete: () => Promise<any>;
-        all: () => Promise<any>;
-    };
+    static filter(...arg: any[]): any;
+    static NewModelInstance(): any;
     static getDBSchema(): DatabaseSchema;
     static getTableSchema(): TableSchema;
     private static getEmptyFields;
@@ -39,13 +28,13 @@ export declare class Model extends ModelManager {
     static createOrFind(getArg: any, defaultCreate: any): Promise<any[]>;
     static updateOrCreate(argToFind: any, argsToUpdate: any): Promise<any>;
     static update(arg: any): Promise<any>;
-    static object: ({ queryId, some, DBconfig, TableSchema }: {
+    static object: ({ queryId, DBconfig, TableSchema, some }: {
         queryId?: string;
-        some?: any;
         DBconfig: any;
         TableSchema: any;
+        some?: any;
     }) => {
-        filter: (...args: any[]) => typeof Model & any;
+        filter: (...args: any[]) => any;
         execute: () => Promise<any>;
         update: (args: any) => Promise<any>;
         delete: () => Promise<any>;

@@ -49,7 +49,6 @@ export class ObjectConditionOperator {
 				const arg = objOperator[field];
 
 				const operationResult: boolean = await operator[operation](field, arg, rowFieldValue, this.row, this.TableSchema)
-				console.log(operation, operationResult)
 				if(!operationResult) {
 					
 					return false

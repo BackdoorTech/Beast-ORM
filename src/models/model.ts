@@ -147,7 +147,17 @@ export class Model extends ModelManager{
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
 
-    return  Object.assign(this, this.object({queryId, DBconfig, TableSchema, some:['filter', arg]}))
+    const newInstanceModel = this.NewModelInstance()
+
+    return  Object.assign(newInstanceModel, this.object({queryId,DBconfig, TableSchema, some:['filter', arg]})) as any
+  }
+
+
+  static NewModelInstance() {
+    class newInstanceModel {
+    }
+    Object.assign(newInstanceModel, this);
+    return newInstanceModel as any
   }
 
   static getDBSchema(): DatabaseSchema  {
@@ -189,7 +199,7 @@ export class Model extends ModelManager{
     for(let i in arg) {
       arg[i] = Object.assign({...emptyFields} , arg[i])
 
-      console.log(TableSchema.attributes)
+      // console.log(TableSchema.attributes)
 
       if (TableSchema.attributes.foreignKey) {
         for (let field of TableSchema.attributes.foreignKey) {
@@ -284,7 +294,8 @@ export class Model extends ModelManager{
     return  await super.obj(DBconfig, TableSchema).update(_methods)
   }
 
-  static object = ({queryId=uniqueGenerator(), some = null, DBconfig, TableSchema}) => {
+  static object = ({queryId=uniqueGenerator(), DBconfig, TableSchema,  some = null}) => {
+
 
     if(!methods[queryId]) {
       methods[queryId] = []
@@ -293,13 +304,14 @@ export class Model extends ModelManager{
     if(some) {
       const methodName = some[0]
       const methodArgs = some[1]
-      this.object({queryId, DBconfig, TableSchema})[methodName](...methodArgs)
+      this.object({queryId,DBconfig, TableSchema})[methodName](...methodArgs)
     }
 
     return {
       filter: (...args) => {
         methods[queryId].push({methodName: 'filter', arguments: args})
-        return Object.assign(this, this.object({queryId, DBconfig, TableSchema}))
+        const newInstanceModel = this.NewModelInstance()
+        return Object.assign(newInstanceModel, this.object({DBconfig, TableSchema,queryId}))
       },
       execute: async () => {
         methods[queryId].push({methodName: 'execute', arguments: null})

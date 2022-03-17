@@ -1,7 +1,6 @@
 import { Model } from './model.js';
 import { ModelReader } from './model.reader.js';
 import { indexedDB } from './../connection/indexedDb/indexedb.js';
-import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js';
 import { uncapitalize } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 export const models = {};
@@ -44,15 +43,13 @@ export class registerModel {
                         }
                     });
                 }
-                if (Field instanceof OneToOneField) {
-                    ModelEditor.addMethodOneToOneField(Field, fieldName, modelName, databaseSchema);
-                }
-                else if (Field instanceof ForeignKey) {
-                    ModelEditor.addMethodForeignKey(Field, fieldName, modelName, databaseSchema);
-                }
-                else if (Field instanceof ManyToManyField) {
-                    await ModelEditor.addMethodManyToManyField(Field, fieldName, modelName, databaseSchema);
-                }
+                // if(Field instanceof OneToOneField) {
+                //   ModelEditor.addMethodOneToOneField(Field, fieldName, modelName, databaseSchema)
+                // } else if (Field instanceof ForeignKey) {
+                //   ModelEditor.addMethodForeignKey(Field, fieldName, modelName, databaseSchema)
+                // } else if (Field instanceof ManyToManyField) {
+                //   await ModelEditor.addMethodManyToManyField(Field, fieldName, modelName, databaseSchema)
+                // }
             });
         });
         if (databaseSchema.type == 'indexedDB') {

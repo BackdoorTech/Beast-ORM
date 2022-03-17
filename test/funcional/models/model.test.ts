@@ -605,35 +605,132 @@ describe("operators", () => {
 
       const models: typeof modelsType = window['models']
       const {ArrayField, JsonField } = models.indexedDB.fields
+      class MessageModel extends models.Model {
 
-      class User extends models.Model {
-
-        userId = models.AutoField({primaryKey:true})
-        username = models.CharField({maxLength: 100})
-        email = models.CharField({blank: true, maxLength: 100})
-        age = models.IntegerField()
-        pets = ArrayField({type: models.CharField()})
+        channels =  ArrayField()
+        mentions =  ArrayField()
+        msg =  models.CharField()
+        rid =  models.CharField()
+        ts =  models.CharField()
+        u =  JsonField()
+        _id =  models.CharField({unique:true})
+        _updatedAt =  models.CharField()
+        messageSend =  models.BooleanField()
+        offline =  models.BooleanField()
+        viewed =  ArrayField() 
+        received =  ArrayField()
+        localReference =  models.CharField({blank:true})
+        attachments =  ArrayField()
+        file =  ArrayField()
       
       }
-
+      
+      class DeleteMessageModel extends models.Model {
+      
+        messageId = models.IntegerField()
+        rid =  models.CharField()
+        ts =  models.CharField()
+        u =  JsonField()
+        needToReceiveBy = ArrayField()
+      
+      }
+      
+      
       await models.register({
-        databaseName:'jest-test-operator-contains-include',
-        type: 'indexedDB',
+        databaseName: 'chat-storage',
+        type: 'indexedDB',		
         version: 1,
-        models: [User]
+        models: [MessageModel, DeleteMessageModel]
       })
 
+      await MessageModel.create({
+        channels: [],
+        mentions:[],
+        msg: '', 
+        rid: 'rid',
+        ts: '',
+        u: {},
+        _id: 8888,
+        id: 555555,
+        _updatedAt: 3333,
+        messageSend: false,
+        offline: false,
+        viewed: [],
+        received: [],
+        localReference: 'sdfsdf',
+        attachments: [],
+        file: '',
+        delate: false
+      })
 
-      await User.create({username:'James', email:'', age:'', pets:['ashe','meggie']})
+      document.body.innerHTML = JSON.stringify(await MessageModel.all())
 
-      const user = await User.filter({pets__contains:['ashe']}).execute()
-
-      document.body.innerHTML = JSON.stringify(user)
     })
     debugger
     // Check to see if text exists on the page
-    await page.waitForFunction('[{"username":"James","email":"","age":"","pets":["ashe","meggie"],"userId":1}]')
+    await page.waitForFunction('[{"msg":"","rid":"rid","ts":"","_id":8888,"_updatedAt":3333,"messageSend":false,"offline":false,"localReference":"sdfsdf","channels":[],"mentions":[],"u":{},"id":555555,"viewed":[],"received":[],"attachments":[],"file":"","delate":false}]')
     
+
+    
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const {ArrayField, JsonField } = models.indexedDB.fields
+
+      class MessageModel extends models.Model {
+
+        channels =  ArrayField()
+        mentions =  ArrayField()
+        msg =  models.CharField()
+        rid =  models.CharField()
+        ts =  models.CharField()
+        u =  JsonField()
+        _id =  models.CharField({unique:true})
+        _updatedAt =  models.CharField()
+        messageSend =  models.BooleanField()
+        offline =  models.BooleanField()
+        viewed =  ArrayField() 
+        received =  ArrayField()
+        localReference =  models.CharField({blank:true})
+        attachments =  ArrayField()
+        file =  ArrayField()
+      
+      }
+      
+      class DeleteMessageModel extends models.Model {
+      
+        messageId = models.IntegerField()
+        rid =  models.CharField()
+        ts =  models.CharField()
+        u =  JsonField()
+        needToReceiveBy = ArrayField()
+      
+      }
+      
+      
+      await models.register({
+        databaseName: 'chat-storage',
+        type: 'indexedDB',		
+        version: 1,
+        models: [MessageModel, DeleteMessageModel]
+      })
+
+
+      await DeleteMessageModel.create({
+        messageId: 555,
+        rid: 3333,
+        ts: 345345345,
+        u: {},
+        needToReceiveBy: []
+      })
+
+      document.body.innerHTML = JSON.stringify(await DeleteMessageModel.all())
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"messageId":555,"rid":3333,"ts":345345345,"u":{},"needToReceiveBy":[],"id":1}]')
+
     expect('time not exceeded').toBe('time not exceeded')
     
   }, 10000)
