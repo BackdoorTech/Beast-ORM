@@ -10,12 +10,34 @@ interface WsRegister {
 
 export class _IndexedDBWorkerQueue {
 
-	private myWorker = new Worker(new URL('./worker.js', import.meta.url),{ type: "module" });
+	private myWorker:  Worker | null;
+	webWorkerModuleSupport = false
 
 	constructor() {
-		this.myWorker.onmessage =  (oEvent) => {
-			const data = oEvent.data
-			this.onmessage(data)
+
+		this.webWorkerModuleSupport = this.supportsWorkerType()
+
+		if(this.webWorkerModuleSupport) {
+			
+			this.myWorker = new Worker(new URL('./worker.js', import.meta.url),{ type: "module" });
+
+			this.myWorker.onmessage =  (oEvent) => {
+				const data = oEvent.data
+				this.onmessage(data)
+			}
+		}
+	}
+
+	// https://stackoverflow.com/a/62963963/14115342
+	supportsWorkerType() {
+		let supports = false;
+		const tester = {
+			get type() { return supports = true; } // it's been called, it's supported
+		}
+		try {
+			const worker = new Worker('blob://', tester as any);
+		} finally {
+			return supports;
 		}
 	}
 

@@ -3,7 +3,7 @@ import { IndexedDBWorkerQueue } from './worker.queue.js';
 export class DBSwitch {
     static async requestHandler(TableSchema, DBconfig, dbType, action, arg, queryId) {
         if (dbType == 'indexedDB') {
-            if (typeof (Worker) !== "undefined") {
+            if (typeof (Worker) !== "undefined" && IndexedDBWorkerQueue.webWorkerModuleSupport) {
                 //great, your browser supports web workers
                 return new Promise((resolve, reject) => {
                     IndexedDBWorkerQueue.register({

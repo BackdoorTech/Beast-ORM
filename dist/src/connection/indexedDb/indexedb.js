@@ -281,7 +281,7 @@ class _indexedDB {
                     }
                 },
                 insert: async (methods) => {
-                    console.log(methods);
+                    // console.log(methods)
                     const createdObjKeys = [];
                     const rows = methods[0].arguments;
                     for (let insert of rows) {

@@ -8,7 +8,7 @@ export class DBSwitch {
 	static async requestHandler(TableSchema: TableSchema, DBconfig:DatabaseSchema, dbType : dbType, action: actionParam, arg: any, queryId) {
 		if(dbType == 'indexedDB') {
 
-			if (typeof(Worker) !== "undefined") {
+			if (typeof(Worker) !== "undefined" && IndexedDBWorkerQueue.webWorkerModuleSupport) {
 				//great, your browser supports web workers
 				return new Promise((resolve, reject) => {
 					IndexedDBWorkerQueue.register({

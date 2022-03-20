@@ -7,7 +7,9 @@ interface WsRegister {
 }
 export declare class _IndexedDBWorkerQueue {
     private myWorker;
+    webWorkerModuleSupport: boolean;
     constructor();
+    supportsWorkerType(): boolean;
     private workerQueues;
     register(data: WsRegister): string;
     onmessage(data: any): Promise<void>;
