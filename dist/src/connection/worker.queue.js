@@ -15,7 +15,7 @@ export class _IndexedDBWorkerQueue {
     async onmessage(data) {
         for (const [key, value] of Object.entries(this.workerQueues)) {
             const dontRepeat = await value.func(data);
-            if (dontRepeat) {
+            if (dontRepeat || !data.queryId) {
                 delete this.workerQueues[key];
             }
         }

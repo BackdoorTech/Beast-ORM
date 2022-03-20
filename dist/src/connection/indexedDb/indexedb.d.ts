@@ -19,12 +19,17 @@ declare class _indexedDB {
     };
     requestHandler: (TableSchema: TableSchema, config: DatabaseSchema, queryId: any) => {
         select: (methods: Method[]) => Promise<unknown>;
-        update: (methods: Method[]) => Promise<void>;
+        update: (methods: Method[]) => Promise<{
+            queryId: any;
+        }>;
         delete: (methods: Method[]) => Promise<{
+            queryId: any;
+            value?: undefined;
+        } | {
             queryId: any;
             value: any;
         }>;
-        insert: (methods: Method[]) => Promise<any[] | {
+        insert: (methods: Method[]) => Promise<{
             queryId: any;
             value: any;
         }>;

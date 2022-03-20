@@ -33,7 +33,7 @@ export class _IndexedDBWorkerQueue {
 		for (const [key, value] of Object.entries(this.workerQueues)) {
 			const dontRepeat = await value.func(data)
 
-			if(dontRepeat) {
+			if(dontRepeat || !data.queryId) {
 				delete this.workerQueues[key]
 			}
 		}

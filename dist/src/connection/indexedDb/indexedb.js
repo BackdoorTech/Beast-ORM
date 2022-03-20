@@ -229,6 +229,9 @@ class _indexedDB {
                         else {
                             await this.getActions(TableSchema.name, config).update(args, idValue);
                         }
+                        return {
+                            queryId
+                        };
                     }
                     else if (methods[0].methodName != 'update' && methods[methods.length - 1].methodName == 'update') {
                         const argsToUpdate = methods[methods.length - 1].arguments;
@@ -240,10 +243,16 @@ class _indexedDB {
                             const updateRow = Object.assign(row, argsToUpdate);
                             await this.getActions(TableSchema.name, config).update(updateRow);
                         }
+                        return {
+                            queryId
+                        };
                     }
                     else if (methods[0].methodName == 'update') {
                         const argsToUpdate = methods[0].arguments;
                         await this.getActions(TableSchema.name, config).update(argsToUpdate);
+                        return {
+                            queryId
+                        };
                     }
                 },
                 delete: async (methods) => {
@@ -257,6 +266,9 @@ class _indexedDB {
                             const id = row[TableSchema.id.keyPath];
                             await this.getActions(TableSchema.name, config).deleteByID(id);
                         }
+                        return {
+                            queryId
+                        };
                     }
                     else if (methods[methods.length - 1].methodName == 'delete' &&
                         typeof methods[methods.length - 1].arguments == 'object') {
@@ -284,7 +296,10 @@ class _indexedDB {
                         };
                     }
                     else {
-                        return createdObjKeys;
+                        return {
+                            queryId: queryId,
+                            value: createdObjKeys
+                        };
                     }
                 }
             };
