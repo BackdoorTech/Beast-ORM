@@ -6,26 +6,26 @@ export class ModelManager {
 _a = ModelManager;
 ModelManager.obj = (DatabaseSchema, TableSchema) => {
     return {
-        create: async (arg) => {
-            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'insert', arg);
+        create: async (arg, queryId) => {
+            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'insert', arg, queryId);
         },
-        get: async (arg) => {
-            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'select', arg);
+        get: async (arg, queryId) => {
+            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'select', arg, queryId);
         },
-        save: async (arg) => {
-            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'update', arg);
+        save: async (arg, queryId) => {
+            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'update', arg, queryId);
         },
-        execute: async (arg) => {
-            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'select', arg);
+        execute: async (arg, queryId) => {
+            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'select', arg, queryId);
         },
-        update: async (arg) => {
-            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'update', arg);
+        update: async (arg, queryId) => {
+            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'update', arg, queryId);
         },
-        delete: async (arg) => {
-            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'delete', arg);
+        delete: async (arg, queryId) => {
+            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'delete', arg, queryId);
         },
-        all: async (arg) => {
-            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'select', arg);
+        all: async (arg, queryId) => {
+            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'select', arg, queryId);
         },
     };
 };

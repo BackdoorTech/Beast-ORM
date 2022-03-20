@@ -17,11 +17,17 @@ declare class _indexedDB {
         deleteAll: () => Promise<any>;
         openCursor: (cursorCallback: any, keyRange?: IDBKeyRange) => Promise<void | IDBCursorWithValue>;
     };
-    requestHandler: (TableSchema: TableSchema, config: DatabaseSchema) => {
-        select: (methods: Method[]) => Promise<any>;
+    requestHandler: (TableSchema: TableSchema, config: DatabaseSchema, queryId: any) => {
+        select: (methods: Method[]) => Promise<unknown>;
         update: (methods: Method[]) => Promise<void>;
-        delete: (methods: Method[]) => Promise<void>;
-        insert: (methods: Method[]) => Promise<any>;
+        delete: (methods: Method[]) => Promise<{
+            queryId: any;
+            value: any;
+        }>;
+        insert: (methods: Method[]) => Promise<any[] | {
+            queryId: any;
+            value: any;
+        }>;
     };
 }
 export declare const indexedDB: _indexedDB;

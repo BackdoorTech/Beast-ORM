@@ -42,7 +42,8 @@ export class Model extends (_b = ModelManager) {
             Fields[name] = this[name];
         }
         const methods = [{ methodName: 'save', arguments: Fields }];
-        await Model.obj(DBconfig, tableSchema).save(methods);
+        const queryId = uniqueGenerator();
+        await Model.obj(DBconfig, tableSchema).save(methods, queryId);
     }
     async delete() {
         const DBconfig = this.getDBSchema();
@@ -51,7 +52,8 @@ export class Model extends (_b = ModelManager) {
         const createArg = {};
         createArg[idFieldName] = this[idFieldName];
         const _methods = [{ methodName: 'delete', arguments: createArg }];
-        await Model.obj(DBconfig, TableSchema).delete(_methods);
+        const queryId = uniqueGenerator();
+        await Model.obj(DBconfig, TableSchema).delete(_methods, queryId);
     }
     async all() {
         const DBconfig = this.getDBSchema();
@@ -85,7 +87,8 @@ export class Model extends (_b = ModelManager) {
         const _methods = [{ methodName: 'get', arguments: arg }];
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
-        const foundObj = await super.obj(DBconfig, TableSchema).get(_methods);
+        const queryId = uniqueGenerator();
+        const foundObj = await super.obj(DBconfig, TableSchema).get(_methods, queryId);
         if (!foundObj) {
             return false;
         }
@@ -151,7 +154,8 @@ export class Model extends (_b = ModelManager) {
         }
         const _methods = [{ methodName: 'create', arguments: arg }];
         const DBconfig = this.getDBSchema();
-        const createObject = await super.obj(DBconfig, TableSchema).create(_methods);
+        const queryId = uniqueGenerator();
+        const createObject = await super.obj(DBconfig, TableSchema).create(_methods, queryId);
         if (createObject) {
             const ModelName = this.getModelName();
             let newInstance = new models[ModelName]();
@@ -203,7 +207,8 @@ export class Model extends (_b = ModelManager) {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
         const _methods = [{ methodName: 'update', arguments: arg }];
-        return await super.obj(DBconfig, TableSchema).update(_methods);
+        const queryId = uniqueGenerator();
+        return await super.obj(DBconfig, TableSchema).update(_methods, queryId);
     }
 }
 _a = Model;
@@ -226,25 +231,25 @@ Model.object = ({ queryId = uniqueGenerator(), DBconfig, TableSchema, some = nul
             methods[queryId].push({ methodName: 'execute', arguments: null });
             const _methods = methods[queryId];
             methods[queryId] = [];
-            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).execute(_methods);
+            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).execute(_methods, queryId);
         },
         update: async (args) => {
             methods[queryId].push({ methodName: 'update', arguments: args });
             const _methods = methods[queryId];
             methods[queryId] = [];
-            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).update(_methods);
+            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).update(_methods, queryId);
         },
         delete: async () => {
             methods[queryId].push({ methodName: 'delete', arguments: null });
             const _methods = methods[queryId];
             methods[queryId] = [];
-            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).delete(_methods);
+            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).delete(_methods, queryId);
         },
         all: async () => {
             methods[queryId].push({ methodName: 'all', arguments: null });
             const _methods = methods[queryId];
             methods[queryId] = [];
-            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).all(_methods);
+            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).all(_methods, queryId);
         }
     };
 };

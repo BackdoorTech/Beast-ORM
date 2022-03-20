@@ -46,7 +46,8 @@
     "first",
     "transaction",
     "promise",
-    "query-builder"
+    "query-builder",
+    "webworker"
   ],
   "homepage": "https://github.com/BackdoorTech/Beast-ORM#readme",
   "dependencies": {}
