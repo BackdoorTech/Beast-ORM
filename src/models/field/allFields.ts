@@ -48,8 +48,10 @@ export class BigIntegerField extends field{
 
 	valid(value) {
 		if( !(typeof value == 'bigint' || typeof value == 'number')) {
-			return false
-		} else if (!(this?.blank == undefined && this.isNull(value) == false)) {
+			if(this?.blank  != true) {
+				return false
+			}
+		} else if ( !this.rules(this, value)) {
 			return false
 		}
 
@@ -247,10 +249,8 @@ export class IntegerField extends field {
 			if(this?.blank  != true) {
 				return false
 			}
-		} else if (this.isNull(value)) {
-			if(this?.blank  != true) {
-				return false
-			}
+		} else if ( !this.rules(this, value)) {
+			return false
 		}
 
 		return true

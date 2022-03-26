@@ -86,7 +86,48 @@ describe("Field valid", () => {
     
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  	}, 10000)
+
+
+	it('CharField maxLength: 10  not valid 3', async () => {
+		
+		await page.waitForFunction(() => 'models' in window);
+	
+		await page.evaluate(() => {
+	
+			const Field: typeof FieldsType = window['Field']
+			const f1 = Field.CharField({blank:false, maxLength: 10})
+			document.body.innerText = `{result:${JSON.stringify(f1.valid('12345678910121314151617'))}}`
+	
+		})
+		debugger
+	
+		await page.waitForFunction('{result:false}');
+		
+		expect('time not exceeded').toBe('time not exceeded')
+		
+	}, 10000)
+
+
+	it('CharField maxLength: 100 valid 3', async () => {
+		
+		await page.waitForFunction(() => 'models' in window);
+	
+		await page.evaluate(() => {
+	
+			const Field: typeof FieldsType = window['Field']
+			const f1 = Field.CharField({blank:false, maxLength: 100})
+			document.body.innerText = `{result:${JSON.stringify(f1.valid('12345678910121314151617'))}}`
+	
+		})
+		debugger
+	
+		await page.waitForFunction('{result:true}');
+		
+		expect('time not exceeded').toBe('time not exceeded')
+		
+	}, 10000)
+
 
 	// ============================================= TextField
 	it('TextField valid blank true 0', async () => {
@@ -95,9 +136,9 @@ describe("Field valid", () => {
 
     await page.evaluate(() => {
 
-			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.TextField({blank:true})
-			document.body.innerText = JSON.stringify(f1.valid(''))
+		const Field: typeof FieldsType = window['Field']
+		const f1 = Field.TextField({blank:true})
+		document.body.innerText = JSON.stringify(f1.valid(''))
 
     })
     debugger

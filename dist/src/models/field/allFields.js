@@ -27,9 +27,11 @@ export class BigIntegerField extends field {
     }
     valid(value) {
         if (!(typeof value == 'bigint' || typeof value == 'number')) {
-            return false;
+            if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
+                return false;
+            }
         }
-        else if (!((this === null || this === void 0 ? void 0 : this.blank) == undefined && this.isNull(value) == false)) {
+        else if (!this.rules(this, value)) {
             return false;
         }
         return true;
@@ -154,10 +156,8 @@ export class IntegerField extends field {
                 return false;
             }
         }
-        else if (this.isNull(value)) {
-            if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
-                return false;
-            }
+        else if (!this.rules(this, value)) {
+            return false;
         }
         return true;
     }
