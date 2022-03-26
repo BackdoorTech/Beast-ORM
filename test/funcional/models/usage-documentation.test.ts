@@ -23,7 +23,7 @@ describe("initial test for model", () => {
         userId = models.AutoField({primaryKey:true})
         username = models.CharField({maxLength: 100})
         email = models.CharField({blank: true, maxLength: 100})
-        age = models.IntegerField()
+        age = models.IntegerField({blank: true})
       
       }
 

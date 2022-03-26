@@ -3,7 +3,16 @@ export class field {
         return true;
     }
     isNull(value) {
-        return value == undefined || null || '';
+        if (value == undefined) {
+            return true;
+        }
+        else if (value == null) {
+            return true;
+        }
+        else if (value == '' && !Array.isArray(value)) {
+            return true;
+        }
+        return false;
     }
     rules(field, value) {
         if (field === null || field === void 0 ? void 0 : field.maxLength) {

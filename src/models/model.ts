@@ -4,7 +4,8 @@ import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
 import { ModelManager } from './model-manager.js';
 import { models, modelsConfig } from './register-model.js'
 import { FieldType } from '../sql/query/interface.js';
-
+import  * as Fields from './field/allFields.js'
+import { field } from './field/field.js'
 
 let methods : Methods = {} = {}
 
@@ -86,7 +87,32 @@ export class Model extends ModelManager{
     const TableSchema = this.getTableSchema()
     return await Model.object({DBconfig, TableSchema}).all()
   }
-  
+
+  getFields(arg) {
+    return Model.getFields(arg)
+  }
+
+
+  formValidation(data) {
+    return Model.formValidation(data)
+  }
+
+  static formValidation(data) {
+    const TableSchema = this.getTableSchema()
+
+    for(let field of TableSchema.fields) {
+
+      const Field = new Fields[field.className](field.fieldAttributes)
+      const FieldValue = data[field.name]
+
+      if(!Field.valid(FieldValue)) {
+        return false
+      }
+    }
+
+    return true
+  }
+
   static async getModelsFields(arg) {
     
     const newArgs = {}
@@ -185,10 +211,26 @@ export class Model extends ModelManager{
     const fieldsName = TableSchema.fields.map((field)=>field.name)
 
     for(let fieldName of fieldsName) {
-      emptyFields[fieldName] = ''
+      emptyFields[fieldName] = null
     }
 
     return emptyFields
+  }
+
+  private static getFields(arg) {
+
+    const TableSchema = this.getTableSchema()
+    const filteredArgs = {}
+
+    const fieldsName = TableSchema.fields.map((field)=>field.name)
+
+    for(let fieldName of fieldsName) {
+      if(arg.hasOwnProperty(fieldName)) {
+        filteredArgs[fieldName] = arg[fieldName]
+      }
+    }
+
+    return filteredArgs
   }
 
 
@@ -201,10 +243,17 @@ export class Model extends ModelManager{
     const emptyFields = await this.getEmptyFields()
     const TableSchema = this.getTableSchema()
 
-    for(let i in arg) {
-      arg[i] = Object.assign({...emptyFields} , arg[i])
 
-      // console.log(TableSchema.attributes)
+    for(let i in arg) {
+      arg[i] = Object.assign({...emptyFields} , this.getFields(arg[i]))
+
+      if(!this.formValidation(arg[i])) {
+        throw('invalid '+ JSON.stringify(arg[i]))
+      }
+
+    }
+
+    for(let i in arg) {
 
       if (TableSchema.attributes.foreignKey) {
         for (let field of TableSchema.attributes.foreignKey) {
@@ -269,7 +318,7 @@ export class Model extends ModelManager{
       instance =  await this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[0] })
     } else {
       created = true
-      instance = await this.create(Object.assign(defaultCreate, getArg))
+      instance = await this.create(Object.assign(getArg, defaultCreate))
     }
 
     return [instance, created]

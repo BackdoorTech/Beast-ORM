@@ -430,7 +430,7 @@ describe("initial test for model", () => {
         userId = models.AutoField({primaryKey:true})
         username = models.CharField({maxLength: 100})
         email = models.CharField({blank: true, maxLength: 100})
-        age = models.IntegerField()
+        age = models.IntegerField({blank:true})
       
       }
 
@@ -445,7 +445,7 @@ describe("initial test for model", () => {
       
       const result = await User.createOrFind(
         {userId:user.userId},
-        {username:'kobe', email:'kobe.bryant@lakers.com'}
+        {username:'kobe', email:'kobe.bryant@lakers.com', age: 5}
       )
 
       document.body.innerHTML = JSON.stringify(result)
@@ -473,7 +473,7 @@ describe("initial test for model", () => {
         userId = models.AutoField({primaryKey:true})
         username = models.CharField({maxLength: 100})
         email = models.CharField({blank: true, maxLength: 100})
-        age = models.IntegerField()
+        age = models.IntegerField({blank: true})
       
       }
 
@@ -520,17 +520,17 @@ describe("initial test for model", () => {
       }
 
       await models.register({
-        databaseName:'jest-test-model updateOrCreate case create',
+        databaseName:'jest-test-model updateOrCreate case create'+ (new Date()).getTime(),
         type: 'indexedDB',
         version: 1,
         models: [User]
       })
 
-      await User.create({username:'jame', email:'jame.mark@lakers.com'})
+      await User.create({username:'jame', email:'jame.mark@lakers.com', age: 5})
       
       const result = await User.updateOrCreate(
         {email:'kobe.bryant@lakers.com'},
-        {username:'kobe', email:'kobe.bryant@lakers.com'}
+        {username:'kobe', email:'kobe.bryant@lakers.com', age: 5}
       )
 
       document.body.innerHTML = JSON.stringify(result)
@@ -568,7 +568,7 @@ describe("initial test for model", () => {
         models: [User]
       })
 
-      await User.create({username:'jame', email:'kobe.bryant@lakers.com'})
+      await User.create({username:'jame', email:'kobe.bryant@lakers.com', age:5})
       
       const result = await User.updateOrCreate(
         {email:'kobe.bryant@lakers.com'},
@@ -614,7 +614,7 @@ describe("operators", () => {
         ts =  models.CharField()
         u =  JsonField()
         _id =  models.CharField({unique:true})
-        _updatedAt =  models.CharField()
+        _updatedAt =  models.IntegerField()
         messageSend =  models.BooleanField()
         offline =  models.BooleanField()
         viewed =  ArrayField() 
@@ -637,7 +637,7 @@ describe("operators", () => {
       
       
       await models.register({
-        databaseName: 'chat-storage',
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
         type: 'indexedDB',		
         version: 1,
         models: [MessageModel, DeleteMessageModel]
@@ -650,8 +650,8 @@ describe("operators", () => {
         rid: 'rid',
         ts: '',
         u: {},
-        _id: 8888,
-        id: 555555,
+        _id: '8888',
+        id: '555555',
         _updatedAt: 3333,
         messageSend: false,
         offline: false,
@@ -659,7 +659,7 @@ describe("operators", () => {
         received: [],
         localReference: 'sdfsdf',
         attachments: [],
-        file: '',
+        file: [],
         delate: false
       })
 
@@ -718,8 +718,8 @@ describe("operators", () => {
 
       await DeleteMessageModel.create({
         messageId: 555,
-        rid: 3333,
-        ts: 345345345,
+        rid: '3333',
+        ts: '345345345',
         u: {},
         needToReceiveBy: []
       })

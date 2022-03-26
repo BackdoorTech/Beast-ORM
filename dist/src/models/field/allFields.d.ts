@@ -9,7 +9,7 @@ export declare class AutoField extends field {
     autoIncrement: boolean;
     primaryKey?: boolean;
     type: FieldType;
-    blank?: boolean;
+    blank: boolean;
     default?: any;
     constructor(data?: AutoFieldParams);
     valid(value: any): boolean;

@@ -3,6 +3,7 @@ import { hashCode, uniqueGenerator } from '../utils.js';
 import { ModelManager } from './model-manager.js';
 import { models, modelsConfig } from './register-model.js';
 import { FieldType } from '../sql/query/interface.js';
+import * as Fields from './field/allFields.js';
 let methods = {} = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model extends (_b = ModelManager) {
@@ -59,6 +60,23 @@ export class Model extends (_b = ModelManager) {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
         return await Model.object({ DBconfig, TableSchema }).all();
+    }
+    getFields(arg) {
+        return Model.getFields(arg);
+    }
+    formValidation(data) {
+        return Model.formValidation(data);
+    }
+    static formValidation(data) {
+        const TableSchema = this.getTableSchema();
+        for (let field of TableSchema.fields) {
+            const Field = new Fields[field.className](field.fieldAttributes);
+            const FieldValue = data[field.name];
+            if (!Field.valid(FieldValue)) {
+                return false;
+            }
+        }
+        return true;
     }
     static async getModelsFields(arg) {
         var _c;
@@ -130,9 +148,20 @@ export class Model extends (_b = ModelManager) {
         const emptyFields = {};
         const fieldsName = TableSchema.fields.map((field) => field.name);
         for (let fieldName of fieldsName) {
-            emptyFields[fieldName] = '';
+            emptyFields[fieldName] = null;
         }
         return emptyFields;
+    }
+    static getFields(arg) {
+        const TableSchema = this.getTableSchema();
+        const filteredArgs = {};
+        const fieldsName = TableSchema.fields.map((field) => field.name);
+        for (let fieldName of fieldsName) {
+            if (arg.hasOwnProperty(fieldName)) {
+                filteredArgs[fieldName] = arg[fieldName];
+            }
+        }
+        return filteredArgs;
     }
     static async create(arg) {
         if (arg.constructor.name != 'Array') {
@@ -141,8 +170,12 @@ export class Model extends (_b = ModelManager) {
         const emptyFields = await this.getEmptyFields();
         const TableSchema = this.getTableSchema();
         for (let i in arg) {
-            arg[i] = Object.assign(Object.assign({}, emptyFields), arg[i]);
-            // console.log(TableSchema.attributes)
+            arg[i] = Object.assign(Object.assign({}, emptyFields), this.getFields(arg[i]));
+            if (!this.formValidation(arg[i])) {
+                throw ('invalid ' + JSON.stringify(arg[i]));
+            }
+        }
+        for (let i in arg) {
             if (TableSchema.attributes.foreignKey) {
                 for (let field of TableSchema.attributes.foreignKey) {
                     try {
@@ -190,7 +223,7 @@ export class Model extends (_b = ModelManager) {
         }
         else {
             created = true;
-            instance = await this.create(Object.assign(defaultCreate, getArg));
+            instance = await this.create(Object.assign(getArg, defaultCreate));
         }
         return [instance, created];
     }

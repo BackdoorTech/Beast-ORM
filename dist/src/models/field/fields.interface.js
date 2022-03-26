@@ -10,7 +10,11 @@ export const FieldKeysArray = [
     'IndDbJsonField',
     'OneToOneField',
     'ForeignKey',
-    'ManyToManyField'
+    'ManyToManyField',
+    'indexedDBJsonField',
+    'indexedDBArrayField',
+    'DateTimeField',
+    'DateField'
 ]; // TS3.4 syntax
 export const AttributesArray = [
     'maxLength',

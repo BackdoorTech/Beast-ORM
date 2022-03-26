@@ -12,7 +12,11 @@ export const FieldKeysArray = [
     'IndDbJsonField',
     'OneToOneField',
     'ForeignKey',
-    'ManyToManyField'
+    'ManyToManyField',
+    'indexedDBJsonField',
+    'indexedDBArrayField',
+    'DateTimeField',
+    'DateField'
 
 ] as const; // TS3.4 syntax
 

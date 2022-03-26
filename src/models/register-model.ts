@@ -62,10 +62,12 @@ export class registerModel {
           databaseSchema.stores[index].fields.push({
             name: fieldName,
             keyPath: fieldName,
-            options: { 
+            options: {
               unique: Field?.unique || false,
               type:  Field.type
-            }
+            },
+            className: Field.constructor.name,
+            fieldAttributes:  Object.assign({}, Field)
           })
 
         }

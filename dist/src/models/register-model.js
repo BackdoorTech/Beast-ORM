@@ -40,7 +40,9 @@ export class registerModel {
                         options: {
                             unique: (Field === null || Field === void 0 ? void 0 : Field.unique) || false,
                             type: Field.type
-                        }
+                        },
+                        className: Field.constructor.name,
+                        fieldAttributes: Object.assign({}, Field)
                     });
                 }
                 // if(Field instanceof OneToOneField) {

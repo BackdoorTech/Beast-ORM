@@ -23,7 +23,7 @@ export class AutoField extends field{
 
 		if(!(typeof value == 'bigint' || typeof value == 'number')) {
 			return false
-		} else if (!(this?.blank && this.isNull(value))) {
+		} else if (!(this?.blank == undefined && this.isNull(value) == false)) {
 			return false
 		}
 
@@ -49,7 +49,7 @@ export class BigIntegerField extends field{
 	valid(value) {
 		if( !(typeof value == 'bigint' || typeof value == 'number')) {
 			return false
-		} else if (!(this?.blank && this.isNull(value))) {
+		} else if (!(this?.blank == undefined && this.isNull(value) == false)) {
 			return false
 		}
 
@@ -73,14 +73,10 @@ export class BooleanField extends field{
 	
 		if( typeof value != 'boolean') {
 			return false
-		} else if (!(this?.blank && this.isNull(value))) {
-			return false
-		} else if(!this.rules(this, value)) {
-			return false
 		}
 
 
-		return false
+		return true
 	}
 }
 
@@ -105,8 +101,6 @@ export class CharField extends field{
 
 		if(!(typeof value == 'string')) {
 			return false
-		} else if (!(this?.blank && this.isNull(value))) {
-			return false
 		}
 
 		return true
@@ -129,7 +123,7 @@ export class DateField extends field{
 
 		if(!(typeof value == 'string') ) {
 			return false
-		} else if (!(this?.blank && this.isNull(value))) {
+		} else if (!(this?.blank == undefined && this.isNull(value) == false)) {
 			return true
 		}
 
@@ -151,7 +145,7 @@ export class DateTimeField  extends field{
 
 		if( !(typeof value == 'string')) {
 			return false
-		} else if (!(this?.blank && this.isNull(value))) {
+		} else if (!(this?.blank == undefined && this.isNull(value) == false)) {
 			return false
 		}
 
@@ -174,11 +168,11 @@ export class indexedDBArrayField extends field {
 
 		if( !(Array.isArray(value))) {
 			return false
-		} else if (!(this?.blank && this.isNull(value))) {
+		} else if (!(this?.blank == undefined && this.isNull(value) == false)) {
 			return false
 		}
 
-		return false
+		return true
 	}
 }
 
@@ -195,17 +189,14 @@ export class indexedDBJsonField extends field {
 
 	valid(value) {
 
-		if(!(typeof value == 'object') ) {
+		if(!(typeof value == 'object' && Array.isArray(value) == false) ) {
 			return false
-		} else if (!(this?.blank && this.isNull(value))) {
+		} else if (!(this?.blank == undefined && this.isNull(value) == false)) {
 			return false
 		}
-
 		return true
 	}
 }
-
-
 
 
 export class TextField  extends field{
@@ -227,7 +218,7 @@ export class TextField  extends field{
 
 		if( !(typeof value == 'string') ) {
 			return false
-		} else if (!(this?.blank && this.isNull(value))) {
+		} else if (!(this?.blank == undefined && this.isNull(value) == false)) {
 			return false
 		}
 
@@ -251,9 +242,13 @@ export class IntegerField extends field {
 	valid(value) {
 
 		if( !(typeof value == 'number')) {
-			return false
-		} else if (!(this?.blank && this.isNull(value))) {
-			return false
+			if(this?.blank  != true) {
+				return false
+			}
+		} else if (this.isNull(value)) {
+			if(this?.blank  != true) {
+				return false
+			}
 		}
 
 		return true

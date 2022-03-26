@@ -16,7 +16,16 @@ export class field{
 	}
 
 	isNull(value) {
-		return value == undefined || null || ''
+
+		if(value == undefined) {
+			return true
+		} else if(value == null) {
+			return true
+		} else if(value == '' && !Array.isArray(value)) {
+			return true
+		}
+
+		return false
 	}
 
 

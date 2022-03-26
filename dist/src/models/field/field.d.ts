@@ -10,6 +10,6 @@ export declare class field {
     foreignKey?: boolean;
     model?: field;
     get field(): boolean;
-    isNull(value: any): true | "";
+    isNull(value: any): boolean;
     rules(field: field, value: any): boolean;
 }
