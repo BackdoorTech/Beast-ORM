@@ -7,7 +7,7 @@ export class DBSwitch {
                 //great, your browser supports web workers
                 return new Promise((resolve, reject) => {
                     IndexedDBWorkerQueue.register({
-                        params: { TableSchema, DBconfig, queryId, action, arg },
+                        params: { TableSchema, DBconfig, queryId, action, arg, dbType },
                         method: 'execute',
                         func: (message) => {
                             if (message.queryId == queryId) {

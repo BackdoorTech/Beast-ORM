@@ -7,6 +7,7 @@ export declare const models: {
     TextField(data?: import("./models/field/interface.js").TextFieldParams): import("./models/field/allFields.js").TextField;
     IntegerField(data?: import("./models/field/interface.js").IntegerFieldParams): import("./models/field/allFields.js").IntegerField;
     DateField(data?: import("./models/field/interface.js").DateFieldParams): import("./models/field/allFields.js").DateField;
+    DateTimeField(data?: import("./models/field/interface.js").DateTimeFieldParams): import("./models/field/allFields.js").DateTimeField;
     BigIntegerField(data?: import("./models/field/interface.js").BigIntegerFieldParams): import("./models/field/allFields.js").BigIntegerField;
     AutoField(data?: import("./models/field/interface.js").AutoFieldParams): import("./models/field/allFields.js").AutoField;
     OneToOneField(data: import("./models/field/interface.js").OneToOneFieldParams): import("./models/field/allFields.js").OneToOneField;

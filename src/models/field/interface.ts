@@ -16,18 +16,21 @@ export interface TextFieldParams {
 	primaryKey?:boolean
 	unique?: boolean
 	default?: any
+	blank?: boolean
 }
 
 export interface IntegerFieldParams {
 	primaryKey?:boolean
 	unique?: boolean
 	default?: any
+	blank?: boolean
 }
 
 export interface BigIntegerFieldParams {
 	primaryKey?:boolean
 	unique?: boolean
 	default?: any
+	blank?: boolean
 }
 
 export interface AutoFieldParams {

@@ -8,6 +8,15 @@ export class AutoField extends field {
         this.type = FieldType.BIGINT;
         Object.assign(this, data);
     }
+    valid(value) {
+        if (typeof value == 'bigint' || typeof value == 'number') {
+            return true;
+        }
+        else if ((this === null || this === void 0 ? void 0 : this.blank) && this.isNull(value)) {
+            return true;
+        }
+        return false;
+    }
 }
 export class BigIntegerField extends field {
     constructor(data) {
@@ -15,11 +24,32 @@ export class BigIntegerField extends field {
         this.type = FieldType.BIGINT;
         Object.assign(this, data);
     }
+    valid(value) {
+        if (typeof value == 'bigint' || typeof value == 'number') {
+            return true;
+        }
+        else if ((this === null || this === void 0 ? void 0 : this.blank) && this.isNull(value)) {
+            return true;
+        }
+        return false;
+    }
 }
 export class BooleanField extends field {
     constructor(data) {
         super();
         Object.assign(this, data);
+    }
+    valid(value) {
+        if (typeof value != 'boolean') {
+            return false;
+        }
+        else if (!((this === null || this === void 0 ? void 0 : this.blank) && this.isNull(value))) {
+            return false;
+        }
+        else if (!this.rules(this, value)) {
+            return false;
+        }
+        return false;
     }
 }
 export class CharField extends field {
@@ -28,12 +58,30 @@ export class CharField extends field {
         this.type = FieldType.DATE;
         Object.assign(this, data);
     }
+    valid(value) {
+        if (!(typeof value == 'string')) {
+            return false;
+        }
+        else if (!((this === null || this === void 0 ? void 0 : this.blank) && this.isNull(value))) {
+            return false;
+        }
+        return true;
+    }
 }
 export class DateField extends field {
     constructor(data) {
         super();
         this.type = FieldType.DATE;
         Object.assign(this, data);
+    }
+    valid(value) {
+        if (!(typeof value == 'string')) {
+            return false;
+        }
+        else if (!((this === null || this === void 0 ? void 0 : this.blank) && this.isNull(value))) {
+            return true;
+        }
+        return false;
     }
 }
 export class DateTimeField extends field {
@@ -42,12 +90,30 @@ export class DateTimeField extends field {
         this.type = FieldType.DATE;
         Object.assign(this, data);
     }
+    valid(value) {
+        if (!(typeof value == 'string')) {
+            return false;
+        }
+        else if (!((this === null || this === void 0 ? void 0 : this.blank) && this.isNull(value))) {
+            return false;
+        }
+        return true;
+    }
 }
 export class indexedDBArrayField extends field {
     constructor(data) {
         super();
         this.type = FieldType.ARRAY;
         Object.assign(this, data);
+    }
+    valid(value) {
+        if (!(Array.isArray(value))) {
+            return false;
+        }
+        else if (!((this === null || this === void 0 ? void 0 : this.blank) && this.isNull(value))) {
+            return false;
+        }
+        return false;
     }
 }
 export class indexedDBJsonField extends field {
@@ -56,11 +122,29 @@ export class indexedDBJsonField extends field {
         this.type = FieldType.JSON;
         Object.assign(this, data);
     }
+    valid(value) {
+        if (!(typeof value == 'object')) {
+            return false;
+        }
+        else if (!((this === null || this === void 0 ? void 0 : this.blank) && this.isNull(value))) {
+            return false;
+        }
+        return true;
+    }
 }
 export class TextField extends field {
     constructor(data) {
         super();
         Object.assign(this, data);
+    }
+    valid(value) {
+        if (!(typeof value == 'string')) {
+            return false;
+        }
+        else if (!((this === null || this === void 0 ? void 0 : this.blank) && this.isNull(value))) {
+            return false;
+        }
+        return true;
     }
 }
 export class IntegerField extends field {
@@ -69,12 +153,24 @@ export class IntegerField extends field {
         this.type = FieldType.INT;
         Object.assign(this, data);
     }
+    valid(value) {
+        if (!(typeof value == 'number')) {
+            return false;
+        }
+        else if (!((this === null || this === void 0 ? void 0 : this.blank) && this.isNull(value))) {
+            return false;
+        }
+        return true;
+    }
 }
 export class ForeignKey extends field {
     constructor(data) {
         super();
         this.foreignKey = true;
         Object.assign(this, data);
+    }
+    valid(value) {
+        return !this.isNull(value);
     }
 }
 export class OneToOneField extends field {
@@ -86,11 +182,17 @@ export class OneToOneField extends field {
     contractor(contractor) {
         throw new Error('Method not implemented.');
     }
+    valid(value) {
+        return !this.isNull(value);
+    }
 }
 export class ManyToManyField extends field {
     constructor(data) {
         super();
         this.foreignKey = true;
         Object.assign(this, data);
+    }
+    valid(value) {
+        return !this.isNull(value);
     }
 }

@@ -1,6 +1,4 @@
 import { FieldType } from '../../sql/query/interface.js'
-import { Model } from '../model.js'
-import { modelsConfig } from '../register-model.js'
 import { field } from './field.js'
 import { AutoFieldParams, BooleanFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams } from './interface.js'
 import { BigIntegerFieldParams } from './interface.js'
@@ -9,14 +7,27 @@ import { TextFieldParams } from './interface.js'
 
 export class AutoField extends field{
 
-    unique = true
-    autoIncrement = true
-    primaryKey?: boolean
-    type= FieldType.BIGINT
+	unique = true
+	autoIncrement = true
+	primaryKey?: boolean
+	type= FieldType.BIGINT
+	blank = true
+	default?: any
 
-    constructor(data?: AutoFieldParams) {
+	constructor(data?: AutoFieldParams) {
 		super()
-    	Object.assign(this, data)
+		Object.assign(this, data)
+	}
+
+	valid(value) {
+
+		if(!(typeof value == 'bigint' || typeof value == 'number')) {
+			return false
+		} else if (!(this?.blank && this.isNull(value))) {
+			return false
+		}
+
+		return false
 	}
 
 }
@@ -24,21 +35,52 @@ export class AutoField extends field{
 
 export class BigIntegerField extends field{
 
-		unique?: boolean
+	unique?: boolean
 	primaryKey?: boolean
-
+	blank?: boolean
+	default?: any
 	type = FieldType.BIGINT
 	
 	constructor(data?:BigIntegerFieldParams) {
 		super()
 		Object.assign(this, data)
 	}
+
+	valid(value) {
+		if( !(typeof value == 'bigint' || typeof value == 'number')) {
+			return false
+		} else if (!(this?.blank && this.isNull(value))) {
+			return false
+		}
+
+		return true
+	}
 }
 
 export class BooleanField extends field{
+
+	unique?: boolean
+	blank?: boolean
+	default?: any
+
 	constructor(data?: BooleanFieldParams) {
 		super()
 		Object.assign(this, data)
+	}
+
+	
+	valid(value) {
+	
+		if( typeof value != 'boolean') {
+			return false
+		} else if (!(this?.blank && this.isNull(value))) {
+			return false
+		} else if(!this.rules(this, value)) {
+			return false
+		}
+
+
+		return false
 	}
 }
 
@@ -48,6 +90,9 @@ export class CharField extends field{
 	minLength?:number | undefined
 	choices?: any[] | undefined
 	primaryKey?: boolean
+	blank?: boolean
+	default?: any
+	unique?: boolean
 
 	type = FieldType.DATE
 	
@@ -56,43 +101,107 @@ export class CharField extends field{
 		Object.assign(this, data);
 	}
 
+	valid(value) {
+
+		if(!(typeof value == 'string')) {
+			return false
+		} else if (!(this?.blank && this.isNull(value))) {
+			return false
+		}
+
+		return true
+
+	}
+
 }
 
 export class DateField extends field{
 	type = FieldType.DATE
+	blank?: boolean
+	default?: any
 	
 	constructor(data?:DateFieldParams) {
 		super()
 		Object.assign(this, data)
 	}
+
+	valid(value) {
+
+		if(!(typeof value == 'string') ) {
+			return false
+		} else if (!(this?.blank && this.isNull(value))) {
+			return true
+		}
+
+		return false
+	}
 }
 
 export class DateTimeField  extends field{
 	type = FieldType.DATE
+	blank?: boolean
+	default?: any
 	
 	constructor(data?:DateTimeFieldParams) {
 		super()
 		Object.assign(this, data)
+	}
+
+	valid(value) {
+
+		if( !(typeof value == 'string')) {
+			return false
+		} else if (!(this?.blank && this.isNull(value))) {
+			return false
+		}
+
+		return true
 	}
 }
 
 export class indexedDBArrayField extends field {
 
 	type = FieldType.ARRAY
+	blank?: boolean
+	default?: any
 	
 	constructor(data?:IndexedDBArrayFieldParams) {
 		super()
 		Object.assign(this, data)
+	}
+
+	valid(value) {
+
+		if( !(Array.isArray(value))) {
+			return false
+		} else if (!(this?.blank && this.isNull(value))) {
+			return false
+		}
+
+		return false
 	}
 }
 
 export class indexedDBJsonField extends field {
 
 	type = FieldType.JSON
+	blank?: boolean
+	default?: any
 	
 	constructor(data?:IndexedDBJsonFieldParams) {
 		super()
 		Object.assign(this, data)
+	}
+
+	valid(value) {
+
+		if(!(typeof value == 'object') ) {
+			return false
+		} else if (!(this?.blank && this.isNull(value))) {
+			return false
+		}
+
+		return true
 	}
 }
 
@@ -103,12 +212,26 @@ export class TextField  extends field{
 	maxLength?:number | undefined
 	minLength?:number | undefined
 	primaryKey?: boolean
+	blank?: boolean
+	default?: any
 
 	type: FieldType.TEXT
 	
 	constructor(data?:TextFieldParams) {
 		super()
 		Object.assign(this, data);
+	}
+
+
+	valid(value) {
+
+		if( !(typeof value == 'string') ) {
+			return false
+		} else if (!(this?.blank && this.isNull(value))) {
+			return false
+		}
+
+		return true
 	}
 }
 
@@ -117,10 +240,23 @@ export class IntegerField extends field {
 	unique?: boolean
 	primaryKey?: boolean
 	type = FieldType.INT
+	blank?: boolean
+	default?: any
 	
 	constructor(data?:IntegerFieldParams) {
 		super()
 		Object.assign(this, data);
+	}
+
+	valid(value) {
+
+		if( !(typeof value == 'number')) {
+			return false
+		} else if (!(this?.blank && this.isNull(value))) {
+			return false
+		}
+
+		return true
 	}
 }
 
@@ -128,10 +264,17 @@ export class ForeignKey extends field {
 	
 	model
 	foreignKey = true
+	blank?: boolean
+	default?: any
 
 	constructor(data?: ForeignKeyParams) {
 		super()
 		Object.assign(this, data);
+	}
+
+
+	valid(value) {
+		return !this.isNull(value)
 	}
 }
 
@@ -139,6 +282,10 @@ export class OneToOneField extends field {
 	
 	foreignKey = true
 	model
+	blank?: boolean
+	default?: any
+	onDelete?: any
+	primaryKey?:boolean
 
 	constructor(data?: OneToOneFieldParams) {
 		super()
@@ -148,6 +295,10 @@ export class OneToOneField extends field {
 	contractor(contractor: any) {
 		throw new Error('Method not implemented.')
 	}
+
+	valid(value) {
+		return !this.isNull(value)
+	}
 }
 
 
@@ -155,9 +306,19 @@ export class ManyToManyField extends field {
 
 	model
 	foreignKey = true
+	blank?: boolean
+	default?: any
+	onDelete?: any
+	primaryKey?:boolean
+	unique?: boolean
+
 
 	constructor(data?:ManyToManyFieldParams) {
 		super()
 		Object.assign(this, data);
+	}
+
+	valid(value) {
+		return !this.isNull(value)
 	}
 }

@@ -1,4 +1,4 @@
-import { AutoFieldParams, BigIntegerFieldParams, BooleanFieldParams, CharFieldParams, DateFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams, TextFieldParams } from './interface.js'
+import { AutoFieldParams, BigIntegerFieldParams, BooleanFieldParams, CharFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams, TextFieldParams } from './interface.js'
 
 
 import * as Fields from './allFields.js'
@@ -24,6 +24,9 @@ export function DateField(data?:DateFieldParams) {
 	return new Fields.DateField(data)
 }
 
+export function DateTimeField(data?:  DateTimeFieldParams) {
+	return new Fields.DateTimeField(data)
+}
 export function BigIntegerField(data?:BigIntegerFieldParams) {
 	return new Fields.BigIntegerField(data)
 }
