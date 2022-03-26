@@ -57,6 +57,9 @@ export class CharField extends field {
         if (!(typeof value == 'string')) {
             return false;
         }
+        else if (!this.rules(this, value)) {
+            return false;
+        }
         return true;
     }
 }
@@ -133,7 +136,7 @@ export class TextField extends field {
         if (!(typeof value == 'string')) {
             return false;
         }
-        else if (!((this === null || this === void 0 ? void 0 : this.blank) == undefined && this.isNull(value) == false)) {
+        else if (!this.rules(this, value)) {
             return false;
         }
         return true;
