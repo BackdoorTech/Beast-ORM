@@ -14,6 +14,9 @@ export function IntegerField(data) {
 export function DateField(data) {
     return new Fields.DateField(data);
 }
+export function DateTimeField(data) {
+    return new Fields.DateTimeField(data);
+}
 export function BigIntegerField(data) {
     return new Fields.BigIntegerField(data);
 }

@@ -1,4 +1,4 @@
-export declare const FieldKeysArray: readonly ["CharField", "JsonField", "AutoField", "BigIntegerField", "DateField", "IntegerField", "TextField", "BooleanField", "IndDbJsonField", "OneToOneField", "ForeignKey", "ManyToManyField"];
+export declare const FieldKeysArray: readonly ["CharField", "JsonField", "AutoField", "BigIntegerField", "DateField", "IntegerField", "TextField", "BooleanField", "IndDbJsonField", "OneToOneField", "ForeignKey", "ManyToManyField", "indexedDBJsonField", "indexedDBArrayField", "DateTimeField", "DateField"];
 export declare const AttributesArray: readonly ["maxLength", "minLength", "choices", "primaryKey", "unique", "autoIncrement", "type", "choices", "model", "blank", "default", "onDelete", "foreignKey"];
 export declare type FieldKeys = typeof FieldKeysArray[number];
 export declare type FieldsMap<K extends string | number | symbol, T> = {

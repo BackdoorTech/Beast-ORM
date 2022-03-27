@@ -3,10 +3,9 @@ import { Methods, getParams, Method } from './model.interface.js'
 import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
 import { ModelManager } from './model-manager.js';
 import { models, modelsConfig } from './register-model.js'
-import { field } from './field/field.js';
 import { FieldType } from '../sql/query/interface.js';
-
-
+import  * as Fields from './field/allFields.js'
+import { field } from './field/field.js'
 
 let methods : Methods = {} = {}
 
@@ -61,7 +60,9 @@ export class Model extends ModelManager{
     }
 
     const methods:  Method[]  = [{methodName: 'save', arguments: Fields}]
-    await Model.obj(DBconfig, tableSchema).save(methods)
+    const queryId=uniqueGenerator()
+
+    await Model.obj(DBconfig, tableSchema).save(methods, queryId)
   }
 
 
@@ -75,7 +76,10 @@ export class Model extends ModelManager{
     createArg[idFieldName] = this[idFieldName]
 
     const _methods: Method[] = [{methodName: 'delete', arguments: createArg}]
-    await Model.obj(DBconfig, TableSchema).delete(_methods)
+
+    const queryId=uniqueGenerator()
+
+    await Model.obj(DBconfig, TableSchema).delete(_methods, queryId)
   }
 
   async all() {
@@ -83,7 +87,32 @@ export class Model extends ModelManager{
     const TableSchema = this.getTableSchema()
     return await Model.object({DBconfig, TableSchema}).all()
   }
-  
+
+  getFields(arg) {
+    return Model.getFields(arg)
+  }
+
+
+  formValidation(data) {
+    return Model.formValidation(data)
+  }
+
+  static formValidation(data) {
+    const TableSchema = this.getTableSchema()
+
+    for(let field of TableSchema.fields) {
+
+      const Field = new Fields[field.className](field.fieldAttributes)
+      const FieldValue = data[field.name]
+
+      if(!Field.valid(FieldValue)) {
+        throw('invalid insert into '+TableSchema.name +', invalid value for field '+ field.name+ ' = '+JSON.stringify(FieldValue))
+      }
+    }
+
+    return true
+  }
+
   static async getModelsFields(arg) {
     
     const newArgs = {}
@@ -117,8 +146,10 @@ export class Model extends ModelManager{
     const _methods:  Method[] = [{methodName: 'get', arguments: arg}]
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
+    
+    const queryId = uniqueGenerator()
 
-    const foundObj = await super.obj(DBconfig, TableSchema).get(_methods)
+    const foundObj = await super.obj(DBconfig, TableSchema).get(_methods, queryId)
 
     if(!foundObj) {
       return false
@@ -180,10 +211,26 @@ export class Model extends ModelManager{
     const fieldsName = TableSchema.fields.map((field)=>field.name)
 
     for(let fieldName of fieldsName) {
-      emptyFields[fieldName] = ''
+      emptyFields[fieldName] = null
     }
 
     return emptyFields
+  }
+
+  private static getFields(arg) {
+
+    const TableSchema = this.getTableSchema()
+    const filteredArgs = {}
+
+    const fieldsName = TableSchema.fields.map((field)=>field.name)
+
+    for(let fieldName of fieldsName) {
+      if(arg.hasOwnProperty(fieldName)) {
+        filteredArgs[fieldName] = arg[fieldName]
+      }
+    }
+
+    return filteredArgs
   }
 
 
@@ -196,10 +243,17 @@ export class Model extends ModelManager{
     const emptyFields = await this.getEmptyFields()
     const TableSchema = this.getTableSchema()
 
-    for(let i in arg) {
-      arg[i] = Object.assign({...emptyFields} , arg[i])
 
-      // console.log(TableSchema.attributes)
+    for(let i in arg) {
+      arg[i] = Object.assign({...emptyFields} , this.getFields(arg[i]))
+
+      if(!this.formValidation(arg[i])) {
+        throw('invalid '+ JSON.stringify(arg[i]))
+      }
+
+    }
+
+    for(let i in arg) {
 
       if (TableSchema.attributes.foreignKey) {
         for (let field of TableSchema.attributes.foreignKey) {
@@ -216,8 +270,10 @@ export class Model extends ModelManager{
     
     const _methods: Method[] = [{methodName: 'create', arguments: arg}]
     const DBconfig = this.getDBSchema()
+
+    const queryId=uniqueGenerator()
     
-    const createObject = await super.obj(DBconfig, TableSchema).create(_methods)
+    const createObject = await super.obj(DBconfig, TableSchema).create(_methods, queryId)
 
 
     if(createObject) {
@@ -262,7 +318,7 @@ export class Model extends ModelManager{
       instance =  await this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[0] })
     } else {
       created = true
-      instance = await this.create(Object.assign(defaultCreate, getArg))
+      instance = await this.create(Object.assign(getArg, defaultCreate))
     }
 
     return [instance, created]
@@ -290,8 +346,9 @@ export class Model extends ModelManager{
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
     const _methods: Method[] = [{methodName: 'update', arguments: arg}]
+    const queryId=uniqueGenerator()
 
-    return  await super.obj(DBconfig, TableSchema).update(_methods)
+    return  await super.obj(DBconfig, TableSchema).update(_methods, queryId)
   }
 
   static object = ({queryId=uniqueGenerator(), DBconfig, TableSchema,  some = null}) => {
@@ -318,19 +375,19 @@ export class Model extends ModelManager{
 
         const _methods: Method[] = methods[queryId]
         methods[queryId] = []
-        return  await super.obj(DBconfig, TableSchema).execute(_methods)
+        return  await super.obj(DBconfig, TableSchema).execute(_methods, queryId)
       }, 
       update: async(args) => {
         methods[queryId].push({methodName: 'update', arguments: args})
         const _methods: Method[] = methods[queryId]
         methods[queryId] = []
-        return  await super.obj(DBconfig, TableSchema).update(_methods)
+        return  await super.obj(DBconfig, TableSchema).update(_methods, queryId)
       },
       delete: async() => {
         methods[queryId].push({methodName: 'delete', arguments: null})
         const _methods: Method[] = methods[queryId]
         methods[queryId] = []
-        return await super.obj(DBconfig, TableSchema).delete(_methods)
+        return await super.obj(DBconfig, TableSchema).delete(_methods, queryId)
 
       },
       all: async() => {
@@ -338,7 +395,7 @@ export class Model extends ModelManager{
         methods[queryId].push({methodName: 'all', arguments: null})
         const _methods: Method[] = methods[queryId]
         methods[queryId] = []
-        return await super.obj(DBconfig, TableSchema).all(_methods)
+        return await super.obj(DBconfig, TableSchema).all(_methods, queryId)
 
       }
     }

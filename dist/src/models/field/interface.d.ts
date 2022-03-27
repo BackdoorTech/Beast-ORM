@@ -13,16 +13,19 @@ export interface TextFieldParams {
     primaryKey?: boolean;
     unique?: boolean;
     default?: any;
+    blank?: boolean;
 }
 export interface IntegerFieldParams {
     primaryKey?: boolean;
     unique?: boolean;
     default?: any;
+    blank?: boolean;
 }
 export interface BigIntegerFieldParams {
     primaryKey?: boolean;
     unique?: boolean;
     default?: any;
+    blank?: boolean;
 }
 export interface AutoFieldParams {
     primaryKey?: boolean;
@@ -76,4 +79,15 @@ export interface ManyToManyFieldParams {
     default?: any;
     onDelete?: any;
     primaryKey?: boolean;
+}
+export interface PossibleFieldAttributes {
+    model?: any;
+    unique?: boolean;
+    blank?: boolean;
+    default?: any;
+    onDelete?: any;
+    primaryKey?: boolean;
+    maxLength?: number;
+    minLength?: number;
+    choices?: any[] | undefined;
 }

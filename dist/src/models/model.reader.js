@@ -7,7 +7,7 @@ export class ModelReader {
         const fields = {};
         const attributes = {};
         Object.entries(classInstance).forEach(([fieldName, Field]) => {
-            const type = Field === null || Field === void 0 ? void 0 : Field.constructor.name;
+            const type = Field === null || Field === void 0 ? void 0 : Field.fieldName;
             if (FieldKeysArray.includes(type)) {
                 fields[fieldName] = Field;
                 if (!fieldTypes[type]) {

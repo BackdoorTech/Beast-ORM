@@ -3,7 +3,7 @@ export class IndexedDBConnection {
     constructor() { }
     connect(config) {
         return new Promise((resolve, reject) => {
-            const idbInstance = typeof window !== "undefined" ? window.indexedDB : null;
+            const idbInstance = indexedDB || self.indexedDB || self.mozIndexedDB || self.webkitIndexedDB || self.msIndexedDB;
             if (idbInstance) {
                 const request = idbInstance.open(config.databaseName, config.version);
                 request.onsuccess = () => {
@@ -17,13 +17,13 @@ export class IndexedDBConnection {
                 };
             }
             else {
-                reject("Failed to connect");
+                reject("IDBDatabase not supported inside webworker");
             }
         });
     }
     migrate(config) {
         return new Promise((resolve, reject) => {
-            const idbInstance = typeof window !== "undefined" ? window.indexedDB : null;
+            const idbInstance = indexedDB || self.indexedDB || self.mozIndexedDB || self.webkitIndexedDB || self.msIndexedDB;
             if (idbInstance) {
                 const request = idbInstance.open(config.databaseName, config.version);
                 request.onsuccess = () => {

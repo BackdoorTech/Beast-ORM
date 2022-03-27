@@ -12,6 +12,9 @@ export declare class Model extends ModelManager {
     save(): Promise<void>;
     delete(): Promise<void>;
     all(): Promise<any>;
+    getFields(arg: any): {};
+    formValidation(data: any): boolean;
+    static formValidation(data: any): boolean;
     static getModelsFields(arg: any): Promise<void>;
     static all(): Promise<any>;
     static get(arg: getParams): Promise<any>;
@@ -22,6 +25,7 @@ export declare class Model extends ModelManager {
     static getDBSchema(): DatabaseSchema;
     static getTableSchema(): TableSchema;
     private static getEmptyFields;
+    private static getFields;
     static create(arg: any): Promise<any>;
     private static getPrimaryKeyValue;
     private static newInstance;

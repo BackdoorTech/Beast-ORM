@@ -1,13 +1,14 @@
 import { DatabaseSchema  } from '../../models/register-modal.interface.js'
 
 // inspire by https://github.com/hc-oss/use-indexeddb
+
 export class IndexedDBConnection {
 
   constructor() {}
 
   connect(config: DatabaseSchema): Promise<IDBDatabase> {
     return new Promise<IDBDatabase>((resolve, reject) => {
-      const idbInstance = typeof window !== "undefined" ? window.indexedDB : null;
+      const idbInstance = indexedDB || self.indexedDB || (self as any).mozIndexedDB || (self as any).webkitIndexedDB || (self as any).msIndexedDB;
       
       if (idbInstance) {
         const request: IDBOpenDBRequest = idbInstance.open(config.databaseName, config.version);
@@ -24,14 +25,14 @@ export class IndexedDBConnection {
           throw('need to migrate first')
         };
       } else {
-        reject("Failed to connect");
+        reject("IDBDatabase not supported inside webworker");
       }
     });
   }
 
   migrate(config: DatabaseSchema): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      const idbInstance = typeof window !== "undefined" ? window.indexedDB : null;
+      const idbInstance = indexedDB || self.indexedDB || (self as any).mozIndexedDB || (self as any).webkitIndexedDB || (self as any).msIndexedDB;
       
       if (idbInstance) {
         const request: IDBOpenDBRequest = idbInstance.open(config.databaseName, config.version);

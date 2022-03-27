@@ -149,11 +149,14 @@ class _indexedDB {
                 },
             };
         };
-        this.requestHandler = (TableSchema, config) => {
+        this.requestHandler = (TableSchema, config, queryId) => {
             return {
                 select: async (methods) => {
                     if (methods[0].methodName == 'all') {
-                        return await this.getActions(TableSchema.name, config).getAll();
+                        return {
+                            queryId: queryId,
+                            value: await this.getActions(TableSchema.name, config).getAll()
+                        };
                     }
                     else if (methods[0].methodName == 'get') {
                         const args = methods[0].arguments;
@@ -161,10 +164,16 @@ class _indexedDB {
                             const key = Object.keys(args)[0];
                             const value = args[key];
                             if (TableSchema.id.keyPath == key) {
-                                return await this.getActions(TableSchema.name, config).getByID(value);
+                                return {
+                                    queryId: queryId,
+                                    value: await this.getActions(TableSchema.name, config).getByID(value)
+                                };
                             }
                             else {
-                                return await this.getActions(TableSchema.name, config).getOneByIndex(key, value);
+                                return {
+                                    queryId: queryId,
+                                    value: await this.getActions(TableSchema.name, config).getOneByIndex(key, value)
+                                };
                             }
                         }
                     }
@@ -180,7 +189,10 @@ class _indexedDB {
                                 }
                                 else {
                                     sqlObject.run();
-                                    resolve(sqlObject.firstMethod.rows);
+                                    resolve({
+                                        queryId: queryId,
+                                        value: sqlObject.firstMethod.rows
+                                    });
                                 }
                             });
                         });
@@ -197,7 +209,10 @@ class _indexedDB {
                                 }
                                 else {
                                     sqlObject.run();
-                                    resolve(sqlObject.firstMethod.rows);
+                                    resolve({
+                                        queryId: queryId,
+                                        value: sqlObject.firstMethod.rows
+                                    });
                                 }
                             });
                         });
@@ -214,20 +229,30 @@ class _indexedDB {
                         else {
                             await this.getActions(TableSchema.name, config).update(args, idValue);
                         }
+                        return {
+                            queryId
+                        };
                     }
                     else if (methods[0].methodName != 'update' && methods[methods.length - 1].methodName == 'update') {
                         const argsToUpdate = methods[methods.length - 1].arguments;
                         const customMethods = Object.create(methods);
                         customMethods[methods.length - 1].methodName = 'execute';
-                        const rows = await this.requestHandler(TableSchema, config).select(customMethods);
+                        const result = await this.requestHandler(TableSchema, config, queryId).select(customMethods);
+                        const rows = result.value;
                         for (let row of rows) {
                             const updateRow = Object.assign(row, argsToUpdate);
                             await this.getActions(TableSchema.name, config).update(updateRow);
                         }
+                        return {
+                            queryId
+                        };
                     }
                     else if (methods[0].methodName == 'update') {
                         const argsToUpdate = methods[0].arguments;
                         await this.getActions(TableSchema.name, config).update(argsToUpdate);
+                        return {
+                            queryId
+                        };
                     }
                 },
                 delete: async (methods) => {
@@ -235,20 +260,28 @@ class _indexedDB {
                         methods[methods.length - 1].arguments == null) {
                         const customMethods = Object.create(methods);
                         customMethods[methods.length - 1].methodName = 'execute';
-                        const rows = await this.requestHandler(TableSchema, config).select(customMethods);
+                        const result = await this.requestHandler(TableSchema, config, queryId).select(customMethods);
+                        const rows = result.value;
                         for (let row of rows) {
                             const id = row[TableSchema.id.keyPath];
                             await this.getActions(TableSchema.name, config).deleteByID(id);
                         }
+                        return {
+                            queryId
+                        };
                     }
                     else if (methods[methods.length - 1].methodName == 'delete' &&
                         typeof methods[methods.length - 1].arguments == 'object') {
                         const IdInObject = methods[methods.length - 1].arguments;
                         const idValue = IdInObject[TableSchema.id.keyPath];
-                        await this.getActions(TableSchema.name, config).deleteByID(idValue);
+                        return {
+                            queryId: queryId,
+                            value: await this.getActions(TableSchema.name, config).deleteByID(idValue)
+                        };
                     }
                 },
                 insert: async (methods) => {
+                    // console.log(methods)
                     const createdObjKeys = [];
                     const rows = methods[0].arguments;
                     for (let insert of rows) {
@@ -257,10 +290,16 @@ class _indexedDB {
                     }
                     // return first element
                     if (rows.length == 1) {
-                        return await this.getActions(TableSchema.name, config).getByID(createdObjKeys[0]);
+                        return {
+                            queryId: queryId,
+                            value: await this.getActions(TableSchema.name, config).getByID(createdObjKeys[0])
+                        };
                     }
                     else {
-                        return createdObjKeys;
+                        return {
+                            queryId: queryId,
+                            value: createdObjKeys
+                        };
                     }
                 }
             };
