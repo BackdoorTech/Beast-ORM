@@ -66,7 +66,7 @@ export class registerModel {
               unique: Field?.unique || false,
               type:  Field.type
             },
-            className: Field.constructor.name,
+            className: Field?.fieldName,
             fieldAttributes:  Object.assign({}, Field)
           })
 

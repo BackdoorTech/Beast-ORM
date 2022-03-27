@@ -41,7 +41,7 @@ export class registerModel {
                             unique: (Field === null || Field === void 0 ? void 0 : Field.unique) || false,
                             type: Field.type
                         },
-                        className: Field.constructor.name,
+                        className: Field === null || Field === void 0 ? void 0 : Field.fieldName,
                         fieldAttributes: Object.assign({}, Field)
                     });
                 }

@@ -1,5 +1,6 @@
 import { FieldType } from '../../sql/query/interface.js'
 import { field } from './field.js'
+import { FieldKeys } from './fields.interface.js'
 import { AutoFieldParams, BooleanFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams } from './interface.js'
 import { BigIntegerFieldParams } from './interface.js'
 import { CharFieldParams } from './interface.js'
@@ -7,6 +8,7 @@ import { TextFieldParams } from './interface.js'
 
 export class AutoField extends field{
 
+	fieldName: FieldKeys = 'AutoField'
 	unique = true
 	autoIncrement = true
 	primaryKey?: boolean
@@ -35,6 +37,7 @@ export class AutoField extends field{
 
 export class BigIntegerField extends field{
 
+	fieldName: FieldKeys = 'BigIntegerField'
 	unique?: boolean
 	primaryKey?: boolean
 	blank?: boolean
@@ -61,6 +64,7 @@ export class BigIntegerField extends field{
 
 export class BooleanField extends field{
 
+	fieldName: FieldKeys = 'BooleanField'
 	unique?: boolean
 	blank?: boolean
 	default?: any
@@ -84,6 +88,8 @@ export class BooleanField extends field{
 
 
 export class CharField extends field{
+
+	fieldName: FieldKeys = 'CharField'
 	maxLength?:number | undefined
 	minLength?:number | undefined
 	choices?: any[] | undefined
@@ -102,7 +108,9 @@ export class CharField extends field{
 	valid(value) {
 
 		if(!(typeof value == 'string')) {
-			return false
+			if(this?.blank  != true) {
+				return false
+			}
 		} else if ( !this.rules(this, value)) {
 			return false
 		}
@@ -114,6 +122,8 @@ export class CharField extends field{
 }
 
 export class DateField extends field{
+
+	fieldName: FieldKeys = 'DateField'
 	type = FieldType.DATE
 	blank?: boolean
 	default?: any
@@ -126,7 +136,9 @@ export class DateField extends field{
 	valid(value) {
 
 		if(!(typeof value == 'string') ) {
-			return false
+			if(this?.blank  != true) {
+				return false
+			}
 		} else if (!(this?.blank == undefined && this.isNull(value) == false)) {
 			return true
 		}
@@ -136,6 +148,8 @@ export class DateField extends field{
 }
 
 export class DateTimeField  extends field{
+
+	fieldName: FieldKeys = 'DateTimeField'
 	type = FieldType.DATE
 	blank?: boolean
 	default?: any
@@ -148,7 +162,9 @@ export class DateTimeField  extends field{
 	valid(value) {
 
 		if( !(typeof value == 'string')) {
-			return false
+			if(this?.blank  != true) {
+				return false
+			}
 		} else if (!(this?.blank == undefined && this.isNull(value) == false)) {
 			return false
 		}
@@ -159,6 +175,7 @@ export class DateTimeField  extends field{
 
 export class indexedDBArrayField extends field {
 
+	fieldName: FieldKeys = 'indexedDBArrayField'
 	type = FieldType.ARRAY
 	blank?: boolean
 	default?: any
@@ -171,9 +188,13 @@ export class indexedDBArrayField extends field {
 	valid(value) {
 
 		if( !(Array.isArray(value))) {
-			return false
-		} else if (!(this?.blank == undefined && this.isNull(value) == false)) {
-			return false
+			if(this?.blank  != true) {
+				return false
+			}
+		} else if (this.isNull(value) == true) {
+			if(this?.blank != true) {
+				return false
+			}
 		}
 
 		return true
@@ -182,6 +203,7 @@ export class indexedDBArrayField extends field {
 
 export class indexedDBJsonField extends field {
 
+	fieldName: FieldKeys = 'indexedDBJsonField'
 	type = FieldType.JSON
 	blank?: boolean
 	default?: any
@@ -194,9 +216,13 @@ export class indexedDBJsonField extends field {
 	valid(value) {
 
 		if(!(typeof value == 'object' && Array.isArray(value) == false) ) {
-			return false
-		} else if (!(this?.blank == undefined && this.isNull(value) == false)) {
-			return false
+			if(this?.blank  != true) {
+				return false
+			}
+		} else if (this.isNull(value) == true) {
+			if(this?.blank != true) {
+				return false
+			}
 		}
 		return true
 	}
@@ -204,6 +230,8 @@ export class indexedDBJsonField extends field {
 
 
 export class TextField  extends field{
+
+	fieldName: FieldKeys = 'TextField'
 	maxLength?:number | undefined
 	minLength?:number | undefined
 	primaryKey?: boolean
@@ -221,7 +249,9 @@ export class TextField  extends field{
 	valid(value) {
 
 		if( !(typeof value == 'string') ) {
-			return false
+			if(this?.blank  != true) {
+				return false
+			}
 		} else if ( !this.rules(this, value)) {
 			return false
 		}
@@ -231,7 +261,8 @@ export class TextField  extends field{
 }
 
 export class IntegerField extends field {
-    
+	
+	fieldName: FieldKeys = 'IntegerField'
 	unique?: boolean
 	primaryKey?: boolean
 	type = FieldType.INT
@@ -259,10 +290,12 @@ export class IntegerField extends field {
 
 export class ForeignKey extends field {
 	
+	fieldName: FieldKeys = 'ForeignKey'
 	model
 	foreignKey = true
 	blank?: boolean
 	default?: any
+	
 
 	constructor(data?: ForeignKeyParams) {
 		super()
@@ -277,6 +310,7 @@ export class ForeignKey extends field {
 
 export class OneToOneField extends field {
 	
+	fieldName: FieldKeys = 'ManyToManyField'
 	foreignKey = true
 	model
 	blank?: boolean
@@ -301,6 +335,7 @@ export class OneToOneField extends field {
 
 export class ManyToManyField extends field {
 
+	fieldName: FieldKeys = 'ManyToManyField'
 	model
 	foreignKey = true
 	blank?: boolean

@@ -73,7 +73,7 @@ export class Model extends (_b = ModelManager) {
             const Field = new Fields[field.className](field.fieldAttributes);
             const FieldValue = data[field.name];
             if (!Field.valid(FieldValue)) {
-                return false;
+                throw ('invalid insert into ' + TableSchema.name + ', invalid value for field ' + field.name + ' = ' + JSON.stringify(FieldValue));
             }
         }
         return true;

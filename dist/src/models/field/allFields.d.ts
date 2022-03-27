@@ -1,10 +1,12 @@
 import { FieldType } from '../../sql/query/interface.js';
 import { field } from './field.js';
+import { FieldKeys } from './fields.interface.js';
 import { AutoFieldParams, BooleanFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams } from './interface.js';
 import { BigIntegerFieldParams } from './interface.js';
 import { CharFieldParams } from './interface.js';
 import { TextFieldParams } from './interface.js';
 export declare class AutoField extends field {
+    fieldName: FieldKeys;
     unique: boolean;
     autoIncrement: boolean;
     primaryKey?: boolean;
@@ -15,6 +17,7 @@ export declare class AutoField extends field {
     valid(value: any): boolean;
 }
 export declare class BigIntegerField extends field {
+    fieldName: FieldKeys;
     unique?: boolean;
     primaryKey?: boolean;
     blank?: boolean;
@@ -24,6 +27,7 @@ export declare class BigIntegerField extends field {
     valid(value: any): boolean;
 }
 export declare class BooleanField extends field {
+    fieldName: FieldKeys;
     unique?: boolean;
     blank?: boolean;
     default?: any;
@@ -31,6 +35,7 @@ export declare class BooleanField extends field {
     valid(value: any): boolean;
 }
 export declare class CharField extends field {
+    fieldName: FieldKeys;
     maxLength?: number | undefined;
     minLength?: number | undefined;
     choices?: any[] | undefined;
@@ -43,6 +48,7 @@ export declare class CharField extends field {
     valid(value: any): boolean;
 }
 export declare class DateField extends field {
+    fieldName: FieldKeys;
     type: FieldType;
     blank?: boolean;
     default?: any;
@@ -50,6 +56,7 @@ export declare class DateField extends field {
     valid(value: any): boolean;
 }
 export declare class DateTimeField extends field {
+    fieldName: FieldKeys;
     type: FieldType;
     blank?: boolean;
     default?: any;
@@ -57,6 +64,7 @@ export declare class DateTimeField extends field {
     valid(value: any): boolean;
 }
 export declare class indexedDBArrayField extends field {
+    fieldName: FieldKeys;
     type: FieldType;
     blank?: boolean;
     default?: any;
@@ -64,6 +72,7 @@ export declare class indexedDBArrayField extends field {
     valid(value: any): boolean;
 }
 export declare class indexedDBJsonField extends field {
+    fieldName: FieldKeys;
     type: FieldType;
     blank?: boolean;
     default?: any;
@@ -71,6 +80,7 @@ export declare class indexedDBJsonField extends field {
     valid(value: any): boolean;
 }
 export declare class TextField extends field {
+    fieldName: FieldKeys;
     maxLength?: number | undefined;
     minLength?: number | undefined;
     primaryKey?: boolean;
@@ -81,6 +91,7 @@ export declare class TextField extends field {
     valid(value: any): boolean;
 }
 export declare class IntegerField extends field {
+    fieldName: FieldKeys;
     unique?: boolean;
     primaryKey?: boolean;
     type: FieldType;
@@ -90,6 +101,7 @@ export declare class IntegerField extends field {
     valid(value: any): boolean;
 }
 export declare class ForeignKey extends field {
+    fieldName: FieldKeys;
     model: any;
     foreignKey: boolean;
     blank?: boolean;
@@ -98,6 +110,7 @@ export declare class ForeignKey extends field {
     valid(value: any): boolean;
 }
 export declare class OneToOneField extends field {
+    fieldName: FieldKeys;
     foreignKey: boolean;
     model: any;
     blank?: boolean;
@@ -109,6 +122,7 @@ export declare class OneToOneField extends field {
     valid(value: any): boolean;
 }
 export declare class ManyToManyField extends field {
+    fieldName: FieldKeys;
     model: any;
     foreignKey: boolean;
     blank?: boolean;

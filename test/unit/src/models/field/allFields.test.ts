@@ -512,23 +512,23 @@ describe("Field valid", () => {
 
 	it('indexedDB.JsonField not valid incorrect type 1', async () => {
 		
-    await page.waitForFunction(() => 'models' in window);
+		await page.waitForFunction(() => 'models' in window);
 
-		await page.evaluate(() => {
+			await page.evaluate(() => {
 
-			const Field: typeof FieldsType = window['Field']
-			const { ArrayField, JsonField}  = Field.indexedDB.fields
-			const f1 = JsonField({blank:true})
-			document.body.innerText = `{result:${JSON.stringify(f1.valid(null))}}`
+				const Field: typeof FieldsType = window['Field']
+				const { ArrayField, JsonField}  = Field.indexedDB.fields
+				const f1 = JsonField({blank:true})
+				document.body.innerText = `{result:${JSON.stringify(f1.valid(null))}}`
 
-    })
-    debugger
+		})
+		debugger
 
 		await page.waitForFunction('{result:true}');
     
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  	}, 10000)
 
 
 		// ============================================= indexedDB.ArrayField

@@ -106,7 +106,7 @@ export class Model extends ModelManager{
       const FieldValue = data[field.name]
 
       if(!Field.valid(FieldValue)) {
-        return false
+        throw('invalid insert into '+TableSchema.name +', invalid value for field '+ field.name+ ' = '+JSON.stringify(FieldValue))
       }
     }
 

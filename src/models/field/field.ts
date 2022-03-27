@@ -1,5 +1,8 @@
+import { FieldKeys } from "./fields.interface"
+
 export class field{
     
+	fieldName: FieldKeys
 	primaryKey?
 	maxLength?:number | undefined
 	minLength?:number | undefined

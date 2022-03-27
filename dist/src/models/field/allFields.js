@@ -3,6 +3,7 @@ import { field } from './field.js';
 export class AutoField extends field {
     constructor(data) {
         super();
+        this.fieldName = 'AutoField';
         this.unique = true;
         this.autoIncrement = true;
         this.type = FieldType.BIGINT;
@@ -22,6 +23,7 @@ export class AutoField extends field {
 export class BigIntegerField extends field {
     constructor(data) {
         super();
+        this.fieldName = 'BigIntegerField';
         this.type = FieldType.BIGINT;
         Object.assign(this, data);
     }
@@ -40,6 +42,7 @@ export class BigIntegerField extends field {
 export class BooleanField extends field {
     constructor(data) {
         super();
+        this.fieldName = 'BooleanField';
         Object.assign(this, data);
     }
     valid(value) {
@@ -52,12 +55,15 @@ export class BooleanField extends field {
 export class CharField extends field {
     constructor(data) {
         super();
+        this.fieldName = 'CharField';
         this.type = FieldType.DATE;
         Object.assign(this, data);
     }
     valid(value) {
         if (!(typeof value == 'string')) {
-            return false;
+            if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
+                return false;
+            }
         }
         else if (!this.rules(this, value)) {
             return false;
@@ -68,12 +74,15 @@ export class CharField extends field {
 export class DateField extends field {
     constructor(data) {
         super();
+        this.fieldName = 'DateField';
         this.type = FieldType.DATE;
         Object.assign(this, data);
     }
     valid(value) {
         if (!(typeof value == 'string')) {
-            return false;
+            if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
+                return false;
+            }
         }
         else if (!((this === null || this === void 0 ? void 0 : this.blank) == undefined && this.isNull(value) == false)) {
             return true;
@@ -84,12 +93,15 @@ export class DateField extends field {
 export class DateTimeField extends field {
     constructor(data) {
         super();
+        this.fieldName = 'DateTimeField';
         this.type = FieldType.DATE;
         Object.assign(this, data);
     }
     valid(value) {
         if (!(typeof value == 'string')) {
-            return false;
+            if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
+                return false;
+            }
         }
         else if (!((this === null || this === void 0 ? void 0 : this.blank) == undefined && this.isNull(value) == false)) {
             return false;
@@ -100,15 +112,20 @@ export class DateTimeField extends field {
 export class indexedDBArrayField extends field {
     constructor(data) {
         super();
+        this.fieldName = 'indexedDBArrayField';
         this.type = FieldType.ARRAY;
         Object.assign(this, data);
     }
     valid(value) {
         if (!(Array.isArray(value))) {
-            return false;
+            if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
+                return false;
+            }
         }
-        else if (!((this === null || this === void 0 ? void 0 : this.blank) == undefined && this.isNull(value) == false)) {
-            return false;
+        else if (this.isNull(value) == true) {
+            if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
+                return false;
+            }
         }
         return true;
     }
@@ -116,15 +133,20 @@ export class indexedDBArrayField extends field {
 export class indexedDBJsonField extends field {
     constructor(data) {
         super();
+        this.fieldName = 'indexedDBJsonField';
         this.type = FieldType.JSON;
         Object.assign(this, data);
     }
     valid(value) {
         if (!(typeof value == 'object' && Array.isArray(value) == false)) {
-            return false;
+            if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
+                return false;
+            }
         }
-        else if (!((this === null || this === void 0 ? void 0 : this.blank) == undefined && this.isNull(value) == false)) {
-            return false;
+        else if (this.isNull(value) == true) {
+            if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
+                return false;
+            }
         }
         return true;
     }
@@ -132,11 +154,14 @@ export class indexedDBJsonField extends field {
 export class TextField extends field {
     constructor(data) {
         super();
+        this.fieldName = 'TextField';
         Object.assign(this, data);
     }
     valid(value) {
         if (!(typeof value == 'string')) {
-            return false;
+            if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
+                return false;
+            }
         }
         else if (!this.rules(this, value)) {
             return false;
@@ -147,6 +172,7 @@ export class TextField extends field {
 export class IntegerField extends field {
     constructor(data) {
         super();
+        this.fieldName = 'IntegerField';
         this.type = FieldType.INT;
         Object.assign(this, data);
     }
@@ -165,6 +191,7 @@ export class IntegerField extends field {
 export class ForeignKey extends field {
     constructor(data) {
         super();
+        this.fieldName = 'ForeignKey';
         this.foreignKey = true;
         Object.assign(this, data);
     }
@@ -175,6 +202,7 @@ export class ForeignKey extends field {
 export class OneToOneField extends field {
     constructor(data) {
         super();
+        this.fieldName = 'ManyToManyField';
         this.foreignKey = true;
         Object.assign(this, data);
     }
@@ -188,6 +216,7 @@ export class OneToOneField extends field {
 export class ManyToManyField extends field {
     constructor(data) {
         super();
+        this.fieldName = 'ManyToManyField';
         this.foreignKey = true;
         Object.assign(this, data);
     }
