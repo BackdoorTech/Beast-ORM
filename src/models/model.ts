@@ -245,7 +245,7 @@ export class Model extends ModelManager{
 
 
     for(let i in arg) {
-      arg[i] = Object.assign({...emptyFields} , this.getFields(arg[i]))
+      arg[i] = Object.assign({...emptyFields} , arg[i])
 
       if(!this.formValidation(arg[i])) {
         throw('invalid '+ JSON.stringify(arg[i]))
@@ -346,7 +346,8 @@ export class Model extends ModelManager{
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
     const _methods: Method[] = [{methodName: 'update', arguments: arg}]
-    const queryId=uniqueGenerator()
+    const queryId = uniqueGenerator()
+    
 
     return  await super.obj(DBconfig, TableSchema).update(_methods, queryId)
   }
