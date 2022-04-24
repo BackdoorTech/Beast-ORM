@@ -11,6 +11,7 @@ export declare class Model extends ModelManager {
     private getPrimaryKeyValue;
     save(): Promise<void>;
     delete(): Promise<void>;
+    static deleteAll(): Promise<void>;
     all(): Promise<any>;
     getFields(arg: any): {};
     formValidation(data: any): boolean;

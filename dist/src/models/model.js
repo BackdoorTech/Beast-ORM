@@ -56,6 +56,16 @@ export class Model extends (_b = ModelManager) {
         const queryId = uniqueGenerator();
         await Model.obj(DBconfig, TableSchema).delete(_methods, queryId);
     }
+    static async deleteAll() {
+        const DBconfig = this.getDBSchema();
+        const TableSchema = this.getTableSchema();
+        const idFieldName = TableSchema.id.keyPath;
+        const createArg = {};
+        createArg[idFieldName] = this[idFieldName];
+        const _methods = [{ methodName: 'delete', arguments: '*' }];
+        const queryId = uniqueGenerator();
+        await Model.obj(DBconfig, TableSchema).delete(_methods, queryId);
+    }
     async all() {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
@@ -170,7 +180,7 @@ export class Model extends (_b = ModelManager) {
         const emptyFields = await this.getEmptyFields();
         const TableSchema = this.getTableSchema();
         for (let i in arg) {
-            arg[i] = Object.assign(Object.assign({}, emptyFields), arg[i]);
+            arg[i] = Object.assign(Object.assign({}, emptyFields), this.getFields(arg[i]));
             if (!this.formValidation(arg[i])) {
                 throw ('invalid ' + JSON.stringify(arg[i]));
             }

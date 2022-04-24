@@ -124,8 +124,13 @@ class _indexedDB {
                             objectStore.clear();
                             tx.oncomplete = (e) => {
                                 var _a, _b;
-                                (_b = (_a = tx) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
-                                resolve(e);
+                                try {
+                                    (_b = (_a = tx) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
+                                    resolve(e);
+                                }
+                                catch (error) {
+                                    resolve(e);
+                                }
                             };
                         })
                             .catch(reject);
@@ -279,9 +284,15 @@ class _indexedDB {
                             value: await this.getActions(TableSchema.name, config).deleteByID(idValue)
                         };
                     }
+                    else if (methods[methods.length - 1].methodName == 'delete' &&
+                        methods[methods.length - 1].arguments == '*') {
+                        return {
+                            queryId: queryId,
+                            value: await this.getActions(TableSchema.name, config).deleteAll()
+                        };
+                    }
                 },
                 insert: async (methods) => {
-                    // console.log(methods)
                     const createdObjKeys = [];
                     const rows = methods[0].arguments;
                     for (let insert of rows) {

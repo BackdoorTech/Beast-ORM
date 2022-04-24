@@ -160,9 +160,17 @@ class _indexedDB {
               let tx = this.createTransaction(db, "readwrite", currentStore, resolve, reject);
               let objectStore = tx.objectStore(currentStore);
               objectStore.clear();
+
+              
               tx.oncomplete = (e: any) => {
-                (tx as any)?.commit?.();
-                resolve(e);
+                
+                try {
+                  (tx as any)?.commit?.();
+                  resolve(e);
+                } catch (error) {
+                  resolve(e);
+                }
+                
               };
             })
             .catch(reject);
@@ -339,11 +347,15 @@ class _indexedDB {
             queryId: queryId,
             value: await this.getActions(TableSchema.name, config).deleteByID(idValue)
           }
+        } else if (methods[methods.length - 1].methodName == 'delete' && 
+        methods[methods.length - 1].arguments == '*') {
+          return {
+            queryId: queryId,
+            value: await this.getActions(TableSchema.name, config).deleteAll()
+          }
         }
       },
       insert: async (methods: Method[]) => {
-
-        // console.log(methods)
 
         const createdObjKeys = []
         const rows = methods[0].arguments

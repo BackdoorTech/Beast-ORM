@@ -736,5 +736,54 @@ describe("operators", () => {
   }, 10000)
 
 
+  it('Delete all', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      
+      class Person extends models.Model {
+        username =  models.CharField({maxLength:0})
+      } 
+
+      await models.register({
+        databaseName:'jest-test-model create([{...}])fffff',
+        type: 'indexedDB',
+        version: 1,
+        models: [Person]
+      })
+
+
+      await Person.create([
+        {username:'Peter'},
+        {username:'Peter'},
+        {username:'Peter'},
+        {username:'Peter'},
+        {username:'Peter'},
+        {username:'Peter'}]
+      )
+
+      const rows = await Person.filter({username:'Peter'}).execute()
+
+      if(JSON.stringify(rows) == 
+      '[{"username":"Peter","id":1},{"username":"Peter","id":2},{"username":"Peter","id":3},{"username":"Peter","id":4},{"username":"Peter","id":5},{"username":"Peter","id":6}]') {
+        await Person.deleteAll()
+      }
+
+      let record = await Person.filter({username:'Peter'}).execute()
+      document.body.innerHTML = JSON.stringify(record)
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[]')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 80000)
+
+
 
 })
