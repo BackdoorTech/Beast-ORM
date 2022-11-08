@@ -20,7 +20,7 @@ describe("comparisonOperator", () => {
 				username =  models.CharField({maxLength:0})
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -49,7 +49,7 @@ describe("comparisonOperator", () => {
 				username =  models.CharField({maxLength:0})
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -85,7 +85,7 @@ describe("comparisonOperator", () => {
 				username =  models.CharField({maxLength:0})
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -122,7 +122,7 @@ describe("comparisonOperator", () => {
 				username =  models.CharField({maxLength:0})
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -159,7 +159,7 @@ describe("comparisonOperator", () => {
 				username =  models.CharField({maxLength:0})
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -198,7 +198,7 @@ describe("comparisonOperator", () => {
 				username =  models.CharField({maxLength:0})
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -236,7 +236,7 @@ describe("comparisonOperator", () => {
 				username =  models.CharField({maxLength:0})
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -274,7 +274,7 @@ describe("comparisonOperator", () => {
 				username =  models.CharField({maxLength:0})
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -315,7 +315,7 @@ describe("comparisonOperator", () => {
 				tags =  ArrayField({})
 			}
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -347,7 +347,7 @@ describe("comparisonOperator", () => {
 				tags =  ArrayField({})
 			}
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -389,7 +389,7 @@ describe("comparisonOperator", () => {
 				data =  JsonField()
 			}
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -430,7 +430,7 @@ describe("comparisonOperator", () => {
 				tags =  ArrayField({})
 			}
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,

@@ -27,7 +27,7 @@ describe("initial test for model", () => {
       
       }
 
-      await models.register({
+      models.register({
         databaseName:'jest-test-documentation first example',
         type: 'indexedDB',
         version: 1,

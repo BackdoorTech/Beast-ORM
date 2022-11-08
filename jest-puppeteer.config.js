@@ -9,7 +9,7 @@ module.exports = {
   launch: {
     dumpio: true,
     headless: openChrome != 'true',
-    product: 'chrome',
+    // product: 'chrome',
     args: [`--window-size=1200,1080`],
     defaultViewport: {
       width:1200,

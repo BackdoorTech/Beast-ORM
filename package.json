@@ -50,5 +50,8 @@
     "webworker"
   ],
   "homepage": "https://github.com/BackdoorTech/Beast-ORM#readme",
-  "dependencies": {}
+  "dependencies": {
+    "jest-environment-node": "^29.3.0",
+    "jest-runner": "^29.3.0"
+  }
 }

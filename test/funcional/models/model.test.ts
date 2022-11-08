@@ -22,7 +22,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      await models.register({
+      models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -53,7 +53,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      await models.register({
+      models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -86,7 +86,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      await models.register({
+      models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -119,7 +119,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      await models.register({
+      models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -159,7 +159,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      await models.register({
+      models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -196,7 +196,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      await models.register({
+      models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -234,7 +234,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      await models.register({
+      models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -275,7 +275,7 @@ describe("initial test for model", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      await models.register({
+      models.register({
         databaseName:'jest-test-model create([{...}])',
         type: 'indexedDB',
         version: 1,
@@ -319,7 +319,7 @@ describe("initial test for model", () => {
         userId = models.AutoField({primaryKey:true})
       } 
 
-      await models.register({
+      models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -358,7 +358,7 @@ describe("initial test for model", () => {
         userId = models.AutoField({primaryKey:true})
       } 
 
-      await models.register({
+      models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -397,7 +397,7 @@ describe("initial test for model", () => {
         userId = models.AutoField({primaryKey:true})
       } 
 
-      await models.register({
+      models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -434,7 +434,7 @@ describe("initial test for model", () => {
       
       }
 
-      await models.register({
+      models.register({
         databaseName:'jest-test-documentation first example',
         type: 'indexedDB',
         version: 1,
@@ -477,7 +477,7 @@ describe("initial test for model", () => {
       
       }
 
-      await models.register({
+      models.register({
         databaseName:'jest-test-model createOrFind case create',
         type: 'indexedDB',
         version: 1,
@@ -519,7 +519,7 @@ describe("initial test for model", () => {
       
       }
 
-      await models.register({
+      models.register({
         databaseName:'jest-test-model updateOrCreate case create'+ (new Date()).getTime(),
         type: 'indexedDB',
         version: 1,
@@ -561,7 +561,7 @@ describe("initial test for model", () => {
       
       }
 
-      await models.register({
+      models.register({
         databaseName:'jest-test-model-updateOrCreate-case-update',
         type: 'indexedDB',
         version: 1,
@@ -636,7 +636,7 @@ describe("operators", () => {
       }
       
       
-      await models.register({
+      models.register({
         databaseName: 'chat-storage'+ (new Date()).getTime(),
         type: 'indexedDB',		
         version: 1,
@@ -708,7 +708,7 @@ describe("operators", () => {
       }
       
       
-      await models.register({
+      models.register({
         databaseName: 'chat-storage',
         type: 'indexedDB',		
         version: 1,
@@ -748,7 +748,7 @@ describe("operators", () => {
         username =  models.CharField({maxLength:0})
       } 
 
-      await models.register({
+      models.register({
         databaseName:'jest-test-model create([{...}])fffff',
         type: 'indexedDB',
         version: 1,

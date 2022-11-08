@@ -3,22 +3,24 @@ import { ModelReader } from './model.reader.js';
 import { indexedDB } from './../connection/indexedDb/indexedb.js';
 import { uncapitalize } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
+import { ModelMigrations } from './mode-migrations.js';
 export const models = {};
 export const modelsConfig = {};
 export class registerModel {
     static async register(entries) {
+        var _a, _b;
         const databaseSchema = {
             databaseName: entries.databaseName,
             version: entries.version,
             type: entries.type,
             stores: []
         };
-        await entries.models.forEach(async (modelClassRepresentations) => {
+        for (const modelClassRepresentations of entries.models) {
             const ModelName = modelClassRepresentations.getModelName();
             models[ModelName] = modelClassRepresentations;
-        });
-        await entries.models.forEach(async (modelClassRepresentations, index) => {
-            var _a, _b;
+        }
+        let index = 0;
+        for (const modelClassRepresentations of entries.models) {
             const { fields, modelName, attributes, fieldTypes } = ModelReader.read(modelClassRepresentations);
             const idFieldName = (_a = attributes === null || attributes === void 0 ? void 0 : attributes.primaryKey) === null || _a === void 0 ? void 0 : _a.shift();
             databaseSchema.stores.push({
@@ -31,7 +33,7 @@ export class registerModel {
                 attributes: attributes,
                 fields: [],
             });
-            await Object.entries(fields).forEach(async ([fieldName, Field]) => {
+            for (const [fieldName, Field] of Object.entries(fields)) {
                 // dont register fields that is primary key and auto increment
                 if (!((Field === null || Field === void 0 ? void 0 : Field.primaryKey) && (Field === null || Field === void 0 ? void 0 : Field.autoIncrement))) {
                     databaseSchema.stores[index].fields.push({
@@ -52,12 +54,10 @@ export class registerModel {
                 // } else if (Field instanceof ManyToManyField) {
                 //   await ModelEditor.addMethodManyToManyField(Field, fieldName, modelName, databaseSchema)
                 // }
-            });
-        });
-        if (databaseSchema.type == 'indexedDB') {
-            await indexedDB.migrate(databaseSchema);
+            }
+            index++;
         }
-        await entries.models.forEach(async (modelClassRepresentations) => {
+        for (const modelClassRepresentations of entries.models) {
             const ModelName = modelClassRepresentations.getModelName();
             models[ModelName] = modelClassRepresentations;
             const tableSchema = databaseSchema.stores.find((e) => e.name == ModelName);
@@ -65,7 +65,11 @@ export class registerModel {
                 DatabaseSchema: databaseSchema,
                 TableSchema: tableSchema
             };
-        });
+        }
+        if (databaseSchema.type == 'indexedDB') {
+            await indexedDB.migrate(databaseSchema);
+        }
+        ModelMigrations.migrationsState(true);
     }
     static manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema) {
         const foreignKeyFieldModel = foreignKeyField.model;

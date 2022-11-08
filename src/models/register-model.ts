@@ -5,6 +5,7 @@ import { indexedDB  } from './../connection/indexedDb/indexedb.js';
 import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js';
 import { uncapitalize } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
+import { ModelMigrations } from './mode-migrations.js'
 
 interface register {
   databaseName: string,
@@ -32,14 +33,13 @@ export class registerModel {
     };
 
 
-    await entries.models.forEach(async(modelClassRepresentations) => {
-      
+    for (const modelClassRepresentations of entries.models) {
       const ModelName = modelClassRepresentations.getModelName()
-      models[ModelName] = modelClassRepresentations
+      models[ModelName] = modelClassRepresentations 
+    }
 
-    })
-
-    await entries.models.forEach(async(modelClassRepresentations, index) => {
+    let index = 0;
+    for (const modelClassRepresentations of entries.models) {
       const {fields, modelName, attributes , fieldTypes} = ModelReader.read(modelClassRepresentations)
       
       const idFieldName = attributes?.primaryKey?.shift()
@@ -55,10 +55,10 @@ export class registerModel {
         fields: [],
       })
 
-      await Object.entries(fields).forEach(async([fieldName, Field]) => {
+      for(const [fieldName, Field] of  Object.entries(fields)) {
         // dont register fields that is primary key and auto increment
         if(!(Field?.primaryKey && Field?.autoIncrement)) {
-          
+  
           databaseSchema.stores[index].fields.push({
             name: fieldName,
             keyPath: fieldName,
@@ -79,17 +79,15 @@ export class registerModel {
         // } else if (Field instanceof ManyToManyField) {
         //   await ModelEditor.addMethodManyToManyField(Field, fieldName, modelName, databaseSchema)
         // }
+      }
 
-      })
-      
-    })
-
-    if(databaseSchema.type =='indexedDB') {
-      await indexedDB.migrate(databaseSchema)
+      index++;
     }
 
-    await entries.models.forEach(async(modelClassRepresentations) => {
-      
+
+
+
+    for(const modelClassRepresentations of entries.models) {
       const ModelName = modelClassRepresentations.getModelName()
       models[ModelName] = modelClassRepresentations
 
@@ -99,9 +97,14 @@ export class registerModel {
         DatabaseSchema: databaseSchema,
         TableSchema: tableSchema
       }
+    }
 
-    })
 
+    if(databaseSchema.type =='indexedDB') {
+      await indexedDB.migrate(databaseSchema)
+    }
+    
+    ModelMigrations.migrationsState(true);
   }
 
   static manyToManyRelationShip(foreignKeyField:ManyToManyField, FieldName:string, modelName:string, databaseSchema:DatabaseSchema) {

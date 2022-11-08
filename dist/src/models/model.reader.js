@@ -6,7 +6,7 @@ export class ModelReader {
         const fieldTypes = {};
         const fields = {};
         const attributes = {};
-        Object.entries(classInstance).forEach(([fieldName, Field]) => {
+        for (const [fieldName, Field] of Object.entries(classInstance)) {
             const type = Field === null || Field === void 0 ? void 0 : Field.fieldName;
             if (FieldKeysArray.includes(type)) {
                 fields[fieldName] = Field;
@@ -14,16 +14,16 @@ export class ModelReader {
                     fieldTypes[type] = [];
                 }
                 fieldTypes[type].push(fieldName);
-                Object.entries(Field).forEach(([FieldProperty, value]) => {
+                for (const [FieldProperty, value] of Object.entries(Field)) {
                     if (typeof value != "function") {
                         if (!attributes[FieldProperty]) {
                             attributes[FieldProperty] = [];
                         }
                         attributes[FieldProperty].push(fieldName);
                     }
-                });
+                }
             }
-        });
+        }
         return {
             modelName,
             fields,
