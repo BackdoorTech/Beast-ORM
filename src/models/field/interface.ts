@@ -50,6 +50,8 @@ export interface IndexedDBArrayFieldParams {
 	blank?: boolean
 	type?: any
 	default?: any
+	maxLength?: number
+	minLength?: number 
 }
 
 

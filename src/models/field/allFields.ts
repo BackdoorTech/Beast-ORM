@@ -179,6 +179,8 @@ export class indexedDBArrayField extends field {
 	type = FieldType.ARRAY
 	blank?: boolean
 	default?: any
+	maxLength?: number
+	minLength?: number
 	
 	constructor(data?:IndexedDBArrayFieldParams) {
 		super()

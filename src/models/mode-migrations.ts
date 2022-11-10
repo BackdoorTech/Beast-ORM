@@ -23,7 +23,7 @@ export class _ModelMigrations {
   async waitMigration() {
     return new Promise((resolve, reject) => {
       if(!this.isMigrationsReady) {
-        this.callback.push(() => { 
+        this.callback.push(() => {
           resolve('ready');
         })
       } else {
