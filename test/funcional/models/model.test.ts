@@ -441,11 +441,11 @@ describe("initial test for model", () => {
         models: [User]
       })
 
-      const user = await User.create({username:'kobe', email:'kobe.bryant@lakers.com'})
+      const user = await User.create({username:'kobe', email:'kobe.bryant@lakers.com', age: 5})
       
       const result = await User.createOrFind(
         {userId:user.userId},
-        {username:'kobe', email:'kobe.bryant@lakers.com', age: 5}
+        {username:'kobe', email:'kobe.bryant@lakers.com'}
       )
 
       document.body.innerHTML = JSON.stringify(result)
@@ -484,7 +484,7 @@ describe("initial test for model", () => {
         models: [User]
       })
 
-      await User.create({username:'jame', email:'jame.mark@lakers.com'})
+      await User.create({username:'jame', email:'jame.mark@lakers.com', age: 5})
       
       const result = await User.createOrFind(
         {email:'kobe.bryant@lakers.com'},
@@ -557,7 +557,7 @@ describe("initial test for model", () => {
         userId = models.AutoField({primaryKey:true})
         username = models.CharField({maxLength: 100})
         email = models.CharField({blank: true, maxLength: 100})
-        age = models.IntegerField()
+        age = models.IntegerField({blank: true})
       
       }
 
@@ -786,4 +786,595 @@ describe("operators", () => {
 
 
 
+})
+
+describe("JSONField", () => {
+  
+  beforeEach(async () => {
+    await page.goto(`http://127.0.0.1:${Port}/test/index.html`)
+  })
+
+
+  it('documentation 1', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const {ArrayField, JsonField } = models.indexedDB.fields
+      class DogModel extends models.Model {
+        name = models.CharField({maxLength:200})
+        data = JsonField({null: false})
+      }
+      
+      await models.register({
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        type: 'indexedDB',		
+        version: 1,
+        models: [DogModel]
+      })
+      
+      await DogModel.create({name:'Max', data: null})
+      await DogModel.create({name:'Archie', data:models.Value('null')})
+
+      const result6 = await DogModel.filter({data__isNull:false}).execute()
+      //  [<Dog: Archie>]
+
+      document.body.insertAdjacentHTML(
+        'beforeend', `<span id="result6" style="background-color: yellow"> ${JSON.stringify(result6)}</span>`,
+      );
+      document.body.insertAdjacentHTML(
+        'beforeend', `<br><span style="background-color: yellow"> ${JSON.stringify(await DogModel.all())}</span>`,
+      );
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"name":"Archie","data":{},"id":2}]')
+
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const {ArrayField, JsonField } = models.indexedDB.fields
+      class DogModel extends models.Model {
+        name = models.CharField({maxLength:200})
+        data = JsonField({null: false})
+      }
+      
+      
+      await models.register({
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        type: 'indexedDB',		
+        version: 1,
+        models: [DogModel]
+      })
+      document.body.innerHTML = ""
+      
+      await DogModel.create({name:'Max', data: null})
+      await DogModel.create({name:'Archie', data:models.Value('null')})
+
+      const result5 = await DogModel.filter({data__isNull:true}).execute()
+      //  [<Dog: Max>]
+
+      document.body.insertAdjacentHTML(
+        'beforeend', `<span style="background-color: yellow"> ${JSON.stringify(result5)}</span>`,
+      );
+
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"name":"Max","data":null,"id":1}]')
+    
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const {ArrayField, JsonField } = models.indexedDB.fields
+      class DogModel extends models.Model {
+        name = models.CharField({maxLength:200})
+        data = JsonField({null: false})
+      }
+      
+      
+      await models.register({
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        type: 'indexedDB',		
+        version: 1,
+        models: [DogModel]
+      })
+      document.body.innerHTML = ""
+      
+      await DogModel.create({name:'Max', data: null})
+      await DogModel.create({name:'Archie', data:models.Value('null')})
+      // const result3 = await DogModel.filter({data:null})
+      // //  [<Dog: Archie>]
+      const result4 = await DogModel.filter({data:models.Value('null')}).execute()
+      // //  [<Dog: Archie>]
+
+
+      // document.body.insertAdjacentHTML(
+      //   'beforeend', `<span style="background-color: yellow"> ${JSON.stringify(result1)}</span>`,
+      // );
+      // document.body.insertAdjacentHTML(
+      //   'beforeend', `<span style="background-color: yellow"> ${JSON.stringify(result2)}</span>`,
+      // );
+      // document.body.insertAdjacentHTML(
+      //   'beforeend', `<span style="background-color: yellow"> ${JSON.stringify(result3)}</span>`,
+      // );
+      document.body.insertAdjacentHTML(
+        'beforeend', `<span style="background-color: yellow"> ${JSON.stringify(result4)}</span>`,
+      );
+
+
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"name":"Archie","data":{},"id":2}]')
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const {ArrayField, JsonField } = models.indexedDB.fields
+      class DogModel extends models.Model {
+        name = models.CharField({maxLength:200})
+        data = JsonField({null: false})
+      }
+      
+      
+      await models.register({
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        type: 'indexedDB',		
+        version: 1,
+        models: [DogModel]
+      })
+      document.body.innerHTML = ""
+      
+      await DogModel.create({name:'Max', data: null})
+      await DogModel.create({name:'Archie', data:models.Value('null')})
+      const result3 = await DogModel.filter({data:null}).execute()
+      // [<Dog: Archie>]
+
+      document.body.insertAdjacentHTML(
+        'beforeend', `<span style="background-color: yellow"> ${JSON.stringify(result3)}</span>`,
+      );
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"name":"Archie","data":{},"id":2}]')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+  it('documentation 2', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const {ArrayField, JsonField } = models.indexedDB.fields
+      class DogModel extends models.Model {
+        name = models.CharField({maxLength:200})
+        data = JsonField({null: false})
+      }
+      
+      await models.register({
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        type: 'indexedDB',		
+        version: 1,
+        models: [DogModel]
+      })
+      
+      await DogModel.create({name:'Rufus', data: {
+        'breed': 'labrador',
+        'owner': {
+          'name': 'Bob',
+          'other_pets': [{
+            'name': 'Fishy',
+          }],
+        },
+      }});
+
+      await DogModel.create({name:'Meg', data:{'breed': 'collie', 'owner': null}})
+
+      const result = await DogModel.filter({data__breed:'collie'}).execute()
+      //  <Dog: Meg>
+
+      document.body.insertAdjacentHTML(
+        'beforeend', `<span id="result6" style="background-color: yellow"> ${JSON.stringify(result)}</span>`,
+      );
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"name":"Meg","data":{"breed":"collie","owner":null},"id":2}]')
+    
+  }, 10000)
+
+
+  it('contained_by', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const { ArrayField, JsonField } = models.indexedDB.fields
+      class DogModel extends models.Model {
+        name = models.CharField({maxLength:200})
+        data = JsonField({null: false})
+      }
+      
+      await models.register({
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        type: 'indexedDB',
+        version: 1,
+        models: [DogModel]
+      })
+      
+      await DogModel.create({name:'Rufus', data:{'breed': 'labrador', 'owner': 'Bob'}})
+      await DogModel.create({name:'Meg', data:{'breed': 'collie', 'owner': 'Bob'}})
+      await DogModel.create({name:'Fred', data:{}})
+
+      const result = await DogModel.filter({data__contained_by: {'breed': 'collie', 'owner': 'Bob'}}).execute()
+      // [<Dog: Meg>, <Dog: Fred>]
+
+      document.body.insertAdjacentHTML(
+        'beforeend', `<span id="result6" style="background-color: yellow"> ${JSON.stringify(result)}</span>`,
+      );
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"name":"Meg","data":{"breed":"collie","owner":"Bob"},"id":2},{"name":"Fred","data":{},"id":3}]')
+    
+  }, 10000)
+
+
+  it('has_key', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const { ArrayField, JsonField } = models.indexedDB.fields
+      class DogModel extends models.Model {
+        name = models.CharField({maxLength:200})
+        data = JsonField({null: false})
+      }
+      
+      await models.register({
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        type: 'indexedDB',
+        version: 1,
+        models: [DogModel]
+      })
+      
+      await DogModel.create({name:'Rufus', data:{'breed': 'labrador'}})
+      await DogModel.create({name:'Meg', data:{'breed': 'collie', 'owner': 'Bob'}})
+
+
+      const result = await DogModel.filter({data__has_key: 'owner'}).execute()
+      // [<Dog: Meg>]
+
+      document.body.insertAdjacentHTML(
+        'beforeend', `<span id="result6" style="background-color: yellow"> ${JSON.stringify(result)}</span>`,
+      );
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"name":"Meg","data":{"breed":"collie","owner":"Bob"},"id":2}]')
+    
+  }, 10000)
+
+  it('has_keys', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const { ArrayField, JsonField } = models.indexedDB.fields
+      class DogModel extends models.Model {
+        name = models.CharField({maxLength:200})
+        data = JsonField({null: false})
+      }
+      
+      await models.register({
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        type: 'indexedDB',
+        version: 1,
+        models: [DogModel]
+      })
+      
+      await DogModel.create({name:'Rufus', data:{'breed': 'labrador'}})
+      await DogModel.create({name:'Meg', data:{'breed': 'collie', 'owner': 'Bob'}})
+
+
+      const result = await DogModel.filter({data__has_keys: ['breed', 'owner']}).execute()
+      // [<Dog: Meg>]
+
+      document.body.insertAdjacentHTML(
+        'beforeend', `<span id="result6" style="background-color: yellow"> ${JSON.stringify(result)}</span>`,
+      );
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"name":"Meg","data":{"breed":"collie","owner":"Bob"},"id":2}]')
+    
+  }, 10000)
+
+
+  it('has_any_keys', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const { ArrayField, JsonField } = models.indexedDB.fields
+      class DogModel extends models.Model {
+        name = models.CharField({maxLength:200})
+        data = JsonField({null: false})
+      }
+      
+      await models.register({
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        type: 'indexedDB',
+        version: 1,
+        models: [DogModel]
+      })
+      
+      await DogModel.create({name:'Rufus', data:{'breed': 'labrador'}})
+      await DogModel.create({name:'Meg', data:{'breed': 'collie', 'owner': 'Bob'}})
+
+
+      const result = await DogModel.filter({data__has_any_keys: ['breed', 'owner']}).execute()
+      // [<Dog: Meg>, <Dog: Rufus>]
+
+      document.body.insertAdjacentHTML(
+        'beforeend', `<span id="result6" style="background-color: yellow"> ${JSON.stringify(result)}</span>`,
+      );
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"name":"Rufus","data":{"breed":"labrador"},"id":1},{"name":"Meg","data":{"breed":"collie","owner":"Bob"},"id":2}]')
+    
+  }, 10000)
+})
+
+describe("JSONField deep", () => {
+  
+  beforeEach(async () => {
+    await page.goto(`http://127.0.0.1:${Port}/test/index.html`)
+  })
+
+
+
+  it('Multiple keys can be chained together to form a path lookup', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    var a = await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const {ArrayField, JsonField } = models.indexedDB.fields
+      class DogModel extends models.Model {
+        name = models.CharField({maxLength:200})
+        data = JsonField({null: false})
+      }
+      
+      await models.register({
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        type: 'indexedDB',
+        version: 1,
+        models: [DogModel]
+      })
+      
+      await DogModel.create({name:'Rufus', data: {
+        'breed': 'labrador',
+        'owner': {
+          'name': 'Bob',
+          'other_pets': [{
+            'name': 'Fishy',
+          }],
+        },
+      }});
+
+      await DogModel.create({name:'Meg', data:{'breed': 'collie', 'owner': null}})
+
+      const result = await DogModel.filter({data__owner__other_pets__0__name:'Fishy'}).execute()
+      //  <Dog: Meg>
+
+      if(JSON.stringify(result) == '[{"name":"Rufus","data":{"breed":"labrador","owner":{"name":"Bob","other_pets":[{"name":"Fishy"}]}},"id":1}]') {
+        await DogModel.deleteAll()
+      }
+
+      document.body.insertAdjacentHTML(
+        'beforeend', `<span id="result6" style="background-color: yellow"> ${JSON.stringify(await DogModel.all())}</span>`,
+      );
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    
+    await page.waitForFunction("[]")
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+
+  it('IsNull deep', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const { ArrayField, JsonField } = models.indexedDB.fields
+      class DogModel extends models.Model {
+        name = models.CharField({maxLength:200})
+        data = JsonField({null: false})
+      }
+      
+      await models.register({
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        type: 'indexedDB',
+        version: 1,
+        models: [DogModel]
+      })
+      
+      
+      await DogModel.create({name:'Rufus', data: {
+        'breed': 'labrador',
+        'owner': {
+          'name': 'Bob',
+          'other_pets': [{
+            'name': 'Fishy',
+          }],
+        },
+      }});
+
+      await DogModel.create({name:'Meg', data:{'breed': 'collie', 'owner': null}})
+
+      const result = await DogModel.filter({data__owner__other_pets__0__age__isNull: true}).execute()
+
+      document.body.insertAdjacentHTML(
+        'beforeend', `<span id="result6" style="background-color: yellow"> ${JSON.stringify(result)}</span>`,
+      );
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"name":"Rufus","data":{"breed":"labrador","owner":{"name":"Bob","other_pets":[{"name":"Fishy"}]}},"id":1}]')
+
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 10000)
+
+
+  it('has_key', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const { ArrayField, JsonField } = models.indexedDB.fields
+      class DogModel extends models.Model {
+        name = models.CharField({maxLength:200})
+        data = JsonField({null: false})
+      }
+      
+      await models.register({
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        type: 'indexedDB',
+        version: 1,
+        models: [DogModel]
+      })
+      
+      await DogModel.create({name:'Rufus', data:{'breed': 'labrador'}})
+      await DogModel.create({name:'Meg', data:{'breed': 'collie', 'owner': 'Bob'}})
+
+
+      const result = await DogModel.filter({data__has_key: 'owner'}).execute()
+      // [<Dog: Meg>]
+
+      document.body.insertAdjacentHTML(
+        'beforeend', `<span id="result6" style="background-color: yellow"> ${JSON.stringify(result)}</span>`,
+      );
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"name":"Meg","data":{"breed":"collie","owner":"Bob"},"id":2}]')
+    
+  }, 10000)
+
+  it('has_keys', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const { ArrayField, JsonField } = models.indexedDB.fields
+      class DogModel extends models.Model {
+        name = models.CharField({maxLength:200})
+        data = JsonField({null: false})
+      }
+      
+      await models.register({
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        type: 'indexedDB',
+        version: 1,
+        models: [DogModel]
+      })
+      
+      await DogModel.create({name:'Rufus', data:{'breed': 'labrador'}})
+      await DogModel.create({name:'Meg', data:{'breed': 'collie', 'owner': 'Bob'}})
+
+
+      const result = await DogModel.filter({data__has_keys: ['breed', 'owner']}).execute()
+      // [<Dog: Meg>]
+
+      document.body.insertAdjacentHTML(
+        'beforeend', `<span id="result6" style="background-color: yellow"> ${JSON.stringify(result)}</span>`,
+      );
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"name":"Meg","data":{"breed":"collie","owner":"Bob"},"id":2}]')
+    
+  }, 10000)
+
+
+  it('has_any_keys', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      const { ArrayField, JsonField } = models.indexedDB.fields
+      class DogModel extends models.Model {
+        name = models.CharField({maxLength:200})
+        data = JsonField({null: false})
+      }
+      
+      await models.register({
+        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        type: 'indexedDB',
+        version: 1,
+        models: [DogModel]
+      })
+      
+      await DogModel.create({name:'Rufus', data:{'breed': 'labrador'}})
+      await DogModel.create({name:'Meg', data:{'breed': 'collie', 'owner': 'Bob'}})
+
+
+      const result = await DogModel.filter({data__has_any_keys: ['breed', 'owner']}).execute()
+      // [<Dog: Meg>, <Dog: Rufus>]
+
+      document.body.insertAdjacentHTML(
+        'beforeend', `<span id="result6" style="background-color: yellow"> ${JSON.stringify(result)}</span>`,
+      );
+
+    })
+    debugger
+    // Check to see if text exists on the page
+    await page.waitForFunction('[{"name":"Rufus","data":{"breed":"labrador"},"id":1},{"name":"Meg","data":{"breed":"collie","owner":"Bob"},"id":2}]')
+    
+  }, 10000)
 })

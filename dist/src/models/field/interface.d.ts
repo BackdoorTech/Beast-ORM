@@ -33,6 +33,7 @@ export interface AutoFieldParams {
 export interface IndexedDBJsonFieldParams {
     unique?: boolean;
     blank?: boolean;
+    null?: boolean;
     default?: any;
 }
 export interface IndexedDBArrayFieldParams {
@@ -40,6 +41,8 @@ export interface IndexedDBArrayFieldParams {
     blank?: boolean;
     type?: any;
     default?: any;
+    maxLength?: number;
+    minLength?: number;
 }
 export interface DateTimeFieldParams {
     unique?: boolean;

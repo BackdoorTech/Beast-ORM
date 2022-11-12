@@ -144,9 +144,6 @@ export class indexedDBJsonField extends field {
             }
         }
         else if (this.isNull(value) == true) {
-            if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
-                return false;
-            }
         }
         return true;
     }

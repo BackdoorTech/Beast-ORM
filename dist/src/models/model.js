@@ -77,6 +77,12 @@ export class Model extends (_b = ModelManager) {
     formValidation(data) {
         return Model.formValidation(data);
     }
+    Value(args) {
+        return Model.Value(args);
+    }
+    static Value(args) {
+        return '';
+    }
     static formValidation(data) {
         const TableSchema = this.getTableSchema();
         for (let field of TableSchema.fields) {

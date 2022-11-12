@@ -5,7 +5,7 @@ import { PossibleFieldAttributes} from './field/interface.js'
 export interface FieldSchema {
 	name: string, 
 	keyPath: string, 
-	className?: string,
+	className?: FieldKeys,
 	fieldAttributes?: PossibleFieldAttributes,
 	options?: { 
 		unique?: boolean,

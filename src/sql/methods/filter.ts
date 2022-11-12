@@ -5,6 +5,7 @@ export class filter {
 	constructor(private arg, private TableSchema) {}
 
 	async cursor(row: object, resolve?, limit?) {
+		
 		const operator = new ObjectConditionOperator(row, this.TableSchema)
 		const operationsResult = await operator.run(this.arg)
 

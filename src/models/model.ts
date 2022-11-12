@@ -113,6 +113,15 @@ export class Model extends ModelManager{
     return Model.formValidation(data)
   }
 
+
+  Value(args) {
+    return Model.Value(args)
+  }
+
+  static Value(args) {
+    return ''
+  }
+  
   static formValidation(data) {
     const TableSchema = this.getTableSchema()
 
@@ -328,7 +337,7 @@ export class Model extends ModelManager{
 
     let instance;
     let created;
-
+    
     if(result.length == 1) {
       created = false
       instance =  await this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[0] })

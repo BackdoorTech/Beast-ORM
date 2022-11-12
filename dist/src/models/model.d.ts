@@ -15,6 +15,8 @@ export declare class Model extends ModelManager {
     all(): Promise<any>;
     getFields(arg: any): {};
     formValidation(data: any): boolean;
+    Value(args: any): string;
+    static Value(args: any): string;
     static formValidation(data: any): boolean;
     static getModelsFields(arg: any): Promise<void>;
     static all(): Promise<any>;

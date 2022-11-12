@@ -1,10 +1,26 @@
-import { TableSchema } from '../../models/register-modal.interface.js';
-import { operator } from './object-operator.js'
+import { TableSchema, FieldSchema } from '../../models/register-modal.interface.js';
+import { ObjOperatorOverwrite, operator, OperatorsKeysArray } from './object-operator.js'
 import { getDeep } from '../../utils.js'
+import { AttributesMap } from '../../models/field/fields.interface.js';
 
 export class ObjectConditionOperator {
 
-	constructor(private row, private TableSchema:TableSchema) {}
+	schemeFields: AttributesMap<string, FieldSchema> = {} = {}
+
+	constructor(private row, private TableSchema:TableSchema) {
+		for( const field of this.TableSchema.fields) {
+			this.schemeFields[field.name] = field
+		}
+
+		this.schemeFields[this.TableSchema.id.keyPath] = {
+			keyPath: this.TableSchema.id.keyPath,
+			name: this.TableSchema.id.keyPath,
+			className: 'IntegerField',
+		}
+
+		// console.log(this.schemeFields)
+		
+	}
 
 	async run(args): Promise<boolean| any> {
 		
@@ -32,7 +48,6 @@ export class ObjectConditionOperator {
 	private async execute(objOperator: any): Promise<boolean> {
 
 		const keys = Object.keys(objOperator)
-
 		for(let field of keys) {
 
 			const element = field.split('__')
@@ -41,14 +56,47 @@ export class ObjectConditionOperator {
 				element.push('eq')
 			}
 
-			const operation = element.pop()
-			const fieldName = element.join('.')
+			let  operation: any = element[element.length - 1]
+
+		
+			if(OperatorsKeysArray.includes(operation)) {
+				operation = element.pop()
+			} else {
+				operation = 'eq'
+			}
 			
-			if(operator[operation]) {
-				const rowFieldValue = getDeep(this.row, fieldName)
+			const fieldName = element[0]
+			const fieldPath = element.join('.')
+
+			console.log(operation)
+
+			if(OperatorsKeysArray.includes(operation)) {
+				const rowFieldValue = getDeep(this.row, fieldPath)
+
 				const arg = objOperator[field];
 
-				const operationResult: boolean = await operator[operation](field, arg, rowFieldValue, this.row, this.TableSchema)
+				// console.log(fieldName, this.schemeFields, element[0])
+				// console.log(fieldName, fieldPath)
+
+				let operationResult: boolean;
+				
+				try {
+					if(this.schemeFields[fieldName].className == 'indexedDBJsonField') {
+						operationResult = await ObjOperatorOverwrite[operation]({fieldName, arg, rowFieldValue, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})
+					} else {
+						// alert('normal')
+						if(rowFieldValue === undefined) {
+							return false
+						}
+						operationResult = await operator[operation]({fieldName, arg, rowFieldValue, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})
+					}
+				} catch (err) {
+					// console.log(this.TableSchema, this.schemeFields[fieldName])
+					throw('Field '+ fieldName +' does not exit on the table'+ err)
+				}
+				
+				
+				
 				if(!operationResult) {
 					
 					return false

@@ -41,6 +41,7 @@ export interface AutoFieldParams {
 export interface IndexedDBJsonFieldParams {
 	unique?: boolean
 	blank?: boolean
+	null?: boolean
 	default?: any
 }
 

@@ -68,6 +68,8 @@ export declare class indexedDBArrayField extends field {
     type: FieldType;
     blank?: boolean;
     default?: any;
+    maxLength?: number;
+    minLength?: number;
     constructor(data?: IndexedDBArrayFieldParams);
     valid(value: any): boolean;
 }
@@ -76,6 +78,7 @@ export declare class indexedDBJsonField extends field {
     type: FieldType;
     blank?: boolean;
     default?: any;
+    null?: boolean;
     constructor(data?: IndexedDBJsonFieldParams);
     valid(value: any): boolean;
 }

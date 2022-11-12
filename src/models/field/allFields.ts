@@ -209,6 +209,7 @@ export class indexedDBJsonField extends field {
 	type = FieldType.JSON
 	blank?: boolean
 	default?: any
+	null?: boolean
 	
 	constructor(data?:IndexedDBJsonFieldParams) {
 		super()
@@ -221,10 +222,9 @@ export class indexedDBJsonField extends field {
 			if(this?.blank  != true) {
 				return false
 			}
+			
 		} else if (this.isNull(value) == true) {
-			if(this?.blank != true) {
-				return false
-			}
+			
 		}
 		return true
 	}
