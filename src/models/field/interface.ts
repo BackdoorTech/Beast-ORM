@@ -1,4 +1,5 @@
 import * as Fields from './allFields.js'
+import { field } from './field.js'
 
 export interface CharFieldParams {
 	maxLength?: number
@@ -53,6 +54,8 @@ export interface IndexedDBArrayFieldParams {
 	default?: any
 	maxLength?: number
 	minLength?: number 
+	field?: field
+	size?: number
 }
 
 

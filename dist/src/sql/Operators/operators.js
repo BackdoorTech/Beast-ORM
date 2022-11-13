@@ -273,3 +273,24 @@ export class objectHasnyKeys {
         return false;
     }
 }
+// array shit
+export class ArrayFieldContains {
+    static validate({ fieldName, arg, rowFieldValue, row, fieldPath }) {
+        return false;
+    }
+}
+export class ArrayFieldContains_by {
+    static validate({ fieldName, arg, rowFieldValue, row, fieldPath }) {
+        return false;
+    }
+}
+export class ArrayFieldContains_overlap {
+    static validate({ fieldName, arg, rowFieldValue, row, fieldPath }) {
+        return false;
+    }
+}
+export class ArrayFieldContains_len {
+    static validate({ fieldName, arg, rowFieldValue, row, fieldPath }) {
+        return false;
+    }
+}

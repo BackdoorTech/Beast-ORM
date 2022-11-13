@@ -5,6 +5,7 @@ export class SqlObject {
         this.Methods = Methods;
         this.limit = 0;
         this.rows = [];
+        this.params = [];
         const arg = this.Methods[0].arguments;
         const methodName = this.Methods[0].methodName;
         this.firstMethod = new methods[methodName](arg, this.TableSchema);

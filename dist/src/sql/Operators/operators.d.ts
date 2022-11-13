@@ -182,3 +182,39 @@ export declare class objectHasnyKeys {
         fieldPath: any;
     }): boolean;
 }
+export declare class ArrayFieldContains {
+    static validate({ fieldName, arg, rowFieldValue, row, fieldPath }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        fieldPath: any;
+    }): boolean;
+}
+export declare class ArrayFieldContains_by {
+    static validate({ fieldName, arg, rowFieldValue, row, fieldPath }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        fieldPath: any;
+    }): boolean;
+}
+export declare class ArrayFieldContains_overlap {
+    static validate({ fieldName, arg, rowFieldValue, row, fieldPath }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        fieldPath: any;
+    }): boolean;
+}
+export declare class ArrayFieldContains_len {
+    static validate({ fieldName, arg, rowFieldValue, row, fieldPath }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        fieldPath: any;
+    }): boolean;
+}

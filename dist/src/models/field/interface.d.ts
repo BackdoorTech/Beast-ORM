@@ -1,3 +1,4 @@
+import { field } from './field.js';
 export interface CharFieldParams {
     maxLength?: number;
     minLength?: number;
@@ -43,6 +44,8 @@ export interface IndexedDBArrayFieldParams {
     default?: any;
     maxLength?: number;
     minLength?: number;
+    field?: field;
+    size?: number;
 }
 export interface DateTimeFieldParams {
     unique?: boolean;

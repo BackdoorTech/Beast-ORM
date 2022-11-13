@@ -70,6 +70,10 @@ export declare class indexedDBArrayField extends field {
     default?: any;
     maxLength?: number;
     minLength?: number;
+    size?: number;
+    private _field?;
+    get field(): any;
+    set field(value: any);
     constructor(data?: IndexedDBArrayFieldParams);
     valid(value: any): boolean;
 }

@@ -82,3 +82,17 @@ export const ObjOperatorOverwrite = Object.assign(Object.assign({}, operator), {
         return operatorsObject.objectHasnyKeys.validate({ fieldName, arg, rowFieldValue, row, fieldPath });
     }
 });
+export const ArrOperatorOverwrite = Object.assign(Object.assign({}, operator), {
+    isNull({ fieldName, rowFieldValue, arg, row, TableSchema, element, fieldPath }) {
+        return operatorsObject.objectIsnull.validate({ fieldName, arg, rowFieldValue, row, fieldPath });
+    },
+    eq: ({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }) => {
+        return operatorsObject.objectEq.validate({ fieldName, arg, rowFieldValue, row, fieldPath });
+    },
+    contains: ({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }) => {
+        return operatorsObject.objectContains.validate({ fieldName, arg, rowFieldValue, row, fieldPath });
+    },
+    contained_by: ({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }) => {
+        return operatorsObject.objectContains_by.validate({ fieldName, arg, rowFieldValue, row, fieldPath });
+    },
+});

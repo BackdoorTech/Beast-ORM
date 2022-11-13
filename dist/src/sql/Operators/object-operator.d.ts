@@ -260,3 +260,138 @@ export declare const ObjOperatorOverwrite: {
         fieldPath: any;
     }): boolean;
 };
+export declare const ArrOperatorOverwrite: {
+    gt: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+    }) => boolean;
+    gte: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+    }) => boolean;
+    lt: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+    }) => boolean;
+    lte: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+    }) => boolean;
+    not: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+    }) => boolean;
+    eq: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+    }) => boolean;
+    contains: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+    }) => any;
+    len({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+    }): boolean;
+    hasKey({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+    }): boolean;
+    containedBy({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+    }): boolean;
+    overlap({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+    }): any;
+    isNull({ fieldName, rowFieldValue, arg, row, TableSchema, element }: {
+        fieldName: any;
+        rowFieldValue: any;
+        arg: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+    }): boolean;
+} & {
+    isNull({ fieldName, rowFieldValue, arg, row, TableSchema, element, fieldPath }: {
+        fieldName: any;
+        rowFieldValue: any;
+        arg: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+        fieldPath: any;
+    }): boolean;
+    eq: ({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+        fieldPath: any;
+    }) => boolean;
+    contains: ({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+        fieldPath: any;
+    }) => boolean;
+    contained_by: ({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }: {
+        fieldName: any;
+        arg: any;
+        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+        fieldPath: any;
+    }) => boolean;
+};

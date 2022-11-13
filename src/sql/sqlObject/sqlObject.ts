@@ -7,6 +7,7 @@ export class SqlObject {
 	limit: number = 0
 	rows = []
 	firstMethod: methodFunction
+	params = []
 
 	constructor(private TableSchema: TableSchema, private Methods: Method[]) {
 		

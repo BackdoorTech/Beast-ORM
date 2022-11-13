@@ -194,10 +194,10 @@ const { ArrayField } = models.indexedDB.fields
 class ChessBoardUser extends models.Model {
   board = ArrayField({
     field: ArrayField({
-      models.CharField(maxLength=10, blank=true),
-      size=8,
+      field: models.CharField({maxLength:10, blank:true}),
+      size:8,
     }),
-    size=8,
+    size:8,
   })
 }
 

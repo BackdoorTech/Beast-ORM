@@ -1,5 +1,5 @@
 import { TableSchema, FieldSchema } from '../../models/register-modal.interface.js';
-import { ObjOperatorOverwrite, operator, OperatorsKeysArray } from './object-operator.js'
+import { ArrOperatorOverwrite, ObjOperatorOverwrite, operator, OperatorsKeysArray } from './object-operator.js'
 import { getDeep } from '../../utils.js'
 import { AttributesMap } from '../../models/field/fields.interface.js';
 
@@ -83,7 +83,11 @@ export class ObjectConditionOperator {
 				try {
 					if(this.schemeFields[fieldName].className == 'indexedDBJsonField') {
 						operationResult = await ObjOperatorOverwrite[operation]({fieldName, arg, rowFieldValue, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})
-					} else {
+					} 
+					else if(this.schemeFields[fieldName].className == 'indexedDBArrayField') {
+						operationResult = await ArrOperatorOverwrite[operation]({fieldName, arg, rowFieldValue, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})	
+					} 
+					else {
 						// alert('normal')
 						if(rowFieldValue === undefined) {
 							return false

@@ -1,4 +1,4 @@
-import { ObjOperatorOverwrite, operator, OperatorsKeysArray } from './object-operator.js';
+import { ArrOperatorOverwrite, ObjOperatorOverwrite, operator, OperatorsKeysArray } from './object-operator.js';
 import { getDeep } from '../../utils.js';
 export class ObjectConditionOperator {
     constructor(row, TableSchema) {
@@ -62,6 +62,9 @@ export class ObjectConditionOperator {
                 try {
                     if (this.schemeFields[fieldName].className == 'indexedDBJsonField') {
                         operationResult = await ObjOperatorOverwrite[operation]({ fieldName, arg, rowFieldValue, row: this.row, TableSchema: this.TableSchema, element: fieldName, fieldPath });
+                    }
+                    else if (this.schemeFields[fieldName].className == 'indexedDBArrayField') {
+                        operationResult = await ArrOperatorOverwrite[operation]({ fieldName, arg, rowFieldValue, row: this.row, TableSchema: this.TableSchema, element: fieldName, fieldPath });
                     }
                     else {
                         // alert('normal')
