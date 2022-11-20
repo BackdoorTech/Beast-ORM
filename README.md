@@ -1,7 +1,6 @@
 # Beast ORM
 
 ORM for accessing indexedDB as a promise base api implementation.
-**Underdeveloped**
 
 
 ## DBMS Support
@@ -554,6 +553,118 @@ Article objects have access to their related Publication objects:
 Article objects have access to their related Publication objects:
 ```javascript
   await p1.article_set_all()
+
+```
+
+
+## One-to-one relationships
+In this example, a Place optionally can be a Restaurant:
+```javascript
+class Place extends models.Model {
+  name = models.CharField({maxLength: 50})
+  address = models.CharField({maxLength: 50})
+} 
+
+class Restaurant extends models.Model  {
+  place = models.OneToOneField({model:Place})
+  servesHotDogs = models.BooleanField({default: false})
+  servesPizza = models.BooleanField({default: false})
+}
+
+
+await models.register({
+  databaseName:'jest-test'+ new Date().getTime(),
+  type: 'indexedDB',
+  version: 1,
+  models: [Place, Restaurant]
+})
+
+```
+
+What follows are examples of operations that can be performed using the Python API facilities.
+
+Create a couple of Places:
+
+```javascript
+  const p1 = await Place.create({name:'Demon Dogs', address:'944 W. Fullerton'})
+
+```
+
+Create a Restaurant. Pass the “parent” object as this object’s primary key:
+
+```javascript
+  const r = await Restaurant.create({place:p1, servesHotDogs: false, servesPizza:false})
+
+```
+
+A Restaurant can access its place:
+```javascript
+  const r = await p1.Restaurant()
+
+```
+
+A Place can access its restaurant, if available:
+```javascript
+  const p = await await r.Place()
+```
+
+## many-to-one relationships
+
+```javascript
+class Reporter extends models.Model {
+  firstName = models.CharField({maxLength: 50})
+  lastName = models.CharField({maxLength: 50})
+  email = models.CharField()
+}
+
+class Article extends models.Model {
+  headline = models.CharField({maxLength: 50})
+  pubDate = models.DateField()
+  reporter = models.ForeignKey({model:Reporter})
+}
+
+
+await models.register({
+  databaseName:'jest-test'+ new Date().getTime(),
+  type: 'indexedDB',
+  version: 1,
+  models: [Reporter, Article]
+})
+
+```
+
+What follows are examples of operations that can be performed using the Python API facilities.
+
+Create a few Reporters:
+
+```javascript
+const r1 = await Reporter.create({firstName: 'asdfsadf', lastName: 'asdfsd', email:'teste'})
+const r2 = await Reporter.create({firstName: 'Peter', lastName: 'Maquiran', email:'teste'})
+
+```
+
+Create an Article:
+
+```javascript
+  const a = await Article.create({headline:"This is a test", pubDate:'', reporter:r1})
+
+```
+
+Article objects have access to their related Reporter objects:
+```javascript
+  const r1 = await a.Reporter()
+
+```
+
+Reporter objects have access to their related Article objects:
+```javascript
+  const a = await await r1.article_setAll()
+
+```
+
+Add the same article to a different article set
+```javascript
+  const a = await await r1.article_setAdd({headline:"This is a test", pubDate:''})
 
 ```
 ## Languages and Tools

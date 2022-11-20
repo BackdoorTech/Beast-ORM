@@ -123,7 +123,6 @@ export declare class OneToOneField extends field {
     blank?: boolean;
     default?: any;
     onDelete?: any;
-    primaryKey?: boolean;
     constructor(data?: OneToOneFieldParams);
     contractor(contractor: any): void;
     valid(value: any): boolean;
@@ -135,7 +134,6 @@ export declare class ManyToManyField extends field {
     blank?: boolean;
     default?: any;
     onDelete?: any;
-    primaryKey?: boolean;
     unique?: boolean;
     constructor(data?: ManyToManyFieldParams);
     valid(value: any): boolean;

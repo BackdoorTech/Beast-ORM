@@ -215,10 +215,6 @@ export class Model extends (_b = ModelManager) {
             let newInstance = new models[ModelName]();
             Object.assign(newInstance, createObject);
             delete newInstance.obj;
-            models[ModelName].prototype.getPrimaryKeyValue = () => {
-                const idFieldName = TableSchema.id.keyPath;
-                return createObject[idFieldName];
-            };
             return newInstance;
         }
         else {

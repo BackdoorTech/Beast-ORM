@@ -172,16 +172,27 @@ export class ModelEditor {
   static addMethodOneToOneField(foreignKeyField:OneToOneField, FieldName:string, modelName:string, databaseSchema:DatabaseSchema) {
 
     const foreignKeyFieldModel: Model = foreignKeyField.model
+    const currentModel: Model = models[modelName]
 
     foreignKeyFieldModel['prototype'][modelName] = async function (body) {
-
+      const foreignModel: Model = currentModel
+      const TableSchema = foreignModel.getTableSchema()
       const obj ={}
-      obj[FieldName] = this.getPrimaryKeyValue()
-
-      const foreignModel: Model = models[modelName]
+      obj[TableSchema.id.keyPath] = this.getPrimaryKeyValue()
 
       return await foreignModel.get(obj)
 
+    }
+
+    currentModel['prototype'][foreignKeyFieldModel['name']] = async function () { 
+
+      const foreignModel: Model = foreignKeyFieldModel
+      let params = {}
+      const TableSchema = foreignModel.getTableSchema()
+
+      params[TableSchema.id.keyPath] = this.getPrimaryKeyValue()
+
+      return await foreignModel.get(params)
     }
 
   }
@@ -189,6 +200,7 @@ export class ModelEditor {
   static addMethodForeignKey(foreignKeyField:ForeignKey, FieldName:string, modelName:string, databaseSchema:DatabaseSchema) {
     
     const foreignKeyFieldModel: Model = foreignKeyField.model
+    const currentModel: Model = models[modelName]
     const FunctionName = uncapitalize(modelName)
 
     foreignKeyFieldModel['prototype'][FunctionName+'_setAll'] = async function () {
@@ -201,6 +213,23 @@ export class ModelEditor {
       return await currentModel.filter(obj).execute()
 
     }
+
+    foreignKeyFieldModel['prototype'][FunctionName+'_setAdd'] = async function (arg) {
+      const reporter = this
+      arg[FieldName] = reporter
+      return currentModel['create'](arg)
+    }
+
+    
+    currentModel['prototype'][foreignKeyFieldModel.getModelName()] = async function () {
+
+      const TableSchema = foreignKeyFieldModel.getTableSchema()
+      const obj = {}
+
+      obj[TableSchema.id.keyPath] = this[FieldName] 
+      return foreignKeyFieldModel.filter(obj).execute()
+    }
+
 
   }
 

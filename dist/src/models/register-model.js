@@ -125,21 +125,42 @@ export class registerModel {
 export class ModelEditor {
     static addMethodOneToOneField(foreignKeyField, FieldName, modelName, databaseSchema) {
         const foreignKeyFieldModel = foreignKeyField.model;
+        const currentModel = models[modelName];
         foreignKeyFieldModel['prototype'][modelName] = async function (body) {
+            const foreignModel = currentModel;
+            const TableSchema = foreignModel.getTableSchema();
             const obj = {};
-            obj[FieldName] = this.getPrimaryKeyValue();
-            const foreignModel = models[modelName];
+            obj[TableSchema.id.keyPath] = this.getPrimaryKeyValue();
             return await foreignModel.get(obj);
+        };
+        currentModel['prototype'][foreignKeyFieldModel['name']] = async function () {
+            const foreignModel = foreignKeyFieldModel;
+            let params = {};
+            const TableSchema = foreignModel.getTableSchema();
+            params[TableSchema.id.keyPath] = this.getPrimaryKeyValue();
+            return await foreignModel.get(params);
         };
     }
     static addMethodForeignKey(foreignKeyField, FieldName, modelName, databaseSchema) {
         const foreignKeyFieldModel = foreignKeyField.model;
+        const currentModel = models[modelName];
         const FunctionName = uncapitalize(modelName);
         foreignKeyFieldModel['prototype'][FunctionName + '_setAll'] = async function () {
             const obj = {};
             obj[FieldName] = this.getPrimaryKeyValue();
             const currentModel = models[modelName];
             return await currentModel.filter(obj).execute();
+        };
+        foreignKeyFieldModel['prototype'][FunctionName + '_setAdd'] = async function (arg) {
+            const reporter = this;
+            arg[FieldName] = reporter;
+            return currentModel['create'](arg);
+        };
+        currentModel['prototype'][foreignKeyFieldModel.getModelName()] = async function () {
+            const TableSchema = foreignKeyFieldModel.getTableSchema();
+            const obj = {};
+            obj[TableSchema.id.keyPath] = this[FieldName];
+            return foreignKeyFieldModel.filter(obj).execute();
         };
     }
     static async addMethodManyToManyField(foreignKeyField, FieldName, modelName, databaseSchema) {

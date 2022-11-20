@@ -348,7 +348,6 @@ export class OneToOneField extends field {
 	blank?: boolean
 	default?: any
 	onDelete?: any
-	primaryKey?:boolean
 
 	constructor(data?: OneToOneFieldParams) {
 		super()
@@ -373,7 +372,6 @@ export class ManyToManyField extends field {
 	blank?: boolean
 	default?: any
 	onDelete?: any
-	primaryKey?:boolean
 	unique?: boolean
 
 

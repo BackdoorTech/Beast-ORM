@@ -24,7 +24,7 @@ describe("initial test for model", () => {
       } 
 
       class Restaurant extends models.Model  {
-        place = models.OneToOneField({model:Place, primaryKey:true})
+        place = models.OneToOneField({model:Place})
         servesHotDogs = models.BooleanField({default: false})
         servesPizza = models.BooleanField({default: false})
       }
@@ -47,6 +47,46 @@ describe("initial test for model", () => {
     debugger
 
     await page.waitForFunction('{"place":1,"servesHotDogs":false,"servesPizza":false}')
+    expect('time not exceeded').toBe('time not exceeded')
+
+  }, 10000)
+
+  it('model relation ship one to one reverse', async () => {
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+
+      class Place extends models.Model {
+        name = models.CharField({maxLength: 50})
+        address = models.CharField({maxLength: 50})
+      } 
+
+      class Restaurant extends models.Model  {
+        place = models.OneToOneField({model:Place})
+        servesHotDogs = models.BooleanField({default: false})
+        servesPizza = models.BooleanField({default: false})
+      }
+
+
+      await models.register({
+        databaseName:'jest-test'+ new Date().getTime(),
+        type: 'indexedDB',
+        version: 1,
+        models: [Place, Restaurant]
+      })
+
+      const p1 = await Place.create({name:'Demon Dogs', address:'944 W. Fullerton'})
+      const r = await Restaurant.create({place:p1, servesHotDogs: false, servesPizza:false})
+
+
+      document.body.innerHTML = JSON.stringify(await r.Place())
+    })
+    
+    debugger
+
+    await page.waitForFunction('{"name":"Demon Dogs","address":"944 W. Fullerton","id":1}')
     expect('time not exceeded').toBe('time not exceeded')
 
   }, 10000)
@@ -199,15 +239,15 @@ describe("initial test for model", () => {
         const models: typeof modelsType = window['models']
 
         class Reporter extends models.Model {
-            firstName = models.CharField({maxLength: 50})
-            lastName = models.CharField({maxLength: 50})
-            email = models.CharField()
+          firstName = models.CharField({maxLength: 50})
+          lastName = models.CharField({maxLength: 50})
+          email = models.CharField()
         }
 
         class Article extends models.Model {
-            headline = models.CharField({maxLength: 50})
-            pubDate = models.DateField()
-            reporter = models.ForeignKey({model:Reporter})
+          headline = models.CharField({maxLength: 50})
+          pubDate = models.DateField()
+          reporter = models.ForeignKey({model:Reporter})
         }
 
   
@@ -218,11 +258,12 @@ describe("initial test for model", () => {
         models: [Reporter, Article]
       })
 
-      const r = await Reporter.create({firstName: 'asdfsadf', lastName: 'asdfsd', email:'teste'})
-      const a = await Article.create({headline:"This is a test", pubDate:'', reporter:r})
+      const r1 = await Reporter.create({firstName: 'asdfsadf', lastName: 'asdfsd', email:'teste'})
+      const r2 = await Reporter.create({firstName: 'Peter', lastName: 'Maquiran', email:'teste'})
+      const a = await Article.create({headline:"This is a test", pubDate:'', reporter:r1})
 
 
-      document.body.innerHTML = JSON.stringify(await r.article_setAll()) 
+      document.body.innerHTML = JSON.stringify(await r1.article_setAll()) 
     })
 
     debugger

@@ -94,7 +94,6 @@ export interface OneToOneFieldParams {
 	blank?: boolean
 	default?: any
 	onDelete?: any
-	primaryKey?:boolean
 }
 
 export interface ManyToManyFieldParams {
@@ -103,7 +102,6 @@ export interface ManyToManyFieldParams {
 	blank?: boolean
 	default?: any
 	onDelete?: any
-	primaryKey?:boolean
 }
 
 
