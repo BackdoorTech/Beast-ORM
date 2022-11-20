@@ -10,10 +10,6 @@ ORM for accessing indexedDB as a promise base api implementation.
 
 <br/>
 
-## Features
-- Create Models, drop, create, get, filter, remove, aggregated functions
-
-<br/>
 
 ## Create model
 
