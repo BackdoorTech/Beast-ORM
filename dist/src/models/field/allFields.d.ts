@@ -68,6 +68,12 @@ export declare class indexedDBArrayField extends field {
     type: FieldType;
     blank?: boolean;
     default?: any;
+    maxLength?: number;
+    minLength?: number;
+    size?: number;
+    private _field?;
+    get field(): any;
+    set field(value: any);
     constructor(data?: IndexedDBArrayFieldParams);
     valid(value: any): boolean;
 }
@@ -76,6 +82,7 @@ export declare class indexedDBJsonField extends field {
     type: FieldType;
     blank?: boolean;
     default?: any;
+    null?: boolean;
     constructor(data?: IndexedDBJsonFieldParams);
     valid(value: any): boolean;
 }
@@ -116,7 +123,6 @@ export declare class OneToOneField extends field {
     blank?: boolean;
     default?: any;
     onDelete?: any;
-    primaryKey?: boolean;
     constructor(data?: OneToOneFieldParams);
     contractor(contractor: any): void;
     valid(value: any): boolean;
@@ -128,7 +134,6 @@ export declare class ManyToManyField extends field {
     blank?: boolean;
     default?: any;
     onDelete?: any;
-    primaryKey?: boolean;
     unique?: boolean;
     constructor(data?: ManyToManyFieldParams);
     valid(value: any): boolean;

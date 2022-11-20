@@ -12,8 +12,8 @@ export class ModelReader {
     const fields: {[ key: string]: any} = {}
     const attributes: AttributesMap<FieldAttributesKeys, string[]> = {}
     
-    Object.entries(classInstance).forEach(([fieldName, Field]) => {
-
+    for( const [fieldName, Field] of Object.entries(classInstance)) {
+      
       const type = Field?.fieldName
       if(FieldKeysArray.includes(type)) {
 
@@ -25,8 +25,7 @@ export class ModelReader {
         
         fieldTypes[type].push(fieldName)
 
-        Object.entries(Field).forEach(([FieldProperty, value]) => {
-
+        for (const [FieldProperty, value] of Object.entries(Field)) {
           if( typeof value !="function") {
 
             if(!attributes[FieldProperty]) {
@@ -35,10 +34,9 @@ export class ModelReader {
 
             attributes[FieldProperty].push(fieldName)
           }
-        })
-        
+        }
       }
-    })  
+    }
 
     return {
       modelName,

@@ -10,4 +10,9 @@ export const models = {
 	register: registerModel.register,
 	migrate: registerModel.register,
 	...Fields,
+	Value(arg) {
+		if(arg == 'null') {
+			return {}
+		}
+	},
 }

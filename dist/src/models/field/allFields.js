@@ -32,6 +32,9 @@ export class BigIntegerField extends field {
             if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
                 return false;
             }
+            else if (!(value === null || value === undefined)) {
+                return false;
+            }
         }
         else if (!this.rules(this, value)) {
             return false;
@@ -62,6 +65,9 @@ export class CharField extends field {
     valid(value) {
         if (!(typeof value == 'string')) {
             if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
+                return false;
+            }
+            else if (!(value === null || value === undefined)) {
                 return false;
             }
         }
@@ -116,6 +122,12 @@ export class indexedDBArrayField extends field {
         this.type = FieldType.ARRAY;
         Object.assign(this, data);
     }
+    get field() {
+        return this._field;
+    }
+    set field(value) {
+        this._field = value;
+    }
     valid(value) {
         if (!(Array.isArray(value))) {
             if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
@@ -125,6 +137,18 @@ export class indexedDBArrayField extends field {
         else if (this.isNull(value) == true) {
             if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
                 return false;
+            }
+        }
+        else if (this.size) {
+            if (value.length != this.size) {
+                return false;
+            }
+        }
+        if (this.field) {
+            for (const e of value) {
+                if (!this.field.valid(e)) {
+                    return false;
+                }
             }
         }
         return true;
@@ -144,9 +168,6 @@ export class indexedDBJsonField extends field {
             }
         }
         else if (this.isNull(value) == true) {
-            if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
-                return false;
-            }
         }
         return true;
     }
@@ -160,6 +181,9 @@ export class TextField extends field {
     valid(value) {
         if (!(typeof value == 'string')) {
             if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
+                return false;
+            }
+            else if (!(value === null || value === undefined)) {
                 return false;
             }
         }
@@ -179,6 +203,9 @@ export class IntegerField extends field {
     valid(value) {
         if (!(typeof value == 'number')) {
             if ((this === null || this === void 0 ? void 0 : this.blank) != true) {
+                return false;
+            }
+            else if (!(value === null || value === undefined)) {
                 return false;
             }
         }

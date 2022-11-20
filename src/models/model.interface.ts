@@ -9,7 +9,7 @@ export const MethodNameArray = [
 	'update',
 	'delete',
 	'all',
-	'first'
+	'first',
 ] as const; // TS3.4 syntax
 
 

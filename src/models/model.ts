@@ -41,7 +41,7 @@ export class Model extends ModelManager{
     return modelsConfig[modelName].TableSchema
   }
 
-  private getPrimaryKeyValue() {
+  getPrimaryKeyValue() {
     const TableSchema = this.getTableSchema()
     const idFieldName = TableSchema.id.keyPath
     return this[idFieldName]
@@ -81,6 +81,22 @@ export class Model extends ModelManager{
 
     await Model.obj(DBconfig, TableSchema).delete(_methods, queryId)
   }
+  
+  static async  deleteAll() {
+    const DBconfig = this.getDBSchema()
+    const TableSchema = this.getTableSchema()
+
+    const idFieldName = TableSchema.id.keyPath
+
+    const createArg = {}
+    createArg[idFieldName] = this[idFieldName]
+
+    const _methods: Method[] = [{methodName: 'delete', arguments: '*'}]
+
+    const queryId=uniqueGenerator()
+
+    await Model.obj(DBconfig, TableSchema).delete(_methods, queryId)
+  }
 
   async all() {
     const DBconfig = this.getDBSchema()
@@ -97,6 +113,15 @@ export class Model extends ModelManager{
     return Model.formValidation(data)
   }
 
+
+  Value(args) {
+    return Model.Value(args)
+  }
+
+  static Value(args) {
+    return ''
+  }
+  
   static formValidation(data) {
     const TableSchema = this.getTableSchema()
 
@@ -159,7 +184,14 @@ export class Model extends ModelManager{
     
     let newInstance = new models[ModelName]()
     Object.assign(newInstance, {...foundObj})
+
     
+    if(TableSchema.fieldTypes['ManyToManyField']) {
+      for( const fieldName of TableSchema.fieldTypes['ManyToManyField']) {
+        delete newInstance[fieldName]
+      }
+    }
+      
     delete newInstance.obj
     return  newInstance
   }
@@ -281,19 +313,13 @@ export class Model extends ModelManager{
       let newInstance = new models[ModelName]();
       Object.assign(newInstance, createObject);
       delete newInstance.obj;
+
       return newInstance;
     } else {
         
     }
 
   }
-
-  private static getPrimaryKeyValue() {
-    const TableSchema = this.getTableSchema()
-    const idFieldName = TableSchema.id.keyPath
-    return this[idFieldName]
-  }
-
 
   private static newInstance({ TableSchema, DBconfig, ModelName, dataToMerge }) {
     let newInstance = new models[ModelName]();
@@ -312,7 +338,7 @@ export class Model extends ModelManager{
 
     let instance;
     let created;
-
+    
     if(result.length == 1) {
       created = false
       instance =  await this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[0] })
@@ -342,11 +368,14 @@ export class Model extends ModelManager{
 
 
   static async update(arg) {
+    
+    arg = this.getFields(arg)
 
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
     const _methods: Method[] = [{methodName: 'update', arguments: arg}]
-    const queryId=uniqueGenerator()
+    const queryId = uniqueGenerator()
+    
 
     return  await super.obj(DBconfig, TableSchema).update(_methods, queryId)
   }

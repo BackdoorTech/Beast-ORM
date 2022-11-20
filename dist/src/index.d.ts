@@ -2,6 +2,7 @@ import { Model } from './models/model.js';
 import { ModelReader } from './models/model.reader.js';
 import { registerModel } from './models/register-model.js';
 export declare const models: {
+    Value(arg: any): {};
     CharField(data?: import("./models/field/interface.js").CharFieldParams): import("./models/field/allFields.js").CharField;
     BooleanField(data?: import("./models/field/interface.js").BooleanFieldParams): import("./models/field/allFields.js").BooleanField;
     TextField(data?: import("./models/field/interface.js").TextFieldParams): import("./models/field/allFields.js").TextField;

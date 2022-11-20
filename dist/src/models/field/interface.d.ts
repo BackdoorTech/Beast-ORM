@@ -1,3 +1,4 @@
+import { field } from './field.js';
 export interface CharFieldParams {
     maxLength?: number;
     minLength?: number;
@@ -33,6 +34,7 @@ export interface AutoFieldParams {
 export interface IndexedDBJsonFieldParams {
     unique?: boolean;
     blank?: boolean;
+    null?: boolean;
     default?: any;
 }
 export interface IndexedDBArrayFieldParams {
@@ -40,6 +42,10 @@ export interface IndexedDBArrayFieldParams {
     blank?: boolean;
     type?: any;
     default?: any;
+    maxLength?: number;
+    minLength?: number;
+    field?: field;
+    size?: number;
 }
 export interface DateTimeFieldParams {
     unique?: boolean;
@@ -70,7 +76,6 @@ export interface OneToOneFieldParams {
     blank?: boolean;
     default?: any;
     onDelete?: any;
-    primaryKey?: boolean;
 }
 export interface ManyToManyFieldParams {
     model: any;
@@ -78,7 +83,6 @@ export interface ManyToManyFieldParams {
     blank?: boolean;
     default?: any;
     onDelete?: any;
-    primaryKey?: boolean;
 }
 export interface PossibleFieldAttributes {
     model?: any;

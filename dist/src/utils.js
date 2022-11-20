@@ -12,11 +12,16 @@ export function hashCode(str) {
     return hash;
 }
 export function getDeep(obj, path) {
-    for (var i = 0, path = path.split('.'), len = path.length; i < len; i++) {
-        obj = obj[path[i]];
+    try {
+        for (var i = 0, path = path.split('.'), len = path.length; i < len; i++) {
+            obj = obj[path[i]];
+        }
+        ;
+        return obj;
     }
-    ;
-    return obj;
+    catch (error) {
+        return undefined;
+    }
 }
 ;
 /** First Character uppercase */

@@ -53,6 +53,8 @@ export class BigIntegerField extends field{
 		if( !(typeof value == 'bigint' || typeof value == 'number')) {
 			if(this?.blank  != true) {
 				return false
+			} else if (!(value === null || value === undefined)) {
+				return false
 			}
 		} else if ( !this.rules(this, value)) {
 			return false
@@ -109,12 +111,14 @@ export class CharField extends field{
 
 		if(!(typeof value == 'string')) {
 			if(this?.blank  != true) {
+				
+				return false
+			} else if (!(value === null || value === undefined)) {
 				return false
 			}
 		} else if ( !this.rules(this, value)) {
 			return false
 		}
-
 		return true
 
 	}
@@ -179,6 +183,17 @@ export class indexedDBArrayField extends field {
 	type = FieldType.ARRAY
 	blank?: boolean
 	default?: any
+	maxLength?: number
+	minLength?: number
+	size?: number
+	private _field?: any
+
+	public get field() {
+		return this._field
+	}
+	public set field(value) {
+		this._field = value
+	}
 	
 	constructor(data?:IndexedDBArrayFieldParams) {
 		super()
@@ -195,6 +210,19 @@ export class indexedDBArrayField extends field {
 			if(this?.blank != true) {
 				return false
 			}
+		} else if(this.size) {
+			if(value.length != this.size) {
+				return false
+			}
+		}
+
+		if(this.field ) {
+			for(const e of value) {
+				if(!this.field.valid(e)) {
+					return false
+				}
+			}
+			
 		}
 
 		return true
@@ -207,6 +235,7 @@ export class indexedDBJsonField extends field {
 	type = FieldType.JSON
 	blank?: boolean
 	default?: any
+	null?: boolean
 	
 	constructor(data?:IndexedDBJsonFieldParams) {
 		super()
@@ -219,10 +248,9 @@ export class indexedDBJsonField extends field {
 			if(this?.blank  != true) {
 				return false
 			}
+			
 		} else if (this.isNull(value) == true) {
-			if(this?.blank != true) {
-				return false
-			}
+			
 		}
 		return true
 	}
@@ -251,6 +279,8 @@ export class TextField  extends field{
 		if( !(typeof value == 'string') ) {
 			if(this?.blank  != true) {
 				return false
+			} else if (!(value === null || value === undefined)) {
+				return false
 			}
 		} else if ( !this.rules(this, value)) {
 			return false
@@ -278,6 +308,8 @@ export class IntegerField extends field {
 
 		if( !(typeof value == 'number')) {
 			if(this?.blank  != true) {
+				return false
+			} else if (!(value === null || value === undefined)) {
 				return false
 			}
 		} else if ( !this.rules(this, value)) {
@@ -316,7 +348,6 @@ export class OneToOneField extends field {
 	blank?: boolean
 	default?: any
 	onDelete?: any
-	primaryKey?:boolean
 
 	constructor(data?: OneToOneFieldParams) {
 		super()
@@ -341,7 +372,6 @@ export class ManyToManyField extends field {
 	blank?: boolean
 	default?: any
 	onDelete?: any
-	primaryKey?:boolean
 	unique?: boolean
 
 

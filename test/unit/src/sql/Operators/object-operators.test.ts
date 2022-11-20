@@ -1,6 +1,6 @@
 import fs from 'fs'
 import * as _Fields from '../../../../../src/models/field/fields'
-import { models as  modelsType } from '../../../../../src/index'
+import { models, models as  modelsType } from '../../../../../src/index'
 import { ObjectConditionOperator as ObjectConditionOperatorType } from './../../../../../src/sql/Operators/Object-condition-operator'
 
 const { Port } = JSON.parse(fs.readFileSync('./test/config/test.json', 'utf8'));
@@ -18,15 +18,17 @@ describe("comparisonOperator", () => {
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
+				age = models.IntegerField()
 			} 
 
-			await models.register({
-        databaseName:'jest-test',
-        type: 'indexedDB',
-        version: 1,
-        models: [Person]
-      })
+			models.register({
+				databaseName:'jest-test',
+				type: 'indexedDB',
+				version: 1,
+				models: [Person]
+			})
 			
+	  		
 			const tableSchema = Person.getTableSchema()
 			const row = {name:'peter', age: 22}
 			const filterParams = [{age: 22}]
@@ -47,9 +49,10 @@ describe("comparisonOperator", () => {
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
+				age = models.IntegerField()
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -83,9 +86,10 @@ describe("comparisonOperator", () => {
 
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
+				age = models.IntegerField()
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -94,7 +98,7 @@ describe("comparisonOperator", () => {
 
 			
 			const tableSchema = Person.getTableSchema()
-			const row = {name:'peter', age: 10}
+			const row = {username:'peter', age: 10}
 			const filterParams = [{age__lte: 22}]
 
 			const operator = new ObjectOperator(row, tableSchema)
@@ -120,9 +124,10 @@ describe("comparisonOperator", () => {
 
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
+				age = models.IntegerField()
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -157,9 +162,10 @@ describe("comparisonOperator", () => {
 
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
+				age = models.IntegerField()
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -168,8 +174,8 @@ describe("comparisonOperator", () => {
 
 			
 			const tableSchema = Person.getTableSchema()
-			const row = {name:'jame', age: 10}
-			const filterParams = [{name__not: 'peter',age__lts: 20}]
+			const row = {username:'jame', age: 10}
+			const filterParams = [{username__not: 'peter',age__lts: 20}]
 
 			const operator = new ObjectOperator(row, tableSchema)
 			const result: Boolean = await operator.run(filterParams)
@@ -196,9 +202,10 @@ describe("comparisonOperator", () => {
 
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
+				age = models.IntegerField()
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -206,7 +213,7 @@ describe("comparisonOperator", () => {
       })
 
 			const tableSchema = Person.getTableSchema()
-			const row = {name:'jame', age: 10}
+			const row = {username:'jame', age: 10}
 			const filterParams = [{age__lte: 5},[{age:10}, [{age:20},{age:12}]]]
 
 			const operator = new ObjectOperator(row, tableSchema)
@@ -234,9 +241,10 @@ describe("comparisonOperator", () => {
 
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
+				age = models.IntegerField()
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -272,9 +280,10 @@ describe("comparisonOperator", () => {
 
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
+				age = models.IntegerField()
 			} 
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -315,7 +324,7 @@ describe("comparisonOperator", () => {
 				tags =  ArrayField({})
 			}
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -347,7 +356,7 @@ describe("comparisonOperator", () => {
 				tags =  ArrayField({})
 			}
 
-			await models.register({
+			models.register({
         databaseName:'jest-test',
         type: 'indexedDB',
         version: 1,
@@ -377,45 +386,45 @@ describe("comparisonOperator", () => {
 
 		await page.waitForFunction(() => 'models' in window);
 
-    await page.evaluate(async() => {
+		await page.evaluate(async() => {
 
-			const models: typeof modelsType = window['models']
-			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
-			
-			const { ArrayField, JsonField} = models.indexedDB.fields
+				const models: typeof modelsType = window['models']
+				const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+				
+				const { ArrayField, JsonField} = models.indexedDB.fields
 
-			class Person extends models.Model {
-				username =  models.CharField({maxLength:0})
-				data =  JsonField()
-			}
-
-			await models.register({
-        databaseName:'jest-test',
-        type: 'indexedDB',
-        version: 1,
-        models: [Person]
-      })
-
-			const tableSchema = Person.getTableSchema()
-			const row = {
-				name:'jame', 
-				data: {
-					'name': 'Bob',
-					'other_pets': [{
-						'name': 'Fishy',
-					}],
+				class Person extends models.Model {
+					username =  models.CharField({maxLength:0})
+					data =  JsonField()
 				}
-			}
 
-			const filterParams = [{data__owner__isNull:  true }]
+				models.register({
+					databaseName:'jest-test',
+					type: 'indexedDB',
+					version: 1,
+					models: [Person]
+				})
 
-			const operator = new ObjectOperator(row, tableSchema)
-			const result: Boolean = await operator.run(filterParams)
-			
-			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
-    })
+				const tableSchema = Person.getTableSchema()
+				const row = {
+					username:'jame', 
+					data: {
+						'name': 'Bob',
+						'other_pets': [{
+							'name': 'Fishy',
+						}],
+					}
+				}
 
-    debugger
+				const filterParams = [{data__owner__isNull:  true }]
+
+				const operator = new ObjectOperator(row, tableSchema)
+				const result: Boolean = await operator.run(filterParams)
+				
+				document.body.innerHTML = 'result: '+ JSON.stringify(result) 
+		})
+
+    	debugger
 		await page.waitForFunction(() => 'result: true');
 
 		await page.evaluate(async() => {
@@ -427,19 +436,19 @@ describe("comparisonOperator", () => {
 
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
-				tags =  ArrayField({})
+				data =  ArrayField({})
 			}
 
-			await models.register({
-        databaseName:'jest-test',
-        type: 'indexedDB',
-        version: 1,
-        models: [Person]
-      })
+			models.register({
+				databaseName:'jest-test',
+				type: 'indexedDB',
+				version: 1,
+				models: [Person]
+			})
 
 			const tableSchema = Person.getTableSchema()
 			const row = {
-				name:'jame', 
+				username:'jame', 
 				data: {
 					'name': 'Bob',
 					'other_pets': [{
@@ -453,9 +462,9 @@ describe("comparisonOperator", () => {
 			const result: Boolean = await operator.run(filterParams)
 			
 			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
-    })
+    	})
 
-    debugger
+    	 debugger
 
 		await page.waitForFunction(() => 'result: false');
 

@@ -19,7 +19,7 @@ export declare const modelsConfig: {
 };
 export declare class registerModel {
     static register(entries: register): Promise<void>;
-    static manyToManyRelationShip(foreignKeyField: ManyToManyField, FieldName: string, modelName: string, databaseSchema: DatabaseSchema): void;
+    static manyToManyRelationShip(foreignKeyField: ManyToManyField, FieldName: string, modelName: string, databaseSchema: DatabaseSchema): Model;
 }
 export declare class ModelEditor {
     static addMethodOneToOneField(foreignKeyField: OneToOneField, FieldName: string, modelName: string, databaseSchema: DatabaseSchema): void;

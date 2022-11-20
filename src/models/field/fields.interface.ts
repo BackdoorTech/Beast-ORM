@@ -9,7 +9,6 @@ export const FieldKeysArray = [
     'IntegerField',
     'TextField',
     'BooleanField',
-    'IndDbJsonField',
     'OneToOneField',
     'ForeignKey',
     'ManyToManyField',

@@ -1,5 +1,5 @@
 import * as _Fields from '../../../src/models/field/fields'
-import { models as  modelsType } from '../../../src/index'
+import { models as  modelsType, models } from '../../../src/index'
 
 import fs from 'fs'
 const { Port } = JSON.parse(fs.readFileSync('./test/config/test.json', 'utf8'));
@@ -27,7 +27,7 @@ describe("initial test for model", () => {
       
       }
 
-      await models.register({
+      models.register({
         databaseName:'jest-test-documentation first example',
         type: 'indexedDB',
         version: 1,

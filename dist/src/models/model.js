@@ -56,6 +56,16 @@ export class Model extends (_b = ModelManager) {
         const queryId = uniqueGenerator();
         await Model.obj(DBconfig, TableSchema).delete(_methods, queryId);
     }
+    static async deleteAll() {
+        const DBconfig = this.getDBSchema();
+        const TableSchema = this.getTableSchema();
+        const idFieldName = TableSchema.id.keyPath;
+        const createArg = {};
+        createArg[idFieldName] = this[idFieldName];
+        const _methods = [{ methodName: 'delete', arguments: '*' }];
+        const queryId = uniqueGenerator();
+        await Model.obj(DBconfig, TableSchema).delete(_methods, queryId);
+    }
     async all() {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
@@ -66,6 +76,12 @@ export class Model extends (_b = ModelManager) {
     }
     formValidation(data) {
         return Model.formValidation(data);
+    }
+    Value(args) {
+        return Model.Value(args);
+    }
+    static Value(args) {
+        return '';
     }
     static formValidation(data) {
         const TableSchema = this.getTableSchema();
@@ -113,6 +129,11 @@ export class Model extends (_b = ModelManager) {
         const ModelName = this.getModelName();
         let newInstance = new models[ModelName]();
         Object.assign(newInstance, Object.assign({}, foundObj));
+        if (TableSchema.fieldTypes['ManyToManyField']) {
+            for (const fieldName of TableSchema.fieldTypes['ManyToManyField']) {
+                delete newInstance[fieldName];
+            }
+        }
         delete newInstance.obj;
         return newInstance;
     }
@@ -199,11 +220,6 @@ export class Model extends (_b = ModelManager) {
         else {
         }
     }
-    static getPrimaryKeyValue() {
-        const TableSchema = this.getTableSchema();
-        const idFieldName = TableSchema.id.keyPath;
-        return this[idFieldName];
-    }
     static newInstance({ TableSchema, DBconfig, ModelName, dataToMerge }) {
         let newInstance = new models[ModelName]();
         Object.assign(newInstance, Object.assign({}, dataToMerge));
@@ -237,6 +253,7 @@ export class Model extends (_b = ModelManager) {
         return instance;
     }
     static async update(arg) {
+        arg = this.getFields(arg);
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
         const _methods = [{ methodName: 'update', arguments: arg }];

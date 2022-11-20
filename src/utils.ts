@@ -17,11 +17,15 @@ export function hashCode(str:string)  {
 
 
 
-export function getDeep(obj, path){
-  for (var i=0, path=path.split('.'), len=path.length; i<len; i++){
+export function getDeep(obj, path) {
+  try {
+    for (var i=0, path=path.split('.'), len=path.length; i<len; i++) {
       obj = obj[path[i]];
-  };
-  return obj;
+    };
+    return obj;
+  } catch (error) {
+    return undefined
+  }
 };
 
 

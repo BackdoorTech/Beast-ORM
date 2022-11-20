@@ -5,7 +5,7 @@ import { PossibleFieldAttributes} from './field/interface.js'
 export interface FieldSchema {
 	name: string, 
 	keyPath: string, 
-	className?: string,
+	className?: FieldKeys,
 	fieldAttributes?: PossibleFieldAttributes,
 	options?: { 
 		unique?: boolean,
@@ -18,11 +18,13 @@ export interface TableSchema {
 	id: { keyPath: string , autoIncrement?: boolean , type:  FieldType},
 	fields: FieldSchema[]
 	attributes: AttributesMap<FieldAttributesKeys, string[]> = {}
+	fieldTypes: FieldsMap<FieldKeys, string[]>
 }
 
 export interface DatabaseSchema {
 	databaseName: string;
 	type: 'indexedDB'
 	version: number;
-	stores: TableSchema[]
+	webWorker?:boolean,
+	stores?: TableSchema[]
 }
