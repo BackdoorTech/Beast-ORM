@@ -67,7 +67,7 @@ describe("initial test for model", () => {
 
         class Article extends models.Model {
             headline = models.CharField({maxLength: 100})
-            publications = models.ManyToManyField({model:Publication})
+            publication = models.ManyToManyField({model:Publication})
         }
 
         await models.register({
@@ -81,7 +81,7 @@ describe("initial test for model", () => {
         const  p1 = await Publication.create({title:'james'})
         const a1 = await Article.create({headline:''})
 
-        a1.publications_add(p1)
+        a1.publication_add(p1)
 
         document.body.innerHTML = JSON.stringify(await Article.getDBSchema())
 
@@ -108,7 +108,7 @@ describe("initial test for model", () => {
 
         class Article extends models.Model {
             headline = models.CharField({maxLength: 100})
-            publications = models.ManyToManyField({model:Publication})
+            publication = models.ManyToManyField({model:Publication})
         }
 
         await models.register({
@@ -127,10 +127,10 @@ describe("initial test for model", () => {
         const a1 = await Article.create({headline:'lets you build web apps easily'})
         const a2 = await Article.create({headline:'NASA uses Python'})
 
-        await a1.publications_add([p1, p2])
+        await a1.publication_add([p1, p2])
 
 
-        const result = await a1.publications_all()
+        const result = await a1.publication_all()
 
         document.body.innerHTML = JSON.stringify(result)
 
@@ -155,8 +155,8 @@ describe("initial test for model", () => {
 
 
         class Article extends models.Model {
-            headline = models.CharField({maxLength: 100})
-            publications = models.ManyToManyField({model:Publication})
+          headline = models.CharField({maxLength: 100})
+          publication = models.ManyToManyField({model:Publication})
         }
 
         await models.register({
@@ -175,7 +175,7 @@ describe("initial test for model", () => {
         const a1 = await Article.create({headline:'lets you build web apps easily'})
         const a2 = await Article.create({headline:'NASA uses Python'})
 
-        await a1.publications_add([p1, p2])
+        await a1.publication_add([p1, p2])
 
 
         const result = await p1.article_set_all()

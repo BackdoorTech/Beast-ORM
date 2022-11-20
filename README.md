@@ -202,7 +202,7 @@ class ChessBoardUser extends models.Model {
 }
 
 models.register({
-  databaseName: 'tutorial',
+  databaseName: 'tutorial-ArrayField',
   version: 1,
   type: 'indexedDB',
   models: [ChessBoardUser]
@@ -349,7 +349,7 @@ class Dog extends models.Model {
 }
 
 models.register({
-  databaseName: 'tutorial',
+  databaseName: 'tutorial-JsonField',
   version: 1,
   type: 'indexedDB',
   models: [Dog]
@@ -501,8 +501,61 @@ Dog.create({name:'Meg', data:{'owner': 'Bob'}})
 Dog.filter({data__has_any_keys:['owner', 'breed']})
 // [<Dog: Rufus>, <Dog: Meg>]
 ```
-## One-to-one relationships
+## Many-to-many relationships
+In this example, an Article can be published in multiple Publication objects, and a Publication has multiple Article objects:
+```javascript
+class Publication extends models.Model {
+  title = models.CharField({maxLength: 50})
+}
 
+
+class Article extends models.Model {
+  headline = models.CharField({maxLength: 100})
+  publication = models.ManyToManyField({model:Publication})
+}
+
+models.register({
+  databaseName:'One-to-one-relationships',
+  type: 'indexedDB',
+  version: 1,
+  models: [Publication, Article]
+})
+
+```
+
+What follows are examples of operations that can be performed using the Python API facilities.
+
+Create a few Publications:
+
+```javascript
+  const  p1 = await Publication.create({title:'The Python Journal'})
+  const  p2 = await Publication.create({title:'Science News'})
+  const  p3 = await Publication.create({title:'Science Weekly'})
+
+```
+
+Create an Article:
+```javascript
+  const a1 = await Article.create({headline:'lets you build web apps easily'})
+  const a2 = await Article.create({headline:'NASA uses Python'})
+
+```
+
+Associate the Article with a Publication:
+```javascript
+  await a1.publication_add([p1, p2])
+
+```
+Article objects have access to their related Publication objects:
+```javascript
+  await a1.publication_all()
+
+```
+Article objects have access to their related Publication objects:
+```javascript
+  await p1.article_set_all()
+
+```
 ## Languages and Tools
 <p align="left">   <a href="https://git-scm.com/" target="_blank"> <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="git" width="40" height="40"/>  </a> <a href="https://jestjs.io" target="_blank"> <img src="https://www.vectorlogo.zone/logos/jestjsio/jestjsio-icon.svg" alt="jest" width="40" height="40"/> </a>    <a href="https://github.com/puppeteer/puppeteer" target="_blank"> <img src="https://www.vectorlogo.zone/logos/pptrdev/pptrdev-official.svg" alt="puppeteer" width="40" height="40"/>  </a>  <a href="https://www.typescriptlang.org/" target="_blank"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="typescript" width="40" height="40"/> </a>
 </p>
