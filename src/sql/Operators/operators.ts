@@ -375,9 +375,6 @@ export class objectEq {
 			return false
 		}
 
-
-		console.log({row, fieldPath,  arg})
-
 		if (JSON.stringify(_rowFieldValue = getDeep(row, fieldPath)
 		) == '{}' && '{}' == JSON.stringify(arg)) {
 			return true
@@ -396,7 +393,7 @@ export class objectEq {
 
 export class objectContains {
 	static validate({fieldName, arg,  row, fieldPath}):boolean {
-		console.log(fieldName, arg, row)
+		// console.log(fieldName, arg, row)
 
 		let rowValue;
 
@@ -465,7 +462,6 @@ export class objectContains_by {
 
 export class objectHasKey {
 	static validate({fieldName, arg,  row, fieldPath}):boolean {
-		console.log(fieldName, arg, row)
 
 		let rowValue;
 
@@ -555,7 +551,6 @@ export class ArrayFieldEq {
 			return false
 		}
 
-		console.log({row, fieldPath,  arg})
 
 		if (JSON.stringify(_rowFieldValue) == '[]' && '[]' == JSON.stringify(arg)) {
 			return true
@@ -574,7 +569,6 @@ export class ArrayFieldEq {
 
 export class ArrayFieldContains {
 	static validate({fieldName, arg,  row, fieldPath}):boolean {
-		console.log(fieldName, arg, row)
 
 		let rowValue;
 
@@ -633,7 +627,6 @@ export class ArrayFieldContains_by {
 }
 export class ArrayFieldContains_overlap {
 	static validate({fieldName, arg,  row, fieldPath}):boolean {
-		console.log(fieldName, arg, row)
 
 		let rowValue;
 
@@ -663,7 +656,6 @@ export class ArrayFieldContains_overlap {
 }
 export class ArrayFieldContains_len {
 	static validate({fieldName, arg,  row, fieldPath}):boolean {
-		console.log(fieldName, arg, row)
 
 		let rowValue;
 

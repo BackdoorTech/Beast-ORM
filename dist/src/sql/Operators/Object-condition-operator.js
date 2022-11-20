@@ -50,7 +50,6 @@ export class ObjectConditionOperator {
             }
             const fieldName = element[0];
             const fieldPath = element.join('.');
-            console.log(operation);
             if (OperatorsKeysArray.includes(operation)) {
                 const arg = objOperator[field];
                 let operationResult;

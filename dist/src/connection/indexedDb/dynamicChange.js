@@ -19,8 +19,8 @@ export class IndexedDBConnectionDynamicChange {
             result[name] = [schema.primKey.src, ...schema.indexes.map((idx) => idx.src)].join(',');
             return result;
         }, {});
-        console.log('Version: ' + db.verno);
-        console.log('Current Schema: ', currentSchema);
+        // console.log('Version: ' + db.verno);
+        // console.log('Current Schema: ', currentSchema);
         // Tell Dexie about current schema:
         // newDb.version(db.verno).stores(currentSchema);
         // Tell Dexie about next schema:

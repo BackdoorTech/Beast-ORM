@@ -273,9 +273,6 @@ export class ModelEditor {
           params[`iD${_model.getModelName()}`] = _model.getPrimaryKeyValue()
           const middleTableResult = await middleTable['filter'](params).execute()
 
-          console.log(middleTableResult)
-          console.log(foreignKeyField, FieldName, modelName, databaseSchema)
-
           foreignKeyField.model
   
           return middleTableResult
@@ -293,8 +290,6 @@ export class ModelEditor {
       params[`iD${_model.getModelName()}`] = _model.getPrimaryKeyValue()
       const middleTableResult = await middleTable['filter'](params).execute()
       let ids
-
-      console.log('middleTableResult', middleTableResult, await middleTable['all']())
 
       if(middleTableResult) {
         const TableSchema = foreignKeyField.model.getTableSchema()
@@ -329,12 +324,9 @@ export class ModelEditor {
       const middleTableResult = await middleTable['filter'](params).execute()
       let ids
 
-      console.log(middleTableResult)
-
       if(middleTableResult) {
         const TableSchema = currentModel.getTableSchema()
 
-        console.log()
         ids = middleTableResult.map((e)=> {
           return e[`iD${modelName}`]  
         })

@@ -23,8 +23,8 @@ export class IndexedDBConnectionDynamicChange {
             return result;
         }, {});
     
-        console.log('Version: ' + db.verno);
-        console.log('Current Schema: ', currentSchema);
+        // console.log('Version: ' + db.verno);
+        // console.log('Current Schema: ', currentSchema);
     
         // Tell Dexie about current schema:
         // newDb.version(db.verno).stores(currentSchema);
