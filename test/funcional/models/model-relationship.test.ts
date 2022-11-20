@@ -41,7 +41,7 @@ describe("initial test for model", () => {
       const r = await Restaurant.create({place:p1, servesHotDogs: false, servesPizza:false})
 
 
-      document.body.innerHTML = JSON.stringify(await p1.restaurant())
+      document.body.innerHTML = JSON.stringify(await p1.Restaurant())
     })
     
     debugger
@@ -81,12 +81,110 @@ describe("initial test for model", () => {
         const  p1 = await Publication.create({title:'james'})
         const a1 = await Article.create({headline:''})
 
-        // a1.publicationsAdd(p1)
+        a1.publications_add(p1)
 
         document.body.innerHTML = JSON.stringify(await Article.getDBSchema())
 
     })
     debugger
+    await page.waitForFunction('{"place":1,"servesHotDogs":false,"servesPizza":false}')
+    expect('time not exceeded').toBe('time not exceeded')
+
+  }, 10000)
+
+
+  it('model relation ship many to many documentation', async () => {
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+        const models: typeof modelsType = window['models']
+
+
+        class Publication extends models.Model {
+          title = models.CharField({maxLength: 50})
+        }
+
+
+        class Article extends models.Model {
+            headline = models.CharField({maxLength: 100})
+            publications = models.ManyToManyField({model:Publication})
+        }
+
+        await models.register({
+          databaseName:'jest-test'+ new Date().getTime(),
+          type: 'indexedDB',
+          version: 1,
+          models: [Publication, Article]
+        })
+
+
+        const  p1 = await Publication.create({title:'The Python Journal'})
+        const  p2 = await Publication.create({title:'Science News'})
+        const  p3 = await Publication.create({title:'Science Weekly'})
+
+
+        const a1 = await Article.create({headline:'lets you build web apps easily'})
+        const a2 = await Article.create({headline:'NASA uses Python'})
+
+        await a1.publications_add([p1, p2])
+
+
+        const result = await a1.publications_all()
+
+        document.body.innerHTML = JSON.stringify(result)
+
+    })
+    debugger
+    await page.waitForFunction('[{"title":"The Python Journal","id":1},{"title":"Science News","id":2}]')
+    expect('time not exceeded').toBe('time not exceeded')
+
+  }, 10000)
+
+  it('model relation ship many to many documentation set_all', async () => {
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+        const models: typeof modelsType = window['models']
+
+
+        class Publication extends models.Model {
+          title = models.CharField({maxLength: 50})
+        }
+
+
+        class Article extends models.Model {
+            headline = models.CharField({maxLength: 100})
+            publications = models.ManyToManyField({model:Publication})
+        }
+
+        await models.register({
+          databaseName:'jest-test'+ new Date().getTime(),
+          type: 'indexedDB',
+          version: 1,
+          models: [Publication, Article]
+        })
+
+
+        const  p1 = await Publication.create({title:'The Python Journal'})
+        const  p2 = await Publication.create({title:'Science News'})
+        const  p3 = await Publication.create({title:'Science Weekly'})
+
+
+        const a1 = await Article.create({headline:'lets you build web apps easily'})
+        const a2 = await Article.create({headline:'NASA uses Python'})
+
+        await a1.publications_add([p1, p2])
+
+
+        const result = await p1.article_set_all()
+
+        document.body.innerHTML = JSON.stringify(result)
+
+    })
+    debugger
+    await page.waitForFunction('[{"headline":"lets you build web apps easily","id":1}]')
     expect('time not exceeded').toBe('time not exceeded')
 
   }, 10000)
@@ -124,7 +222,7 @@ describe("initial test for model", () => {
       const a = await Article.create({headline:"This is a test", pubDate:'', reporter:r})
 
 
-      document.body.innerHTML = JSON.stringify(await r.articleSetAll()) 
+      document.body.innerHTML = JSON.stringify(await r.article_setAll()) 
     })
 
     debugger

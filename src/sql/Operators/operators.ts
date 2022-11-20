@@ -3,60 +3,173 @@ import { TableSchema } from '../../models/register-modal.interface.js';
 import { getDeep } from '../../utils.js'
 
 export class gt {
-	static validate({fieldName, arg, rowFieldValue, row}):boolean {
-		return rowFieldValue > arg
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		return _rowFieldValue > arg
 	}
 }
 
+export class iexact {
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		return _rowFieldValue === arg
+	}
+}
 export class gte {
-	static validate({fieldName, arg, rowFieldValue, row}):boolean {
-		return rowFieldValue >= arg
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		return _rowFieldValue >= arg
 	}
 }
 
 
 export class lt {
-	static validate({fieldName, arg, rowFieldValue, row}):boolean{
-		return rowFieldValue < arg
+	static validate({fieldName, arg,  row, fieldPath}):boolean{
+
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+
+		return _rowFieldValue < arg
 	}
 }
 
 
 export class lte {
-	static validate({fieldName, arg, rowFieldValue, row}):boolean {
-		return  rowFieldValue <= arg
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
+
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		return  _rowFieldValue <= arg
 	}
 }
 
+
+
+
 export class not {
-	static validate({fieldName, arg, rowFieldValue, row}):boolean {
-		return rowFieldValue != arg
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
+
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		return _rowFieldValue != arg
 	}
 }
 
 export class eq {
-	static validate({fieldName, arg, rowFieldValue, row}):boolean {
-		return rowFieldValue == arg 
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		return _rowFieldValue == arg 
 	}
 }
 
 export class contains {
-	static validate({fieldName, arg, rowFieldValue, row}) {
+	static validate({fieldName, arg,  row, fieldPath}) {
 
-		return rowFieldValue.some(r=> arg.includes(r))
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		return _rowFieldValue.some(r=> arg.includes(r))
 		
 	}
 }
+
 
 /**
  * @returns true when the given dict of key-value pairs are all contained in the field
  */
 export class containsOBj {
-	static validate({fieldName, arg, rowFieldValue, row}) {
+	static validate({fieldName, arg,  row, fieldPath}) {
+
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
 		const keys = Object.keys(arg)
 
 		for (let key of keys) {
-			if(!rowFieldValue[key]) {
+			if(!_rowFieldValue[key]) {
 				return false
 			}
 		}
@@ -67,9 +180,20 @@ export class containsOBj {
 
 
 export class containedBy {
-	static validate({fieldName, arg, rowFieldValue, row}) {
+	static validate({fieldName, arg,  row, fieldPath}) {
 
-		for(let value of rowFieldValue) {
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		for(let value of _rowFieldValue) {
 			if(!arg.includes(value)) {
 				return false
 			}
@@ -83,25 +207,60 @@ export class containedBy {
 
 
 export class overlap {
-	static validate({fieldName, arg, rowFieldValue, row}) {
-		return rowFieldValue.some(r=> arg.includes(r))
+	static validate({fieldName, arg,  row, fieldPath}) {
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		return _rowFieldValue.some(r=> arg.includes(r))
 	}
 }
 
 
 export class len {
-	static validate({fieldName, arg, rowFieldValue = [], row}) {
-		return rowFieldValue.length ==  arg
+	static validate({fieldName, arg, rowFieldValue = [], row, fieldPath}) {
+
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		return _rowFieldValue.length ==  arg
 	}
 }
 
 export class hasKey {
-	static validate({fieldName, arg, rowFieldValue = [], row}) {
+	static validate({fieldName, arg, rowFieldValue = [], row, fieldPath}) {
+
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
 
 		const keys = Object.keys(arg)
 
 		for (let key of keys) {
-			if(!rowFieldValue[key]) {
+			if(!_rowFieldValue[key]) {
 				return false
 			}
 		}
@@ -110,9 +269,20 @@ export class hasKey {
 }
 
 export class hasAnyKeys {
-	static validate({fieldName, arg, rowFieldValue, row}) {
+	static validate({fieldName, arg,  row, fieldPath}) {
 
-		return rowFieldValue.some(key=> !arg.includes(key))
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		return _rowFieldValue.some(key=> !arg.includes(key))
 	}
 }
 
@@ -121,8 +291,9 @@ export class hasAnyKeys {
  * @returns true when all of the given keys are in the data
  */
 export 	class hasKeys {
-	static validate(fieldObj, keys, rowFieldValue, row) {
+	static validate(fieldObj, keys,  row) {
 
+		
 		for (let fieldName of keys) {
 			if(!fieldObj[fieldName]) {
 				return false
@@ -137,22 +308,33 @@ export 	class hasKeys {
 
 
 export class isNull {
-	static validate({fieldName, arg, rowFieldValue, row}) {
+	static validate({fieldName, arg,  row, fieldPath}) {
 
-		return  (rowFieldValue == null) == arg
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		return  (_rowFieldValue == null) == arg
 	}
 }
 
 // object
 export class objectIsnull {
-	static validate({fieldName, arg, rowFieldValue, row, fieldPath}) {
+	static validate({fieldName, arg,  row, fieldPath}) {
 		
-		let rowValue;
+		let rowFieldValue;
 
 		try {
-			rowValue = getDeep(row, fieldPath)
+			rowFieldValue = getDeep(row, fieldPath)
 
-			if (rowValue === undefined) {
+			if (rowFieldValue === undefined) {
 				if(arg == true) {
 					return true
 				} 
@@ -165,12 +347,10 @@ export class objectIsnull {
 			return false
 		}
 
-		console.log('fieldPath', fieldPath)
-		console.log({fieldName, arg, rowFieldValue, row}, rowValue)
 
-		if(JSON.stringify(rowValue) == '{}' && arg == false) {
+		if(JSON.stringify(rowFieldValue) == '{}' && arg == false) {
 			return true
-		} else if (rowValue == null && arg == true) {
+		} else if (rowFieldValue == null && arg == true) {
 			return true
 		} else if (rowFieldValue == undefined) {
 			return true
@@ -182,17 +362,29 @@ export class objectIsnull {
 }
 
 export class objectEq {
-	static validate({fieldName, arg, rowFieldValue, row, fieldPath}):boolean {
-		const rowValue = row[fieldName]
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
 
-		console.log({row, fieldPath, rowFieldValue, arg})
+		let _rowFieldValue
 
-		if (JSON.stringify(rowValue) == '{}' && '{}' == JSON.stringify(arg)) {
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+
+		console.log({row, fieldPath,  arg})
+
+		if (JSON.stringify(_rowFieldValue = getDeep(row, fieldPath)
+		) == '{}' && '{}' == JSON.stringify(arg)) {
 			return true
-		} else if (arg == null && JSON.stringify(rowValue) == '{}') {
+		} else if (arg == null && JSON.stringify(_rowFieldValue) == '{}') {
 			return true
 		} else if (fieldPath) {
-			if(arg == rowFieldValue) {
+			if(arg == _rowFieldValue) {
 
 				return true
 			}
@@ -203,7 +395,7 @@ export class objectEq {
 }
 
 export class objectContains {
-	static validate({fieldName, arg, rowFieldValue, row, fieldPath}):boolean {
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
 		console.log(fieldName, arg, row)
 
 		let rowValue;
@@ -234,7 +426,7 @@ export class objectContains {
 
 
 export class objectContains_by {
-	static validate({fieldName, arg, rowFieldValue, row, fieldPath}):boolean {
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
 		
 		// console.log(fieldName, arg, row);
 
@@ -272,8 +464,8 @@ export class objectContains_by {
 }
 
 export class objectHasKey {
-	static validate({fieldName, arg, rowFieldValue, row, fieldPath}):boolean {
-		console.log(fieldName, arg, row, rowFieldValue)
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
+		console.log(fieldName, arg, row)
 
 		let rowValue;
 
@@ -296,7 +488,7 @@ export class objectHasKey {
 
 
 export class objectHasKeys {
-	static validate({fieldName, arg, rowFieldValue, row, fieldPath}):boolean {
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
 
 		let rowValue;
 
@@ -323,7 +515,7 @@ export class objectHasKeys {
 
 
 export class objectHasnyKeys {
-	static validate({fieldName, arg, rowFieldValue, row, fieldPath}):boolean {
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
 
 		let rowValue;
 
@@ -349,23 +541,146 @@ export class objectHasnyKeys {
 }
 
 // array shit
+
+export class ArrayFieldEq {
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
+		let _rowFieldValue
+
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		console.log({row, fieldPath,  arg})
+
+		if (JSON.stringify(_rowFieldValue) == '[]' && '[]' == JSON.stringify(arg)) {
+			return true
+		} else if (arg == null && JSON.stringify(_rowFieldValue) == '[]') {
+			return true
+		} else if (fieldPath) {
+			if(arg == _rowFieldValue) {
+
+				return true
+			}
+		}
+
+		return false 
+	}
+}
+
 export class ArrayFieldContains {
-	static validate({fieldName, arg, rowFieldValue, row, fieldPath}):boolean {
-		return false
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
+		console.log(fieldName, arg, row)
+
+		let rowValue;
+
+		try {
+			rowValue = getDeep(row, fieldPath)
+			if (rowValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		try {
+			for (const keys of arg) {
+				if(!rowValue.includes(keys)) {
+					return false
+				}
+				
+			}
+		} catch (error) {
+			return false
+		}
+		
+
+		return true 
 	}
 }
 export class ArrayFieldContains_by {
-	static validate({fieldName, arg, rowFieldValue, row, fieldPath}):boolean {
-		return false
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
+
+		let rowValue;
+
+		try {
+			rowValue = getDeep(row, fieldPath)
+			if (rowValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		try {
+			for (const keys of arg) {
+				if(rowValue.includes(keys)) {
+					return true
+				}
+				
+			}
+		} catch (error) {
+			return false
+		}
+		
+
+		return false 
 	}
 }
 export class ArrayFieldContains_overlap {
-	static validate({fieldName, arg, rowFieldValue, row, fieldPath}):boolean {
-		return false
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
+		console.log(fieldName, arg, row)
+
+		let rowValue;
+
+		try {
+			rowValue = getDeep(row, fieldPath)
+			if (rowValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		try {
+			for (const keys of arg) {
+				if(rowValue.includes(keys)) {
+					return true
+				}
+				
+			}
+		} catch (error) {
+			return false
+		}
+		
+
+		return false 
 	}
 }
 export class ArrayFieldContains_len {
-	static validate({fieldName, arg, rowFieldValue, row, fieldPath}):boolean {
+	static validate({fieldName, arg,  row, fieldPath}):boolean {
+		console.log(fieldName, arg, row)
+
+		let rowValue;
+
+		try {
+			rowValue = getDeep(row, fieldPath)
+			if (rowValue === undefined) {
+				return false 
+			}
+		} catch (error) {
+			return false
+		}
+
+		if(rowValue.length == arg) {
+			return true
+		}
+		
+
 		return false
 	}
 }

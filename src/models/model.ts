@@ -41,7 +41,7 @@ export class Model extends ModelManager{
     return modelsConfig[modelName].TableSchema
   }
 
-  private getPrimaryKeyValue() {
+  getPrimaryKeyValue() {
     const TableSchema = this.getTableSchema()
     const idFieldName = TableSchema.id.keyPath
     return this[idFieldName]
@@ -184,7 +184,14 @@ export class Model extends ModelManager{
     
     let newInstance = new models[ModelName]()
     Object.assign(newInstance, {...foundObj})
+
     
+    if(TableSchema.fieldTypes['ManyToManyField']) {
+      for( const fieldName of TableSchema.fieldTypes['ManyToManyField']) {
+        delete newInstance[fieldName]
+      }
+    }
+      
     delete newInstance.obj
     return  newInstance
   }
@@ -306,19 +313,17 @@ export class Model extends ModelManager{
       let newInstance = new models[ModelName]();
       Object.assign(newInstance, createObject);
       delete newInstance.obj;
+
+      models[ModelName].prototype.getPrimaryKeyValue = () => {
+        const idFieldName = TableSchema.id.keyPath
+        return createObject[idFieldName]
+      }
       return newInstance;
     } else {
         
     }
 
   }
-
-  private static getPrimaryKeyValue() {
-    const TableSchema = this.getTableSchema()
-    const idFieldName = TableSchema.id.keyPath
-    return this[idFieldName]
-  }
-
 
   private static newInstance({ TableSchema, DBconfig, ModelName, dataToMerge }) {
     let newInstance = new models[ModelName]();
@@ -367,6 +372,8 @@ export class Model extends ModelManager{
 
 
   static async update(arg) {
+    
+    arg = this.getFields(arg)
 
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()

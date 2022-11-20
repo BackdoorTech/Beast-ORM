@@ -17,89 +17,101 @@ export const OperatorsKeysArray = [
     'contained_by',
 	'has_key',
 	'has_keys',
-	'has_any_keys'
+	'has_any_keys',
+	'len',
+	'overlap',
+	'iexact'
 ] as const; // TS3.4 syntax
 export type OperatorKeys = typeof OperatorsKeysArray[number];
 
 export const operator = {
-	gt:({fieldName, arg, rowFieldValue, row, TableSchema, element}) => {
-		return operatorsObject.gt.validate({fieldName, arg, rowFieldValue, row})
+	gt:({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
+		return operatorsObject.gt.validate({fieldName, arg,  row, fieldPath})
 	},
-	gte:({fieldName, arg, rowFieldValue, row, TableSchema, element}) => {
-		return operatorsObject.gte.validate({fieldName, arg, rowFieldValue, row})
+	gte:({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
+		return operatorsObject.gte.validate({fieldName, arg,  row, fieldPath})
 	},
-	lt:({fieldName, arg, rowFieldValue, row, TableSchema, element}) => {
-		return operatorsObject.lt.validate({fieldName, arg, rowFieldValue, row})
+	lt:({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
+		return operatorsObject.lt.validate({fieldName, arg,  row, fieldPath})
 	},
-	lte:({fieldName, arg, rowFieldValue, row, TableSchema, element}) => {
-		return operatorsObject.lte.validate({fieldName, arg, rowFieldValue, row})
+	lte:({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
+		return operatorsObject.lte.validate({fieldName, arg,  row , fieldPath})
 	},
-	not:({fieldName, arg, rowFieldValue, row, TableSchema, element}) => {
-		return rowFieldValue != arg  
+	not:({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
+		return operatorsObject.not.validate({fieldName, arg,  row , fieldPath})
 	},
-	eq:({fieldName, arg, rowFieldValue, row, TableSchema, element}) => {
+	eq:({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
 		console.log(fieldName)
-		return operatorsObject.eq.validate({fieldName, arg, rowFieldValue, row})
+		return operatorsObject.eq.validate({fieldName, arg,  row, fieldPath})
 	},
-	contains:({fieldName, arg, rowFieldValue, row, TableSchema, element}) => {
-		return operatorsObject.contains.validate({fieldName, arg, rowFieldValue, row})
+	contains:({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
+		return operatorsObject.contains.validate({fieldName, arg,  row, fieldPath})
 	},
-	len({fieldName, arg, rowFieldValue, row, TableSchema, element}) {
-		return operatorsObject.len.validate({fieldName, arg, rowFieldValue, row})
+	len({fieldName, arg,  row, TableSchema, element, fieldPath}) {
+		return operatorsObject.len.validate({fieldName, arg,  row, fieldPath})
 	},
-	hasKey({fieldName, arg, rowFieldValue, row, TableSchema, element}) {
-		return operatorsObject.hasKey.validate({fieldName, arg, rowFieldValue, row})
+	hasKey({fieldName, arg,  row, TableSchema, element, fieldPath}) {
+		return operatorsObject.hasKey.validate({fieldName, arg,  row, fieldPath})
 	},
-	containedBy({fieldName, arg, rowFieldValue, row, TableSchema, element}) {
-		return operatorsObject.containedBy.validate({fieldName, arg, rowFieldValue, row})
+	containedBy({fieldName, arg,  row, TableSchema, element, fieldPath}) {
+		return operatorsObject.containedBy.validate({fieldName, arg,  row, fieldPath})
 	},
-	overlap({fieldName, arg, rowFieldValue, row, TableSchema, element}) {
-		return operatorsObject.overlap.validate({fieldName, arg, rowFieldValue, row})
+	overlap({fieldName, arg,  row, TableSchema, element, fieldPath}) {
+		return operatorsObject.overlap.validate({fieldName, arg,  row, fieldPath})
 	},
-	isNull({fieldName, rowFieldValue, arg, row, TableSchema, element} ) {
-		console.log(fieldName, arg, rowFieldValue, row, TableSchema, element)
-		return operatorsObject.isNull.validate({fieldName, arg, rowFieldValue, row})
+	isNull({fieldName,  arg, row, TableSchema, element, fieldPath} ) {
+		console.log(fieldName, arg,  row, TableSchema, element, fieldPath)
+		return operatorsObject.isNull.validate({fieldName, arg,  row, fieldPath})
 	},
+	iexact({fieldName,  arg, row, TableSchema, element, fieldPath}) {
+		return operatorsObject.iexact.validate({fieldName, arg,  row, fieldPath})
+	}
 }
 
 
 export const ObjOperatorOverwrite = Object.assign({...operator}, {
-	isNull({fieldName, rowFieldValue, arg, row, TableSchema, element, fieldPath} ) {
-		// console.log(fieldName, arg, rowFieldValue, row, TableSchema, element)
-		return operatorsObject.objectIsnull.validate({fieldName, arg, rowFieldValue, row, fieldPath})
+	isNull({fieldName, arg, row, TableSchema, element, fieldPath} ) {
+		// console.log(fieldName, arg,  row, TableSchema, element)
+		return operatorsObject.objectIsnull.validate({fieldName, arg,  row, fieldPath})
 	},
-	eq:({fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath}) => {
-		return operatorsObject.objectEq.validate({fieldName, arg, rowFieldValue, row, fieldPath})
+	eq:({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
+		return operatorsObject.objectEq.validate({fieldName, arg,  row, fieldPath})
 	},
-	contains: ({fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath}) => {
-		return operatorsObject.objectContains.validate({fieldName, arg, rowFieldValue, row, fieldPath})
+	contains: ({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
+		return operatorsObject.objectContains.validate({fieldName, arg,  row, fieldPath})
 	},
-	contained_by: ({fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath}) => {
-		return operatorsObject.objectContains_by.validate({fieldName, arg, rowFieldValue, row, fieldPath})
+	contained_by: ({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
+		return operatorsObject.objectContains_by.validate({fieldName, arg,  row, fieldPath})
 	},
-	has_key({fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath}) {
-		return operatorsObject.objectHasKey.validate({fieldName, arg, rowFieldValue, row, fieldPath})
+	has_key({fieldName, arg,  row, TableSchema, element, fieldPath}) {
+		return operatorsObject.objectHasKey.validate({fieldName, arg,  row, fieldPath})
 	},
-	has_keys({fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath}) {
-		return operatorsObject.objectHasKeys.validate({fieldName, arg, rowFieldValue, row, fieldPath})
+	has_keys({fieldName, arg,  row, TableSchema, element, fieldPath}) {
+		return operatorsObject.objectHasKeys.validate({fieldName, arg,  row, fieldPath})
 	},
-	has_any_keys({fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath}) {
-		return operatorsObject.objectHasnyKeys.validate({fieldName, arg, rowFieldValue, row, fieldPath})
+	has_any_keys({fieldName, arg,  row, TableSchema, element, fieldPath}) {
+		return operatorsObject.objectHasnyKeys.validate({fieldName, arg,  row, fieldPath})
 	}
 })
 
 
 export const ArrOperatorOverwrite = Object.assign({...operator}, {
-	isNull({fieldName, rowFieldValue, arg, row, TableSchema, element, fieldPath} ) {
-		return operatorsObject.objectIsnull.validate({fieldName, arg, rowFieldValue, row, fieldPath})
+	isNull({fieldName,  arg, row, TableSchema, element, fieldPath} ) {
+		return operatorsObject.objectIsnull.validate({fieldName, arg,  row, fieldPath})
 	},
-	eq:({fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath}) => {
-		return operatorsObject.objectEq.validate({fieldName, arg, rowFieldValue, row, fieldPath})
+	eq:({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
+		return operatorsObject.ArrayFieldEq.validate({fieldName, arg,  row, fieldPath})
 	},
-	contains: ({fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath}) => {
-		return operatorsObject.objectContains.validate({fieldName, arg, rowFieldValue, row, fieldPath})
+	contains: ({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
+		return operatorsObject.ArrayFieldContains.validate({fieldName, arg,  row, fieldPath})
 	},
-	contained_by: ({fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath}) => {
-		return operatorsObject.objectContains_by.validate({fieldName, arg, rowFieldValue, row, fieldPath})
+	contained_by: ({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
+		return operatorsObject.ArrayFieldContains_by.validate({fieldName, arg,  row, fieldPath})
 	},
+	len: ({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
+		return operatorsObject.ArrayFieldContains_len.validate({fieldName, arg,  row, fieldPath})
+	},
+	overlap: ({fieldName, arg,  row, TableSchema, element, fieldPath}) => {
+		return operatorsObject.ArrayFieldContains_overlap.validate({fieldName, arg,  row, fieldPath})
+	}
 })

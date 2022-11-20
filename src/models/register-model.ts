@@ -53,11 +53,14 @@ export class registerModel {
         },
         attributes: attributes,
         fields: [],
+        fieldTypes
       })
+
+      
 
       for(const [fieldName, Field] of  Object.entries(fields)) {
         // dont register fields that is primary key and auto increment
-        if(!(Field?.primaryKey && Field?.autoIncrement)) {
+        if(!(Field?.primaryKey && Field?.autoIncrement  ) && !fieldTypes['ManyToManyField']?.includes(fieldName) ) {
   
           databaseSchema.stores[index].fields.push({
             name: fieldName,
@@ -72,13 +75,13 @@ export class registerModel {
 
         }
 
-        // if(Field instanceof OneToOneField) {
-        //   ModelEditor.addMethodOneToOneField(Field, fieldName, modelName, databaseSchema)
-        // } else if (Field instanceof ForeignKey) {
-        //   ModelEditor.addMethodForeignKey(Field, fieldName, modelName, databaseSchema)
-        // } else if (Field instanceof ManyToManyField) {
-        //   await ModelEditor.addMethodManyToManyField(Field, fieldName, modelName, databaseSchema)
-        // }
+        if(Field instanceof OneToOneField) {
+          await ModelEditor.addMethodOneToOneField(Field, fieldName, modelName, databaseSchema)
+        } else if (Field instanceof ForeignKey) {
+          await ModelEditor.addMethodForeignKey(Field, fieldName, modelName, databaseSchema)
+        } else if (Field instanceof ManyToManyField) {
+          await ModelEditor.addMethodManyToManyField(Field, fieldName, modelName, databaseSchema)
+        }
       }
 
       index++;
@@ -107,7 +110,7 @@ export class registerModel {
     ModelMigrations.migrationsState(true);
   }
 
-  static manyToManyRelationShip(foreignKeyField:ManyToManyField, FieldName:string, modelName:string, databaseSchema:DatabaseSchema) {
+  static manyToManyRelationShip(foreignKeyField:ManyToManyField, FieldName:string, modelName:string, databaseSchema:DatabaseSchema): Model {
     const foreignKeyFieldModel: any = foreignKeyField.model
     const currentModel: Model = models[modelName]
 
@@ -117,7 +120,7 @@ export class registerModel {
 
     const tableName = currentModelName+foreignKeyFieldModelName
 
-    const id = databaseSchema.stores.push({
+    const num = databaseSchema.stores.push({
       name: tableName,
       id: { keyPath:'id', autoIncrement: true, type: FieldType.INT},
       fields: [
@@ -127,7 +130,8 @@ export class registerModel {
           options: {
             unique:  false,
             type:  FieldType.INT
-          }
+          },
+          className: 'IntegerField'
         },
         {
           name: 'iD'+currentModelName,
@@ -135,17 +139,29 @@ export class registerModel {
           options: {
             unique:  false,
             type:  FieldType.INT
-          }
+          },
+          className: 'IntegerField'
         }
       ],
-      attributes: {}
+      attributes: {},
+      fieldTypes: {
+        IntegerField: ['iD'+foreignKeyFieldModelName, 'iD'+currentModelName]
+      }
     })
+
+    const id = num -1
 
     models[tableName] = generateGenericModel({
       DBSchema: databaseSchema,
       ModelName: tableName,
       TableSchema: databaseSchema.stores[id]
     })
+
+    return generateGenericModel({
+      DBSchema: databaseSchema,
+      ModelName: tableName,
+      TableSchema: databaseSchema.stores[id]
+    }) as any
 
   }
 
@@ -156,9 +172,8 @@ export class ModelEditor {
   static addMethodOneToOneField(foreignKeyField:OneToOneField, FieldName:string, modelName:string, databaseSchema:DatabaseSchema) {
 
     const foreignKeyFieldModel: Model = foreignKeyField.model
-    const modelNameLowCase = uncapitalize(modelName)
 
-    foreignKeyFieldModel['prototype'][modelNameLowCase] = async function (body) {
+    foreignKeyFieldModel['prototype'][modelName] = async function (body) {
 
       const obj ={}
       obj[FieldName] = this.getPrimaryKeyValue()
@@ -176,7 +191,7 @@ export class ModelEditor {
     const foreignKeyFieldModel: Model = foreignKeyField.model
     const FunctionName = uncapitalize(modelName)
 
-    foreignKeyFieldModel['prototype'][FunctionName+'SetAll'] = async function () {
+    foreignKeyFieldModel['prototype'][FunctionName+'_setAll'] = async function () {
 
       const obj = {}
       obj[FieldName] = this.getPrimaryKeyValue()
@@ -193,60 +208,160 @@ export class ModelEditor {
     
    
     const foreignKeyFieldModel: any = foreignKeyField.model
-    FieldName = uncapitalize(FieldName)
+    FieldName = FieldName
 
     const currentModel: Model = models[modelName]
 
-    await registerModel.manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema)
+    const middleTable = await registerModel.manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema)
 
-    currentModel['prototype'][FieldName+'Add'] = async function (modelInstance) {
-
-      if(modelInstance instanceof foreignKeyFieldModel) {
-        await foreignKeyFieldModel.create(modelInstance)
-      } else {
-        throw('Need to be instance of '+ foreignKeyFieldModel.getModelName())
+    currentModel['prototype'][FieldName+'_add'] = async function (modelInstances) {
+      if(modelInstances.constructor.name != 'Array') {
+        modelInstances = [modelInstances]
       }
 
+      for(const modelInstance of modelInstances) {
+
+        if(modelInstance instanceof foreignKeyFieldModel) {
+          let params = {}
+  
+          params[`iD${currentModel.getModelName()}`] = this.getPrimaryKeyValue()
+          params[`iD${modelInstance.getModelName()}`] =  modelInstance.getPrimaryKeyValue()
+  
+          await middleTable['create'](params)
+        } else {
+          throw('Need to be instance of '+ foreignKeyFieldModel.getModelName())
+        }
+      }
     }
 
+    currentModel['prototype'][FieldName] = function()  {
+      
+      let _model = this
+
+      return  {
+        async all () {
+          let params = {}
+          params[`iD${_model.getModelName()}`] = _model.getPrimaryKeyValue()
+          const middleTableResult = await middleTable['filter'](params).execute()
+
+          console.log(middleTableResult)
+          console.log(foreignKeyField, FieldName, modelName, databaseSchema)
+
+          foreignKeyField.model
+  
+          return middleTableResult
+        }
+      }
+    }
+
+
+    currentModel['prototype'][FieldName+'_all'] = async function()  {
+      
+      let _model = this
+
+      let params = {}
+      let result = []
+      params[`iD${_model.getModelName()}`] = _model.getPrimaryKeyValue()
+      const middleTableResult = await middleTable['filter'](params).execute()
+      let ids
+
+      console.log('middleTableResult', middleTableResult, await middleTable['all']())
+
+      if(middleTableResult) {
+        const TableSchema = foreignKeyField.model.getTableSchema()
+
+        ids = middleTableResult.map((e)=> {
+          return e[`iD${foreignKeyField.model.name}`]  
+        })
+
+        let params = {}
+
+        for( const id of ids) {
+          try {
+            params[TableSchema.id.keyPath] = id
+            const row = await foreignKeyField.model.get(params)
+            result.push(row)
+          } catch(error) {
+          }
+        }
+      }
+
+      return result
+    }
+
+
+
+    foreignKeyField.model['prototype'][uncapitalize(modelName)+'_set_all'] = async function()  {
+      let _model = this
+
+      let params = {}
+      let result = []
+      params[`iD${_model.getModelName()}`] = _model.getPrimaryKeyValue()
+      const middleTableResult = await middleTable['filter'](params).execute()
+      let ids
+
+      console.log(middleTableResult)
+
+      if(middleTableResult) {
+        const TableSchema = currentModel.getTableSchema()
+
+        console.log()
+        ids = middleTableResult.map((e)=> {
+          return e[`iD${modelName}`]  
+        })
+
+        let params = {}
+
+        for( const id of ids) {
+          try {
+            params[TableSchema.id.keyPath] = id
+            const row = await currentModel.get(params)
+            result.push(row)
+          } catch(error) {
+          }
+        }
+      }
+
+      return result
+    }
   }
 }
 
 
-
 function generateGenericModel ({DBSchema, ModelName, TableSchema}) {
   
-  class GenericModel {}
+  class GenericModel extends  Model {}
 
-  Object.assign(Model).forEach((Field, value) => {
+
+  for (const [Field, value] of Object.entries(Model)) {
     GenericModel[Field] = value
-  })
+  }
   
-  GenericModel.prototype = Model.prototype
+  // GenericModel.prototype = Model.prototype
   
   GenericModel.prototype['getDBSchema'] = () => {
-
+    return DBSchema
   }
 
   GenericModel.prototype['getModelName'] = () => {
-
+    return ModelName
   }
 
   GenericModel.prototype['getTableSchema'] = () => {
-
+    return TableSchema
   }
 
 
   GenericModel['getDBSchema'] = () => {
-
+    return DBSchema
   }
 
   GenericModel['getModelName'] = () => {
-
+    return ModelName
   }
 
   GenericModel['getTableSchema'] = () => {
-
+    return TableSchema
   }
 
   return GenericModel

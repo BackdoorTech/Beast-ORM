@@ -18,8 +18,6 @@ export class ObjectConditionOperator {
 			className: 'IntegerField',
 		}
 
-		// console.log(this.schemeFields)
-		
 	}
 
 	async run(args): Promise<boolean| any> {
@@ -71,28 +69,19 @@ export class ObjectConditionOperator {
 			console.log(operation)
 
 			if(OperatorsKeysArray.includes(operation)) {
-				const rowFieldValue = getDeep(this.row, fieldPath)
 
 				const arg = objOperator[field];
-
-				// console.log(fieldName, this.schemeFields, element[0])
-				// console.log(fieldName, fieldPath)
-
 				let operationResult: boolean;
 				
 				try {
 					if(this.schemeFields[fieldName].className == 'indexedDBJsonField') {
-						operationResult = await ObjOperatorOverwrite[operation]({fieldName, arg, rowFieldValue, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})
+						operationResult = await ObjOperatorOverwrite[operation]({fieldName, arg, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})
 					} 
 					else if(this.schemeFields[fieldName].className == 'indexedDBArrayField') {
-						operationResult = await ArrOperatorOverwrite[operation]({fieldName, arg, rowFieldValue, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})	
+						operationResult = await ArrOperatorOverwrite[operation]({fieldName, arg, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})	
 					} 
 					else {
-						// alert('normal')
-						if(rowFieldValue === undefined) {
-							return false
-						}
-						operationResult = await operator[operation]({fieldName, arg, rowFieldValue, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})
+						operationResult = await operator[operation]({fieldName, arg, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})
 					}
 				} catch (err) {
 					// console.log(this.TableSchema, this.schemeFields[fieldName])

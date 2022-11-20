@@ -88,6 +88,7 @@ class _indexedDB {
                             this.validateBeforeTransaction(db, currentStore, reject);
                             let tx = this.createTransaction(db, "readwrite", currentStore, resolve, reject);
                             let objectStore = tx.objectStore(currentStore);
+                            console.log(value, key);
                             let request = objectStore.put(value, key);
                             request.onsuccess = (e) => {
                                 var _a, _b;
@@ -225,6 +226,7 @@ class _indexedDB {
                 },
                 update: async (methods) => {
                     if (methods[0].methodName == 'save') {
+                        console.log(methods);
                         const args = methods[0].arguments;
                         const idFieldName = TableSchema.id.keyPath;
                         const idValue = args[idFieldName];
@@ -239,6 +241,7 @@ class _indexedDB {
                         };
                     }
                     else if (methods[0].methodName != 'update' && methods[methods.length - 1].methodName == 'update') {
+                        console.log('update');
                         const argsToUpdate = methods[methods.length - 1].arguments;
                         const customMethods = Object.create(methods);
                         customMethods[methods.length - 1].methodName = 'execute';
@@ -253,8 +256,18 @@ class _indexedDB {
                         };
                     }
                     else if (methods[0].methodName == 'update') {
+                        console.log('update000');
                         const argsToUpdate = methods[0].arguments;
-                        await this.getActions(TableSchema.name, config).update(argsToUpdate);
+                        const idFieldName = TableSchema.id.keyPath;
+                        //await this.getActions(TableSchema.name, config).update(argsToUpdate)
+                        const idValue = argsToUpdate[idFieldName];
+                        console.log(argsToUpdate, idFieldName);
+                        if (idValue) {
+                            await this.getActions(TableSchema.name, config).update(argsToUpdate);
+                        }
+                        else {
+                            await this.getActions(TableSchema.name, config).update(argsToUpdate, idValue);
+                        }
                         return {
                             queryId
                         };

@@ -201,6 +201,13 @@ class ChessBoardUser extends models.Model {
   })
 }
 
+models.register({
+  databaseName: 'tutorial',
+  version: 1,
+  type: 'indexedDB',
+  models: [ChessBoardUser]
+})
+
 // valid
 ChessBoardUser.create({
   board: [
@@ -227,7 +234,7 @@ const { ArrayField } = models.indexedDB.fields
 
 class Post extends models.Model {
   name = models.CharField({maxLength=200})
-  tags = ArrayField({field:models.CharField(maxLength=200), blank:true})
+  tags = ArrayField({field:models.CharField({maxLength:200}), blank:true})
 }
 
 
@@ -244,13 +251,13 @@ Post.create({name:'First post', tags:['thoughts', 'django']})
 Post.create({name:'Second post', tags:['thoughts']})
 Post.create({name:'Third post', tags:['tutorial', 'django']})
 
-Post.filter({tags__contains:['thoughts']})
+Post.filter({tags__contains:['thoughts']}).execute()
 // [<Post: First post>, <Post: Second post>]
 
-Post.filter({tags__contains:['django']})
+Post.filter({tags__contains:['django']}).execute()
 // [<Post: First post>, <Post: Third post>]
 
-Post.filter({tags__contains:['django', 'thoughts']})
+Post.filter({tags__contains:['django', 'thoughts']}).execute()
 // [<Post: First post>]
 
 
@@ -262,14 +269,14 @@ Post.filter({tags__contains:['django', 'thoughts']})
 This is the inverse of the contains lookup - the objects returned will be those where the data is a subset of the values passed. It uses the SQL operator <@. For example:
 
 ```javascript
-Post.create({name:'First post', tags:['thoughts', 'django']})
-Post.create({name:'Second post', tags:['thoughts']})
-Post.create({name:'Third post', tags:['tutorial', 'django']})
+Post.create({name:'First post', tags:['thoughts', 'django']}).execute()
+Post.create({name:'Second post', tags:['thoughts']}).execute()
+Post.create({name:'Third post', tags:['tutorial', 'django']}).execute()
 
-Post.filter({tags__contained_by:['thoughts', 'django']})
+Post.filter({tags__contained_by:['thoughts', 'django']}).execute()
 // <Post: First post>, <Post: Second post>]
 
-Post.filter({tags__contained_by:['thoughts', 'django', 'tutorial']})
+Post.filter({tags__contained_by:['thoughts', 'django', 'tutorial']}).execute()
 // [<Post: First post>, <Post: Second post>, <Post: Third post>]
 
 
@@ -279,14 +286,14 @@ Post.filter({tags__contained_by:['thoughts', 'django', 'tutorial']})
 Returns objects where the data shares any results with the values passed. Uses the SQL operator &&. For example:s the SQL operator <@. For example:
 
 ```javascript
-Post.create({name:'First post', tags:['thoughts', 'django']})
-Post.create({name:'Second post', tags:['thoughts']})
-Post.create({name:'Third post', tags:['tutorial', 'django']})
+Post.create({name:'First post', tags:['thoughts', 'django']}).execute()
+Post.create({name:'Second post', tags:['thoughts']}).execute()
+Post.create({name:'Third post', tags:['tutorial', 'django']}).execute()
 
-Post.filter({tags__overlap:['thoughts']})
+Post.filter({tags__overlap:['thoughts']}).execute()
 // [<Post: First post>, <Post: Second post>]
 
-Post.filter({tags__overlap:['thoughts', 'tutorial']})
+Post.filter({tags__overlap:['thoughts', 'tutorial']}).execute()
 // [<Post: First post>, <Post: Second post>, <Post: Third post>]
 
 
@@ -302,7 +309,7 @@ Returns the length of the array. The lookups available afterward are those avail
 Post.create({name:'First post', tags:['thoughts', 'django']})
 Post.create({name:'Second post', tags:['thoughts']})
 
-Post.filter(tags__len=1)
+Post.filter(tags__len=1).execute()
 // [<Post: Second post>]
 
 
@@ -319,13 +326,13 @@ Index transforms index into the array. Any non-negative integer can be used. The
 Post.create({name:'First post', tags:['thoughts', 'django']})
 Post.create({name:'Second post', tags:['thoughts']})
 
-Post.filter({tags__0:'thoughts'})
+Post.filter({tags__0:'thoughts'}).execute()
 // [<Post: First post>, <Post: Second post>]
 
-Post.filter({tags__1__iexact:'Django'})
+Post.filter({tags__1__iexact:'Django'}).execute()
 // [<Post: First post>]
 
-Post.filter({tags__276:'javascript'})
+Post.filter({tags__276:'javascript'}).execute()
 // []
 ```
 <br>
@@ -340,6 +347,13 @@ class Dog extends models.Model {
   name = models.CharField({maxLength:200})
   data = JsonField({null: false})
 }
+
+models.register({
+  databaseName: 'tutorial',
+  version: 1,
+  type: 'indexedDB',
+  models: [Dog]
+})
 ```
 <br/>
 <br/>
@@ -358,13 +372,13 @@ Dog.create({name:'Max', data: null})  # SQL NULL.
 // <Dog: Max>
 Dog.create({name:'Archie', data:Value('null')})  # JSON null.
 // <Dog: Archie>
-Dog.filter({data:null})
+Dog.filter({data:null}).execute()
 //  [<Dog: Archie>]
-Dog.filter({data=Value('null')})
+Dog.filter({data=Value('null')}).execute()
 //  [<Dog: Archie>]
-Dog.filter({data__isnull:true})
+Dog.filter({data__isnull:true}).execute()
 //  [<Dog: Max>]
-Dog.filter({data__isnull:false})
+Dog.filter({data__isnull:false}).execute()
 //  [<Dog: Archie>]
 ```
 
@@ -385,7 +399,7 @@ Dog.create({name:'Rufus', data: {
 
 Dog.create({name:'Meg', data:{'breed': 'collie', 'owner': null}})
 // <Dog: Meg>
-Dog.filter({data__breed:'collie'})
+Dog.filter({data__breed:'collie'}).execute()
 // [<Dog: Meg>]
 ```
 
@@ -393,7 +407,7 @@ Dog.filter({data__breed:'collie'})
 Multiple keys can be chained together to form a path lookup:
 ```javascript
 
-Dog.objects.filter({data__owner__name:'Bob'})
+Dog.objects.filter({data__owner__name:'Bob'}).execute()
 // [<Dog: Rufus>]
 ```
 
@@ -401,7 +415,7 @@ If the key is an integer, it will be interpreted as an index transform in an arr
 
 ```javascript
 
-Dog.objects.filter({data__owner__other_pets__0__name:'Fishy'})
+Dog.objects.filter({data__owner__other_pets__0__name:'Fishy'}).execute()
 // [<Dog: Rufus>]
 ```
 
@@ -409,9 +423,9 @@ If the key you wish to query by clashes with the name of another lookup, use the
 
 To query for missing keys, use the isnull lookup:
 ```javascript
-Dog.objects.create(name='Shep', data={'breed': 'collie'})
+Dog.objects.create({name:'Shep', data:{'breed': 'collie'}})
 
-Dog.objects.filter({data__owner__isnull:true})
+Dog.objects.filter({data__owner__isnull:true}).execute()
 // [<Dog: Shep>]
 ```
 Note
@@ -427,15 +441,15 @@ The contains lookup is overridden on JSONField. The returned objects are those w
 
 
 ```javascript
-Dog.create(name='Rufus', data={'breed': 'labrador', 'owner': 'Bob'})
+Dog.create({name:'Rufus', data:{'breed': 'labrador', 'owner': 'Bob'}})
 // <Dog: Rufus>
-Dog.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+Dog.create({name:'Meg', data:{'breed': 'collie', 'owner': 'Bob'}})
 // <Dog: Meg>
-Dog.create(name='Fred', data={})
+Dog.create({name:'Fred', data:{}})
 // <Dog: Fred>
-Dog.filter(data__contains={'owner': 'Bob'})
+Dog.filter({data__contains:{'owner': 'Bob'}}).execute()
 // [<Dog: Rufus>, <Dog: Meg>]
-Dog.filter(data__contains={'breed': 'collie'})
+Dog.filter({data__contains:{'breed': 'collie'}}).execute()
 // [<Dog: Meg>]
 ```
 
@@ -445,13 +459,13 @@ This is the inverse of the contains lookup - the objects returned will be those 
 
 
 ```javascript
-Dog.create(name='Rufus', data={'breed': 'labrador', 'owner': 'Bob'})
-Dog.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
-Dog.create(name='Fred', data={})
+Dog.create({name:'Rufus', data:{'breed': 'labrador', 'owner': 'Bob'}})
+Dog.create({name:'Meg', data:{'breed': 'collie', 'owner': 'Bob'}})
+Dog.create({name:'Fred', data:{}})
 
-Dog.filter(data__contained_by={'breed': 'collie', 'owner': 'Bob'})
+Dog.filter({data__contained_by:{'breed': 'collie', 'owner': 'Bob'}}).execute()
 // [<Dog: Meg>, <Dog: Fred>]
-Dog.filter(data__contained_by={'breed': 'collie'})
+Dog.filter({data__contained_by:{'breed': 'collie'}}).execute()
 // [<Dog: Fred>]
 ```
 
@@ -459,34 +473,35 @@ Dog.filter(data__contained_by={'breed': 'collie'})
 Returns objects where the given key is in the top-level of the data. For example:
 
 ```javascript
-Dog.create(name='Rufus', data={'breed': 'labrador'})
+Dog.create({name:'Rufus', data:{'breed': 'labrador'}})
 // [<Dog: Rufus>]
-Dog.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+Dog.create({name:'Meg', data:{'breed': 'collie', 'owner': 'Bob'}})
 // [<Dog: Meg>]
-Dog.filter(data__has_key='owner')
+Dog.filter({data__has_key:'owner'}).execute()
 // [<Dog: Meg>]
 ```
 
 ### has_keys
 Returns objects where all of the given keys are in the top-level of the data. For example:
 ```javascript
-Dog.create(name='Rufus', data={'breed': 'labrador'})
+Dog.create(name:'Rufus', data:{'breed': 'labrador'})
 // [<Dog: Rufus>]
-Dog.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+Dog.create({name:'Meg', data:{'breed': 'collie', 'owner': 'Bob'}})
 // [<Dog: Meg>]
-Dog.filter(data__has_keys=['breed', 'owner'])
+Dog.filter({data__has_keys:['breed', 'owner']})
 // [<Dog: Meg>]
 ```
 ### has_any_keys
 Returns objects where any of the given keys are in the top-level of the data. For example:
 ```javascript
-Dog.create(name='Rufus', data={'breed': 'labrador'})
+Dog.create({name:'Rufus', data:{'breed': 'labrador'}})
 // [<Dog: Rufus>]
-Dog.create(name='Meg', data={'owner': 'Bob'})
+Dog.create({name:'Meg', data:{'owner': 'Bob'}})
 // [<Dog: Meg>]
-Dog.filter(data__has_any_keys=['owner', 'breed'])
+Dog.filter({data__has_any_keys:['owner', 'breed']})
 // [<Dog: Rufus>, <Dog: Meg>]
 ```
+## One-to-one relationships
 
 ## Languages and Tools
 <p align="left">   <a href="https://git-scm.com/" target="_blank"> <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="git" width="40" height="40"/>  </a> <a href="https://jestjs.io" target="_blank"> <img src="https://www.vectorlogo.zone/logos/jestjsio/jestjsio-icon.svg" alt="jest" width="40" height="40"/> </a>    <a href="https://github.com/puppeteer/puppeteer" target="_blank"> <img src="https://www.vectorlogo.zone/logos/pptrdev/pptrdev-official.svg" alt="puppeteer" width="40" height="40"/>  </a>  <a href="https://www.typescriptlang.org/" target="_blank"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="typescript" width="40" height="40"/> </a>

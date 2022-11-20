@@ -8,7 +8,7 @@ export declare class Model extends ModelManager {
     getModelName(): string;
     filter(...arg: any[]): any;
     getTableSchema(): TableSchema;
-    private getPrimaryKeyValue;
+    getPrimaryKeyValue(): any;
     save(): Promise<void>;
     delete(): Promise<void>;
     static deleteAll(): Promise<void>;
@@ -30,7 +30,6 @@ export declare class Model extends ModelManager {
     private static getEmptyFields;
     private static getFields;
     static create(arg: any): Promise<any>;
-    private static getPrimaryKeyValue;
     private static newInstance;
     static createOrFind(getArg: any, defaultCreate: any): Promise<any[]>;
     static updateOrCreate(argToFind: any, argsToUpdate: any): Promise<any>;

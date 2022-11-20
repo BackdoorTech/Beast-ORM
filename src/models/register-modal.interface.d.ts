@@ -18,6 +18,7 @@ export interface TableSchema {
 	id: { keyPath: string , autoIncrement?: boolean , type:  FieldType},
 	fields: FieldSchema[]
 	attributes: AttributesMap<FieldAttributesKeys, string[]> = {}
+	fieldTypes: FieldsMap<FieldKeys, string[]>
 }
 
 export interface DatabaseSchema {

@@ -1,259 +1,268 @@
-export declare const OperatorsKeysArray: readonly ["gt", "gte", "lt", "lte", "not", "eq", "contains", "len", "hasKey", "ForeignKey", "containedBy", "overlap", "isNull", "contained_by", "has_key", "has_keys", "has_any_keys"];
+export declare const OperatorsKeysArray: readonly ["gt", "gte", "lt", "lte", "not", "eq", "contains", "len", "hasKey", "ForeignKey", "containedBy", "overlap", "isNull", "contained_by", "has_key", "has_keys", "has_any_keys", "len", "overlap", "iexact"];
 export declare type OperatorKeys = typeof OperatorsKeysArray[number];
 export declare const operator: {
-    gt: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    gt: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    gte: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    gte: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    lt: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    lt: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    lte: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    lte: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    not: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    not: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    eq: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    eq: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    contains: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    contains: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => any;
-    len({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    len({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }): boolean;
-    hasKey({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    hasKey({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }): boolean;
-    containedBy({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    containedBy({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }): boolean;
-    overlap({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    overlap({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }): any;
-    isNull({ fieldName, rowFieldValue, arg, row, TableSchema, element }: {
+    isNull({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
-        rowFieldValue: any;
         arg: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
+    }): boolean;
+    iexact({ fieldName, arg, row, TableSchema, element, fieldPath }: {
+        fieldName: any;
+        arg: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+        fieldPath: any;
     }): boolean;
 };
 export declare const ObjOperatorOverwrite: {
-    gt: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    gt: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    gte: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    gte: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    lt: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    lt: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    lte: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    lte: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    not: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    not: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    eq: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    eq: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    contains: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    contains: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => any;
-    len({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    len({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }): boolean;
-    hasKey({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    hasKey({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }): boolean;
-    containedBy({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    containedBy({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }): boolean;
-    overlap({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    overlap({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }): any;
-    isNull({ fieldName, rowFieldValue, arg, row, TableSchema, element }: {
+    isNull({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
-        rowFieldValue: any;
         arg: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
+    }): boolean;
+    iexact({ fieldName, arg, row, TableSchema, element, fieldPath }: {
+        fieldName: any;
+        arg: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+        fieldPath: any;
     }): boolean;
 } & {
-    isNull({ fieldName, rowFieldValue, arg, row, TableSchema, element, fieldPath }: {
+    isNull({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
-        rowFieldValue: any;
         arg: any;
         row: any;
         TableSchema: any;
         element: any;
         fieldPath: any;
     }): boolean;
-    eq: ({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }: {
+    eq: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
         fieldPath: any;
     }) => boolean;
-    contains: ({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }: {
+    contains: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
         fieldPath: any;
     }) => boolean;
-    contained_by: ({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }: {
+    contained_by: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
         fieldPath: any;
     }) => boolean;
-    has_key({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }: {
+    has_key({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
         fieldPath: any;
     }): boolean;
-    has_keys({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }: {
+    has_keys({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
         fieldPath: any;
     }): boolean;
-    has_any_keys({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }: {
+    has_any_keys({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
@@ -261,134 +270,154 @@ export declare const ObjOperatorOverwrite: {
     }): boolean;
 };
 export declare const ArrOperatorOverwrite: {
-    gt: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    gt: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    gte: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    gte: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    lt: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    lt: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    lte: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    lte: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    not: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    not: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    eq: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    eq: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => boolean;
-    contains: ({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    contains: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }) => any;
-    len({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    len({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }): boolean;
-    hasKey({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    hasKey({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }): boolean;
-    containedBy({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    containedBy({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }): boolean;
-    overlap({ fieldName, arg, rowFieldValue, row, TableSchema, element }: {
+    overlap({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
     }): any;
-    isNull({ fieldName, rowFieldValue, arg, row, TableSchema, element }: {
+    isNull({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
-        rowFieldValue: any;
         arg: any;
         row: any;
         TableSchema: any;
         element: any;
+        fieldPath: any;
+    }): boolean;
+    iexact({ fieldName, arg, row, TableSchema, element, fieldPath }: {
+        fieldName: any;
+        arg: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+        fieldPath: any;
     }): boolean;
 } & {
-    isNull({ fieldName, rowFieldValue, arg, row, TableSchema, element, fieldPath }: {
+    isNull({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
-        rowFieldValue: any;
         arg: any;
         row: any;
         TableSchema: any;
         element: any;
         fieldPath: any;
     }): boolean;
-    eq: ({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }: {
+    eq: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
         fieldPath: any;
     }) => boolean;
-    contains: ({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }: {
+    contains: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
         row: any;
         TableSchema: any;
         element: any;
         fieldPath: any;
     }) => boolean;
-    contained_by: ({ fieldName, arg, rowFieldValue, row, TableSchema, element, fieldPath }: {
+    contained_by: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
         fieldName: any;
         arg: any;
-        rowFieldValue: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+        fieldPath: any;
+    }) => boolean;
+    len: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
+        fieldName: any;
+        arg: any;
+        row: any;
+        TableSchema: any;
+        element: any;
+        fieldPath: any;
+    }) => boolean;
+    overlap: ({ fieldName, arg, row, TableSchema, element, fieldPath }: {
+        fieldName: any;
+        arg: any;
         row: any;
         TableSchema: any;
         element: any;
