@@ -35,7 +35,7 @@ export class SqlObject {
 			const arg  = method.arguments
 
 			if(methods[methodName]) {
-				const methodToExecute: methodFunction = new methods[methodName](arg, this.TableSchema)
+				const methodToExecute: methodFunction = new methods[methodName](this.argsAttributes, this.TableSchema)
 				this.rows = await methodToExecute.run(this.rows)
 			}
 
