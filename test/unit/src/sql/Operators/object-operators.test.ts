@@ -2,6 +2,7 @@ import fs from 'fs'
 import * as _Fields from '../../../../../src/models/field/fields'
 import { models, models as  modelsType } from '../../../../../src/index'
 import { ObjectConditionOperator as ObjectConditionOperatorType } from './../../../../../src/sql/Operators/Object-condition-operator'
+import { argsAttributes as argsAttributesType } from './../../../../../src/sql/Operators/args-attributes'
 
 const { Port } = JSON.parse(fs.readFileSync('./test/config/test.json', 'utf8'));
 
@@ -16,6 +17,7 @@ describe("comparisonOperator", () => {
 
 			const models: typeof modelsType = window['models']
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
 				age = models.IntegerField()
@@ -33,8 +35,10 @@ describe("comparisonOperator", () => {
 			const row = {name:'peter', age: 22}
 			const filterParams = [{age: 22}]
 
-			const operator = new ObjectOperator(row, tableSchema)
-			const result: Boolean = await operator.run(filterParams)
+			const args = new argsAttributes(filterParams, tableSchema)
+
+			const operator = new ObjectOperator(tableSchema, args)
+			const result: Boolean = await operator.run(row)
 			
 			document.body.innerHTML = 'result: '+result
 		})
@@ -47,6 +51,7 @@ describe("comparisonOperator", () => {
 
 			const models: typeof modelsType = window['models']
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
 				age = models.IntegerField()
@@ -63,8 +68,10 @@ describe("comparisonOperator", () => {
 			const row = {name:'peter', age: 22}
 			const filterParams = [{age: 23}]
 
-			const operator = new ObjectOperator(row, tableSchema)
-			const result: Boolean = await operator.run(filterParams)
+						const args = new argsAttributes(filterParams, tableSchema)
+
+			const operator = new ObjectOperator(tableSchema, args)
+			const result: Boolean = await operator.run(row)
 			
 			document.body.innerHTML = 'result: '+result
 		})
@@ -83,6 +90,7 @@ describe("comparisonOperator", () => {
 
 			const models: typeof modelsType = window['models']
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
 
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
@@ -101,8 +109,10 @@ describe("comparisonOperator", () => {
 			const row = {username:'peter', age: 10}
 			const filterParams = [{age__lte: 22}]
 
-			const operator = new ObjectOperator(row, tableSchema)
-			const result: Boolean = await operator.run(filterParams)
+						const args = new argsAttributes(filterParams, tableSchema)
+
+			const operator = new ObjectOperator(tableSchema, args)
+			const result: Boolean = await operator.run(row)
 			
 			document.body.innerHTML = 'result: '+result
     })
@@ -121,6 +131,7 @@ describe("comparisonOperator", () => {
 
 			const models: typeof modelsType = window['models']
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
 
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
@@ -139,8 +150,10 @@ describe("comparisonOperator", () => {
 			const row = {name:'peter', age: 23}
 			const filterParams = [{age__lte: 22}]
 
-			const operator = new ObjectOperator(row, tableSchema)
-			const result: Boolean = await operator.run(filterParams)
+						const args = new argsAttributes(filterParams, tableSchema)
+
+			const operator = new ObjectOperator(tableSchema, args)
+			const result: Boolean = await operator.run(row)
 			
 			document.body.innerHTML = 'result: '+result
     })
@@ -159,6 +172,7 @@ describe("comparisonOperator", () => {
 
 			const models: typeof modelsType = window['models']
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
 
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
@@ -177,8 +191,10 @@ describe("comparisonOperator", () => {
 			const row = {username:'jame', age: 10}
 			const filterParams = [{username__not: 'peter',age__lts: 20}]
 
-			const operator = new ObjectOperator(row, tableSchema)
-			const result: Boolean = await operator.run(filterParams)
+						const args = new argsAttributes(filterParams, tableSchema)
+
+			const operator = new ObjectOperator(tableSchema, args)
+			const result: Boolean = await operator.run(row)
 			
 			document.body.innerHTML = 'result: '+result
     })
@@ -199,6 +215,7 @@ describe("comparisonOperator", () => {
 
 			const models: typeof modelsType = window['models']
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
 
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
@@ -216,8 +233,10 @@ describe("comparisonOperator", () => {
 			const row = {username:'jame', age: 10}
 			const filterParams = [{age__lte: 5},[{age:10}, [{age:20},{age:12}]]]
 
-			const operator = new ObjectOperator(row, tableSchema)
-			const result: Boolean = await operator.run(filterParams)
+						const args = new argsAttributes(filterParams, tableSchema)
+
+			const operator = new ObjectOperator(tableSchema, args)
+			const result: Boolean = await operator.run(row)
 			
 			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
     })
@@ -238,6 +257,7 @@ describe("comparisonOperator", () => {
 
 			const models: typeof modelsType = window['models']
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
 
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
@@ -255,8 +275,10 @@ describe("comparisonOperator", () => {
 			const row = {name:'jame', age: 10}
 			const filterParams = [{age__not: 5}]
 
-			const operator = new ObjectOperator(row, tableSchema)
-			const result: Boolean = await operator.run(filterParams)
+						const args = new argsAttributes(filterParams, tableSchema)
+
+			const operator = new ObjectOperator(tableSchema, args)
+			const result: Boolean = await operator.run(row)
 			
 			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
     })
@@ -277,6 +299,7 @@ describe("comparisonOperator", () => {
 
 			const models: typeof modelsType = window['models']
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
 
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
@@ -294,8 +317,10 @@ describe("comparisonOperator", () => {
 			const row = {name:'jame', age: 10}
 			const filterParams = [{age__not: 5}]
 
-			const operator = new ObjectOperator(row, tableSchema)
-			const result: Boolean = await operator.run(filterParams)
+						const args = new argsAttributes(filterParams, tableSchema)
+
+			const operator = new ObjectOperator(tableSchema, args)
+			const result: Boolean = await operator.run(row)
 			
 			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
     })
@@ -316,6 +341,7 @@ describe("comparisonOperator", () => {
 
 			const models: typeof modelsType = window['models']
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
 			
 			const { ArrayField, JsonField} = models.indexedDB.fields
 
@@ -335,8 +361,10 @@ describe("comparisonOperator", () => {
 			const row = {name:'jame', tags: ['django']}
 			const filterParams = [{tags__len:  1}]
 
-			const operator = new ObjectOperator(row, tableSchema)
-			const result: Boolean = await operator.run(filterParams)
+						const args = new argsAttributes(filterParams, tableSchema)
+
+			const operator = new ObjectOperator(tableSchema, args)
+			const result: Boolean = await operator.run(row)
 			
 			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
     })
@@ -348,6 +376,7 @@ describe("comparisonOperator", () => {
 
 			const models: typeof modelsType = window['models']
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
 			
 			const { ArrayField, JsonField} = models.indexedDB.fields
 
@@ -367,8 +396,10 @@ describe("comparisonOperator", () => {
 			const row = {name:'jame', tags: ['django']}
 			const filterParams = [{tags__len:  2}]
 
-			const operator = new ObjectOperator(row, tableSchema)
-			const result: Boolean = await operator.run(filterParams)
+						const args = new argsAttributes(filterParams, tableSchema)
+
+			const operator = new ObjectOperator(tableSchema, args)
+			const result: Boolean = await operator.run(row)
 			
 			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
     })
@@ -390,6 +421,7 @@ describe("comparisonOperator", () => {
 
 				const models: typeof modelsType = window['models']
 				const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
 				
 				const { ArrayField, JsonField} = models.indexedDB.fields
 
@@ -418,8 +450,10 @@ describe("comparisonOperator", () => {
 
 				const filterParams = [{data__owner__isNull:  true }]
 
-				const operator = new ObjectOperator(row, tableSchema)
-				const result: Boolean = await operator.run(filterParams)
+							const args = new argsAttributes(filterParams, tableSchema)
+
+			const operator = new ObjectOperator(tableSchema, args)
+				const result: Boolean = await operator.run(row)
 				
 				document.body.innerHTML = 'result: '+ JSON.stringify(result) 
 		})
@@ -431,6 +465,7 @@ describe("comparisonOperator", () => {
 
 			const models: typeof modelsType = window['models']
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
+			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
 			
 			const { ArrayField, JsonField} = models.indexedDB.fields
 
@@ -458,8 +493,10 @@ describe("comparisonOperator", () => {
 			}
 			const filterParams = [{data__name__isNull:  false }]
 
-			const operator = new ObjectOperator(row, tableSchema)
-			const result: Boolean = await operator.run(filterParams)
+						const args = new argsAttributes(filterParams, tableSchema)
+
+			const operator = new ObjectOperator(tableSchema, args)
+			const result: Boolean = await operator.run(row )
 			
 			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
     	})

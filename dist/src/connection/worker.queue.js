@@ -4,11 +4,11 @@ export class _IndexedDBWorkerQueue {
         this.workerQueues = {};
         this.webWorkerModuleSupport = this.supportsWorkerType();
         if (this.webWorkerModuleSupport) {
-            this.myWorker = new Worker(new URL('./worker.js', import.meta.url), { type: "module" });
-            this.myWorker.onmessage = (oEvent) => {
-                const data = oEvent.data;
-                this.onmessage(data);
-            };
+            // this.myWorker = new Worker(new URL('./worker.js', import.meta.url),{ type: "module" });
+            // this.myWorker.onmessage =  (oEvent) => {
+            // 	const data = oEvent.data
+            // 	this.onmessage(data)
+            // }
         }
     }
     // https://stackoverflow.com/a/62963963/14115342

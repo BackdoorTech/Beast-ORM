@@ -1,8 +1,8 @@
-import { ArrOperatorOverwrite, ObjOperatorOverwrite, operator, OperatorsKeysArray } from './object-operator.js';
+import { ArrOperatorOverwrite, ObjOperatorOverwrite, operator } from './object-operator.js';
 export class ObjectConditionOperator {
-    constructor(row, TableSchema) {
-        this.row = row;
+    constructor(TableSchema, args) {
         this.TableSchema = TableSchema;
+        this.args = args;
         this.schemeFields = {} = {};
         for (const field of this.TableSchema.fields) {
             this.schemeFields[field.name] = field;
@@ -13,64 +13,44 @@ export class ObjectConditionOperator {
             className: 'IntegerField',
         };
     }
-    async run(args) {
-        return new Promise(async (resolve, reject) => {
-            const loop = async (o) => {
-                // https://stackoverflow.com/a/38597076/14115342
-                await Object.keys(o).forEach(async (k) => {
-                    if (o[k].constructor.name === 'Array') {
-                        await loop(o[k]);
-                    }
-                    else {
-                        const result = await this.execute(o[k]);
-                        if (result) {
-                            resolve(true);
-                        }
-                    }
-                });
-                return o;
-            };
-            await loop(args);
-            resolve(false);
-        });
+    async run(row) {
+        this.row = row;
+        for (const arg of this.args.value) {
+            const result = await this.execute(arg);
+            if (result) {
+                return true;
+            }
+        }
     }
     async execute(objOperator) {
-        const keys = Object.keys(objOperator);
-        for (let field of keys) {
-            const element = field.split('__');
-            if (element.length == 1) {
-                element.push('eq');
-            }
-            let operation = element[element.length - 1];
-            if (OperatorsKeysArray.includes(operation)) {
-                operation = element.pop();
-            }
-            else {
-                operation = 'eq';
-            }
-            const fieldName = element[0];
-            const fieldPath = element.join('.');
-            if (OperatorsKeysArray.includes(operation)) {
-                const arg = objOperator[field];
-                let operationResult;
-                try {
-                    if (this.schemeFields[fieldName].className == 'indexedDBJsonField') {
-                        operationResult = await ObjOperatorOverwrite[operation]({ fieldName, arg, row: this.row, TableSchema: this.TableSchema, element: fieldName, fieldPath });
-                    }
-                    else if (this.schemeFields[fieldName].className == 'indexedDBArrayField') {
-                        operationResult = await ArrOperatorOverwrite[operation]({ fieldName, arg, row: this.row, TableSchema: this.TableSchema, element: fieldName, fieldPath });
-                    }
-                    else {
-                        operationResult = await operator[operation]({ fieldName, arg, row: this.row, TableSchema: this.TableSchema, element: fieldName, fieldPath });
-                    }
+        for (let objOperatorFieldName in objOperator) {
+            const field = objOperator[objOperatorFieldName];
+            const fieldName = field.fieldName;
+            const fieldPath = field.fieldPath;
+            const operation = field.operation;
+            const operationArg = field.operationArg;
+            const fieldClassName = field.fieldClassName;
+            // const operator = field.operator
+            const arg = operationArg;
+            let operationResult;
+            // operator({fieldName, arg, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})
+            try {
+                if (this.schemeFields[fieldName].className == 'indexedDBJsonField') {
+                    operationResult = await ObjOperatorOverwrite[operation]({ fieldName, arg, row: this.row, TableSchema: this.TableSchema, element: fieldName, fieldPath });
                 }
-                catch (err) {
-                    // console.log(this.TableSchema, this.schemeFields[fieldName])
-                    throw ('Field ' + fieldName + ' does not exit on the table' + err);
+                else if (this.schemeFields[fieldName].className == 'indexedDBArrayField') {
+                    operationResult = await ArrOperatorOverwrite[operation]({ fieldName, arg, row: this.row, TableSchema: this.TableSchema, element: fieldName, fieldPath });
                 }
-                if (!operationResult) {
-                    return false;
+                else {
+                    operationResult = await operator[operation]({ fieldName, arg, row: this.row, TableSchema: this.TableSchema, element: fieldName, fieldPath });
                 }
+            }
+            catch (err) {
+                // console.log(this.TableSchema, this.schemeFields[fieldName])
+                throw ('Field ' + fieldName + ' does not exit on the table' + err);
+            }
+            if (!operationResult) {
+                return false;
             }
         }
         return true;

@@ -1,13 +1,15 @@
 import { TableSchema, FieldSchema } from '../../models/register-modal.interface.js';
 import { ArrOperatorOverwrite, ObjOperatorOverwrite, operator, OperatorsKeysArray } from './object-operator.js'
 import { getDeep } from '../../utils.js'
-import { AttributesMap } from '../../models/field/fields.interface.js';
+import { AttributesMap, FieldsMap } from '../../models/field/fields.interface.js';
+import { argsAttributes, Field } from './args-attributes.js';
 
 export class ObjectConditionOperator {
 
 	schemeFields: AttributesMap<string, FieldSchema> = {} = {}
+	row
 
-	constructor(private row, private TableSchema:TableSchema) {
+	constructor(private TableSchema:TableSchema, private args: argsAttributes) {
 		for( const field of this.TableSchema.fields) {
 			this.schemeFields[field.name] = field
 		}
@@ -20,79 +22,63 @@ export class ObjectConditionOperator {
 
 	}
 
-	async run(args): Promise<boolean| any> {
-		
-		return new Promise(async(resolve, reject) => {
-			const loop = async (o) => {
-				// https://stackoverflow.com/a/38597076/14115342
-				await Object.keys(o).forEach( async (k) => {
-					if ( o[k].constructor.name === 'Array') {
-						await loop(o[k]);
-					} else {
-						const result = await this.execute(o[k])
-						if(result) {
-							resolve(true)
-						}
-					}
-				});
-				return o
+	async run(row): Promise<boolean| any> {
+		this.row = row
+
+		for(const arg of this.args.value) {
+			
+			const result = await this.execute(arg)
+			if(result) {
+				return true
 			}
-			await loop(args)
-			resolve(false)
-		})
+		}
 
 	}
 
-	private async execute(objOperator: any): Promise<boolean> {
+	private async execute(objOperator: FieldsMap<string, Field> ): Promise<boolean> {
 
-		const keys = Object.keys(objOperator)
-		for(let field of keys) {
+		for(let objOperatorFieldName in objOperator) {
 
-			const element = field.split('__')
+			const field = objOperator[objOperatorFieldName]
+				
+			const fieldName = field.fieldName
+			const fieldPath = field.fieldPath
+			const operation = field.operation
+			const operationArg = field.operationArg
+			const fieldClassName = field.fieldClassName
+			// const operator = field.operator
+
 			
-			if(element.length == 1) {
-				element.push('eq')
+
+			const arg = operationArg;
+			
+
+			let operationResult: boolean; 
+			
+			// operator({fieldName, arg, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})
+			
+			try {
+				if(this.schemeFields[fieldName].className == 'indexedDBJsonField') {
+					operationResult = await ObjOperatorOverwrite[operation]({fieldName, arg, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})
+				} 
+				else if(this.schemeFields[fieldName].className == 'indexedDBArrayField') {
+					operationResult = await ArrOperatorOverwrite[operation]({fieldName, arg, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})	
+				} 
+				else {
+					operationResult = await operator[operation]({fieldName, arg, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})
+				}
+			} catch (err) {
+				// console.log(this.TableSchema, this.schemeFields[fieldName])
+				throw('Field '+ fieldName +' does not exit on the table'+ err)
 			}
-
-			let  operation: any = element[element.length - 1]
-
+			
+			
+			
+			if(!operationResult) {
+				
+				return false
+			}
 		
-			if(OperatorsKeysArray.includes(operation)) {
-				operation = element.pop()
-			} else {
-				operation = 'eq'
-			}
-			
-			const fieldName = element[0]
-			const fieldPath = element.join('.')
-
-			if(OperatorsKeysArray.includes(operation)) {
-
-				const arg = objOperator[field];
-				let operationResult: boolean;
-				
-				try {
-					if(this.schemeFields[fieldName].className == 'indexedDBJsonField') {
-						operationResult = await ObjOperatorOverwrite[operation]({fieldName, arg, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})
-					} 
-					else if(this.schemeFields[fieldName].className == 'indexedDBArrayField') {
-						operationResult = await ArrOperatorOverwrite[operation]({fieldName, arg, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})	
-					} 
-					else {
-						operationResult = await operator[operation]({fieldName, arg, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})
-					}
-				} catch (err) {
-					// console.log(this.TableSchema, this.schemeFields[fieldName])
-					throw('Field '+ fieldName +' does not exit on the table'+ err)
-				}
-				
-				
-				
-				if(!operationResult) {
-					
-					return false
-				}
-			}
 		}
 
 		return true

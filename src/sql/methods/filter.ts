@@ -1,13 +1,17 @@
 import { ObjectConditionOperator } from '../Operators/Object-condition-operator.js'
+import { argsAttributes } from '../Operators/args-attributes.js'
 
 export class filter {
-  rows = []
-	constructor(private arg, private TableSchema) {}
+  	rows = []
+	operator : ObjectConditionOperator
+
+	constructor(private arg: argsAttributes, private TableSchema) {
+		this.operator = new ObjectConditionOperator(this.TableSchema, this.arg)
+	}
 
 	async cursor(row: object, resolve?, limit?) {
 		
-		const operator = new ObjectConditionOperator(row, this.TableSchema)
-		const operationsResult = await operator.run(this.arg)
+		const operationsResult = await this.operator.run(row)
 
 		if(operationsResult == true) {
 			this.rows.push(row)
@@ -22,8 +26,7 @@ export class filter {
 
 		for(let row of rows) {
 			
-			const operator = new ObjectConditionOperator(row, this.TableSchema)
-			const operationsResult = await operator.run(this.arg)
+			const operationsResult = await this.operator.run(row)
 
 			if(operationsResult == true) {
 				newRows.push(row)

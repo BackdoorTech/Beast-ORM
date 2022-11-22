@@ -5,7 +5,7 @@ export declare class ModelReader {
         fields: {
             [key: string]: any;
         };
-        fieldTypes: FieldsMap<"CharField" | "JsonField" | "AutoField" | "BigIntegerField" | "DateField" | "IntegerField" | "TextField" | "BooleanField" | "OneToOneField" | "ForeignKey" | "ManyToManyField" | "indexedDBJsonField" | "indexedDBArrayField" | "DateTimeField", string[]>;
+        fieldTypes: FieldsMap<"ForeignKey" | "IntegerField" | "CharField" | "JsonField" | "AutoField" | "BigIntegerField" | "DateField" | "TextField" | "BooleanField" | "OneToOneField" | "ManyToManyField" | "indexedDBJsonField" | "indexedDBArrayField" | "DateTimeField", string[]>;
         attributes: AttributesMap<"maxLength" | "minLength" | "choices" | "primaryKey" | "unique" | "autoIncrement" | "type" | "model" | "blank" | "default" | "onDelete" | "foreignKey", string[]>;
     };
 }

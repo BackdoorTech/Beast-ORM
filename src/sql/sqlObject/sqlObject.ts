@@ -1,6 +1,7 @@
 import { Method } from '../../models/model.interface.js'
 import { TableSchema } from '../../models/register-modal.interface.js'
 import { methods, methodFunction } from '../methods/methods.js'
+import { argsAttributes } from '../Operators/args-attributes.js'
 
 export class SqlObject {
 
@@ -8,13 +9,14 @@ export class SqlObject {
 	rows = []
 	firstMethod: methodFunction
 	params = []
+	argsAttributes: argsAttributes 
 
 	constructor(private TableSchema: TableSchema, private Methods: Method[]) {
 		
 		const arg = this.Methods[0].arguments
 		const methodName = this.Methods[0].methodName
-		this.firstMethod = new methods[methodName](arg, this.TableSchema)
-
+		this.argsAttributes = new argsAttributes(arg, TableSchema )
+		this.firstMethod = new methods[methodName](this.argsAttributes, this.TableSchema)
 	}
 
 	async runFirstMethod (row, resolve?, limit?) {

@@ -19,12 +19,12 @@ export class _IndexedDBWorkerQueue {
 
 		if(this.webWorkerModuleSupport) {
 			
-			this.myWorker = new Worker(new URL('./worker.js', import.meta.url),{ type: "module" });
+			// this.myWorker = new Worker(new URL('./worker.js', import.meta.url),{ type: "module" });
 
-			this.myWorker.onmessage =  (oEvent) => {
-				const data = oEvent.data
-				this.onmessage(data)
-			}
+			// this.myWorker.onmessage =  (oEvent) => {
+			// 	const data = oEvent.data
+			// 	this.onmessage(data)
+			// }
 		}
 	}
 

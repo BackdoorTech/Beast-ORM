@@ -58,10 +58,10 @@ export const operator = {
 	overlap({fieldName, arg,  row, TableSchema, element, fieldPath}) {
 		return operatorsObject.overlap.validate({fieldName, arg,  row, fieldPath})
 	},
-	isNull({fieldName,  arg, row, TableSchema, element, fieldPath} ) {
+	isNull({fieldName, arg,  row, TableSchema, element, fieldPath}) {
 		return operatorsObject.isNull.validate({fieldName, arg,  row, fieldPath})
 	},
-	iexact({fieldName,  arg, row, TableSchema, element, fieldPath}) {
+	iexact({fieldName, arg,  row, TableSchema, element, fieldPath}) {
 		return operatorsObject.iexact.validate({fieldName, arg,  row, fieldPath})
 	}
 }
@@ -93,7 +93,7 @@ export const ObjOperatorOverwrite = Object.assign({...operator}, {
 
 
 export const ArrOperatorOverwrite = Object.assign({...operator}, {
-	isNull({fieldName,  arg, row, TableSchema, element, fieldPath} ) {
+	isNull({fieldName, arg,  row, TableSchema, element, fieldPath}) {
 		return operatorsObject.objectIsnull.validate({fieldName, arg,  row, fieldPath})
 	},
 	eq:({fieldName, arg,  row, TableSchema, element, fieldPath}) => {

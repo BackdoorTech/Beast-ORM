@@ -236,7 +236,9 @@ class _indexedDB {
                 const row = cursor.value
                 await sqlObject.runFirstMethod(row)
                 cursor.continue();
+                
               } else {
+                sqlObject.doneRunFirstMethod()
                 sqlObject.run()
                 resolve({
                   queryId: queryId,
@@ -255,6 +257,7 @@ class _indexedDB {
                 await sqlObject.runFirstMethod(row, resolve, 1)
                 cursor.continue();
               } else {
+                sqlObject.doneRunFirstMethod()
                 sqlObject.run()
                 
                 resolve({
