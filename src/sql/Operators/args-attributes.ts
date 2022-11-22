@@ -74,13 +74,15 @@ export class argsAttributes {
                     throw('operator')
                 }
 
+                const fieldClassName = this.detectClassName(fieldName)
+
                 newObject[field] = {
                     fieldName: fieldName,
                     fieldPath: fieldPath,
                     operation: operation,
                     operationArg: arg,
-                    // operator: this.detectOperator(fieldName, operation)
-                    fieldClassName: this.detectClassName(fieldName)
+                    operator: this.detectOperator(fieldClassName, operation, fieldName),
+                    fieldClassName: fieldClassName
                 }
             }
 
@@ -89,9 +91,21 @@ export class argsAttributes {
         }) as any
     }
 
-    private async detectClassName(fieldName) {
+    private detectClassName(fieldName) {
+        return this.schemeFields[fieldName].className
+    }
+
+    private detectOperator(fieldClassName, operation, fieldName) {
         try {
-            return this.schemeFields[fieldName].className
+            if(fieldClassName == 'indexedDBJsonField') {
+                return ObjOperatorOverwrite[operation]
+            } 
+            else if(fieldClassName == 'indexedDBArrayField') {
+                return ArrOperatorOverwrite[operation]	
+            } 
+            else {
+                return operator[operation]
+            }
         } catch (err) {
             // console.log(this.TableSchema, this.schemeFields[fieldName])
             throw('Field '+ fieldName +' does not exit on the table'+ err)

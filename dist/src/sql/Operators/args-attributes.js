@@ -1,4 +1,4 @@
-import { OperatorsKeysArray } from "./object-operator.js";
+import { OperatorsKeysArray, operator, ObjOperatorOverwrite, ArrOperatorOverwrite } from "./object-operator.js";
 export class argsAttributes {
     constructor(args, TableSchema) {
         this.TableSchema = TableSchema;
@@ -45,21 +45,33 @@ export class argsAttributes {
                 else {
                     throw ('operator');
                 }
+                const fieldClassName = this.detectClassName(fieldName);
                 newObject[field] = {
                     fieldName: fieldName,
                     fieldPath: fieldPath,
                     operation: operation,
                     operationArg: arg,
-                    // operator: this.detectOperator(fieldName, operation)
-                    fieldClassName: this.detectClassName(fieldName)
+                    operator: this.detectOperator(fieldClassName, operation, fieldName),
+                    fieldClassName: fieldClassName
                 };
             }
             return newObject;
         });
     }
-    async detectClassName(fieldName) {
+    detectClassName(fieldName) {
+        return this.schemeFields[fieldName].className;
+    }
+    detectOperator(fieldClassName, operation, fieldName) {
         try {
-            return this.schemeFields[fieldName].className;
+            if (fieldClassName == 'indexedDBJsonField') {
+                return ObjOperatorOverwrite[operation];
+            }
+            else if (fieldClassName == 'indexedDBArrayField') {
+                return ArrOperatorOverwrite[operation];
+            }
+            else {
+                return operator[operation];
+            }
         }
         catch (err) {
             // console.log(this.TableSchema, this.schemeFields[fieldName])

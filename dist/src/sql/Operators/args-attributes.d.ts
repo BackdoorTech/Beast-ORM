@@ -16,5 +16,6 @@ export declare class argsAttributes {
     constructor(args: any, TableSchema: TableSchema);
     private analyzeArgs;
     private detectClassName;
+    private detectOperator;
     private argsPrettyTransform;
 }
