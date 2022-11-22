@@ -8,6 +8,7 @@ export interface Field {
     operationArg?: string;
     operator: Function;
     fieldClassName: FieldKeys;
+    customData?: Function;
 }
 export declare class argsAttributes {
     private TableSchema;

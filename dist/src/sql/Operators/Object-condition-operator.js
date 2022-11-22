@@ -21,8 +21,9 @@ export class ObjectConditionOperator {
             const operationArg = field.operationArg;
             const fieldClassName = field.fieldClassName;
             const operator = field.operator;
+            const customData = field.customData({ row: this.row, fieldPath });
             const arg = operationArg;
-            let operationResult = operator({ fieldName, arg, row: this.row, TableSchema: this.TableSchema, element: fieldName, fieldPath });
+            let operationResult = operator({ fieldName, arg, row: this.row, TableSchema: this.TableSchema, element: fieldName, fieldPath, customData });
             if (!operationResult) {
                 return false;
             }

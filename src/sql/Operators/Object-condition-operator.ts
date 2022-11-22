@@ -1,7 +1,5 @@
-import { TableSchema, FieldSchema } from '../../models/register-modal.interface.js';
-import { ArrOperatorOverwrite, ObjOperatorOverwrite, operator, OperatorsKeysArray } from './object-operator.js'
-import { getDeep } from '../../utils.js'
-import { AttributesMap, FieldsMap } from '../../models/field/fields.interface.js';
+import { TableSchema } from '../../models/register-modal.interface.js';
+import { FieldsMap } from '../../models/field/fields.interface.js';
 import { argsAttributes, Field } from './args-attributes.js';
 
 export class ObjectConditionOperator {
@@ -39,9 +37,11 @@ export class ObjectConditionOperator {
 			const fieldClassName = field.fieldClassName
 			const operator = field.operator
 
+			const customData = field.customData({row:this.row, fieldPath})
+
 			const arg = operationArg;
 			
-			let operationResult: boolean = operator({fieldName, arg, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath})
+			let operationResult: boolean = operator({fieldName, arg, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath, customData})
 			
 			if(!operationResult) {
 				

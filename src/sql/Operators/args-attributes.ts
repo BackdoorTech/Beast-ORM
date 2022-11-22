@@ -1,6 +1,7 @@
 import { AttributesMap, FieldAttributesKeys, FieldKeys, FieldsMap } from "../../models/field/fields.interface.js";
 import { OperatorKeys, OperatorsKeysArray, operator, ObjOperatorOverwrite, ArrOperatorOverwrite } from "./object-operator.js";
 import { TableSchema, FieldSchema } from '../../models/register-modal.interface.js';
+import { info } from "./operators.js";
 
 export interface Field {
     fieldName: string,
@@ -8,7 +9,8 @@ export interface Field {
     operation: OperatorKeys,
     operationArg?: string
     operator: Function
-    fieldClassName: FieldKeys
+    fieldClassName: FieldKeys,
+    customData?: Function
 }
 
 export class argsAttributes {
@@ -82,8 +84,15 @@ export class argsAttributes {
                     operation: operation,
                     operationArg: arg,
                     operator: this.detectOperator(fieldClassName, operation, fieldName),
-                    fieldClassName: fieldClassName
+                    fieldClassName: fieldClassName,
                 }
+
+                if(fieldClassName == 'indexedDBArrayField' || fieldClassName == 'indexedDBJsonField') {
+                    newObject[field]['customData']  = info.run
+                } else {
+                    newObject[field]['customData']  = () => {}
+                }
+                
             }
 
             return newObject

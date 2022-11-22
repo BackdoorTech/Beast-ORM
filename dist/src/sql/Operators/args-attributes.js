@@ -1,4 +1,5 @@
 import { OperatorsKeysArray, operator, ObjOperatorOverwrite, ArrOperatorOverwrite } from "./object-operator.js";
+import { info } from "./operators.js";
 export class argsAttributes {
     constructor(args, TableSchema) {
         this.TableSchema = TableSchema;
@@ -52,8 +53,14 @@ export class argsAttributes {
                     operation: operation,
                     operationArg: arg,
                     operator: this.detectOperator(fieldClassName, operation, fieldName),
-                    fieldClassName: fieldClassName
+                    fieldClassName: fieldClassName,
                 };
+                if (fieldClassName == 'indexedDBArrayField' || fieldClassName == 'indexedDBJsonField') {
+                    newObject[field]['customData'] = info.run;
+                }
+                else {
+                    newObject[field]['customData'] = () => { };
+                }
             }
             return newObject;
         });
