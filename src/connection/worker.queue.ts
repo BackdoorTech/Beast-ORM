@@ -19,12 +19,16 @@ export class _IndexedDBWorkerQueue {
 
 		if(this.webWorkerModuleSupport) {
 			
-			// this.myWorker = new Worker(new URL('./worker.js', import.meta.url),{ type: "module" });
+			this.myWorker = new Worker(new URL('./worker.js', import.meta.url),{ type: "module" });
 
-			// this.myWorker.onmessage =  (oEvent) => {
-			// 	const data = oEvent.data
-			// 	this.onmessage(data)
-			// }
+			this.myWorker.onmessage =  (oEvent) => {
+				const data = oEvent.data
+				this.onmessage(data)
+			}
+
+			this.myWorker.onerror = (error) => {
+				console.log(error, 'erroror');
+			};
 		}
 	}
 
@@ -44,10 +48,14 @@ export class _IndexedDBWorkerQueue {
 	private  workerQueues: {[key: string]:  WsRegister} = {}
 
 	register(data: WsRegister) {
-
-		this.myWorker.postMessage(data.params);
-		this.workerQueues[data.queryId] = data
-		return data.queryId
+		try { 
+			this.myWorker.postMessage(data.params);
+			this.workerQueues[data.queryId] = data
+			return data.queryId
+		} catch (error) {
+			return false
+		}
+		
 	}
 
 	async onmessage (data: any) {

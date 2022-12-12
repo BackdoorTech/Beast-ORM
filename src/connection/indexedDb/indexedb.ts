@@ -368,7 +368,6 @@ class _indexedDB {
         }
       },
       insert: async (methods: Method[]) => {
-
         const createdObjKeys = []
         const rows = methods[0].arguments
 

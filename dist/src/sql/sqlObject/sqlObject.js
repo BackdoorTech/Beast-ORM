@@ -22,7 +22,6 @@ export class SqlObject {
         for (let i = 1; i < this.Methods.length; i++) {
             const method = this.Methods[i];
             const methodName = method.methodName;
-            const arg = method.arguments;
             if (methods[methodName]) {
                 const methodToExecute = new methods[methodName](this.argsAttributes, this.TableSchema);
                 this.rows = await methodToExecute.run(this.rows);
