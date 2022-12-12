@@ -1,10 +1,10 @@
-import { TableSchema, FieldSchema } from '../../models/register-modal.interface.js';
-import { AttributesMap } from '../../models/field/fields.interface.js';
+import { TableSchema } from '../../models/register-modal.interface.js';
+import { argsAttributes } from './args-attributes.js';
 export declare class ObjectConditionOperator {
-    private row;
     private TableSchema;
-    schemeFields: AttributesMap<string, FieldSchema>;
-    constructor(row: any, TableSchema: TableSchema);
-    run(args: any): Promise<boolean | any>;
+    private args;
+    row: any;
+    constructor(TableSchema: TableSchema, args: argsAttributes);
+    run(row: any): boolean | any;
     private execute;
 }

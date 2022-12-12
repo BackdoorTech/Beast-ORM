@@ -9,6 +9,9 @@ export class _IndexedDBWorkerQueue {
                 const data = oEvent.data;
                 this.onmessage(data);
             };
+            this.myWorker.onerror = (error) => {
+                console.log(error, 'erroror');
+            };
         }
     }
     // https://stackoverflow.com/a/62963963/14115342
@@ -25,9 +28,14 @@ export class _IndexedDBWorkerQueue {
         }
     }
     register(data) {
-        this.myWorker.postMessage(data.params);
-        this.workerQueues[data.queryId] = data;
-        return data.queryId;
+        try {
+            this.myWorker.postMessage(data.params);
+            this.workerQueues[data.queryId] = data;
+            return data.queryId;
+        }
+        catch (error) {
+            return false;
+        }
     }
     async onmessage(data) {
         for (const [key, value] of Object.entries(this.workerQueues)) {

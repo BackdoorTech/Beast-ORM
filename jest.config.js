@@ -13,8 +13,9 @@ module.exports = {
   preset: 'jest-puppeteer',
   setupFilesAfterEnv: [
     // "<rootDir>/test/setupJest.ts"
+    "jest-test-performance"
   ],
   "setupFiles": [
-    // "<rootDir>/test/setupJest.ts"
+    // "<rootDir>/test/setupJest.ts",
   ]
 }

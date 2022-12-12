@@ -1114,7 +1114,7 @@ describe("JSONField", () => {
   }, 10000)
 
 
-  it('has_any_keys', async () => {
+  it('has_any_keys 1', async () => {
   
     await page.waitForFunction(() => 'models' in window);
 
@@ -1340,7 +1340,7 @@ describe("JSONField deep", () => {
   }, 10000)
 
 
-  it('has_any_keys', async () => {
+  it('has_any_keys 2', async () => {
   
     await page.waitForFunction(() => 'models' in window);
 

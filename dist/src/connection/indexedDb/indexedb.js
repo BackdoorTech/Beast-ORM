@@ -193,6 +193,7 @@ class _indexedDB {
                                     cursor.continue();
                                 }
                                 else {
+                                    sqlObject.doneRunFirstMethod();
                                     sqlObject.run();
                                     resolve({
                                         queryId: queryId,
@@ -213,6 +214,7 @@ class _indexedDB {
                                     cursor.continue();
                                 }
                                 else {
+                                    sqlObject.doneRunFirstMethod();
                                     sqlObject.run();
                                     resolve({
                                         queryId: queryId,

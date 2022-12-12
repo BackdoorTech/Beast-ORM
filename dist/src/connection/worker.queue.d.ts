@@ -11,7 +11,7 @@ export declare class _IndexedDBWorkerQueue {
     constructor();
     supportsWorkerType(): boolean;
     private workerQueues;
-    register(data: WsRegister): string;
+    register(data: WsRegister): string | false;
     onmessage(data: any): Promise<void>;
     requestHandler(): void;
 }
