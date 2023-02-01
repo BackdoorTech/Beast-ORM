@@ -49,3 +49,26 @@ export class ModelReader {
 
 }
 
+export class LocalStorageModelReader {
+  static read(modelClassRepresentation) {
+    const classInstance: typeof models.LocalStorage = modelClassRepresentation
+
+    const fieldTypes: FieldsMap<FieldKeys, string[]> = {}
+    const attributes: AttributesMap<FieldAttributesKeys, string[]> = {}
+    const modelName = classInstance.getModelName()
+    const fields: {[ key: string]: any} = {}
+
+
+    for( const [fieldName, Field] of Object.entries(classInstance)) { 
+      // const type = Field?.fieldName
+      fields[fieldName] = Field || null
+    }
+
+    return {
+      modelName,
+      fields,
+      attributes,
+      fieldTypes
+    }
+  }
+}

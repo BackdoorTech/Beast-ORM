@@ -1,5 +1,5 @@
 import { getParams } from './model.interface.js';
-import { DatabaseSchema, TableSchema } from './register-modal.interface.js';
+import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchema } from './register-modal.interface.js';
 import { ModelManager } from './model-manager.js';
 export declare class Model extends ModelManager {
     constructor(obg?: any);
@@ -46,4 +46,19 @@ export declare class Model extends ModelManager {
         delete: () => Promise<any>;
         all: () => Promise<any>;
     };
+}
+export declare class LocalStorage {
+    constructor();
+    static save(data?: Object): void;
+    static get(): any;
+    static getModelName(): string;
+    static getDBSchema(): DatabaseSchemaLocalStorage;
+    static getTableSchema(): TableSchema;
+    private static getIgnoreAttributes;
+    static ignoreAttributes(attributesStartWidth?: string[]): void;
+    private static getFields;
+    private static formValidation;
+    static clear(): void;
+    static clearComponent(): void;
+    static clearStorage(): void;
 }

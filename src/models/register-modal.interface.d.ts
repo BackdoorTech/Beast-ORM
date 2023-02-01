@@ -23,8 +23,24 @@ export interface TableSchema {
 
 export interface DatabaseSchema {
 	databaseName: string;
-	type: 'indexedDB'
+	type: 'indexedDB' | 'localStorage'
 	version: number;
 	webWorker?:boolean,
 	stores?: TableSchema[]
+}
+
+export interface TableSchemaLocalStorage {
+	name: string,
+	id: { keyPath: string , autoIncrement?: boolean , type:  FieldType},
+	fields: FieldSchema[]
+	attributes: AttributesMap<FieldAttributesKeys, string[]> = {}
+	fieldTypes: FieldsMap<FieldKeys, string[]>
+}
+
+export interface DatabaseSchemaLocalStorage {
+	databaseName: string;
+	type: 'localStorage'
+	version: number;
+	webWorker?:boolean,
+	stores?: TableSchemaLocalStorage[]
 }

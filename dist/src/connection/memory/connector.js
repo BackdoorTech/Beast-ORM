@@ -1,13 +1,14 @@
-// inspire by https://github.com/hc-oss/use-indexeddb
-export class IndexedDBConnection {
+import { DatabaseMemory } from './db.js';
+export class MemoryConnector {
     constructor() { }
+    open() { }
     connect(config) {
         return new Promise((resolve, reject) => {
             const idbInstance = indexedDB || self.indexedDB || self.mozIndexedDB || self.webkitIndexedDB || self.msIndexedDB;
             if (idbInstance) {
                 const request = idbInstance.open(config.databaseName, config.version);
                 request.onsuccess = () => {
-                    resolve(request.result);
+                    resolve(new DatabaseMemory());
                 };
                 request.onerror = (e) => {
                     reject(e.target.error.name);
@@ -17,9 +18,6 @@ export class IndexedDBConnection {
                     await this.migrate(config);
                     return await this.connect(config);
                 };
-                // request.onblocked = async (e: any) => {
-                //   reject(e.target.error.name);
-                // }
             }
             else {
                 reject("IDBDatabase not supported inside webworker");

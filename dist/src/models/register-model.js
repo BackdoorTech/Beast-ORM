@@ -1,5 +1,5 @@
 import { Model } from './model.js';
-import { ModelReader } from './model.reader.js';
+import { LocalStorageModelReader, ModelReader } from './model.reader.js';
 import { indexedDB } from './../connection/indexedDb/indexedb.js';
 import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js';
 import { uncapitalize } from '../utils.js';
@@ -7,6 +7,16 @@ import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js';
 export const models = {};
 export const modelsConfig = {};
+export const modelsLocalStorage = {};
+export const modelsConfigLocalStorage = {};
+export function migrate(register) {
+    if (register.type == 'indexedDB') {
+        registerModel.register(register);
+    }
+    else if (register.type == 'localStorage') {
+        registerLocalStorage.register(register);
+    }
+}
 export class registerModel {
     static async register(entries) {
         var _a, _b, _c;
@@ -120,6 +130,65 @@ export class registerModel {
             ModelName: tableName,
             TableSchema: databaseSchema.stores[id]
         });
+    }
+}
+export class registerLocalStorage {
+    static async register(entries) {
+        const databaseSchema = {
+            databaseName: entries.databaseName,
+            version: entries.version,
+            type: 'localStorage',
+            stores: []
+        };
+        for (const modelClassRepresentations of entries.models) {
+            const ModelName = modelClassRepresentations.getModelName();
+            modelsLocalStorage[ModelName] = modelClassRepresentations;
+        }
+        let index = 0;
+        for (const modelClassRepresentations of entries.models) {
+            const { fields, modelName, attributes, fieldTypes } = LocalStorageModelReader.read(modelClassRepresentations);
+            // const idFieldName = attributes?.primaryKey?.shift()
+            databaseSchema.stores.push({
+                name: modelName,
+                id: {
+                    keyPath: modelName,
+                    type: FieldType.VARCHAR,
+                    autoIncrement: false
+                },
+                attributes: attributes,
+                fields: [],
+                fieldTypes
+            });
+            for (const [fieldName, Field] of Object.entries(fields)) {
+                databaseSchema.stores[index].fields.push({
+                    name: fieldName,
+                    keyPath: fieldName,
+                    options: {
+                        unique: false,
+                        type: null
+                    },
+                    className: Field === null || Field === void 0 ? void 0 : Field.fieldName,
+                    fieldAttributes: Object.assign({}, Field)
+                });
+            }
+            index++;
+        }
+        for (const modelClassRepresentations of entries.models) {
+            const ModelName = modelClassRepresentations.getModelName();
+            const tableSchema = databaseSchema.stores.find((e) => e.name == ModelName);
+            modelClassRepresentations.getDBSchema = () => {
+                return databaseSchema;
+            };
+            modelClassRepresentations.getTableSchema = () => {
+                return tableSchema;
+            };
+            modelsConfigLocalStorage[ModelName] = {
+                DatabaseSchema: databaseSchema,
+                TableSchema: tableSchema
+            };
+            modelsLocalStorage[ModelName] = modelClassRepresentations;
+        }
+        ModelMigrations.migrationsState(true);
     }
 }
 export class ModelEditor {

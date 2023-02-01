@@ -11,7 +11,7 @@ declare class _indexedDB {
         getOneByIndex: (keyPath: string, value: string | number) => Promise<any>;
         getManyByIndex: (keyPath: string, value: string | number) => Promise<any[]>;
         getAll: () => Promise<any[]>;
-        add: (value: Object, key?: any) => Promise<number>;
+        add: (value: Object, key?: any) => Promise<number | Object>;
         update: (value: any, key?: any) => Promise<any>;
         deleteByID: (id: any) => Promise<any>;
         deleteAll: () => Promise<any>;

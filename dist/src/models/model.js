@@ -1,7 +1,7 @@
 var _a, _b;
 import { hashCode, uniqueGenerator } from '../utils.js';
 import { ModelManager } from './model-manager.js';
-import { models, modelsConfig } from './register-model.js';
+import { models, modelsConfig, modelsConfigLocalStorage } from './register-model.js';
 import { FieldType } from '../sql/query/interface.js';
 import * as Fields from './field/allFields.js';
 let methods = {} = {};
@@ -134,6 +134,10 @@ export class Model extends (_b = ModelManager) {
                 delete newInstance[fieldName];
             }
         }
+        Object.defineProperty(newInstance, TableSchema.id.keyPath, {
+            configurable: false,
+            writable: false
+        });
         delete newInstance.obj;
         return newInstance;
     }
@@ -211,11 +215,16 @@ export class Model extends (_b = ModelManager) {
         const queryId = uniqueGenerator();
         const createObject = await super.obj(DBconfig, TableSchema).create(_methods, queryId);
         if (createObject) {
-            const ModelName = this.getModelName();
-            let newInstance = new models[ModelName]();
-            Object.assign(newInstance, createObject);
-            delete newInstance.obj;
-            return newInstance;
+            if (typeof createObject[TableSchema.id.keyPath] == 'object') {
+                throw (createObject[TableSchema.id.keyPath].error);
+            }
+            else {
+                const ModelName = this.getModelName();
+                let newInstance = new models[ModelName]();
+                Object.assign(newInstance, createObject);
+                delete newInstance.obj;
+                return newInstance;
+            }
         }
         else {
         }
@@ -303,3 +312,82 @@ Model.object = ({ queryId = uniqueGenerator(), DBconfig, TableSchema, some = nul
         }
     };
 };
+export class LocalStorage {
+    constructor() { }
+    static save(data = {}) {
+        const dataToSave = this.getFields(Object.assign(this, Object.assign({}, data)));
+        const key = this.getTableSchema().id;
+        localStorage.setItem(key.keyPath, JSON.stringify(dataToSave));
+    }
+    static get() {
+        const key = this.getTableSchema().id;
+        const restedData = JSON.parse(localStorage.getItem(key.keyPath));
+        Object.assign(this, Object.assign({}, restedData));
+        return restedData;
+    }
+    static getModelName() {
+        return this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
+    }
+    static getDBSchema() {
+        const modalName = this.getModelName();
+        return modelsConfigLocalStorage[modalName].DatabaseSchema;
+    }
+    static getTableSchema() {
+        const modalName = this.getModelName();
+        return modelsConfigLocalStorage[modalName].TableSchema;
+    }
+    static getIgnoreAttributes() {
+        return false;
+    }
+    static ignoreAttributes(attributesStartWidth = []) {
+        if (!this.getIgnoreAttributes()) {
+            this.getIgnoreAttributes = () => {
+                return attributesStartWidth;
+            };
+        }
+    }
+    static getFields(arg) {
+        const TableSchema = this.getTableSchema();
+        const filteredArgs = {};
+        const fieldsName = TableSchema.fields.map((field) => field.name);
+        const Attributes = this.getIgnoreAttributes();
+        const fieldNameFilter = fieldsName.filter((fieldName) => {
+            if (Attributes) {
+                for (let Attribute of Attributes) {
+                    if (fieldName.startsWith(Attribute)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        });
+        for (let fieldName of fieldNameFilter) {
+            if (arg.hasOwnProperty(fieldName)) {
+                filteredArgs[fieldName] = arg[fieldName];
+            }
+        }
+        return filteredArgs;
+    }
+    static formValidation(data) {
+        const TableSchema = this.getTableSchema();
+        for (let field of TableSchema.fields) {
+            const Field = new Fields[field.className](field.fieldAttributes);
+            const FieldValue = data[field.name];
+            if (!Field.valid(FieldValue)) {
+                throw ('invalid insert into ' + TableSchema.name + ', invalid value for field ' + field.name + ' = ' + JSON.stringify(FieldValue));
+            }
+        }
+        return true;
+    }
+    static clear() {
+        this.clearComponent();
+        this.clearStorage();
+    }
+    static clearComponent() {
+        const key = this.getTableSchema().id;
+    }
+    static clearStorage() {
+        const key = this.getTableSchema().id;
+        localStorage.removeItem(key.keyPath);
+    }
+}

@@ -1,6 +1,7 @@
 import { Model } from './models/model.js';
+import { LocalStorage } from './models/model.js';
 import { ModelReader } from './models/model.reader.js';
-import { registerModel } from './models/register-model.js';
+import { registerModel, migrate } from './models/register-model.js';
 export declare const models: {
     Value(arg: any): {};
     CharField(data?: import("./models/field/interface.js").CharFieldParams): import("./models/field/allFields.js").CharField;
@@ -21,7 +22,8 @@ export declare const models: {
         };
     };
     Model: typeof Model;
+    LocalStorage: typeof LocalStorage;
     read: typeof ModelReader.read;
+    migrate: typeof migrate;
     register: typeof registerModel.register;
-    migrate: typeof registerModel.register;
 };

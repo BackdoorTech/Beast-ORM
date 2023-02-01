@@ -22,8 +22,14 @@ export class IndexedDBConnection {
         };
   
         request.onupgradeneeded = async (e: any) => {
-          throw('need to migrate first')
+          console.log('need to migrate first')
+          await this.migrate(config)
+          return await this.connect(config)
         };
+
+        // request.onblocked = async (e: any) => {
+        //   reject(e.target.error.name);
+        // }
       } else {
         reject("IDBDatabase not supported inside webworker");
       }

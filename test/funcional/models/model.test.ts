@@ -949,7 +949,7 @@ describe("JSONField", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  }, 1000)
 
   it('documentation 2', async () => {
   

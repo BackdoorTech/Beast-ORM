@@ -107,7 +107,7 @@ class _indexedDB {
         });
       },
       add:(value:Object, key?: any) => {
-        return new Promise<number>((resolve, reject) => {
+        return new Promise<number| Object>((resolve, reject) => {
           this.getConnection(config).then(db => {
             this.validateBeforeTransaction(db, currentStore, reject);
             let tx = this.createTransaction(db, "readwrite", currentStore, resolve, reject);
@@ -117,7 +117,18 @@ class _indexedDB {
             request.onsuccess = (e: any) => {
               (tx as any)?.commit?.();
               resolve(e.target.result);
+              db.transaction
             };
+
+            request.onerror = (e) => {
+              let data = {
+                error: e.target['error']
+              }
+              resolve(data)
+            };
+            
+
+
           })
           .catch(reject);
         });
@@ -187,6 +198,7 @@ class _indexedDB {
               request.onsuccess = e => {
                 cursorCallback(e);
                 resolve();
+                db.close()
               };
             })
             .catch(reject);
@@ -373,19 +385,19 @@ class _indexedDB {
 
         for( let insert of rows) {
           const id = await this.getActions(TableSchema.name, config).add(insert)
-          createdObjKeys.push(id)
+          insert[TableSchema.id.keyPath] = id
         }
 
         // return first element
         if(rows.length == 1) {
           return {
             queryId: queryId,
-            value: await this.getActions(TableSchema.name, config).getByID(createdObjKeys[0])
+            value: rows[0]
           }
         } else {
           return  {
             queryId: queryId,
-            value: createdObjKeys
+            value: rows
           }
         }
 

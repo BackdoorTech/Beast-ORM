@@ -77,6 +77,13 @@ class _indexedDB {
                                 var _a, _b;
                                 (_b = (_a = tx) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
                                 resolve(e.target.result);
+                                db.transaction;
+                            };
+                            request.onerror = (e) => {
+                                let data = {
+                                    error: e.target['error']
+                                };
+                                resolve(data);
                             };
                         })
                             .catch(reject);
@@ -147,6 +154,7 @@ class _indexedDB {
                             request.onsuccess = e => {
                                 cursorCallback(e);
                                 resolve();
+                                db.close();
                             };
                         })
                             .catch(reject);
@@ -307,19 +315,19 @@ class _indexedDB {
                     const rows = methods[0].arguments;
                     for (let insert of rows) {
                         const id = await this.getActions(TableSchema.name, config).add(insert);
-                        createdObjKeys.push(id);
+                        insert[TableSchema.id.keyPath] = id;
                     }
                     // return first element
                     if (rows.length == 1) {
                         return {
                             queryId: queryId,
-                            value: await this.getActions(TableSchema.name, config).getByID(createdObjKeys[0])
+                            value: rows[0]
                         };
                     }
                     else {
                         return {
                             queryId: queryId,
-                            value: createdObjKeys
+                            value: rows
                         };
                     }
                 }

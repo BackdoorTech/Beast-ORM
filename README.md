@@ -1,6 +1,6 @@
 # Beast ORM
 
-ORM for accessing indexedDB as a promise base api implementation.
+ORM for accessing indexedDB and localStorage.
 
 
 ## DBMS Support
@@ -11,6 +11,7 @@ ORM for accessing indexedDB as a promise base api implementation.
 <br/>
 
 
+#### A promise base api implementation for accessing for accessing indexedDB 
 ## Create model
 
 A model is a representation of a database table. Feel free to place your models anywhere that can be exported
@@ -663,6 +664,10 @@ Add the same article to a different article set
   const a = await await r1.article_setAdd({headline:"This is a test", pubDate:''})
 
 ```
+
+
+# LocalStorage base api implementation.
+
 ## Languages and Tools
 <p align="left">   <a href="https://git-scm.com/" target="_blank"> <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="git" width="40" height="40"/>  </a> <a href="https://jestjs.io" target="_blank"> <img src="https://www.vectorlogo.zone/logos/jestjsio/jestjsio-icon.svg" alt="jest" width="40" height="40"/> </a>    <a href="https://github.com/puppeteer/puppeteer" target="_blank"> <img src="https://www.vectorlogo.zone/logos/pptrdev/pptrdev-official.svg" alt="puppeteer" width="40" height="40"/>  </a>  <a href="https://www.typescriptlang.org/" target="_blank"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="typescript" width="40" height="40"/> </a>
 </p>
