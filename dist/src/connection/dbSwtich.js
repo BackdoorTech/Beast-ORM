@@ -11,7 +11,6 @@ export class DBSwitch {
                     method: 'execute',
                     func: (message) => {
                         resolve(message === null || message === void 0 ? void 0 : message.value);
-                        return true;
                     },
                 });
                 if (request == false) {

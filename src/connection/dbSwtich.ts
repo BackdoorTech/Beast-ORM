@@ -17,13 +17,12 @@ export class DBSwitch {
 					method: 'execute',
 					func:(message) => {
 						resolve(message?.value)
-						return true
 					},
 				})
 
 				if(request == false) {
 					const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg) as any
-					resolve(result?.value ) 
+					resolve(result?.value) 
 				}
 			});
 
