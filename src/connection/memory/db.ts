@@ -1,23 +1,34 @@
 import { transaction } from './transaction.js'
-import { data } from './data.js'
 
 export class DatabaseMemory {
     
-
-    private static data = data
-
-    static transactions = []
+    static transactions: {[ key: string]: any[]} = {}
     private static executingTransaction = false
-    static transaction (currentStore, dbMode): transaction {
-        return new transaction(DatabaseMemory.data[currentStore])
-    }
 
-    executeTransaction() {
+    static executeTransaction(currentStore) {
 
+        const {mode, callback} = this.transactions[currentStore].shift()
+        if (mode.includes('write')) {
+            const transactionInstance = new transaction({store: currentStore})
+            callback(transactionInstance)
+            transactionInstance.request
+        }
+        
+        if(this.transactions[currentStore].length == 0) {
+            this.executingTransaction = false
+        } else {
+            this.executeTransaction(currentStore)
+        }
     }
     
-    static createTransaction(currentStore, mode, callback:  (transaction) => void) {
-        DatabaseMemory.transactions.push({currentStore, mode, callback})
+    static getOrCreateTransaction(currentStore, mode, callback:  (transaction:transaction) => void) {
+        
+        this.transactions[currentStore].push({mode, callback})
+        if (this.transactions[currentStore].length == 1) {
+            this.executingTransaction = true
+            this.executeTransaction(currentStore)
+        }
+
         if(!DatabaseMemory.executingTransaction) {
 
         } 

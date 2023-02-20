@@ -13,12 +13,11 @@ export class DBSwitch {
 	
 				const request = IndexedDBWorkerQueue.register({
 					params: {TableSchema, DBconfig, queryId, action, arg, dbType},
+					queryId: queryId,
 					method: 'execute',
 					func:(message) => {
-						if(message.queryId == queryId) {
-							resolve(message?.value)
-							return true
-						}
+						resolve(message?.value)
+						return true
 					},
 				})
 

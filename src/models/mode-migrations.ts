@@ -9,11 +9,8 @@ export class _ModelMigrations {
     if(this.isMigrationsReady) {
       this.callback.forEach((item, index, object) => {
         item()
-        object.splice(index, 1);
       });
     }
-
-
   }
   isReady(modelClassRepresentation) {
 

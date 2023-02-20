@@ -15,13 +15,6 @@ export class Memory {
             reject(`Store ${storeName} not found`);
         }
     }
-    static createTransaction(db, dbMode, currentStore, resolve, reject, abort) {
-        let tx = DatabaseMemory.transaction(currentStore, dbMode);
-        tx.onerror = reject;
-        tx.oncomplete = resolve;
-        tx.onabort = abort;
-        return tx;
-    }
     static migrate(config) {
         return new MemoryConnector().migrate(config);
     }
@@ -34,7 +27,7 @@ Memory.getActions = (currentStore, config) => {
     return {
         getAll: () => {
             return new Promise((resolve, reject) => {
-                DatabaseMemory.createTransaction(currentStore, "readwrite", (transaction) => {
+                DatabaseMemory.getOrCreateTransaction(currentStore, "readwrite", (transaction) => {
                     let objectStore = transaction.objectStore(currentStore);
                     let request = objectStore.getAll();
                     request.onsuccess = (e) => {
@@ -45,7 +38,7 @@ Memory.getActions = (currentStore, config) => {
         },
         add: (value, key) => {
             return new Promise((resolve, reject) => {
-                DatabaseMemory.createTransaction(currentStore, "readwrite", (transaction) => {
+                DatabaseMemory.getOrCreateTransaction(currentStore, "readwrite", (transaction) => {
                     let objectStore = transaction.objectStore(currentStore);
                     let request = objectStore.add(value, key);
                     request.onsuccess = (e) => {

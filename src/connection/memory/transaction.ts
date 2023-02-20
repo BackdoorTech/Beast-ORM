@@ -1,44 +1,46 @@
 import { DatabaseMemory } from './db.js'
 
 class transactionRequest {
-    private type: string
-    private value: any
-    private key: any
-    private result: any
+    type: string
+    value: any
+    key: any
+    result: any
 
     
     set onsuccess(func) {
         func({e:{target:{result: this.result}}})
     }
 
+    
+
 }
 
 export class transaction {
 
     data: {[ key: string]: any[]}
-    constructor(data) {
-        this.data = data
+    constructor({store}) {
+        // this.data = data
     }
 
-    request;
-    add() {}
-    getAll (){}
+    request = []
 
     objectStore = (name) => {
         return {
             add:(value, key?) =>  {
-                this.request = new transactionRequest()
-                this.request.type = 'add'
-                this.request.value = value
-                this.request.key = key
-                this.request.result = this.data[name].push(value)
-                return this.request
+                const request = new transactionRequest()
+                request.type = 'add'
+                request.value = value
+                request.key = key
+                request.result = this.data[name].push(value)
+                this.request.push(request)
+                return request
             },
             getAll:() => {
-                this.request = new transactionRequest()
-                this.request.type = 'getAll'
-                this.request.result = this.data[name]
-                return this.request
+                const request = new transactionRequest()
+                request.type = 'getAll'
+                request.result = this.data[name]
+                this.request.push(request)
+                return request
             }
         }
     }

@@ -3,7 +3,7 @@ import { Methods, getParams, Method } from '../models/model.interface.js'
 interface WsRegister {
 	type?: 'response' | 'Register',
 	func: Function
-	queryId?: string,
+	queryId: string,
 	params: any,
 	method: 'execute' | 'migrate',
 }
@@ -59,13 +59,13 @@ export class _IndexedDBWorkerQueue {
 	}
 
 	async onmessage (data: any) {
+		const value = this.workerQueues[data.queryId]
+		const key = data.queryId
 
-		for (const [key, value] of Object.entries(this.workerQueues)) {
-			const dontRepeat = await value.func(data)
+		const dontRepeat = await value.func(data)
 
-			if(dontRepeat || !data.queryId) {
-				delete this.workerQueues[key]
-			}
+		if(dontRepeat || !data.queryId) {
+			delete this.workerQueues[key]
 		}
 	}
 

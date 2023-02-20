@@ -1,8 +1,8 @@
-import { IndexedDBConnection } from './connector'
+import { IndexedDB } from './connector'
 export class IndexedDBConnectionDynamicChange {
     changeSchema(db, schemaChanges) {
         db.close();
-        const newDb = new IndexedDBConnection().connect({
+        const newDb = IndexedDB.connect({
             databaseName: 'databaseName',
             type: 'indexedDB',
             version: 0

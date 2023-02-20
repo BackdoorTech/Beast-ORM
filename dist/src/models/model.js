@@ -113,6 +113,7 @@ export class Model extends (_b = ModelManager) {
         }
     }
     static async all() {
+        // console.log('trigger get')
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
         return await Model.object({ DBconfig, TableSchema }).all();
@@ -214,6 +215,7 @@ export class Model extends (_b = ModelManager) {
         const DBconfig = this.getDBSchema();
         const queryId = uniqueGenerator();
         const createObject = await super.obj(DBconfig, TableSchema).create(_methods, queryId);
+        // console.log('done create model', createObject)
         if (createObject) {
             if (typeof createObject[TableSchema.id.keyPath] == 'object') {
                 throw (createObject[TableSchema.id.keyPath].error);
@@ -305,6 +307,7 @@ Model.object = ({ queryId = uniqueGenerator(), DBconfig, TableSchema, some = nul
             return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).delete(_methods, queryId);
         },
         all: async () => {
+            // console.log('model all')
             methods[queryId].push({ methodName: 'all', arguments: null });
             const _methods = methods[queryId];
             methods[queryId] = [];

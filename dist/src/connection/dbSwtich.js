@@ -7,12 +7,11 @@ export class DBSwitch {
             return new Promise(async (resolve, reject) => {
                 const request = IndexedDBWorkerQueue.register({
                     params: { TableSchema, DBconfig, queryId, action, arg, dbType },
+                    queryId: queryId,
                     method: 'execute',
                     func: (message) => {
-                        if (message.queryId == queryId) {
-                            resolve(message === null || message === void 0 ? void 0 : message.value);
-                            return true;
-                        }
+                        resolve(message === null || message === void 0 ? void 0 : message.value);
+                        return true;
                     },
                 });
                 if (request == false) {

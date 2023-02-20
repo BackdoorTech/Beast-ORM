@@ -5,6 +5,7 @@ import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js
 import { uncapitalize } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js';
+import { ModelManager } from './model-manager.js';
 export const models = {};
 export const modelsConfig = {};
 export const modelsLocalStorage = {};
@@ -71,10 +72,12 @@ export class registerModel {
             }
             index++;
         }
+        let tableSchema_;
         for (const modelClassRepresentations of entries.models) {
             const ModelName = modelClassRepresentations.getModelName();
             models[ModelName] = modelClassRepresentations;
             const tableSchema = databaseSchema.stores.find((e) => e.name == ModelName);
+            tableSchema_ = tableSchema;
             modelsConfig[ModelName] = {
                 DatabaseSchema: databaseSchema,
                 TableSchema: tableSchema
@@ -82,8 +85,9 @@ export class registerModel {
         }
         if (databaseSchema.type == 'indexedDB') {
             await indexedDB.migrate(databaseSchema);
+            ModelMigrations.migrationsState(true);
+            await ModelManager.obj(databaseSchema, tableSchema_).migrate();
         }
-        ModelMigrations.migrationsState(true);
     }
     static manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema) {
         const foreignKeyFieldModel = foreignKeyField.model;

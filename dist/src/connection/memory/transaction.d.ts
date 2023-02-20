@@ -1,16 +1,24 @@
+declare class transactionRequest {
+    type: string;
+    value: any;
+    key: any;
+    result: any;
+    set onsuccess(func: any);
+}
 export declare class transaction {
     data: {
         [key: string]: any[];
     };
-    constructor(data: any);
-    request: any;
-    add(): void;
-    getAll(): void;
+    constructor({ store }: {
+        store: any;
+    });
+    request: any[];
     objectStore: (name: any) => {
-        add: (value: any, key?: any) => any;
-        getAll: () => any;
+        add: (value: any, key?: any) => transactionRequest;
+        getAll: () => transactionRequest;
     };
     onerror(): void;
     oncomplete(): void;
     onabort(): void;
 }
+export {};

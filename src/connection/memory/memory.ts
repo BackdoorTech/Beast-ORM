@@ -19,21 +19,6 @@ export class Memory {
       reject(`Store ${storeName} not found`);
     }
   }
-
-  private static createTransaction(
-    db: DatabaseMemory,
-    dbMode: IDBTransactionMode,
-    currentStore: string,
-    resolve,
-    reject?,
-    abort?
-  ): transaction {
-    let tx: transaction = DatabaseMemory.transaction(currentStore, dbMode);
-    tx.onerror = reject;
-    tx.oncomplete = resolve;
-    tx.onabort = abort;
-    return tx;
-  }
   
   static migrate(config: DatabaseSchema) {
     return new MemoryConnector().migrate(config)
@@ -48,7 +33,7 @@ export class Memory {
     return {
       getAll:() => {
         return new Promise<any[]>((resolve, reject) => {
-          DatabaseMemory.createTransaction(currentStore, "readwrite", (transaction:transaction) => {
+          DatabaseMemory.getOrCreateTransaction(currentStore, "readwrite", (transaction) => {
             let objectStore = transaction.objectStore(currentStore);
 
             let request = objectStore.getAll();
@@ -61,7 +46,7 @@ export class Memory {
       add:(value:Object, key?: any) => {
         return new Promise<number>((resolve, reject) => {
           
-          DatabaseMemory.createTransaction(currentStore, "readwrite", (transaction:transaction) => {
+          DatabaseMemory.getOrCreateTransaction(currentStore, "readwrite", (transaction:transaction) => {
             let objectStore = transaction.objectStore(currentStore);
 
             let request = objectStore.add(value, key);

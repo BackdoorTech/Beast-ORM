@@ -2,6 +2,7 @@ import { Methods, Method } from './model.interface.js'
 import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
 import { DBSwitch } from '../connection/dbSwtich.js'
 import { ModelMigrations } from './mode-migrations.js'
+import { uniqueGenerator } from '../utils.js';
 
 export class ModelManager {
     
@@ -37,6 +38,9 @@ export class ModelManager {
 				await ModelMigrations.waitMigration()
 				return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type ,'select' , arg, queryId)
 			},
+			migrate: async (queryId:string = uniqueGenerator()) => {
+				return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type ,'migrate' , {}, queryId)
+			}
 		}
 	}
     

@@ -1,6 +1,7 @@
 var _a;
 import { DBSwitch } from '../connection/dbSwtich.js';
 import { ModelMigrations } from './mode-migrations.js';
+import { uniqueGenerator } from '../utils.js';
 export class ModelManager {
     constructor() { }
 }
@@ -35,5 +36,8 @@ ModelManager.obj = (DatabaseSchema, TableSchema) => {
             await ModelMigrations.waitMigration();
             return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'select', arg, queryId);
         },
+        migrate: async (queryId = uniqueGenerator()) => {
+            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'migrate', {}, queryId);
+        }
     };
 };

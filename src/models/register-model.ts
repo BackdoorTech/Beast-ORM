@@ -6,6 +6,7 @@ import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js
 import { uncapitalize } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js'
+import { ModelManager } from './model-manager.js';
 
 interface register {
   databaseName: string,
@@ -103,12 +104,13 @@ export class registerModel {
 
 
 
-
+    let tableSchema_
     for(const modelClassRepresentations of entries.models) {
       const ModelName = modelClassRepresentations.getModelName()
       models[ModelName] = modelClassRepresentations
 
       const tableSchema = databaseSchema.stores.find((e)=> e.name == ModelName)
+      tableSchema_ = tableSchema
 
       modelsConfig[ModelName] = {
         DatabaseSchema: databaseSchema,
@@ -119,9 +121,10 @@ export class registerModel {
 
     if(databaseSchema.type =='indexedDB') {
       await indexedDB.migrate(databaseSchema)
+      ModelMigrations.migrationsState(true);
+      await ModelManager.obj(databaseSchema, tableSchema_ ).migrate()
     }
     
-    ModelMigrations.migrationsState(true);
   }
 
   static manyToManyRelationShip(foreignKeyField:ManyToManyField, FieldName:string, modelName:string, databaseSchema:DatabaseSchema): Model {

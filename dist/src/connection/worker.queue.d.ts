@@ -1,7 +1,7 @@
 interface WsRegister {
     type?: 'response' | 'Register';
     func: Function;
-    queryId?: string;
+    queryId: string;
     params: any;
     method: 'execute' | 'migrate';
 }

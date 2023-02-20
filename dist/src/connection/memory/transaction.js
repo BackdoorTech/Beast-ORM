@@ -4,29 +4,30 @@ class transactionRequest {
     }
 }
 export class transaction {
-    constructor(data) {
+    constructor({ store }) {
+        this.request = [];
         this.objectStore = (name) => {
             return {
                 add: (value, key) => {
-                    this.request = new transactionRequest();
-                    this.request.type = 'add';
-                    this.request.value = value;
-                    this.request.key = key;
-                    this.request.result = this.data[name].push(value);
-                    return this.request;
+                    const request = new transactionRequest();
+                    request.type = 'add';
+                    request.value = value;
+                    request.key = key;
+                    request.result = this.data[name].push(value);
+                    this.request.push(request);
+                    return request;
                 },
                 getAll: () => {
-                    this.request = new transactionRequest();
-                    this.request.type = 'getAll';
-                    this.request.result = this.data[name];
-                    return this.request;
+                    const request = new transactionRequest();
+                    request.type = 'getAll';
+                    request.result = this.data[name];
+                    this.request.push(request);
+                    return request;
                 }
             };
         };
-        this.data = data;
+        // this.data = data
     }
-    add() { }
-    getAll() { }
     onerror() { }
     oncomplete() { }
     onabort() { }
