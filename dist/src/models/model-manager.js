@@ -38,6 +38,8 @@ ModelManager.obj = (DatabaseSchema, TableSchema) => {
         },
         migrate: async (queryId = uniqueGenerator()) => {
             return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'migrate', {}, queryId);
+        }, trigger: async (queryId, Subscription) => {
+            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'trigger', {}, queryId);
         }
     };
 };

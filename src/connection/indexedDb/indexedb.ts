@@ -107,7 +107,7 @@ class indexedDBInterface {
           };
 
           request.onerror = (e: any) => {
-            console.log(e)
+            // console.log(e)
             let data = {
               error: e.target['error']
             }
@@ -368,8 +368,6 @@ class indexedDBInterface {
             }})
           }
         })
-
-
       },
       migrate: async() => {
         await IndexedDB.run(config)

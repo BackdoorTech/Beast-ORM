@@ -63,7 +63,7 @@ class indexedDBInterface {
                             func(e.target.result);
                         };
                         request.onerror = (e) => {
-                            console.log(e);
+                            // console.log(e)
                             let data = {
                                 error: e.target['error']
                             };
