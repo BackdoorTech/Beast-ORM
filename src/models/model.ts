@@ -6,6 +6,7 @@ import { models, modelsConfig, modelsConfigLocalStorage } from './register-model
 import { FieldType } from '../sql/query/interface.js';
 import  * as Fields from './field/allFields.js'
 import { field } from './field/field.js'
+import { IndexedDBWorkerQueue } from '../connection/worker.queue.js';
 
 let methods : Methods = {} = {}
 
@@ -63,6 +64,7 @@ export class Model extends ModelManager{
     const queryId=uniqueGenerator()
 
     await Model.obj(DBconfig, tableSchema).save(methods, queryId)
+    IndexedDBWorkerQueue.finish(queryId)
   }
 
 
@@ -80,6 +82,7 @@ export class Model extends ModelManager{
     const queryId=uniqueGenerator()
 
     await Model.obj(DBconfig, TableSchema).delete(_methods, queryId)
+    IndexedDBWorkerQueue.finish(queryId)
   }
   
   static async  deleteAll() {
@@ -96,12 +99,17 @@ export class Model extends ModelManager{
     const queryId=uniqueGenerator()
 
     await Model.obj(DBconfig, TableSchema).delete(_methods, queryId)
+    IndexedDBWorkerQueue.finish(queryId)
   }
 
   async all() {
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
-    return await Model.object({DBconfig, TableSchema}).all()
+    const queryId=uniqueGenerator()
+
+    const result = await Model.object({queryId, DBconfig, TableSchema}).all()
+    IndexedDBWorkerQueue.finish(queryId)
+    return result
   }
 
   getFields(arg) {
@@ -165,7 +173,11 @@ export class Model extends ModelManager{
     // console.log('trigger get')
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
-    return await Model.object({DBconfig, TableSchema}).all()
+    const queryId = uniqueGenerator()
+
+    const result = await Model.object({queryId, DBconfig, TableSchema}).all()
+    IndexedDBWorkerQueue.finish(queryId)
+    return result
   }
   
   static async get(arg: getParams) {
@@ -176,6 +188,7 @@ export class Model extends ModelManager{
     const queryId = uniqueGenerator()
 
     const foundObj = await super.obj(DBconfig, TableSchema).get(_methods, queryId)
+    IndexedDBWorkerQueue.finish(queryId)
 
     if(!foundObj) {
       return false
@@ -220,7 +233,9 @@ export class Model extends ModelManager{
 
     const newInstanceModel = this.NewModelInstance()
 
-    return  Object.assign(newInstanceModel, this.object({queryId,DBconfig, TableSchema, some:['filter', arg]})) as any
+    const result = Object.assign(newInstanceModel, this.object({queryId,DBconfig, TableSchema, some:['filter', arg]})) as any
+    IndexedDBWorkerQueue.finish(queryId)
+    return result
   }
 
 
@@ -311,11 +326,11 @@ export class Model extends ModelManager{
     const _methods: Method[] = [{methodName: 'create', arguments: arg}]
     const DBconfig = this.getDBSchema()
 
-    const queryId=uniqueGenerator()
+    const queryId = uniqueGenerator()
     
     const createObject = await super.obj(DBconfig, TableSchema).create(_methods, queryId)
+    IndexedDBWorkerQueue.finish(queryId)
 
-    // console.log('done create model', createObject)
     if(createObject) {
 
       if(typeof createObject[TableSchema.id.keyPath] == 'object') {
@@ -389,10 +404,12 @@ export class Model extends ModelManager{
     const queryId = uniqueGenerator()
     
 
-    return  await super.obj(DBconfig, TableSchema).update(_methods, queryId)
+    const result = await super.obj(DBconfig, TableSchema).update(_methods, queryId)
+    IndexedDBWorkerQueue.finish(queryId)
+    return result
   }
 
-  static object = ({queryId=uniqueGenerator(), DBconfig, TableSchema,  some = null}) => {
+  static object = ({queryId, DBconfig, TableSchema,  some = null}) => {
 
 
     if(!methods[queryId]) {

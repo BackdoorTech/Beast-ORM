@@ -69,6 +69,12 @@ export class _IndexedDBWorkerQueue {
 		}
 	}
 
+	finish(queryId) {
+		try {
+			delete this.workerQueues[queryId]
+		} catch (error) {}
+	}
+
 	requestHandler () {
 			
 	}

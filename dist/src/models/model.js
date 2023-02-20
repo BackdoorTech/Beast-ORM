@@ -4,6 +4,7 @@ import { ModelManager } from './model-manager.js';
 import { models, modelsConfig, modelsConfigLocalStorage } from './register-model.js';
 import { FieldType } from '../sql/query/interface.js';
 import * as Fields from './field/allFields.js';
+import { IndexedDBWorkerQueue } from '../connection/worker.queue.js';
 let methods = {} = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model extends (_b = ModelManager) {
@@ -45,6 +46,7 @@ export class Model extends (_b = ModelManager) {
         const methods = [{ methodName: 'save', arguments: Fields }];
         const queryId = uniqueGenerator();
         await Model.obj(DBconfig, tableSchema).save(methods, queryId);
+        IndexedDBWorkerQueue.finish(queryId);
     }
     async delete() {
         const DBconfig = this.getDBSchema();
@@ -55,6 +57,7 @@ export class Model extends (_b = ModelManager) {
         const _methods = [{ methodName: 'delete', arguments: createArg }];
         const queryId = uniqueGenerator();
         await Model.obj(DBconfig, TableSchema).delete(_methods, queryId);
+        IndexedDBWorkerQueue.finish(queryId);
     }
     static async deleteAll() {
         const DBconfig = this.getDBSchema();
@@ -65,11 +68,15 @@ export class Model extends (_b = ModelManager) {
         const _methods = [{ methodName: 'delete', arguments: '*' }];
         const queryId = uniqueGenerator();
         await Model.obj(DBconfig, TableSchema).delete(_methods, queryId);
+        IndexedDBWorkerQueue.finish(queryId);
     }
     async all() {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
-        return await Model.object({ DBconfig, TableSchema }).all();
+        const queryId = uniqueGenerator();
+        const result = await Model.object({ queryId, DBconfig, TableSchema }).all();
+        IndexedDBWorkerQueue.finish(queryId);
+        return result;
     }
     getFields(arg) {
         return Model.getFields(arg);
@@ -116,7 +123,10 @@ export class Model extends (_b = ModelManager) {
         // console.log('trigger get')
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
-        return await Model.object({ DBconfig, TableSchema }).all();
+        const queryId = uniqueGenerator();
+        const result = await Model.object({ queryId, DBconfig, TableSchema }).all();
+        IndexedDBWorkerQueue.finish(queryId);
+        return result;
     }
     static async get(arg) {
         const _methods = [{ methodName: 'get', arguments: arg }];
@@ -124,6 +134,7 @@ export class Model extends (_b = ModelManager) {
         const TableSchema = this.getTableSchema();
         const queryId = uniqueGenerator();
         const foundObj = await super.obj(DBconfig, TableSchema).get(_methods, queryId);
+        IndexedDBWorkerQueue.finish(queryId);
         if (!foundObj) {
             return false;
         }
@@ -153,7 +164,9 @@ export class Model extends (_b = ModelManager) {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
         const newInstanceModel = this.NewModelInstance();
-        return Object.assign(newInstanceModel, this.object({ queryId, DBconfig, TableSchema, some: ['filter', arg] }));
+        const result = Object.assign(newInstanceModel, this.object({ queryId, DBconfig, TableSchema, some: ['filter', arg] }));
+        IndexedDBWorkerQueue.finish(queryId);
+        return result;
     }
     static NewModelInstance() {
         class newInstanceModel {
@@ -215,7 +228,7 @@ export class Model extends (_b = ModelManager) {
         const DBconfig = this.getDBSchema();
         const queryId = uniqueGenerator();
         const createObject = await super.obj(DBconfig, TableSchema).create(_methods, queryId);
-        // console.log('done create model', createObject)
+        IndexedDBWorkerQueue.finish(queryId);
         if (createObject) {
             if (typeof createObject[TableSchema.id.keyPath] == 'object') {
                 throw (createObject[TableSchema.id.keyPath].error);
@@ -269,11 +282,13 @@ export class Model extends (_b = ModelManager) {
         const TableSchema = this.getTableSchema();
         const _methods = [{ methodName: 'update', arguments: arg }];
         const queryId = uniqueGenerator();
-        return await super.obj(DBconfig, TableSchema).update(_methods, queryId);
+        const result = await super.obj(DBconfig, TableSchema).update(_methods, queryId);
+        IndexedDBWorkerQueue.finish(queryId);
+        return result;
     }
 }
 _a = Model;
-Model.object = ({ queryId = uniqueGenerator(), DBconfig, TableSchema, some = null }) => {
+Model.object = ({ queryId, DBconfig, TableSchema, some = null }) => {
     if (!methods[queryId]) {
         methods[queryId] = [];
     }

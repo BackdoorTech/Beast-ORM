@@ -52,7 +52,10 @@
     "transaction",
     "promise",
     "query-builder",
-    "webworker"
+    "webworker",
+    "trigger",
+    "localStorage",
+    "storage"
   ],
   "homepage": "https://github.com/BackdoorTech/Beast-ORM#readme"
 }

@@ -35,7 +35,7 @@ export declare class Model extends ModelManager {
     static updateOrCreate(argToFind: any, argsToUpdate: any): Promise<any>;
     static update(arg: any): Promise<any>;
     static object: ({ queryId, DBconfig, TableSchema, some }: {
-        queryId?: string;
+        queryId: any;
         DBconfig: any;
         TableSchema: any;
         some?: any;
