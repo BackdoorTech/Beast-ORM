@@ -5,7 +5,6 @@ import { ModelManager } from './model-manager.js';
 import { models, modelsConfig, modelsConfigLocalStorage } from './register-model.js'
 import { FieldType } from '../sql/query/interface.js';
 import  * as Fields from './field/allFields.js'
-import { field } from './field/field.js'
 import { IndexedDBWorkerQueue } from '../connection/worker.queue.js';
 
 let methods : Methods = {} = {}

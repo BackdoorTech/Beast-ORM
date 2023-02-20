@@ -14,7 +14,6 @@ export declare class _IndexedDBWorkerQueue {
     register(data: WsRegister): string | false;
     onmessage(data: any): Promise<void>;
     finish(queryId: any): void;
-    requestHandler(): void;
 }
 export declare const IndexedDBWorkerQueue: _IndexedDBWorkerQueue;
 export {};

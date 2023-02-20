@@ -27,7 +27,7 @@ export class _IndexedDBWorkerQueue {
 			}
 
 			this.myWorker.onerror = (error) => {
-				console.log(error, 'erroror');
+				console.log('myWorker', error);
 			};
 		}
 	}
@@ -60,23 +60,13 @@ export class _IndexedDBWorkerQueue {
 
 	async onmessage (data: any) {
 		const value = this.workerQueues[data.queryId]
-		const key = data.queryId
-
-		const dontRepeat = await value.func(data)
-
-		if(dontRepeat || !data.queryId) {
-			delete this.workerQueues[key]
-		}
+		await value.func(data)
 	}
 
 	finish(queryId) {
 		try {
 			delete this.workerQueues[queryId]
 		} catch (error) {}
-	}
-
-	requestHandler () {
-			
 	}
 
 }
