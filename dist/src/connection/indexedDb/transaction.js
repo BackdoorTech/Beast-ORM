@@ -4,7 +4,7 @@ class transactionRequest {
         this.onsuccessFunc = func;
     }
     set onerror(func) {
-        this.onerror = func;
+        this.onerrorFunc = func;
     }
 }
 export class transaction {
@@ -29,10 +29,15 @@ export class transaction {
                         let addGetList = objectStore.add(value);
                         addGetList.onsuccess = (e) => {
                             var _a, _b;
-                            console.log('add result e');
-                            console.log(e);
+                            //console.log('add result e');
+                            //console.log(e);
                             (_b = (_a = tx) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
                             request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
+                            db.close();
+                            this.done();
+                        };
+                        addGetList.onerror = (e) => {
+                            request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
                             db.close();
                             this.done();
                         };
@@ -53,7 +58,7 @@ export class transaction {
                         let getList = objectStore.getAll();
                         getList.onsuccess = (e) => {
                             var _a, _b;
-                            console.log('all', e);
+                            //console.log('all', e);
                             (_b = (_a = tx) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
                             request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
                             db.close();
@@ -87,6 +92,11 @@ export class transaction {
                             db.close();
                             this.done();
                         };
+                        updateRequest.onerror = (e) => {
+                            request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
+                            db.close();
+                            this.done();
+                        };
                     });
                     return request;
                 },
@@ -109,6 +119,11 @@ export class transaction {
                                 (_b = (_a = tx) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
                             }
                             catch (error) { }
+                            db.close();
+                            this.done();
+                        };
+                        tx.onerror = (e) => {
+                            request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
                             db.close();
                             this.done();
                         };
@@ -138,6 +153,11 @@ export class transaction {
                             db.close();
                             this.done();
                         };
+                        deleteRequest.onerror = (e) => {
+                            request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
+                            db.close();
+                            this.done();
+                        };
                     })
                         .catch(onerror);
                     return request;
@@ -161,6 +181,11 @@ export class transaction {
                                 (_b = (_a = tx) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
                             }
                             catch (error) { }
+                            db.close();
+                            this.done();
+                        };
+                        getRequest.onerror = (e) => {
+                            request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
                             db.close();
                             this.done();
                         };
@@ -188,6 +213,11 @@ export class transaction {
                                 (_b = (_a = tx) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
                             }
                             catch (error) { }
+                            db.close();
+                            this.done();
+                        };
+                        getRequest.onerror = (e) => {
+                            request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
                             db.close();
                             this.done();
                         };

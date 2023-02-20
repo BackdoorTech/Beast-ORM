@@ -17,10 +17,9 @@ class transactionRequest {
     }
     
     set onerror(func) {
-        this.onerror = func
+        this.onerrorFunc = func
     }
 
-    
 
 }
 
@@ -47,7 +46,7 @@ export class transaction {
                 this.request.push(request)
 
 
-                let onerror = (x) =>{ console.log('error',x)}
+                let onerror = (x) => {console.log('error',x)}
                 let oncomplete = () =>{}
                 let onabort = (e) => { console.log('error',e)}
 
@@ -59,14 +58,19 @@ export class transaction {
                     let addGetList = objectStore.add(value);
 
                     addGetList.onsuccess = (e: any) => {
-                        console.log('add result e');
-                        console.log(e);
+                        //console.log('add result e');
+                        //console.log(e);
                         (tx as any)?.commit?.();
                         request?.onsuccessFunc(e)
                         db.close()
                         this.done()
                     };
-        
+
+                    addGetList.onerror = (e) => {
+                        request?.onerrorFunc(e)
+                        db.close()
+                        this.done()
+                    };
         
                   })
 
@@ -88,7 +92,7 @@ export class transaction {
                     let objectStore = tx.objectStore(currentStore);
                     let getList = objectStore.getAll();
                     getList.onsuccess = (e: any) => {
-                        console.log('all', e);
+                        //console.log('all', e);
                         (tx as any)?.commit?.();
                         request?.onsuccessFunc(e)
                         db.close()
@@ -128,6 +132,11 @@ export class transaction {
                         db.close()
                         this.done()
                     };
+                    updateRequest.onerror = (e) => {
+                        request?.onerrorFunc(e)
+                        db.close()
+                        this.done()
+                    };
                 })
 
                 return request
@@ -157,6 +166,11 @@ export class transaction {
 
                         db.close()
                         this.done() 
+                    };
+                    tx.onerror = (e) => {
+                        request?.onerrorFunc(e)
+                        db.close()
+                        this.done()
                     };
                 })
                 .catch(onerror);
@@ -188,6 +202,11 @@ export class transaction {
                         db.close()
                         this.done() 
                     };
+                    deleteRequest.onerror = (e) => {
+                        request?.onerrorFunc(e)
+                        db.close()
+                        this.done()
+                    };
                   })
                   .catch(onerror);
 
@@ -217,6 +236,11 @@ export class transaction {
 
                         db.close()
                         this.done() 
+                    };
+                    getRequest.onerror = (e) => {
+                        request?.onerrorFunc(e)
+                        db.close()
+                        this.done()
                     };
                 })
                 .catch(onerror);
@@ -248,6 +272,11 @@ export class transaction {
 
                         db.close()
                         this.done() 
+                    };
+                    getRequest.onerror = (e) => {
+                        request?.onerrorFunc(e)
+                        db.close()
+                        this.done()
                     };
                 })
                 .catch(onerror);

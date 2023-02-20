@@ -105,6 +105,14 @@ class indexedDBInterface {
           request.onsuccess = (e: any) => {
             func(e.target.result)
           };
+
+          request.onerror = (e: any) => {
+            console.log(e)
+            let data = {
+              error: e.target['error']
+            }
+            func(data)
+          };
         });
       },
       update:({value, key = undefined}) => {
@@ -114,6 +122,12 @@ class indexedDBInterface {
             let request = objectStore.put({value, key, config});
             request.onsuccess = (e: any) => {
               resolve(e.target.result);
+            };
+            request.onerror = (e: any) => {
+              let data = {
+                error: e.target['error']
+              }
+              resolve(data)
             };
           });
         });
@@ -125,6 +139,12 @@ class indexedDBInterface {
             let request = objectStore.delete({id, config});
             request.onsuccess = (e: any) => {
               resolve(e.target.result);
+            };
+            request.onerror = (e: any) => {
+              let data = {
+                error: e.target['error']
+              }
+              resolve(data)
             };
           });
         });
