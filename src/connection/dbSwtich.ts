@@ -15,7 +15,7 @@ export class DBSwitch {
 					params: {TableSchema, DBconfig, queryId, action, arg, dbType},
 					queryId: queryId,
 					method: 'execute',
-					func:(message) => {
+					func: (message) => {
 						resolve(message?.value)
 					},
 				})
@@ -29,6 +29,29 @@ export class DBSwitch {
 		} else {
 			const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg) as any
 			return result?.value
+		}
+	}
+
+	static async callBackRequestHandler(TableSchema: TableSchema, DBconfig:DatabaseSchema, dbType : dbType, action: actionParam, arg: any, queryId) {
+		if (typeof(Worker) !== "undefined" && IndexedDBWorkerQueue.webWorkerModuleSupport) {
+			//great, your browser supports web workers
+			const request = IndexedDBWorkerQueue.register({
+				params: {TableSchema, DBconfig, queryId, action, arg, dbType},
+				queryId: queryId,
+				method: 'execute',
+				func: (message) => {
+					arg.callback(message?.value)
+				},
+			})
+
+			if(request == false) {
+				const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg) as any
+				arg.callback(result?.value) 
+			}
+
+		} else {
+			const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg) as any
+			arg.callback(result?.value)
 		}
 	}
 

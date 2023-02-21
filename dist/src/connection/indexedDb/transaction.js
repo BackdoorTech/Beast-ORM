@@ -9,6 +9,10 @@ class transactionRequest {
 }
 export class transaction {
     constructor({ store, done }) {
+        this.trigger = {
+            beforeInsert: false,
+            afterInsert: false,
+        };
         this.request = [];
         this.FinishRequest = [];
         this.objectStore = (currentStore) => {

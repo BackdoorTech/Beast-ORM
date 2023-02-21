@@ -40,8 +40,8 @@ export class ModelManager {
 			},
 			migrate: async (queryId:string = uniqueGenerator()) => {
 				return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type ,'migrate' , {}, queryId)
-			}, trigger: async (queryId, Subscription) => {
-				return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type ,'trigger' , {}, queryId)
+			}, trigger: async (args, Subscription) => {
+				DBSwitch.callBackRequestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type ,'trigger' , args, Subscription)
 			}
 		}
 	}

@@ -11,6 +11,6 @@ export declare class ModelManager {
         delete: (arg: any, queryId: string) => Promise<any>;
         all: (arg: any, queryId: string) => Promise<any>;
         migrate: (queryId?: string) => Promise<any>;
-        trigger: (queryId: any, Subscription: any) => Promise<any>;
+        trigger: (args: any, Subscription: any) => Promise<void>;
     };
 }

@@ -13,6 +13,10 @@ declare class transactionRequest {
 export declare class transaction {
     store: any;
     done: Function;
+    trigger: {
+        beforeInsert: boolean;
+        afterInsert: boolean;
+    };
     constructor({ store, done }: {
         store: any;
         done: any;

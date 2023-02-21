@@ -2,6 +2,7 @@
 
 import { DatabaseSchema } from '../../models/register-modal.interface.js'
 import { indexedDB } from './indexedb.js'
+import { triggerSignal } from './triggers/triggers.js'
 class transactionRequest {
     type: string
     value: any
@@ -27,6 +28,11 @@ export class transaction {
     store
 
     done: Function
+
+    trigger = {
+        beforeInsert: false,
+        afterInsert: false,
+    }
 
     constructor({store, done}) {
         // currentStore = store
@@ -56,7 +62,7 @@ export class transaction {
                     let objectStore = tx.objectStore(currentStore);
         
                     let addGetList = objectStore.add(value);
-
+                    
                     addGetList.onsuccess = (e: any) => {
                         //console.log('add result e');
                         //console.log(e);

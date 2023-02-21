@@ -57,7 +57,11 @@ export class triggers {
         const functionId = uniqueGenerator();
         const args = {
             type: functionId,
-            callback: callback
+            callback: (row) => {
+                for (const request of triggerBeforeInsert[databaseName][ModelName]) {
+                    request.callback(row);
+                }
+            }
         };
         ModelManager.obj(Model.getDBSchema(), Model.getTableSchema()).trigger(args, Subscription);
         return {
@@ -99,55 +103,5 @@ export class triggers {
                 delete triggerAfterDelete[databaseName][ModelName];
             }
         };
-    }
-}
-export class triggerSignal {
-    static beforeInsertExist(Model) {
-        var _a;
-        const ModelName = Model.getModelName();
-        const databaseName = Model.getDBSchema().databaseName;
-        return (_a = triggerBeforeInsert === null || triggerBeforeInsert === void 0 ? void 0 : triggerBeforeInsert[databaseName]) === null || _a === void 0 ? void 0 : _a[ModelName];
-    }
-    static async beforeInsert(instance) {
-        const ModelName = instance.getModelName();
-        const databaseName = instance.getDBSchema().databaseName;
-        for (const trigger of triggerBeforeInsert[databaseName][ModelName]) {
-            trigger.callback(instance);
-        }
-    }
-    static AfterInsertExist(Model) {
-        var _a;
-        const ModelName = Model.getModelName();
-        const databaseName = Model.getDBSchema().databaseName;
-        return (_a = triggerAfterInsert === null || triggerAfterInsert === void 0 ? void 0 : triggerAfterInsert[databaseName]) === null || _a === void 0 ? void 0 : _a[ModelName];
-    }
-    static async AfterInsert(instance) {
-        const ModelName = instance.getModelName();
-        const databaseName = instance.getDBSchema().databaseName;
-        for (const trigger of triggerAfterInsert[databaseName][ModelName]) {
-            trigger.callback(instance);
-        }
-    }
-    static AfterDeleteExist(Model) {
-        var _a;
-        const ModelName = Model.getModelName();
-        const databaseName = Model.getDBSchema().databaseName;
-        return (_a = triggerAfterDelete === null || triggerAfterDelete === void 0 ? void 0 : triggerAfterDelete[databaseName]) === null || _a === void 0 ? void 0 : _a[ModelName];
-    }
-    static async AfterDelete(instance, { modelName, databaseName }) {
-        for (const trigger of triggerAfterDelete[databaseName][modelName]) {
-            trigger.callback(instance);
-        }
-    }
-    static BeforeDeleteExist(Model) {
-        var _a;
-        const ModelName = Model.getModelName();
-        const databaseName = Model.getDBSchema().databaseName;
-        return (_a = triggerBeforeDelete === null || triggerBeforeDelete === void 0 ? void 0 : triggerBeforeDelete[databaseName]) === null || _a === void 0 ? void 0 : _a[ModelName];
-    }
-    static async BeforeDelete(instance, { modelName, databaseName }) {
-        for (const trigger of triggerBeforeDelete[databaseName][modelName]) {
-            trigger.callback(instance);
-        }
     }
 }
