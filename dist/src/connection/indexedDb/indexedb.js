@@ -10,7 +10,7 @@ class indexedDBInterface {
                         IndexedDB.getOrCreateTransaction({ currentStore, queryId, config }, 'readonly', (transaction) => {
                             let objectStore = transaction.objectStore(currentStore);
                             let request = objectStore.get({ id, config });
-                            request.onsuccess = (e) => {
+                            request.onsuccess = async (e) => {
                                 resolve(e.target.result);
                             };
                         });
@@ -21,7 +21,7 @@ class indexedDBInterface {
                         IndexedDB.getOrCreateTransaction({ currentStore, queryId, config }, 'readonly', (transaction) => {
                             let objectStore = transaction.objectStore(currentStore);
                             let request = objectStore.index({ keyPath, value, config });
-                            request.onsuccess = (e) => {
+                            request.onsuccess = async (e) => {
                                 resolve(e.target.result);
                             };
                         });
@@ -48,7 +48,7 @@ class indexedDBInterface {
                         IndexedDB.getOrCreateTransaction({ currentStore, queryId, config }, 'readonly', (transaction) => {
                             let objectStore = transaction.objectStore(currentStore);
                             let request = objectStore.getAll(config);
-                            request.onsuccess = (e) => {
+                            request.onsuccess = async (e) => {
                                 // console.log('all', e.target.results)
                                 resolve(e.target.result);
                             };
@@ -59,7 +59,7 @@ class indexedDBInterface {
                     IndexedDB.getOrCreateTransaction({ currentStore, queryId, config }, 'readwrite', (transaction) => {
                         let objectStore = transaction.objectStore(currentStore);
                         let request = objectStore.add({ value, key, config });
-                        request.onsuccess = (e) => {
+                        request.onsuccess = async (e) => {
                             func(e.target.result);
                         };
                         request.onerror = (e) => {
@@ -76,7 +76,7 @@ class indexedDBInterface {
                         IndexedDB.getOrCreateTransaction({ currentStore, queryId, config }, 'readwrite', (transaction) => {
                             let objectStore = transaction.objectStore(currentStore);
                             let request = objectStore.put({ value, key, config });
-                            request.onsuccess = (e) => {
+                            request.onsuccess = async (e) => {
                                 resolve(e.target.result);
                             };
                             request.onerror = (e) => {
@@ -93,7 +93,7 @@ class indexedDBInterface {
                         IndexedDB.getOrCreateTransaction({ currentStore, queryId, config }, 'readwrite', (transaction) => {
                             let objectStore = transaction.objectStore(currentStore);
                             let request = objectStore.delete({ id, config });
-                            request.onsuccess = (e) => {
+                            request.onsuccess = async (e) => {
                                 resolve(e.target.result);
                             };
                             request.onerror = (e) => {
@@ -110,7 +110,7 @@ class indexedDBInterface {
                         IndexedDB.getOrCreateTransaction({ currentStore, queryId, config }, 'readwrite', (transaction) => {
                             let objectStore = transaction.objectStore(currentStore);
                             let request = objectStore.clear({ config });
-                            request.onsuccess = (e) => {
+                            request.onsuccess = async (e) => {
                                 resolve(e.target.result);
                             };
                         });

@@ -131,7 +131,7 @@ export class IndexedDB {
     const {mode, callback, config} = this.transactions[databaseName][currentStore].shift()
     this.txInstanceMode[databaseName][currentStore][mode] = true
 
-    const done = () => {
+    const done = async () => {
       if(this.transactions[config.databaseName][currentStore].length == 0) {
         this.executingTransaction[databaseName][currentStore] = false;
 
@@ -168,7 +168,7 @@ export class IndexedDB {
     callback(transactionInstance)
   }
   
-  static getOrCreateTransaction({currentStore, queryId, config}, mode, callback:  (transaction:transaction) => void) {
+  static getOrCreateTransaction({currentStore, queryId, config}, mode: IDBTransactionMode, callback:  (transaction:transaction) => void) {
     this.transactions[config.databaseName][currentStore].push({config, queryId, mode, callback})
     if (this.executingTransaction[config.databaseName][currentStore] == false) {
       this.executingTransaction[config.databaseName][currentStore] = true

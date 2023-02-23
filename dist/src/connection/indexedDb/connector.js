@@ -88,7 +88,7 @@ export class IndexedDB {
     static executeTransaction(currentStore, databaseName) {
         const { mode, callback, config } = this.transactions[databaseName][currentStore].shift();
         this.txInstanceMode[databaseName][currentStore][mode] = true;
-        const done = () => {
+        const done = async () => {
             var _a, _b;
             if (this.transactions[config.databaseName][currentStore].length == 0) {
                 this.executingTransaction[databaseName][currentStore] = false;

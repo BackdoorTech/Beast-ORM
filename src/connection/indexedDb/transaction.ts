@@ -59,12 +59,12 @@ export class transaction {
     
                 let addGetList = objectStore.add(value);
                 
-                addGetList.onsuccess = (e: any) => {
+                addGetList.onsuccess = async (e: any) => {
                     request?.onsuccessFunc(e)
                     this.done()
                 };
 
-                addGetList.onerror = (e) => {
+                addGetList.onerror = async (e) => {
                     request?.onerrorFunc(e)
                     this.done()
                 };
@@ -80,16 +80,16 @@ export class transaction {
 
                 let objectStore = this.tx.objectStore(currentStore);
                 let getList = objectStore.getAll();
-                getList.onsuccess = (e: any) => {    
+                getList.onsuccess = (e: any) => { 
+                    this.done()   
                     request?.onsuccessFunc(e)
                 };
 
                 getList.onerror = (e: any) => {
+                    this.done()
                     request?.onerrorFunc(e)
                 };
 
-          
-                this.done()
                 return request
             },
             put: ({value, key = undefined, config}) => {
@@ -101,12 +101,12 @@ export class transaction {
 
                 let objectStore = this.tx.objectStore(currentStore);
                 let updateRequest = objectStore.put(value, key);
-                updateRequest.onsuccess = (e: any) => {
+                updateRequest.onsuccess = async (e: any) => {
                     request?.onsuccessFunc(e)
                     
                     this.done()
                 };
-                updateRequest.onerror = (e) => {
+                updateRequest.onerror =  async (e) => {
                     request?.onerrorFunc(e)
                     
                     this.done()
@@ -124,11 +124,11 @@ export class transaction {
                 let objectStore = this.tx.objectStore(currentStore);
                 objectStore.clear();
                 
-                this.tx.oncomplete = (e: any) => {
+                this.tx.oncomplete = async (e: any) => {
                     request?.onsuccessFunc(e)
                     this.done() 
                 };
-                this.tx.onerror = (e) => {
+                this.tx.onerror = async (e) => {
                     request?.onerrorFunc(e)
                     this.done()
                 };
@@ -144,11 +144,11 @@ export class transaction {
 
                 let objectStore = this.tx.objectStore(currentStore);
                 let deleteRequest = objectStore.delete(id);
-                deleteRequest.onsuccess = (e: any) => {
+                deleteRequest.onsuccess = async (e: any) => {
                     request?.onsuccessFunc(e)
                     this.done() 
                 };
-                deleteRequest.onerror = (e) => {
+                deleteRequest.onerror = async (e) => {
                     request?.onerrorFunc(e)                    
                     this.done()
                 };
@@ -165,13 +165,14 @@ export class transaction {
                 let objectStore = this.tx.objectStore(currentStore);
                 let getRequest = objectStore.get(id);
                 getRequest.onsuccess = (e: any) => {
+                    this.done()
                     request?.onsuccessFunc(e) 
                 };
                 getRequest.onerror = (e) => {
+                    this.done()
                     request?.onerrorFunc(e)
                 };
    
-                this.done()
                 return request
             },
             index: ({keyPath, value, config}) => {
@@ -184,13 +185,14 @@ export class transaction {
                 let targe = objectStore.index(keyPath);
                 let getRequest = targe.get(value);
                 getRequest.onsuccess = (e: any) => {
+                    this.done()
                     request?.onsuccessFunc(e) 
                 };
                 getRequest.onerror = (e) => {
+                    this.done()
                     request?.onerrorFunc(e)                    
                 };
 
-                this.done()
                 return request
             }
         }

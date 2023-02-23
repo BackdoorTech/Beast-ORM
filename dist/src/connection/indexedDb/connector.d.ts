@@ -52,6 +52,6 @@ export declare class IndexedDB {
         currentStore: any;
         queryId: any;
         config: any;
-    }, mode: any, callback: (transaction: transaction) => void): void;
+    }, mode: IDBTransactionMode, callback: (transaction: transaction) => void): void;
     private static createTransaction;
 }

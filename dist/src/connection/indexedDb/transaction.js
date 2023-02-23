@@ -24,11 +24,11 @@ export class transaction {
                     this.request.push(request);
                     let objectStore = this.tx.objectStore(currentStore);
                     let addGetList = objectStore.add(value);
-                    addGetList.onsuccess = (e) => {
+                    addGetList.onsuccess = async (e) => {
                         request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
                         this.done();
                     };
-                    addGetList.onerror = (e) => {
+                    addGetList.onerror = async (e) => {
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
                         this.done();
                     };
@@ -41,12 +41,13 @@ export class transaction {
                     let objectStore = this.tx.objectStore(currentStore);
                     let getList = objectStore.getAll();
                     getList.onsuccess = (e) => {
+                        this.done();
                         request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
                     };
                     getList.onerror = (e) => {
+                        this.done();
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
                     };
-                    this.done();
                     return request;
                 },
                 put: ({ value, key = undefined, config }) => {
@@ -56,11 +57,11 @@ export class transaction {
                     this.request.push(request);
                     let objectStore = this.tx.objectStore(currentStore);
                     let updateRequest = objectStore.put(value, key);
-                    updateRequest.onsuccess = (e) => {
+                    updateRequest.onsuccess = async (e) => {
                         request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
                         this.done();
                     };
-                    updateRequest.onerror = (e) => {
+                    updateRequest.onerror = async (e) => {
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
                         this.done();
                     };
@@ -72,11 +73,11 @@ export class transaction {
                     request.type = 'clear';
                     let objectStore = this.tx.objectStore(currentStore);
                     objectStore.clear();
-                    this.tx.oncomplete = (e) => {
+                    this.tx.oncomplete = async (e) => {
                         request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
                         this.done();
                     };
-                    this.tx.onerror = (e) => {
+                    this.tx.onerror = async (e) => {
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
                         this.done();
                     };
@@ -88,11 +89,11 @@ export class transaction {
                     request.type = 'delete';
                     let objectStore = this.tx.objectStore(currentStore);
                     let deleteRequest = objectStore.delete(id);
-                    deleteRequest.onsuccess = (e) => {
+                    deleteRequest.onsuccess = async (e) => {
                         request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
                         this.done();
                     };
-                    deleteRequest.onerror = (e) => {
+                    deleteRequest.onerror = async (e) => {
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
                         this.done();
                     };
@@ -105,12 +106,13 @@ export class transaction {
                     let objectStore = this.tx.objectStore(currentStore);
                     let getRequest = objectStore.get(id);
                     getRequest.onsuccess = (e) => {
+                        this.done();
                         request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
                     };
                     getRequest.onerror = (e) => {
+                        this.done();
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
                     };
-                    this.done();
                     return request;
                 },
                 index: ({ keyPath, value, config }) => {
@@ -121,12 +123,13 @@ export class transaction {
                     let targe = objectStore.index(keyPath);
                     let getRequest = targe.get(value);
                     getRequest.onsuccess = (e) => {
+                        this.done();
                         request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
                     };
                     getRequest.onerror = (e) => {
+                        this.done();
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
                     };
-                    this.done();
                     return request;
                 }
             };
