@@ -12,21 +12,26 @@ export declare class IndexedDB {
         };
     };
     static dbInstance: {
-        [dbNmae: string]: IDBDatabase;
+        [dbName: string]: IDBDatabase;
     };
     static dbInstanceUsing: {
-        [dbNmae: string]: {
+        [dbName: string]: {
             [store: string]: boolean;
         };
     };
     static txInstance: {
-        [dbNmae: string]: {
+        [dbName: string]: {
             [store: string]: IDBTransaction;
         };
     };
     static txInstanceMode: {
-        [dbNmae: string]: {
+        [dbName: string]: {
             [store: string]: object;
+        };
+    };
+    static storeCache: {
+        [dbName: string]: {
+            [store: string]: object[];
         };
     };
     constructor();

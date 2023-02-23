@@ -82,16 +82,14 @@ export class transaction {
                 let getList = objectStore.getAll();
                 getList.onsuccess = (e: any) => {    
                     request?.onsuccessFunc(e)
-                    this.done()
                 };
 
                 getList.onerror = (e: any) => {
                     request?.onerrorFunc(e)
-                    this.done()
                 };
 
           
-
+                this.done()
                 return request
             },
             put: ({value, key = undefined, config}) => {
@@ -167,15 +165,13 @@ export class transaction {
                 let objectStore = this.tx.objectStore(currentStore);
                 let getRequest = objectStore.get(id);
                 getRequest.onsuccess = (e: any) => {
-                    request?.onsuccessFunc(e)
-                    this.done() 
+                    request?.onsuccessFunc(e) 
                 };
                 getRequest.onerror = (e) => {
                     request?.onerrorFunc(e)
-                    
-                    this.done()
                 };
    
+                this.done()
                 return request
             },
             index: ({keyPath, value, config}) => {
@@ -188,14 +184,13 @@ export class transaction {
                 let targe = objectStore.index(keyPath);
                 let getRequest = targe.get(value);
                 getRequest.onsuccess = (e: any) => {
-                    request?.onsuccessFunc(e)
-                    this.done() 
+                    request?.onsuccessFunc(e) 
                 };
                 getRequest.onerror = (e) => {
                     request?.onerrorFunc(e)                    
-                    this.done()
                 };
 
+                this.done()
                 return request
             }
         }

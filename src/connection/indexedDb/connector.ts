@@ -12,10 +12,11 @@ export class IndexedDB {
     config: DatabaseSchema
   }[]} } = {}
 
-  static dbInstance: {[dbNmae: string]: IDBDatabase} = {}
-  static dbInstanceUsing: {[dbNmae: string]: {[store: string]: boolean}} = {}
-  static txInstance: {[dbNmae: string]: {[store: string]: IDBTransaction}} = {}
-  static txInstanceMode: {[dbNmae: string]: {[store: string]: object }} = {}
+  static dbInstance: {[dbName: string]: IDBDatabase} = {}
+  static dbInstanceUsing: {[dbName: string]: {[store: string]: boolean}} = {}
+  static txInstance: {[dbName: string]: {[store: string]: IDBTransaction}} = {}
+  static txInstanceMode: {[dbName: string]: {[store: string]: object }} = {}
+  static storeCache: {[dbName: string]: {[store: string]: object[] }} = {}
 
   constructor() {}
 
@@ -82,17 +83,6 @@ export class IndexedDB {
       } else {
         reject("Failed to connect");
       }
-
-
-      
-      // if(!this.transactions[config.databaseName]) {
-      //   this.transactions[config.databaseName] = {}
-      //   for( const storeName of config.stores) {
-      //     if(!this.transactions[config.databaseName][storeName.name]) { 
-      //       this.transactions[config.databaseName][storeName.name] = []
-      //     }
-      //   }
-      // }
 
     });
   }
@@ -197,7 +187,6 @@ export class IndexedDB {
       })
     }
   }
-
 
 
   private static createTransaction(

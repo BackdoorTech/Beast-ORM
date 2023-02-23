@@ -53,14 +53,6 @@ export class IndexedDB {
             else {
                 reject("Failed to connect");
             }
-            // if(!this.transactions[config.databaseName]) {
-            //   this.transactions[config.databaseName] = {}
-            //   for( const storeName of config.stores) {
-            //     if(!this.transactions[config.databaseName][storeName.name]) { 
-            //       this.transactions[config.databaseName][storeName.name] = []
-            //     }
-            //   }
-            // }
         });
     }
     static run(config) {
@@ -154,4 +146,5 @@ IndexedDB.dbInstance = {};
 IndexedDB.dbInstanceUsing = {};
 IndexedDB.txInstance = {};
 IndexedDB.txInstanceMode = {};
+IndexedDB.storeCache = {};
 IndexedDB.executingTransaction = {};

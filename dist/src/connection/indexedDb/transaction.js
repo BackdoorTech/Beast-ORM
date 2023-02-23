@@ -42,12 +42,11 @@ export class transaction {
                     let getList = objectStore.getAll();
                     getList.onsuccess = (e) => {
                         request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
-                        this.done();
                     };
                     getList.onerror = (e) => {
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
-                        this.done();
                     };
+                    this.done();
                     return request;
                 },
                 put: ({ value, key = undefined, config }) => {
@@ -107,12 +106,11 @@ export class transaction {
                     let getRequest = objectStore.get(id);
                     getRequest.onsuccess = (e) => {
                         request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
-                        this.done();
                     };
                     getRequest.onerror = (e) => {
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
-                        this.done();
                     };
+                    this.done();
                     return request;
                 },
                 index: ({ keyPath, value, config }) => {
@@ -124,12 +122,11 @@ export class transaction {
                     let getRequest = targe.get(value);
                     getRequest.onsuccess = (e) => {
                         request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
-                        this.done();
                     };
                     getRequest.onerror = (e) => {
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
-                        this.done();
                     };
+                    this.done();
                     return request;
                 }
             };
