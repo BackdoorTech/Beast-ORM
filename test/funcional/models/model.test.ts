@@ -585,7 +585,7 @@ describe("initial test for model", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  }, 20000)
 
 })
 

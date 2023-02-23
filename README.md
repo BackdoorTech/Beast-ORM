@@ -668,6 +668,57 @@ Add the same article to a different article set
 
 # LocalStorage base api implementation.
 
+
+## Create model
+
+A model is a representation of a database table. Feel free to place your models anywhere that can be exported
+
+```javascript
+import { models } from 'beast-orm';
+
+class Session extends models.LocalStorage {
+  static username = ''  
+  static userId = 55
+  static token = ''
+} 
+```
+
+<br/>
+
+## Register model
+Once you’ve register your data models, automatically gives you a abstraction API for accessing local storage base api implementation that lets you create, retrieve, update and delete object.
+
+```javascript
+import { models } from 'beast-orm';
+import { Session } from './models/user.js';
+
+models.migrate({
+  databaseName: 'tutorial',
+  version: 1,
+  type: 'indexedDB',
+  models: [Session]
+})
+```
+
+## Creating objects or Update
+
+Change Session and save the changes, it will create the key value to the local storage in case it doesn't exist or simple update the value
+
+```javascript
+Session.username = 'kobe'
+Session.userId = '1'
+Session.token = 'fjif8382'
+Session.save()
+```
+
+### Deleting objects
+
+The delete method, conveniently, is named delete(). This method immediately deletes the object and returns the number of objects deleted and a dictionary with the number of deletions per object type. Example:
+
+```javascript
+  Session.delete()
+```
+
 ## Languages and Tools
 <p align="left">   <a href="https://git-scm.com/" target="_blank"> <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="git" width="40" height="40"/>  </a> <a href="https://jestjs.io" target="_blank"> <img src="https://www.vectorlogo.zone/logos/jestjsio/jestjsio-icon.svg" alt="jest" width="40" height="40"/> </a>    <a href="https://github.com/puppeteer/puppeteer" target="_blank"> <img src="https://www.vectorlogo.zone/logos/pptrdev/pptrdev-official.svg" alt="puppeteer" width="40" height="40"/>  </a>  <a href="https://www.typescriptlang.org/" target="_blank"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="typescript" width="40" height="40"/> </a>
 </p>

@@ -217,22 +217,26 @@ class indexedDBInterface {
         } else if (methods[methods.length - 1].methodName == 'execute') {
           return new Promise(async(resolve, reject) => {
             const sqlObject =  new SqlObject(TableSchema, methods)
-            await this.getActions(TableSchema.name, config, queryId).openCursor(async(event: any) => {
-              var cursor = event.target.result;
-              if(cursor) {
-                const row = cursor.value
-                await sqlObject.runFirstMethod(row)
-                cursor.continue();
+            //await this.getActions(TableSchema.name, config, queryId).openCursor(async(event: any) => {
+              //var cursor = event.target.result;
+              //if(cursor) {
+                const rows = await this.getActions(TableSchema.name, config, queryId).getAll()
+                for (const row of rows) {
+                  //const row = cursor.value
+                  await sqlObject.runFirstMethod(row)
+                  //cursor.continue();
                 
-              } else {
+                }
+                
+              //} else {
                 sqlObject.doneRunFirstMethod()
                 sqlObject.run()
                 resolve({
                   queryId: queryId,
                   value: sqlObject.firstMethod.rows
                 })
-              }
-            })
+              //}
+            //})
           })
         } else if (methods[methods.length - 1].methodName == 'first') {
           return new Promise(async(resolve, reject) => {

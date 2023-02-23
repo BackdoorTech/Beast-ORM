@@ -31,7 +31,6 @@ describe("initial test for model", () => {
 
 			const promise = indexedDB.databases()
 			promise.then(databases => {
-				// console.log(databases)
 				document.body.innerHTML = JSON.stringify(databases)
 			})
 

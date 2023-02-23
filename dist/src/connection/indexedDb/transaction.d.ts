@@ -13,13 +13,17 @@ declare class transactionRequest {
 export declare class transaction {
     store: any;
     done: Function;
+    db: any;
+    tx: IDBTransaction;
     trigger: {
         beforeInsert: boolean;
         afterInsert: boolean;
     };
-    constructor({ store, done }: {
+    constructor({ store, done, db, tx }: {
         store: any;
         done: any;
+        db: any;
+        tx: any;
     });
     request: any[];
     FinishRequest: any[];
@@ -52,11 +56,5 @@ export declare class transaction {
             config: any;
         }) => transactionRequest;
     };
-    onerror(): void;
-    oncomplete(): void;
-    onabort(): void;
-    private static createTransaction;
-    private static validateBeforeTransaction;
-    private static validateStore;
 }
 export {};

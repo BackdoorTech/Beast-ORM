@@ -4,10 +4,14 @@ export class IndexedDB {
     constructor() { }
     static connect(config) {
         return new Promise((resolve, reject) => {
+            if (this.dbInstance[config.databaseName]) {
+                resolve(this.dbInstance[config.databaseName]);
+            }
             const idbInstance = indexedDB || self.indexedDB || self.mozIndexedDB || self.webkitIndexedDB || self.msIndexedDB;
             if (idbInstance) {
                 const request = idbInstance.open(config.databaseName, config.version);
                 request.onsuccess = () => {
+                    this.dbInstance[config.databaseName] = request.result;
                     resolve(request.result);
                 };
                 request.onerror = (e) => {
@@ -62,9 +66,16 @@ export class IndexedDB {
     static run(config) {
         if (!this.transactions[config.databaseName]) {
             this.transactions[config.databaseName] = {};
+            this.executingTransaction[config.databaseName] = {};
+            this.txInstance[config.databaseName] = {};
+            this.dbInstanceUsing[config.databaseName] = {};
+            this.txInstanceMode[config.databaseName] = {};
             for (const storeName of config.stores) {
                 if (!this.transactions[config.databaseName][storeName.name]) {
                     this.transactions[config.databaseName][storeName.name] = [];
+                    this.executingTransaction[config.databaseName][storeName.name] = false;
+                    this.txInstance[config.databaseName][storeName.name] = null;
+                    this.txInstanceMode[config.databaseName][storeName.name] = {};
                 }
             }
         }
@@ -83,32 +94,64 @@ export class IndexedDB {
         });
     }
     static executeTransaction(currentStore, databaseName) {
-        this.executingTransaction = true;
         const { mode, callback, config } = this.transactions[databaseName][currentStore].shift();
+        this.txInstanceMode[databaseName][currentStore][mode] = true;
         const done = () => {
+            var _a, _b;
             if (this.transactions[config.databaseName][currentStore].length == 0) {
-                this.executingTransaction = false;
+                this.executingTransaction[databaseName][currentStore] = false;
+                if (this.txInstanceMode[databaseName][currentStore]['readwrite']) {
+                    try {
+                        (_b = (_a = this.txInstance[databaseName][currentStore]) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
+                    }
+                    catch (error) {
+                        // no commit need 
+                    }
+                }
+                this.txInstanceMode[databaseName][currentStore] = {};
+                this.dbInstance[config.databaseName].close();
+                delete this.dbInstanceUsing[config.databaseName][currentStore];
+                if (Object.keys(this.dbInstanceUsing[config.databaseName]).length == 0) {
+                    delete this.dbInstance[config.databaseName];
+                }
             }
             else {
-                // console.log('next')
-                // console.log('left '+this.transactions[config.databaseName][currentStore].length)
                 this.executeTransaction(currentStore, databaseName);
             }
         };
-        const transactionInstance = new transaction({ store: currentStore, done });
+        const transactionInstance = new transaction({
+            store: currentStore,
+            done,
+            db: this.dbInstance[config.databaseName],
+            tx: this.txInstance[databaseName][currentStore]
+        });
         // console.log('execute')
         callback(transactionInstance);
     }
     static getOrCreateTransaction({ currentStore, queryId, config }, mode, callback) {
         this.transactions[config.databaseName][currentStore].push({ config, queryId, mode, callback });
-        if (this.executingTransaction == false) {
+        if (this.executingTransaction[config.databaseName][currentStore] == false) {
+            this.executingTransaction[config.databaseName][currentStore] = true;
             // console.log('start')
-            this.executeTransaction(currentStore, config.databaseName);
+            this.connect(config).then(() => {
+                const tx = this.createTransaction(this.dbInstance[config.databaseName], "readwrite", currentStore, () => { });
+                this.txInstance[config.databaseName][currentStore] = tx;
+                this.dbInstanceUsing[config.databaseName][currentStore] = true;
+                this.executeTransaction(currentStore, config.databaseName);
+            });
         }
-        else {
-            // console.log('padding '+this.transactions[config.databaseName][currentStore].length)
-        }
+    }
+    static createTransaction(db, dbMode, currentStore, resolve, reject, abort) {
+        let tx = db.transaction(currentStore, dbMode);
+        tx.onerror = reject;
+        tx.oncomplete = resolve;
+        tx.onabort = abort;
+        return tx;
     }
 }
 IndexedDB.transactions = {};
-IndexedDB.executingTransaction = false;
+IndexedDB.dbInstance = {};
+IndexedDB.dbInstanceUsing = {};
+IndexedDB.txInstance = {};
+IndexedDB.txInstanceMode = {};
+IndexedDB.executingTransaction = {};

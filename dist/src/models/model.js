@@ -208,6 +208,7 @@ export class Model extends (_b = ModelManager) {
         }
         const emptyFields = await this.getEmptyFields();
         const TableSchema = this.getTableSchema();
+        const ModelName = TableSchema.name;
         for (let i in arg) {
             arg[i] = Object.assign(Object.assign({}, emptyFields), this.getFields(arg[i]));
             if (!this.formValidation(arg[i])) {
@@ -227,26 +228,49 @@ export class Model extends (_b = ModelManager) {
         const _methods = [{ methodName: 'create', arguments: arg }];
         const DBconfig = this.getDBSchema();
         const queryId = uniqueGenerator();
-        const createObject = await super.obj(DBconfig, TableSchema).create(_methods, queryId);
+        const createObjectRequest = super.obj(DBconfig, TableSchema).create(_methods, queryId);
+        for (let i in arg) {
+            let newInstance = new models[ModelName]();
+            Object.assign(newInstance, arg[i]);
+            delete newInstance.obj;
+            delete newInstance[TableSchema.id.keyPath];
+            if (TableSchema.fieldTypes.ManyToManyField) {
+                for (let field of TableSchema.fieldTypes.ManyToManyField) {
+                    // console.log(ModelName, field)
+                    newInstance[field] = null;
+                }
+            }
+            if (TableSchema.fieldTypes.OneToOneField) {
+                for (let field of TableSchema.fieldTypes.ManyToManyField) {
+                    // console.log(ModelName, field)
+                    newInstance[field] = null;
+                }
+            }
+            arg[i] = newInstance;
+        }
+        const createObject = await createObjectRequest;
         IndexedDBWorkerQueue.finish(queryId);
         if (createObject) {
             if (typeof createObject[TableSchema.id.keyPath] == 'object') {
                 throw (createObject[TableSchema.id.keyPath].error);
             }
             else {
-                const ModelName = this.getModelName();
-                let newInstance = new models[ModelName]();
-                Object.assign(newInstance, createObject);
-                delete newInstance.obj;
-                return newInstance;
+                if (Array.isArray(createObject)) {
+                    for (let a in createObject) {
+                        arg[a][TableSchema.id.keyPath] = createObject[a][TableSchema.id.keyPath];
+                    }
+                    return arg;
+                }
+                else {
+                    arg[0][TableSchema.id.keyPath] = createObject[TableSchema.id.keyPath];
+                    return arg[0];
+                }
             }
-        }
-        else {
         }
     }
     static newInstance({ TableSchema, DBconfig, ModelName, dataToMerge }) {
         let newInstance = new models[ModelName]();
-        Object.assign(newInstance, Object.assign({}, dataToMerge));
+        Object.assign(newInstance, dataToMerge);
         delete newInstance.obj;
         return newInstance;
     }
