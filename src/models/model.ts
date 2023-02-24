@@ -6,6 +6,7 @@ import { models, modelsConfig, modelsConfigLocalStorage } from './register-model
 import { FieldType } from '../sql/query/interface.js';
 import  * as Fields from './field/allFields.js'
 import { IndexedDBWorkerQueue } from '../connection/worker.queue.js';
+import { transactionOnCommit } from '../triggers/transaction.js';
 
 let methods : Methods = {} = {}
 
@@ -437,6 +438,11 @@ export class Model extends ModelManager{
     const result = await super.obj(DBconfig, TableSchema).update(_methods, queryId)
     IndexedDBWorkerQueue.finish(queryId)
     return result
+  }
+
+
+  static transactionOnCommit (callback : () => void) {
+    return transactionOnCommit.subscribe(this as unknown as Model, callback)
   }
 
   static object = ({queryId, DBconfig, TableSchema,  some = null}) => {

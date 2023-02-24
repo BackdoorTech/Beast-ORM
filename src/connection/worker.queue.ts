@@ -60,7 +60,8 @@ export class _IndexedDBWorkerQueue {
 
 	async onmessage (data: any) {
 		const value = this.workerQueues[data.queryId]
-		await value.func(data)
+		value.func(data)
+		
 	}
 
 	finish(queryId) {

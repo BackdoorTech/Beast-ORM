@@ -74,16 +74,12 @@ export class triggers {
         triggerBeforeInsert[databaseName][ModelName].push({callback})
         const functionId = uniqueGenerator();
 
-        const args = {
-            type: functionId,
-            callback: (row) => {
-                for (const request of triggerBeforeInsert[databaseName][ModelName]) {
-                    request.callback(row)
-                }
-            }
+        const args = {}
+        const eventHandler = () => {
+            
         }
 
-        ModelManager.obj(Model.getDBSchema(), Model.getTableSchema()).trigger(args, Subscription)
+        ModelManager.obj(Model.getDBSchema(), Model.getTableSchema()).trigger(args, Subscription, eventHandler)
         
         return {
             SubscriptionName: SubscriptionName,

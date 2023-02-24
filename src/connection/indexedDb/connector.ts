@@ -1,4 +1,4 @@
-import { DatabaseSchema  } from '../../models/register-modal.interface.js'
+import { DatabaseSchema, TableSchema } from "../../models/register-modal.interface.js";
 import { transaction } from './transaction.js';
 
 // inspire by https://github.com/hc-oss/use-indexeddb
@@ -17,6 +17,7 @@ export class IndexedDB {
   static txInstance: {[dbName: string]: {[store: string]: IDBTransaction}} = {}
   static txInstanceMode: {[dbName: string]: {[store: string]: object }} = {}
   static storeCache: {[dbName: string]: {[store: string]: object[] }} = {}
+  static transactionOnCommit: {[dbName: string]: {[store: string]: {[queryId: string]: Object}}} = {}
 
   constructor() {}
 
@@ -94,6 +95,7 @@ export class IndexedDB {
       this.txInstance[config.databaseName] = {}
       this.dbInstanceUsing[config.databaseName] = {}
       this.txInstanceMode[config.databaseName] = {}
+      this.transactionOnCommit[config.databaseName] = {}
 
       for( const storeName of config.stores) {
         if(!this.transactions[config.databaseName][storeName.name]) {
@@ -101,6 +103,7 @@ export class IndexedDB {
           this.executingTransaction[config.databaseName][storeName.name] = false
           this.txInstance[config.databaseName][storeName.name] = null
           this.txInstanceMode[config.databaseName][storeName.name] = {}
+          this.transactionOnCommit[config.databaseName][storeName.name] = {}
         }
       }
     }
@@ -139,6 +142,12 @@ export class IndexedDB {
         if(this.txInstanceMode[databaseName][currentStore]['readwrite']) {
           try {
             (this.txInstance[databaseName][currentStore] as any)?.commit?.();
+
+            for (let onTransaction of Object.entries(this.transactionOnCommit[databaseName][currentStore]) ) {
+              postMessage({
+                queryId: onTransaction,
+              })
+            }
           } catch (error) {
             // no commit need 
           }
@@ -202,5 +211,23 @@ export class IndexedDB {
     tx.oncomplete = resolve;
     tx.onabort = abort;
     return tx;
+  }
+
+
+
+  static transactionOnCommitSubscribe(TableSchema:TableSchema, config:DatabaseSchema, SubscriptionName) {
+    this.transactionOnCommit[config.databaseName][TableSchema.name][SubscriptionName] = {}
+    return {
+      subscription: true,
+      queryId: SubscriptionName
+    }
+  }
+
+  static transactionOnCommitUnSubscribe(TableSchema:TableSchema, config:DatabaseSchema, SubscriptionName) {
+    delete this.transactionOnCommit[config.databaseName][TableSchema.name][SubscriptionName]
+    return {
+      subscription: false,
+      queryId: SubscriptionName
+    }
   }
 }

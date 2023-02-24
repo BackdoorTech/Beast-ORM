@@ -1,4 +1,4 @@
-import { DatabaseSchema } from '../../models/register-modal.interface.js';
+import { DatabaseSchema, TableSchema } from "../../models/register-modal.interface.js";
 import { transaction } from './transaction.js';
 export declare class IndexedDB {
     static transactions: {
@@ -34,6 +34,13 @@ export declare class IndexedDB {
             [store: string]: object[];
         };
     };
+    static transactionOnCommit: {
+        [dbName: string]: {
+            [store: string]: {
+                [queryId: string]: Object;
+            };
+        };
+    };
     constructor();
     static connect(config: DatabaseSchema): Promise<IDBDatabase>;
     static migrate(config: DatabaseSchema): Promise<boolean>;
@@ -54,4 +61,12 @@ export declare class IndexedDB {
         config: any;
     }, mode: IDBTransactionMode, callback: (transaction: transaction) => void): void;
     private static createTransaction;
+    static transactionOnCommitSubscribe(TableSchema: TableSchema, config: DatabaseSchema, SubscriptionName: any): {
+        subscription: boolean;
+        queryId: any;
+    };
+    static transactionOnCommitUnSubscribe(TableSchema: TableSchema, config: DatabaseSchema, SubscriptionName: any): {
+        subscription: boolean;
+        queryId: any;
+    };
 }

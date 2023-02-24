@@ -304,6 +304,18 @@ class indexedDBInterface {
                     return {
                         queryId: queryId
                     };
+                },
+                trigger: async ({ type, subscribe }) => {
+                    if (type == 'transactionOnCommit') {
+                        if (subscribe) {
+                            return await IndexedDB.transactionOnCommitSubscribe(TableSchema, config, queryId);
+                        }
+                        else {
+                            return await IndexedDB.transactionOnCommitUnSubscribe(TableSchema, config, queryId);
+                        }
+                    }
+                    else if (type == 'trigger') {
+                    }
                 }
             };
         };

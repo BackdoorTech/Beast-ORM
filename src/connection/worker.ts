@@ -17,14 +17,19 @@ onmessage = async (oEvent) => {
         value: undefined
       })
     }
-  }).catch((result) => {
+  }).catch((error) => {
   
     try {
-      postMessage(result)
+      postMessage({
+        error: error,
+        queryId: queryId,
+        value: error
+      })
     } catch (error) {
       postMessage({
-        queryId: result.queryId,
-        value: undefined
+        error: error,
+        queryId: queryId,
+        value: error
       })
     }
   })

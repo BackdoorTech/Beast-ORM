@@ -5,6 +5,7 @@ import { models, modelsConfig, modelsConfigLocalStorage } from './register-model
 import { FieldType } from '../sql/query/interface.js';
 import * as Fields from './field/allFields.js';
 import { IndexedDBWorkerQueue } from '../connection/worker.queue.js';
+import { transactionOnCommit } from '../triggers/transaction.js';
 let methods = {} = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model extends (_b = ModelManager) {
@@ -309,6 +310,9 @@ export class Model extends (_b = ModelManager) {
         const result = await super.obj(DBconfig, TableSchema).update(_methods, queryId);
         IndexedDBWorkerQueue.finish(queryId);
         return result;
+    }
+    static transactionOnCommit(callback) {
+        return transactionOnCommit.subscribe(this, callback);
     }
 }
 _a = Model;

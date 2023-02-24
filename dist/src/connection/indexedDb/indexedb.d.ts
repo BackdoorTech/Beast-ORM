@@ -40,6 +40,13 @@ declare class indexedDBInterface {
         migrate: () => Promise<{
             queryId: any;
         }>;
+        trigger: ({ type, subscribe }: {
+            type: any;
+            subscribe: any;
+        }) => Promise<{
+            subscription: boolean;
+            queryId: any;
+        }>;
     };
 }
 export declare const indexedDB: indexedDBInterface;

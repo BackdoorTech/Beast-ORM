@@ -6,6 +6,7 @@ import { uncapitalize } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js';
 import { ModelManager } from './model-manager.js';
+import { transactionOnCommit } from '../triggers/transaction.js';
 export const models = {};
 export const modelsConfig = {};
 export const modelsLocalStorage = {};
@@ -82,6 +83,7 @@ export class registerModel {
                 DatabaseSchema: databaseSchema,
                 TableSchema: tableSchema
             };
+            transactionOnCommit.prepare(modelClassRepresentations);
         }
         if (databaseSchema.type == 'indexedDB') {
             // console.log(JSON.stringify(databaseSchema))

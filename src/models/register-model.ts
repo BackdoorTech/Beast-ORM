@@ -7,6 +7,7 @@ import { uncapitalize } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js'
 import { ModelManager } from './model-manager.js';
+import { transactionOnCommit } from '../triggers/transaction.js';
 
 interface register {
   databaseName: string,
@@ -51,6 +52,7 @@ export class registerModel {
     for (const modelClassRepresentations of entries.models) {
       const ModelName = modelClassRepresentations.getModelName()
       models[ModelName] = modelClassRepresentations 
+
     }
 
     let index = 0;
@@ -116,6 +118,8 @@ export class registerModel {
         DatabaseSchema: databaseSchema,
         TableSchema: tableSchema
       }
+
+      transactionOnCommit.prepare(modelClassRepresentations as any)
     }
 
 

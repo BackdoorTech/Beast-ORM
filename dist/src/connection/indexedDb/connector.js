@@ -62,12 +62,14 @@ export class IndexedDB {
             this.txInstance[config.databaseName] = {};
             this.dbInstanceUsing[config.databaseName] = {};
             this.txInstanceMode[config.databaseName] = {};
+            this.transactionOnCommit[config.databaseName] = {};
             for (const storeName of config.stores) {
                 if (!this.transactions[config.databaseName][storeName.name]) {
                     this.transactions[config.databaseName][storeName.name] = [];
                     this.executingTransaction[config.databaseName][storeName.name] = false;
                     this.txInstance[config.databaseName][storeName.name] = null;
                     this.txInstanceMode[config.databaseName][storeName.name] = {};
+                    this.transactionOnCommit[config.databaseName][storeName.name] = {};
                 }
             }
         }
@@ -95,6 +97,11 @@ export class IndexedDB {
                 if (this.txInstanceMode[databaseName][currentStore]['readwrite']) {
                     try {
                         (_b = (_a = this.txInstance[databaseName][currentStore]) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
+                        for (let onTransaction of Object.entries(this.transactionOnCommit[databaseName][currentStore])) {
+                            postMessage({
+                                queryId: onTransaction,
+                            });
+                        }
                     }
                     catch (error) {
                         // no commit need 
@@ -140,6 +147,20 @@ export class IndexedDB {
         tx.onabort = abort;
         return tx;
     }
+    static transactionOnCommitSubscribe(TableSchema, config, SubscriptionName) {
+        this.transactionOnCommit[config.databaseName][TableSchema.name][SubscriptionName] = {};
+        return {
+            subscription: true,
+            queryId: SubscriptionName
+        };
+    }
+    static transactionOnCommitUnSubscribe(TableSchema, config, SubscriptionName) {
+        delete this.transactionOnCommit[config.databaseName][TableSchema.name][SubscriptionName];
+        return {
+            subscription: false,
+            queryId: SubscriptionName
+        };
+    }
 }
 IndexedDB.transactions = {};
 IndexedDB.dbInstance = {};
@@ -147,4 +168,5 @@ IndexedDB.dbInstanceUsing = {};
 IndexedDB.txInstance = {};
 IndexedDB.txInstanceMode = {};
 IndexedDB.storeCache = {};
+IndexedDB.transactionOnCommit = {};
 IndexedDB.executingTransaction = {};

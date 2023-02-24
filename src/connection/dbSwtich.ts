@@ -32,7 +32,7 @@ export class DBSwitch {
 		}
 	}
 
-	static async callBackRequestHandler(TableSchema: TableSchema, DBconfig:DatabaseSchema, dbType : dbType, action: actionParam, arg: any, queryId) {
+	static async callBackRequestHandler(TableSchema: TableSchema, DBconfig:DatabaseSchema, dbType : dbType, action: actionParam, arg: any, callback: Function, queryId: string) {
 		if (typeof(Worker) !== "undefined" && IndexedDBWorkerQueue.webWorkerModuleSupport) {
 			//great, your browser supports web workers
 			const request = IndexedDBWorkerQueue.register({
@@ -40,7 +40,7 @@ export class DBSwitch {
 				queryId: queryId,
 				method: 'execute',
 				func: (message) => {
-					arg.callback(message?.value)
+					callback(message)
 				},
 			})
 
