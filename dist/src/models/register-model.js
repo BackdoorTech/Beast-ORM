@@ -82,11 +82,12 @@ export class registerModel {
                 DatabaseSchema: databaseSchema,
                 TableSchema: tableSchema
             };
+            ModelMigrations.prepare(databaseSchema.databaseName);
             transactionOnCommit.prepare(modelClassRepresentations);
         }
         if (databaseSchema.type == 'indexedDB') {
             await ModelManager.obj(databaseSchema, tableSchema_).migrate();
-            ModelMigrations.migrationsState(true);
+            ModelMigrations.migrationsState(databaseSchema.databaseName, true);
         }
     }
     static manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema) {
@@ -192,7 +193,6 @@ export class registerLocalStorage {
             };
             modelsLocalStorage[ModelName] = modelClassRepresentations;
         }
-        ModelMigrations.migrationsState(true);
     }
 }
 export class ModelEditor {

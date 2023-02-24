@@ -1,8 +1,13 @@
 export declare class _ModelMigrations {
-    callback: any[];
-    private isMigrationsReady;
-    migrationsState(value: boolean): void;
+    callback: {
+        [dbName: string]: Function[];
+    };
+    migrated: {
+        [dbName: string]: boolean;
+    };
+    prepare(databaseName: any): void;
+    migrationsState(databaseName: string, value: boolean): void;
     isReady(modelClassRepresentation: any): void;
-    waitMigration(): Promise<unknown>;
+    waitMigration(databaseName: string): Promise<unknown>;
 }
 export declare const ModelMigrations: _ModelMigrations;

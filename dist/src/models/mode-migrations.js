@@ -1,23 +1,26 @@
 export class _ModelMigrations {
     constructor() {
-        this.callback = [];
-        this.isMigrationsReady = false;
+        this.callback = {};
+        this.migrated = {};
     }
-    migrationsState(value) {
-        this.isMigrationsReady = value;
-        if (this.isMigrationsReady) {
-            this.callback.forEach((item, index, object) => {
-                item();
+    prepare(databaseName) {
+        this.callback[databaseName] = [];
+    }
+    migrationsState(databaseName, value) {
+        this.migrated[databaseName] = value;
+        if (this.migrated[databaseName]) {
+            this.callback[databaseName].forEach((callback, index, object) => {
+                callback();
             });
         }
     }
     isReady(modelClassRepresentation) {
         // const classInstance: typeof models.Model = new modelClassRepresentation()
     }
-    async waitMigration() {
+    async waitMigration(databaseName) {
         return new Promise((resolve, reject) => {
-            if (!this.isMigrationsReady) {
-                this.callback.push(() => {
+            if (!this.migrated[databaseName]) {
+                this.callback[databaseName].push(() => {
                     resolve('ready');
                 });
             }

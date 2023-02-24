@@ -1,14 +1,19 @@
 export class _ModelMigrations {
   
-  callback = []
+  callback: {[dbName: string]: Function[] } = {}
+  migrated: {[dbName: string]: boolean} = {}
 
-  private isMigrationsReady = false
-  migrationsState(value: boolean) {
+  prepare(databaseName) {
+    this.callback[databaseName] = []
+  }
 
-    this.isMigrationsReady = value;
-    if(this.isMigrationsReady) {
-      this.callback.forEach((item, index, object) => {
-        item()
+  migrationsState(databaseName:string, value: boolean) {
+
+    this.migrated[databaseName] = value
+
+    if(this.migrated[databaseName]) {
+      this.callback[databaseName].forEach((callback, index, object) => {
+        callback()
       });
     }
   }
@@ -17,10 +22,10 @@ export class _ModelMigrations {
     // const classInstance: typeof models.Model = new modelClassRepresentation()
   }
 
-  async waitMigration() {
+  async waitMigration(databaseName: string) {
     return new Promise((resolve, reject) => {
-      if(!this.isMigrationsReady) {
-        this.callback.push(() => {
+      if(!this.migrated[databaseName]) {
+        this.callback[databaseName].push(() => {
           resolve('ready');
         })
       } else {

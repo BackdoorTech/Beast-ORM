@@ -119,13 +119,14 @@ export class registerModel {
         TableSchema: tableSchema
       }
 
+      ModelMigrations.prepare(databaseSchema.databaseName)
       transactionOnCommit.prepare(modelClassRepresentations as any)
     }
 
 
     if(databaseSchema.type =='indexedDB') {
       await ModelManager.obj(databaseSchema, tableSchema_ ).migrate()
-      ModelMigrations.migrationsState(true);
+      ModelMigrations.migrationsState(databaseSchema.databaseName, true);
     }
     
   }
@@ -259,7 +260,6 @@ export class registerLocalStorage {
       modelsLocalStorage[ModelName] = modelClassRepresentations
     }
     
-    ModelMigrations.migrationsState(true);
   }
 }
 
