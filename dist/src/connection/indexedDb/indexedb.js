@@ -300,6 +300,7 @@ class indexedDBInterface {
                     });
                 },
                 migrate: async () => {
+                    await IndexedDB.migrate(config);
                     await IndexedDB.run(config);
                     return {
                         queryId: queryId

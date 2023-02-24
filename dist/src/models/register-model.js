@@ -1,6 +1,5 @@
 import { Model } from './model.js';
 import { LocalStorageModelReader, ModelReader } from './model.reader.js';
-import { indexedDB } from './../connection/indexedDb/indexedb.js';
 import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js';
 import { uncapitalize } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
@@ -86,10 +85,8 @@ export class registerModel {
             transactionOnCommit.prepare(modelClassRepresentations);
         }
         if (databaseSchema.type == 'indexedDB') {
-            // console.log(JSON.stringify(databaseSchema))
-            await indexedDB.migrate(databaseSchema);
-            ModelMigrations.migrationsState(true);
             await ModelManager.obj(databaseSchema, tableSchema_).migrate();
+            ModelMigrations.migrationsState(true);
         }
     }
     static manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema) {

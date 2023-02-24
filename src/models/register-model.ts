@@ -124,10 +124,8 @@ export class registerModel {
 
 
     if(databaseSchema.type =='indexedDB') {
-      // console.log(JSON.stringify(databaseSchema))
-      await indexedDB.migrate(databaseSchema)
-      ModelMigrations.migrationsState(true);
       await ModelManager.obj(databaseSchema, tableSchema_ ).migrate()
+      ModelMigrations.migrationsState(true);
     }
     
   }
