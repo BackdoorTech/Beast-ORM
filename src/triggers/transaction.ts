@@ -23,8 +23,8 @@ export  class transactionOnCommit {
         const databaseName = DatabaseSchema.databaseName
         const table = TableSchema.name
         const SubscriptionName = databaseName + table
-
         const queryId = uniqueGenerator();
+        let subscribe = false
         this.stores[databaseName][table][queryId]  = callback
         
         if(!this.subscription[SubscriptionName]) {
@@ -35,14 +35,19 @@ export  class transactionOnCommit {
             }
 
             ModelManager.obj(DatabaseSchema, TableSchema).trigger(args, SubscriptionName, async () => {
-                for(const [requestId, callback] of Object.entries(this.stores[databaseName][table])) {
-                    callback()
-                }
+                subscribe = true
+
+                IndexedDBWorkerQueue.updateFunction(SubscriptionName, () => {
+                    for(const [requestId, callback] of Object.entries(this.stores[databaseName][table])) {
+                        callback()
+                    }
+                })
             })
 
         }
 
         return {
+            subscribe,
             unsubscribe: () => {
                 return new Promise((resolve, reject) => {
 

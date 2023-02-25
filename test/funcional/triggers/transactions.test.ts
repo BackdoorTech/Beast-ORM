@@ -23,7 +23,7 @@ describe("Trigger", () => {
       } 
       
       models.migrate({
-        databaseName:'jest-test',
+        databaseName:'jest-test123',
         type: 'indexedDB',
         version: 1,
         models: [Person]

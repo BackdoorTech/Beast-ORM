@@ -35,6 +35,7 @@ export declare class Model extends ModelManager {
     static updateOrCreate(argToFind: any, argsToUpdate: any): Promise<any>;
     static update(arg: any): Promise<any>;
     static transactionOnCommit(callback: () => void): {
+        subscribe: boolean;
         unsubscribe: () => Promise<unknown>;
     };
     static object: ({ queryId, DBconfig, TableSchema, some }: {

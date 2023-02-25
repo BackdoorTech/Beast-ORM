@@ -47,5 +47,8 @@ export class _IndexedDBWorkerQueue {
         }
         catch (error) { }
     }
+    updateFunction(queryId, func) {
+        this.workerQueues[queryId].func = func;
+    }
 }
 export const IndexedDBWorkerQueue = new _IndexedDBWorkerQueue();

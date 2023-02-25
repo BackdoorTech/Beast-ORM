@@ -70,6 +70,10 @@ export class _IndexedDBWorkerQueue {
 		} catch (error) {}
 	}
 
+	updateFunction(queryId, func:Function) {
+		this.workerQueues[queryId].func = func
+	}
+
 }
 
 

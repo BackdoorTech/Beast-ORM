@@ -88,29 +88,33 @@ export class IndexedDB {
         });
     }
     static executeTransaction(currentStore, databaseName) {
-        const { mode, callback, config } = this.transactions[databaseName][currentStore].shift();
+        const { mode, callback, config } = this.transactions[databaseName][currentStore][0];
         this.txInstanceMode[databaseName][currentStore][mode] = true;
         const done = async () => {
             var _a, _b;
+            this.transactions[databaseName][currentStore].shift();
             if (this.transactions[config.databaseName][currentStore].length == 0) {
                 this.executingTransaction[databaseName][currentStore] = false;
                 if (this.txInstanceMode[databaseName][currentStore]['readwrite']) {
                     try {
                         (_b = (_a = this.txInstance[databaseName][currentStore]) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
-                        for (let onTransaction of Object.entries(this.transactionOnCommit[databaseName][currentStore])) {
-                            postMessage({
-                                queryId: onTransaction,
-                            });
-                        }
+                        (async () => {
+                            for (let [queryId, value] of Object.entries(this.transactionOnCommit[databaseName][currentStore])) {
+                                postMessage({
+                                    queryId: queryId,
+                                });
+                            }
+                        })();
                     }
                     catch (error) {
                         // no commit need 
                     }
                 }
+                delete this.txInstance[databaseName][currentStore];
                 this.txInstanceMode[databaseName][currentStore] = {};
-                this.dbInstance[config.databaseName].close();
                 delete this.dbInstanceUsing[config.databaseName][currentStore];
                 if (Object.keys(this.dbInstanceUsing[config.databaseName]).length == 0) {
+                    this.dbInstance[config.databaseName].close();
                     delete this.dbInstance[config.databaseName];
                 }
             }
