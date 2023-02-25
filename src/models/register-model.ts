@@ -1,32 +1,48 @@
-import { Model } from './model.js';
-import { ModelReader } from './model.reader.js';
-import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
+import { Model, LocalStorage } from './model.js';
+import { LocalStorageModelReader, ModelReader } from './model.reader.js';
+import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchema, TableSchemaLocalStorage  } from './register-modal.interface.js';
 import { indexedDB  } from './../connection/indexedDb/indexedb.js';
 import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js';
-import { uncapitalize } from '../utils.js';
+import { uncapitalize, uniqueGenerator } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js'
+import { ModelManager } from './model-manager.js';
+import { transactionOnCommit } from '../triggers/transaction.js';
 
 interface register {
   databaseName: string,
   version: number,
-  type: 'indexedDB'
-  models: typeof Model[]
+  type: 'indexedDB' | 'localStorage'
+  models: typeof Model[] | typeof LocalStorage[]
 }
 
 export const models = {}
-export const modelsConfig: {[key:string]: { 
+export const modelsConfig: {[key:string]: {
   DatabaseSchema:DatabaseSchema,
   TableSchema:TableSchema,
   OneToOneField?: {[key:string]: {}} 
-  }} = {}
+}} = {}
 
 
+export const modelsLocalStorage = {}
+export const modelsConfigLocalStorage: {[key:string]: { 
+  DatabaseSchema:DatabaseSchemaLocalStorage,
+  TableSchema:TableSchemaLocalStorage
+}} = {}
+
+
+export function migrate(register: register) {
+  if(register.type == 'indexedDB') {
+    registerModel.register(register)
+  } else if (register.type == 'localStorage') {
+    registerLocalStorage.register(register)
+  }
+}
 export class registerModel {
   static async register(entries: register) {
     
     const databaseSchema : DatabaseSchema  = {
-      databaseName: entries.databaseName,
+      databaseName: entries.databaseName || uniqueGenerator(),
       version: entries.version,
       type: entries.type,
       stores: []
@@ -36,6 +52,7 @@ export class registerModel {
     for (const modelClassRepresentations of entries.models) {
       const ModelName = modelClassRepresentations.getModelName()
       models[ModelName] = modelClassRepresentations 
+
     }
 
     let index = 0;
@@ -89,25 +106,29 @@ export class registerModel {
 
 
 
-
+    let tableSchema_
     for(const modelClassRepresentations of entries.models) {
       const ModelName = modelClassRepresentations.getModelName()
       models[ModelName] = modelClassRepresentations
 
       const tableSchema = databaseSchema.stores.find((e)=> e.name == ModelName)
+      tableSchema_ = tableSchema
 
       modelsConfig[ModelName] = {
         DatabaseSchema: databaseSchema,
         TableSchema: tableSchema
       }
+
+      ModelMigrations.prepare(databaseSchema.databaseName)
+      transactionOnCommit.prepare(modelClassRepresentations as any)
     }
 
 
     if(databaseSchema.type =='indexedDB') {
-      await indexedDB.migrate(databaseSchema)
+      await ModelManager.obj(databaseSchema, tableSchema_ ).migrate()
+      ModelMigrations.migrationsState(databaseSchema.databaseName, true);
     }
     
-    ModelMigrations.migrationsState(true);
   }
 
   static manyToManyRelationShip(foreignKeyField:ManyToManyField, FieldName:string, modelName:string, databaseSchema:DatabaseSchema): Model {
@@ -167,6 +188,80 @@ export class registerModel {
 
 }
 
+export class registerLocalStorage {
+  static async register(entries: register) {
+ 
+
+    const databaseSchema : DatabaseSchemaLocalStorage = {
+      databaseName: entries.databaseName,
+      version: entries.version,
+      type: 'localStorage',
+      stores: []
+    };
+
+
+    for (const modelClassRepresentations of entries.models) {
+      const ModelName = modelClassRepresentations.getModelName()
+      modelsLocalStorage[ModelName] = modelClassRepresentations 
+    }
+
+    let index = 0;
+
+    for (const modelClassRepresentations of entries.models) {
+      const {fields, modelName, attributes , fieldTypes} = LocalStorageModelReader.read(modelClassRepresentations)
+      // const idFieldName = attributes?.primaryKey?.shift()
+
+      databaseSchema.stores.push({
+        name: modelName,
+        id: {
+          keyPath: modelName, //by default primary key is id
+          type: FieldType.VARCHAR,
+          autoIncrement: false
+        },
+        attributes: attributes,
+        fields: [],
+        fieldTypes
+      })
+
+      for(const [fieldName, Field] of  Object.entries(fields)) {
+        databaseSchema.stores[index].fields.push({
+          name: fieldName,
+          keyPath: fieldName,
+          options: {
+            unique: false,
+            type:  null
+          },
+          className: Field?.fieldName,
+          fieldAttributes:  Object.assign({}, Field)
+        })
+      }
+
+      index++;
+    }
+
+   
+    for(const modelClassRepresentations of entries.models) {
+      
+      const ModelName = modelClassRepresentations.getModelName()
+      const tableSchema = databaseSchema.stores.find((e)=> e.name == ModelName)
+         
+      modelClassRepresentations.getDBSchema = (): any => {
+        return databaseSchema
+      }
+
+      modelClassRepresentations.getTableSchema = (): any => {
+        return tableSchema
+      }
+
+      modelsConfigLocalStorage[ModelName] = {
+        DatabaseSchema: databaseSchema,
+        TableSchema: tableSchema
+      }
+      modelsLocalStorage[ModelName] = modelClassRepresentations
+    }
+    
+  }
+}
 
 export class ModelEditor {
   static addMethodOneToOneField(foreignKeyField:OneToOneField, FieldName:string, modelName:string, databaseSchema:DatabaseSchema) {

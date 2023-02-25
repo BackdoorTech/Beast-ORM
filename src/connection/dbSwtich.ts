@@ -13,24 +13,45 @@ export class DBSwitch {
 	
 				const request = IndexedDBWorkerQueue.register({
 					params: {TableSchema, DBconfig, queryId, action, arg, dbType},
+					queryId: queryId,
 					method: 'execute',
-					func:(message) => {
-						if(message.queryId == queryId) {
-							resolve(message?.value)
-							return true
-						}
+					func: (message) => {
+						resolve(message?.value)
 					},
 				})
 
 				if(request == false) {
 					const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg) as any
-					resolve(result?.value ) 
+					resolve(result?.value) 
 				}
 			});
 
 		} else {
 			const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg) as any
 			return result?.value
+		}
+	}
+
+	static async callBackRequestHandler(TableSchema: TableSchema, DBconfig:DatabaseSchema, dbType : dbType, action: actionParam, arg: any, callback: Function, queryId: string) {
+		if (typeof(Worker) !== "undefined" && IndexedDBWorkerQueue.webWorkerModuleSupport) {
+			//great, your browser supports web workers
+			const request = IndexedDBWorkerQueue.register({
+				params: {TableSchema, DBconfig, queryId, action, arg, dbType},
+				queryId: queryId,
+				method: 'execute',
+				func: (message) => {
+					callback(message)
+				},
+			})
+
+			if(request == false) {
+				const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg) as any
+				arg.callback(result?.value) 
+			}
+
+		} else {
+			const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg) as any
+			arg.callback(result?.value)
 		}
 	}
 

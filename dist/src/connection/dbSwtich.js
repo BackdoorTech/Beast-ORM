@@ -7,12 +7,10 @@ export class DBSwitch {
             return new Promise(async (resolve, reject) => {
                 const request = IndexedDBWorkerQueue.register({
                     params: { TableSchema, DBconfig, queryId, action, arg, dbType },
+                    queryId: queryId,
                     method: 'execute',
                     func: (message) => {
-                        if (message.queryId == queryId) {
-                            resolve(message === null || message === void 0 ? void 0 : message.value);
-                            return true;
-                        }
+                        resolve(message === null || message === void 0 ? void 0 : message.value);
                     },
                 });
                 if (request == false) {
@@ -24,6 +22,27 @@ export class DBSwitch {
         else {
             const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg);
             return result === null || result === void 0 ? void 0 : result.value;
+        }
+    }
+    static async callBackRequestHandler(TableSchema, DBconfig, dbType, action, arg, callback, queryId) {
+        if (typeof (Worker) !== "undefined" && IndexedDBWorkerQueue.webWorkerModuleSupport) {
+            //great, your browser supports web workers
+            const request = IndexedDBWorkerQueue.register({
+                params: { TableSchema, DBconfig, queryId, action, arg, dbType },
+                queryId: queryId,
+                method: 'execute',
+                func: (message) => {
+                    callback(message);
+                },
+            });
+            if (request == false) {
+                const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg);
+                arg.callback(result === null || result === void 0 ? void 0 : result.value);
+            }
+        }
+        else {
+            const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg);
+            arg.callback(result === null || result === void 0 ? void 0 : result.value);
         }
     }
 }

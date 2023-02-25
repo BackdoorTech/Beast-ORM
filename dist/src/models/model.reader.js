@@ -32,3 +32,22 @@ export class ModelReader {
         };
     }
 }
+export class LocalStorageModelReader {
+    static read(modelClassRepresentation) {
+        const classInstance = modelClassRepresentation;
+        const fieldTypes = {};
+        const attributes = {};
+        const modelName = classInstance.getModelName();
+        const fields = {};
+        for (const [fieldName, Field] of Object.entries(classInstance)) {
+            // const type = Field?.fieldName
+            fields[fieldName] = Field || null;
+        }
+        return {
+            modelName,
+            fields,
+            attributes,
+            fieldTypes
+        };
+    }
+}

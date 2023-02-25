@@ -417,7 +417,6 @@ export class objectEq {
 
 export class objectContains {
 	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
-		// console.log(fieldName, arg, row)
 
 		let rowValue;
 
@@ -448,8 +447,6 @@ export class objectContains {
 
 export class objectContains_by {
 	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
-		
-		// console.log(fieldName, arg, row);
 
 		let rowValue;
 		const keyCount = Object.keys(arg).length
@@ -473,7 +470,6 @@ export class objectContains_by {
 			return false
 		}
 
-		// console.log('keyFoundNEqual', keyFoundNEqual, 'keyCount', keyCount);
 		if(keyFoundNEqual == 0) {
 			return true
 		} else if (keyFoundNEqual == keyCount ) {

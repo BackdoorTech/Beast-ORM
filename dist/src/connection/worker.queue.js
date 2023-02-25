@@ -10,7 +10,7 @@ export class _IndexedDBWorkerQueue {
                 this.onmessage(data);
             };
             this.myWorker.onerror = (error) => {
-                console.log(error, 'erroror');
+                console.log('myWorker', error);
             };
         }
     }
@@ -38,14 +38,17 @@ export class _IndexedDBWorkerQueue {
         }
     }
     async onmessage(data) {
-        for (const [key, value] of Object.entries(this.workerQueues)) {
-            const dontRepeat = await value.func(data);
-            if (dontRepeat || !data.queryId) {
-                delete this.workerQueues[key];
-            }
-        }
+        const value = this.workerQueues[data.queryId];
+        value.func(data);
     }
-    requestHandler() {
+    finish(queryId) {
+        try {
+            delete this.workerQueues[queryId];
+        }
+        catch (error) { }
+    }
+    updateFunction(queryId, func) {
+        this.workerQueues[queryId].func = func;
     }
 }
 export const IndexedDBWorkerQueue = new _IndexedDBWorkerQueue();

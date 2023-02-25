@@ -1,11 +1,13 @@
 import { hashCode, uniqueGenerator } from '../utils.js'
 import { Methods, getParams, Method } from './model.interface.js'
-import { DatabaseSchema, TableSchema  } from './register-modal.interface.js';
+import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchema  } from './register-modal.interface.js';
 import { ModelManager } from './model-manager.js';
-import { models, modelsConfig } from './register-model.js'
+import { models, modelsConfig, modelsConfigLocalStorage } from './register-model.js'
 import { FieldType } from '../sql/query/interface.js';
 import  * as Fields from './field/allFields.js'
-import { field } from './field/field.js'
+import { IndexedDBWorkerQueue } from '../connection/worker.queue.js';
+import { transactionOnCommit } from '../triggers/transaction.js';
+import { ReactiveList } from '../reactive/DynamicList.js';
 
 let methods : Methods = {} = {}
 
@@ -63,6 +65,7 @@ export class Model extends ModelManager{
     const queryId=uniqueGenerator()
 
     await Model.obj(DBconfig, tableSchema).save(methods, queryId)
+    IndexedDBWorkerQueue.finish(queryId)
   }
 
 
@@ -80,6 +83,7 @@ export class Model extends ModelManager{
     const queryId=uniqueGenerator()
 
     await Model.obj(DBconfig, TableSchema).delete(_methods, queryId)
+    IndexedDBWorkerQueue.finish(queryId)
   }
   
   static async  deleteAll() {
@@ -96,12 +100,17 @@ export class Model extends ModelManager{
     const queryId=uniqueGenerator()
 
     await Model.obj(DBconfig, TableSchema).delete(_methods, queryId)
+    IndexedDBWorkerQueue.finish(queryId)
   }
 
   async all() {
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
-    return await Model.object({DBconfig, TableSchema}).all()
+    const queryId=uniqueGenerator()
+
+    const result = await Model.object({queryId, DBconfig, TableSchema}).all()
+    IndexedDBWorkerQueue.finish(queryId)
+    return result
   }
 
   getFields(arg) {
@@ -164,7 +173,11 @@ export class Model extends ModelManager{
   static async all() {
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
-    return await Model.object({DBconfig, TableSchema}).all()
+    const queryId = uniqueGenerator()
+
+    const result = await Model.object({queryId, DBconfig, TableSchema}).all()
+    IndexedDBWorkerQueue.finish(queryId)
+    return result
   }
   
   static async get(arg: getParams) {
@@ -175,6 +188,7 @@ export class Model extends ModelManager{
     const queryId = uniqueGenerator()
 
     const foundObj = await super.obj(DBconfig, TableSchema).get(_methods, queryId)
+    IndexedDBWorkerQueue.finish(queryId)
 
     if(!foundObj) {
       return false
@@ -182,16 +196,8 @@ export class Model extends ModelManager{
 
     const ModelName = this.getModelName()
     
-    let newInstance = new models[ModelName]()
-    Object.assign(newInstance, {...foundObj})
+    let newInstance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: foundObj})
 
-    
-    if(TableSchema.fieldTypes['ManyToManyField']) {
-      for( const fieldName of TableSchema.fieldTypes['ManyToManyField']) {
-        delete newInstance[fieldName]
-      }
-    }
-      
     delete newInstance.obj
     return  newInstance
   }
@@ -212,7 +218,9 @@ export class Model extends ModelManager{
 
     const newInstanceModel = this.NewModelInstance()
 
-    return  Object.assign(newInstanceModel, this.object({queryId,DBconfig, TableSchema, some:['filter', arg]})) as any
+    const result = Object.assign(newInstanceModel, this.object({queryId,DBconfig, TableSchema, some:['filter', arg]})) as any
+    IndexedDBWorkerQueue.finish(queryId)
+    return result
   }
 
 
@@ -268,62 +276,98 @@ export class Model extends ModelManager{
 
   static async create(arg): Promise<any> {
 
-    if (arg.constructor.name != 'Array') {
-      arg = [arg]
-    }
+    return new Promise(async (resolve, reject)=> {
 
-    const emptyFields = await this.getEmptyFields()
-    const TableSchema = this.getTableSchema()
-
-
-    for(let i in arg) {
-      arg[i] = Object.assign({...emptyFields} , this.getFields(arg[i]))
-
-      if(!this.formValidation(arg[i])) {
-        throw('invalid '+ JSON.stringify(arg[i]))
+      if (arg.constructor.name != 'Array') {
+        arg = [arg]
       }
-
-    }
-
-    for(let i in arg) {
-
-      if (TableSchema.attributes.foreignKey) {
-        for (let field of TableSchema.attributes.foreignKey) {
-          
-          try {
-            arg[i][field] = arg[i][field].getPrimaryKeyValue()
-          } catch (error){}
-          
+  
+      const emptyFields = await this.getEmptyFields()
+      const TableSchema = this.getTableSchema()
+      const ModelName = TableSchema.name
+  
+  
+      for(let i in arg) {
+        arg[i] = Object.assign({...emptyFields} , this.getFields(arg[i]))
+  
+        if(!this.formValidation(arg[i])) {
+          throw('invalid '+ JSON.stringify(arg[i]))
+        }
+  
+      }
+  
+      for(let i in arg) {
+  
+        if (TableSchema.attributes.foreignKey) {
+          for (let field of TableSchema.attributes.foreignKey) {
+            try {
+              arg[i][field] = arg[i][field].getPrimaryKeyValue()
+            } catch (error){}
+            
+          }
+        }
+  
+      }
+  
+      const _methods: Method[] = [{methodName: 'create', arguments: arg}]
+      const DBconfig = this.getDBSchema()
+  
+      const queryId = uniqueGenerator()
+      
+      const createObjectRequest = super.obj(DBconfig, TableSchema).create(_methods, queryId)
+  
+      const createObject  = await createObjectRequest
+      IndexedDBWorkerQueue.finish(queryId)
+  
+      if(createObject) {
+  
+        if(typeof createObject[TableSchema.id.keyPath] == 'object') {
+          reject(createObject[TableSchema.id.keyPath].error)
+        } else {
+          if(Array.isArray(createObject)) {
+            resolve(createObject)
+            for(let a in createObject) {
+              createObject[a] = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: createObject[a]}) 
+            }
+            return arg
+          } else {
+            const instance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: createObject})
+            resolve(instance)
+          }
         }
       }
-
-    }
+    });
     
-    
-    const _methods: Method[] = [{methodName: 'create', arguments: arg}]
-    const DBconfig = this.getDBSchema()
-
-    const queryId=uniqueGenerator()
-    
-    const createObject = await super.obj(DBconfig, TableSchema).create(_methods, queryId)
-
-
-    if(createObject) {
-      const ModelName = this.getModelName();
-      let newInstance = new models[ModelName]();
-      Object.assign(newInstance, createObject);
-      delete newInstance.obj;
-
-      return newInstance;
-    } else {
-        
-    }
 
   }
 
   private static newInstance({ TableSchema, DBconfig, ModelName, dataToMerge }) {
     let newInstance = new models[ModelName]();
-    Object.assign(newInstance, {...dataToMerge});
+
+    delete newInstance[TableSchema.id.keyPath]
+
+    if(TableSchema.fieldTypes.ManyToManyField) {
+      for (let field of TableSchema.fieldTypes.ManyToManyField) {
+        newInstance[field] = null
+        
+      }
+    }
+
+    if(TableSchema.fieldTypes.OneToOneField) {
+      for (let field of TableSchema.fieldTypes.ManyToManyField) {
+        newInstance[field] = null 
+      }
+    }
+    Object.assign(newInstance, dataToMerge);
+
+    if(newInstance[TableSchema.id.keyPath]) {
+      Object.defineProperty(newInstance, TableSchema.id.keyPath, 
+        { 
+          configurable: false, 
+          writable: false 
+        }
+      );
+    }
     delete newInstance.obj;
     return newInstance;
   }
@@ -355,13 +399,11 @@ export class Model extends ModelManager{
     let [instance , created] = await this.createOrFind(argToFind, argsToUpdate)
 
     if(!created) {
-
       const params = Object.assign(argToFind, argsToUpdate)
       instance = Object.assign(instance, params)
 
       await instance.save()
     }
-
     return instance
 
   }
@@ -377,11 +419,23 @@ export class Model extends ModelManager{
     const queryId = uniqueGenerator()
     
 
-    return  await super.obj(DBconfig, TableSchema).update(_methods, queryId)
+    const result = await super.obj(DBconfig, TableSchema).update(_methods, queryId)
+    IndexedDBWorkerQueue.finish(queryId)
+    return result
   }
 
-  static object = ({queryId=uniqueGenerator(), DBconfig, TableSchema,  some = null}) => {
 
+  static transactionOnCommit (callback : () => void) {
+    return transactionOnCommit.subscribe(this as unknown as Model, callback)
+  }
+
+  static ReactiveList (callback : (Model: Model) => void) {
+    return ReactiveList.subscribe(this as unknown as Model, callback)
+  }
+
+  static object = ({queryId, DBconfig, TableSchema,  some = null}) => {
+
+    const ModelName = TableSchema.name
 
     if(!methods[queryId]) {
       methods[queryId] = []
@@ -399,12 +453,20 @@ export class Model extends ModelManager{
         const newInstanceModel = this.NewModelInstance()
         return Object.assign(newInstanceModel, this.object({DBconfig, TableSchema,queryId}))
       },
-      execute: async () => {
-        methods[queryId].push({methodName: 'execute', arguments: null})
+      execute: async (): Promise<any[]> => {
+        return new Promise(async(resolve, reject) => {
+          methods[queryId].push({methodName: 'execute', arguments: null})
 
-        const _methods: Method[] = methods[queryId]
-        methods[queryId] = []
-        return  await super.obj(DBconfig, TableSchema).execute(_methods, queryId)
+          const _methods: Method[] = methods[queryId]
+          methods[queryId] = []
+          const result = await super.obj(DBconfig, TableSchema).execute(_methods, queryId)
+          resolve(result);
+
+          for(let i of result) {
+            result[i] = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[i]})
+          }
+        })
+        
       }, 
       update: async(args) => {
         methods[queryId].push({methodName: 'update', arguments: args})
@@ -419,14 +481,126 @@ export class Model extends ModelManager{
         return await super.obj(DBconfig, TableSchema).delete(_methods, queryId)
 
       },
-      all: async() => {
+      all: async(): Promise<any[]> => {
+        return new Promise(async(resolve, reject) => {
+          methods[queryId].push({methodName: 'all', arguments: null})
+          const _methods: Method[] = methods[queryId]
+          methods[queryId] = []
+          const result = await super.obj(DBconfig, TableSchema).all(_methods, queryId)
 
-        methods[queryId].push({methodName: 'all', arguments: null})
-        const _methods: Method[] = methods[queryId]
-        methods[queryId] = []
-        return await super.obj(DBconfig, TableSchema).all(_methods, queryId)
-
+          resolve(result);
+          for(let i of result) {
+            result[i] = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[i]})
+          }
+        });
       }
     }
   }
+}
+
+
+export class LocalStorage {
+
+  constructor() {}
+
+  static save(data: Object = {}) {
+    const dataToSave = this.getFields(Object.assign(this, {...data}))
+    const key = this.getTableSchema().id
+    localStorage.setItem(key.keyPath, JSON.stringify(dataToSave))
+  }
+
+  static get() {
+    const key = this.getTableSchema().id
+    const restedData = JSON.parse(localStorage.getItem(key.keyPath))
+    Object.assign(this, {...restedData})
+
+    return restedData
+  }
+
+  static getModelName() {
+    return this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
+  }
+
+  static getDBSchema(): DatabaseSchemaLocalStorage  {
+    const modalName = this.getModelName()
+    return modelsConfigLocalStorage[modalName].DatabaseSchema 
+  }
+
+  static getTableSchema(): TableSchema {
+    const modalName = this.getModelName()
+    return modelsConfigLocalStorage[modalName].TableSchema;
+  }
+
+  private static getIgnoreAttributes(): false | [] {
+    return false
+  }
+
+  static ignoreAttributes(attributesStartWidth: string[] = []) {
+    if(!this.getIgnoreAttributes()) {
+      this.getIgnoreAttributes = (): any => {
+        return attributesStartWidth
+      }
+    }
+  }
+
+  private static getFields(arg) {
+
+    const TableSchema = this.getTableSchema()
+    const filteredArgs = {}
+
+    const fieldsName = TableSchema.fields.map((field)=>field.name)
+    const Attributes = this.getIgnoreAttributes()
+    
+    const fieldNameFilter = fieldsName.filter((fieldName) => {
+      
+      if(Attributes) {
+        for(let Attribute of Attributes) {
+          if(fieldName.startsWith(Attribute)) {
+            return false
+          }
+        }
+      }
+      
+      return true
+    })
+
+    for(let fieldName of fieldNameFilter) {
+      if(arg.hasOwnProperty(fieldName)) {
+        filteredArgs[fieldName] = arg[fieldName]
+      }
+    }
+
+    return filteredArgs
+  }
+
+  private static formValidation(data) {
+    const TableSchema = this.getTableSchema()
+
+    for(let field of TableSchema.fields) {
+
+      const Field = new Fields[field.className](field.fieldAttributes)
+      const FieldValue = data[field.name]
+
+      if(!Field.valid(FieldValue)) {
+        throw('invalid insert into '+TableSchema.name +', invalid value for field '+ field.name+ ' = '+JSON.stringify(FieldValue))
+      }
+    }
+
+    return true
+  }
+
+  static clear() {
+    this.clearComponent()
+    this.clearStorage()
+  }
+
+  static clearComponent() {
+    const key = this.getTableSchema().id
+  }
+
+  static clearStorage() {
+    const key = this.getTableSchema().id
+    localStorage.removeItem(key.keyPath)
+  }
+
 }

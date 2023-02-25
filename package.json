@@ -39,6 +39,7 @@
   },
   "keywords": [
     "indexeddb",
+    "interface",
     "indexed-db",
     "browser",
     "database",
@@ -49,10 +50,16 @@
     "orm",
     "offline",
     "first",
-    "transaction",
     "promise",
     "query-builder",
-    "webworker"
+    "webworker",
+    "trigger",
+    "localStorage",
+    "storage",
+    "multiple",
+    "request",
+    "per",
+    "transaction"
   ],
   "homepage": "https://github.com/BackdoorTech/Beast-ORM#readme"
 }
