@@ -7,6 +7,7 @@ import { FieldType } from '../sql/query/interface.js';
 import  * as Fields from './field/allFields.js'
 import { IndexedDBWorkerQueue } from '../connection/worker.queue.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
+import { ReactiveList } from '../reactive/DynamicList.js';
 
 let methods : Methods = {} = {}
 
@@ -443,6 +444,10 @@ export class Model extends ModelManager{
 
   static transactionOnCommit (callback : () => void) {
     return transactionOnCommit.subscribe(this as unknown as Model, callback)
+  }
+
+  static ReactiveList (callback : (this) => void) {
+    return ReactiveList.subscribe(this as unknown as Model, callback)
   }
 
   static object = ({queryId, DBconfig, TableSchema,  some = null}) => {

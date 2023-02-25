@@ -12,6 +12,7 @@ export declare class transactionOnCommit {
     };
     static prepare(Model: Model): void;
     static subscribe(Model: Model, callback: any): {
+        queryId: string;
         subscribe: boolean;
         unsubscribe: () => Promise<unknown>;
     };

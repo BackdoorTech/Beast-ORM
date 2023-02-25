@@ -35,8 +35,14 @@ export declare class Model extends ModelManager {
     static updateOrCreate(argToFind: any, argsToUpdate: any): Promise<any>;
     static update(arg: any): Promise<any>;
     static transactionOnCommit(callback: () => void): {
+        queryId: string;
         subscribe: boolean;
         unsubscribe: () => Promise<unknown>;
+    };
+    static ReactiveList(callback: (this: any) => void): {
+        readonly value: any[];
+        readonly subscribe: any;
+        unsubscribe: () => Promise<any>;
     };
     static object: ({ queryId, DBconfig, TableSchema, some }: {
         queryId: any;

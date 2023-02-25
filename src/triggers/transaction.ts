@@ -47,6 +47,7 @@ export  class transactionOnCommit {
         }
 
         return {
+            queryId,
             subscribe,
             unsubscribe: () => {
                 return new Promise((resolve, reject) => {

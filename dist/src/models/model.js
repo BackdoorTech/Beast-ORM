@@ -6,6 +6,7 @@ import { FieldType } from '../sql/query/interface.js';
 import * as Fields from './field/allFields.js';
 import { IndexedDBWorkerQueue } from '../connection/worker.queue.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
+import { ReactiveList } from '../reactive/DynamicList.js';
 let methods = {} = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model extends (_b = ModelManager) {
@@ -313,6 +314,9 @@ export class Model extends (_b = ModelManager) {
     }
     static transactionOnCommit(callback) {
         return transactionOnCommit.subscribe(this, callback);
+    }
+    static ReactiveList(callback) {
+        return ReactiveList.subscribe(this, callback);
     }
 }
 _a = Model;
