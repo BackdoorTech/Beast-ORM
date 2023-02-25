@@ -11,6 +11,9 @@ ORM for accessing indexedDB and localStorage.
 
 <br/>
 
+### Details
+- Unpacked size 236kB
+- The indexedDB implementation runs multiple request in a single transaction
 
 #### A promise base api implementation for accessing for accessing indexedDB 
 ## Create model
@@ -779,7 +782,7 @@ Session.token = 'fjif8382'
 Session.save()
 ```
 
-### Deleting objects
+## Deleting objects
 
 The delete method, conveniently, is named delete(). This method immediately deletes the object and returns the number of objects deleted and a dictionary with the number of deletions per object type. Example:
 
