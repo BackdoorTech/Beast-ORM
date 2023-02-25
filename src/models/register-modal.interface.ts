@@ -1,4 +1,4 @@
-import { FieldType } from '../sql/query/model.js'
+import { FieldType } from '../sql/query/interface.js'
 import { FieldsMap, FieldKeys, FieldKeysArray, AttributesMap, FieldAttributesKeys } from './field/fields.interface.js'
 import { PossibleFieldAttributes} from './field/interface.js'
 
@@ -17,7 +17,7 @@ export interface TableSchema {
 	name: string,
 	id: { keyPath: string , autoIncrement?: boolean , type:  FieldType},
 	fields: FieldSchema[]
-	attributes: AttributesMap<FieldAttributesKeys, string[]> = {}
+	attributes: AttributesMap<FieldAttributesKeys, string[]> 
 	fieldTypes: FieldsMap<FieldKeys, string[]>
 }
 
@@ -33,7 +33,7 @@ export interface TableSchemaLocalStorage {
 	name: string,
 	id: { keyPath: string , autoIncrement?: boolean , type:  FieldType},
 	fields: FieldSchema[]
-	attributes: AttributesMap<FieldAttributesKeys, string[]> = {}
+	attributes: AttributesMap<FieldAttributesKeys, string[]> 
 	fieldTypes: FieldsMap<FieldKeys, string[]>
 }
 

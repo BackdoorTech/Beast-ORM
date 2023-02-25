@@ -453,7 +453,7 @@ export class Model extends ModelManager{
         const newInstanceModel = this.NewModelInstance()
         return Object.assign(newInstanceModel, this.object({DBconfig, TableSchema,queryId}))
       },
-      execute: async () => {
+      execute: async (): Promise<any[]> => {
         return new Promise(async(resolve, reject) => {
           methods[queryId].push({methodName: 'execute', arguments: null})
 
@@ -481,7 +481,7 @@ export class Model extends ModelManager{
         return await super.obj(DBconfig, TableSchema).delete(_methods, queryId)
 
       },
-      all: async() => {
+      all: async(): Promise<any[]> => {
         return new Promise(async(resolve, reject) => {
           methods[queryId].push({methodName: 'all', arguments: null})
           const _methods: Method[] = methods[queryId]

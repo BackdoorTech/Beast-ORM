@@ -45,7 +45,7 @@ describe("catch model error", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 600000)
+  }, 30000)
 
 
 

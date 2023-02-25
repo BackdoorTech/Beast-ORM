@@ -12,14 +12,14 @@ export declare class Model extends ModelManager {
     save(): Promise<void>;
     delete(): Promise<void>;
     static deleteAll(): Promise<void>;
-    all(): Promise<unknown>;
+    all(): Promise<any[]>;
     getFields(arg: any): {};
     formValidation(data: any): boolean;
     Value(args: any): string;
     static Value(args: any): string;
     static formValidation(data: any): boolean;
     static getModelsFields(arg: any): Promise<void>;
-    static all(): Promise<unknown>;
+    static all(): Promise<any[]>;
     static get(arg: getParams): Promise<any>;
     private static getId;
     static getModelName(): string;
@@ -51,10 +51,10 @@ export declare class Model extends ModelManager {
         some?: any;
     }) => {
         filter: (...args: any[]) => any;
-        execute: () => Promise<unknown>;
+        execute: () => Promise<any[]>;
         update: (args: any) => Promise<any>;
         delete: () => Promise<any>;
-        all: () => Promise<unknown>;
+        all: () => Promise<any[]>;
     };
 }
 export declare class LocalStorage {
