@@ -81,7 +81,7 @@ export class transaction {
                 let objectStore = this.tx.objectStore(currentStore);
                 let getList = objectStore.getAll();
                 getList.onsuccess = (e: any) => { 
-                    this.done()   
+                    this.done()
                     request?.onsuccessFunc(e)
                 };
 

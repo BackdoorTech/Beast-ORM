@@ -22,7 +22,6 @@ export class MemoryConnector {
           };
     
           request.onupgradeneeded = async (e: any) => {
-            console.log('need to migrate first')
             await this.migrate(config)
             return await this.connect(config)
           };

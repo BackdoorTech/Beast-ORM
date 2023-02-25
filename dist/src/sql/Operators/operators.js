@@ -336,7 +336,6 @@ export class objectEq {
 }
 export class objectContains {
     static validate({ fieldName, arg, row, fieldPath, customData }) {
-        // console.log(fieldName, arg, row)
         let rowValue;
         try {
             rowValue = getDeep(row, fieldPath);
@@ -362,7 +361,6 @@ export class objectContains {
 }
 export class objectContains_by {
     static validate({ fieldName, arg, row, fieldPath, customData }) {
-        // console.log(fieldName, arg, row);
         let rowValue;
         const keyCount = Object.keys(arg).length;
         let keyFoundNEqual = 0;
@@ -384,7 +382,6 @@ export class objectContains_by {
         catch (error) {
             return false;
         }
-        // console.log('keyFoundNEqual', keyFoundNEqual, 'keyCount', keyCount);
         if (keyFoundNEqual == 0) {
             return true;
         }

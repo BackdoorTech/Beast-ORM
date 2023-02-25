@@ -171,7 +171,6 @@ export class Model extends ModelManager{
   }
 
   static async all() {
-    // console.log('trigger get')
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
     const queryId = uniqueGenerator()
@@ -340,7 +339,6 @@ export class Model extends ModelManager{
 
       if(TableSchema.fieldTypes.ManyToManyField) {
         for (let field of TableSchema.fieldTypes.ManyToManyField) {
-          // console.log(ModelName, field)
           newInstance[field] = null
           
         }
@@ -348,7 +346,6 @@ export class Model extends ModelManager{
 
       if(TableSchema.fieldTypes.OneToOneField) {
         for (let field of TableSchema.fieldTypes.ManyToManyField) {
-          // console.log(ModelName, field)
           newInstance[field] = null 
         }
       }
@@ -490,7 +487,6 @@ export class Model extends ModelManager{
 
       },
       all: async() => {
-        // console.log('model all')
         methods[queryId].push({methodName: 'all', arguments: null})
         const _methods: Method[] = methods[queryId]
         methods[queryId] = []

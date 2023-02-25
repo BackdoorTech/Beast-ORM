@@ -18,7 +18,6 @@ export class IndexedDB {
                     reject(e.target.error.name);
                 };
                 request.onupgradeneeded = async (e) => {
-                    console.log('need to migrate first');
                     await this.migrate(config);
                     return await this.connect(config);
                 };
@@ -128,14 +127,12 @@ export class IndexedDB {
             db: this.dbInstance[config.databaseName],
             tx: this.txInstance[databaseName][currentStore]
         });
-        // console.log('execute')
         callback(transactionInstance);
     }
     static getOrCreateTransaction({ currentStore, queryId, config }, mode, callback) {
         this.transactions[config.databaseName][currentStore].push({ config, queryId, mode, callback });
         if (this.executingTransaction[config.databaseName][currentStore] == false) {
             this.executingTransaction[config.databaseName][currentStore] = true;
-            // console.log('start')
             this.connect(config).then(() => {
                 const tx = this.createTransaction(this.dbInstance[config.databaseName], "readwrite", currentStore, () => { });
                 this.txInstance[config.databaseName][currentStore] = tx;

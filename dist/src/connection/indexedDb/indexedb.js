@@ -49,7 +49,6 @@ class indexedDBInterface {
                             let objectStore = transaction.objectStore(currentStore);
                             let request = objectStore.getAll(config);
                             request.onsuccess = async (e) => {
-                                // console.log('all', e.target.results)
                                 resolve(e.target.result);
                             };
                         });
@@ -63,7 +62,6 @@ class indexedDBInterface {
                             func(e.target.result);
                         };
                         request.onerror = (e) => {
-                            // console.log(e)
                             let data = {
                                 error: e.target['error']
                             };

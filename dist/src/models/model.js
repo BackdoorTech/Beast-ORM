@@ -122,7 +122,6 @@ export class Model extends (_b = ModelManager) {
         }
     }
     static async all() {
-        // console.log('trigger get')
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
         const queryId = uniqueGenerator();
@@ -238,13 +237,11 @@ export class Model extends (_b = ModelManager) {
             delete newInstance[TableSchema.id.keyPath];
             if (TableSchema.fieldTypes.ManyToManyField) {
                 for (let field of TableSchema.fieldTypes.ManyToManyField) {
-                    // console.log(ModelName, field)
                     newInstance[field] = null;
                 }
             }
             if (TableSchema.fieldTypes.OneToOneField) {
                 for (let field of TableSchema.fieldTypes.ManyToManyField) {
-                    // console.log(ModelName, field)
                     newInstance[field] = null;
                 }
             }
@@ -354,7 +351,6 @@ Model.object = ({ queryId, DBconfig, TableSchema, some = null }) => {
             return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).delete(_methods, queryId);
         },
         all: async () => {
-            // console.log('model all')
             methods[queryId].push({ methodName: 'all', arguments: null });
             const _methods = methods[queryId];
             methods[queryId] = [];

@@ -44,7 +44,6 @@ export class IndexedDB {
         };
   
         request.onupgradeneeded = async (e: any) => {
-          console.log('need to migrate first')
           await this.migrate(config)
           return await this.connect(config)
         };
@@ -179,7 +178,6 @@ export class IndexedDB {
       db: this.dbInstance[config.databaseName],
       tx: this.txInstance[databaseName][currentStore]
     })
-    // console.log('execute')
     callback(transactionInstance)
   }
   
@@ -187,7 +185,6 @@ export class IndexedDB {
     this.transactions[config.databaseName][currentStore].push({config, queryId, mode, callback})
     if (this.executingTransaction[config.databaseName][currentStore] == false) {
       this.executingTransaction[config.databaseName][currentStore] = true
-      // console.log('start')
       this.connect(config).then(() => {
         const tx = this.createTransaction(
           this.dbInstance[config.databaseName],

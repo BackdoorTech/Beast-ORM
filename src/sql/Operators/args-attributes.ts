@@ -116,7 +116,6 @@ export class argsAttributes {
                 return operator[operation]
             }
         } catch (err) {
-            // console.log(this.TableSchema, this.schemeFields[fieldName])
             throw('Field '+ fieldName +' does not exit on the table'+ err)
         }
     }
@@ -133,14 +132,11 @@ export class argsAttributes {
                     loop(o[k]);
                 } else {
                     if ( o.constructor.name === 'Array') {
-                        // console.log('dif', o, k , )
                         for( const j of Object.keys(o[k])) {
-                            // console.log('push',  o[k], j)
                             condition[j] = o[k][j]
                         }
                         
                     } else {
-                        // console.log('push',  o, k)
                         condition[k] = o[k]
                     }
                     
