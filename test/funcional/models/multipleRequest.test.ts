@@ -26,7 +26,7 @@ describe("multiple Request", () => {
       }
 
       models.register({
-        databaseName:'jest-test-documentation first example',
+        databaseName:'jestest-documentation first example',
         type: 'indexedDB',
         version: 1,
         models: [User]

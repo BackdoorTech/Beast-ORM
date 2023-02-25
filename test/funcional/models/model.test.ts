@@ -23,7 +23,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test'+ new Date().getTime(),
+        databaseName:'jest-tefst'+ new Date().getTime(),
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -54,7 +54,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test'+ new Date().getTime(),
+        databaseName:'jest-testcfreate'+ new Date().getTime(),
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -88,7 +88,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test'+ new Date().getTime(),
+        databaseName:'jest-ftest1'+ new Date().getTime(),
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -128,7 +128,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test'+ new Date().getTime(),
+        databaseName:'jest-test2'+ new Date().getTime(),
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -165,7 +165,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test'+ new Date().getTime(),
+        databaseName:'jest-test5'+ new Date().getTime(),
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -203,7 +203,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test'+ new Date().getTime() ,
+        databaseName:'jest-test4'+ new Date().getTime() ,
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -288,7 +288,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test'+ new Date().getTime(),
+        databaseName:'jest-stest3'+ new Date().getTime(),
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -327,7 +327,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test'+ new Date().getTime(),
+        databaseName:'jest-ftest4'+ new Date().getTime(),
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -366,7 +366,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test'+ new Date().getTime(),
+        databaseName:'jest-test12'+ new Date().getTime(),
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -606,7 +606,7 @@ describe("operators", () => {
       
       
       models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chat-stofrage'+ (new Date()).getTime(),
         type: 'indexedDB',		
         version: 1,
         models: [MessageModel, DeleteMessageModel]
@@ -717,7 +717,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chat-storagedoc'+ (new Date()).getTime(),
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -753,7 +753,7 @@ describe("JSONField", () => {
       
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chat-storageddf'+ (new Date()).getTime(),
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -788,7 +788,7 @@ describe("JSONField", () => {
       
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chat-sto4rage'+ (new Date()).getTime(),
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -834,7 +834,7 @@ describe("JSONField", () => {
       
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chat-stor3age'+ (new Date()).getTime(),
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -873,7 +873,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chat-s2torage'+ (new Date()).getTime(),
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -920,7 +920,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chat-stofrage'+ (new Date()).getTime(),
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -959,7 +959,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chat-stofrage'+ (new Date()).getTime(),
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -997,7 +997,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chat-storagre'+ (new Date()).getTime(),
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1036,7 +1036,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chat-steorage'+ (new Date()).getTime(),
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1083,7 +1083,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chat-stofrage'+ (new Date()).getTime(),
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1136,7 +1136,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chat-fstorage'+ (new Date()).getTime(),
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1185,7 +1185,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chat-sstorage'+ (new Date()).getTime(),
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1223,7 +1223,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chast-storage'+ (new Date()).getTime(),
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1262,7 +1262,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName: 'chat-stofrage'+ (new Date()).getTime(),
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
