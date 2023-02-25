@@ -223,7 +223,6 @@ class indexedDBInterface {
                   //const row = cursor.value
                   await sqlObject.runFirstMethod(row)
                   //cursor.continue();
-                
                 }
                 
               //} else {

@@ -196,22 +196,7 @@ export class Model extends ModelManager{
 
     const ModelName = this.getModelName()
     
-    let newInstance = new models[ModelName]()
-    Object.assign(newInstance, {...foundObj})
-
-    
-    if(TableSchema.fieldTypes['ManyToManyField']) {
-      for( const fieldName of TableSchema.fieldTypes['ManyToManyField']) {
-        delete newInstance[fieldName]
-      }
-    }
-    
-    Object.defineProperty(newInstance, TableSchema.id.keyPath, 
-      { 
-        configurable: false, 
-        writable: false 
-      }
-    );
+    let newInstance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: foundObj})
 
     delete newInstance.obj
     return  newInstance
@@ -291,97 +276,98 @@ export class Model extends ModelManager{
 
   static async create(arg): Promise<any> {
 
-    if (arg.constructor.name != 'Array') {
-      arg = [arg]
-    }
+    return new Promise(async (resolve, reject)=> {
 
-    const emptyFields = await this.getEmptyFields()
-    const TableSchema = this.getTableSchema()
-    const ModelName = TableSchema.name
-
-
-    for(let i in arg) {
-      arg[i] = Object.assign({...emptyFields} , this.getFields(arg[i]))
-
-      if(!this.formValidation(arg[i])) {
-        throw('invalid '+ JSON.stringify(arg[i]))
+      if (arg.constructor.name != 'Array') {
+        arg = [arg]
       }
-
-    }
-
-    for(let i in arg) {
-
-      if (TableSchema.attributes.foreignKey) {
-        for (let field of TableSchema.attributes.foreignKey) {
-          try {
-            arg[i][field] = arg[i][field].getPrimaryKeyValue()
-          } catch (error){}
-          
+  
+      const emptyFields = await this.getEmptyFields()
+      const TableSchema = this.getTableSchema()
+      const ModelName = TableSchema.name
+  
+  
+      for(let i in arg) {
+        arg[i] = Object.assign({...emptyFields} , this.getFields(arg[i]))
+  
+        if(!this.formValidation(arg[i])) {
+          throw('invalid '+ JSON.stringify(arg[i]))
         }
+  
       }
-
-    }
-    
-    
-    const _methods: Method[] = [{methodName: 'create', arguments: arg}]
-    const DBconfig = this.getDBSchema()
-
-    const queryId = uniqueGenerator()
-    
-    const createObjectRequest = super.obj(DBconfig, TableSchema).create(_methods, queryId)
-    
-
-    for(let i in arg) {
-      let newInstance = new models[ModelName]();
-      Object.assign(newInstance, arg[i]);
-      delete newInstance.obj;
-      delete newInstance[TableSchema.id.keyPath]
-
-      if(TableSchema.fieldTypes.ManyToManyField) {
-        for (let field of TableSchema.fieldTypes.ManyToManyField) {
-          newInstance[field] = null
-          
-        }
-      }
-
-      if(TableSchema.fieldTypes.OneToOneField) {
-        for (let field of TableSchema.fieldTypes.ManyToManyField) {
-          newInstance[field] = null 
-        }
-      }
-
-
-      arg[i] = newInstance
-    }
-
-    const createObject  = await createObjectRequest
-    IndexedDBWorkerQueue.finish(queryId)
-
-    if(createObject) {
-
-      if(typeof createObject[TableSchema.id.keyPath] == 'object') {
-        throw(createObject[TableSchema.id.keyPath].error)
-      } else {
-        if(Array.isArray(createObject)) {
-          
-          for(let a in createObject) {
-            arg[a][TableSchema.id.keyPath] = createObject[a][TableSchema.id.keyPath] 
+  
+      for(let i in arg) {
+  
+        if (TableSchema.attributes.foreignKey) {
+          for (let field of TableSchema.attributes.foreignKey) {
+            try {
+              arg[i][field] = arg[i][field].getPrimaryKeyValue()
+            } catch (error){}
+            
           }
-
-          return arg
+        }
+  
+      }
+  
+      const _methods: Method[] = [{methodName: 'create', arguments: arg}]
+      const DBconfig = this.getDBSchema()
+  
+      const queryId = uniqueGenerator()
+      
+      const createObjectRequest = super.obj(DBconfig, TableSchema).create(_methods, queryId)
+  
+      const createObject  = await createObjectRequest
+      IndexedDBWorkerQueue.finish(queryId)
+  
+      if(createObject) {
+  
+        if(typeof createObject[TableSchema.id.keyPath] == 'object') {
+          throw(createObject[TableSchema.id.keyPath].error)
         } else {
-
-          arg[0][TableSchema.id.keyPath] = createObject[TableSchema.id.keyPath]
-          return arg[0]
+          if(Array.isArray(createObject)) {
+            resolve(createObject)
+            for(let a in createObject) {
+              createObject[a] = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: createObject[a]}) 
+            }
+            return arg
+          } else {
+            const instance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: createObject})
+            resolve(instance)
+          }
         }
       }
-    }
+    });
+    
 
   }
 
   private static newInstance({ TableSchema, DBconfig, ModelName, dataToMerge }) {
     let newInstance = new models[ModelName]();
+
+    delete newInstance[TableSchema.id.keyPath]
+
+    if(TableSchema.fieldTypes.ManyToManyField) {
+      for (let field of TableSchema.fieldTypes.ManyToManyField) {
+        newInstance[field] = null
+        
+      }
+    }
+
+    if(TableSchema.fieldTypes.OneToOneField) {
+      for (let field of TableSchema.fieldTypes.ManyToManyField) {
+        newInstance[field] = null 
+      }
+    }
     Object.assign(newInstance, dataToMerge);
+
+    if(newInstance[TableSchema.id.keyPath]) {
+      Object.defineProperty(newInstance, TableSchema.id.keyPath, 
+        { 
+          configurable: false, 
+          writable: false 
+        }
+      );
+    }
     delete newInstance.obj;
     return newInstance;
   }
@@ -449,6 +435,7 @@ export class Model extends ModelManager{
 
   static object = ({queryId, DBconfig, TableSchema,  some = null}) => {
 
+    const ModelName = TableSchema.name
 
     if(!methods[queryId]) {
       methods[queryId] = []
@@ -467,11 +454,19 @@ export class Model extends ModelManager{
         return Object.assign(newInstanceModel, this.object({DBconfig, TableSchema,queryId}))
       },
       execute: async () => {
-        methods[queryId].push({methodName: 'execute', arguments: null})
+        return new Promise(async(resolve, reject) => {
+          methods[queryId].push({methodName: 'execute', arguments: null})
 
-        const _methods: Method[] = methods[queryId]
-        methods[queryId] = []
-        return  await super.obj(DBconfig, TableSchema).execute(_methods, queryId)
+          const _methods: Method[] = methods[queryId]
+          methods[queryId] = []
+          const result = await super.obj(DBconfig, TableSchema).execute(_methods, queryId)
+          resolve(result);
+
+          for(let i of result) {
+            result[i] = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[i]})
+          }
+        })
+        
       }, 
       update: async(args) => {
         methods[queryId].push({methodName: 'update', arguments: args})
@@ -487,11 +482,17 @@ export class Model extends ModelManager{
 
       },
       all: async() => {
-        methods[queryId].push({methodName: 'all', arguments: null})
-        const _methods: Method[] = methods[queryId]
-        methods[queryId] = []
-        return await super.obj(DBconfig, TableSchema).all(_methods, queryId)
+        return new Promise(async(resolve, reject) => {
+          methods[queryId].push({methodName: 'all', arguments: null})
+          const _methods: Method[] = methods[queryId]
+          methods[queryId] = []
+          const result = await super.obj(DBconfig, TableSchema).all(_methods, queryId)
 
+          resolve(result);
+          for(let i of result) {
+            result[i] = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[i]})
+          }
+        });
       }
     }
   }

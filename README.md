@@ -162,15 +162,16 @@ You can do this with the update() method. For example:
 ```
 ### Deleting objects
 
-The delete method, conveniently, is named delete(). This method immediately deletes the object and returns the number of objects deleted and a dictionary with the number of deletions per object type. Example:
+The delete method, conveniently, is named delete(). This method immediately deletes the object
 
 ```javascript
-  person.delete()
+  User.delete()
 ```
 
 You can also delete objects in bulk. Every QuerySet has a delete() method, which deletes all members of that QuerySet.
 
-For example, this deletes all User objects with a age 40:
+For example, this deletes all User objects with a age 40, and returns the number of objects deleted.
+
 ```javascript
   User.filter({age: 40}).delete()
 ```
@@ -699,7 +700,39 @@ unsubscribe the reactive list
   PersonList.unsubscribe()
 ```
 
+## Trigger transaction
+```javascript
+  class Person extends models.Model {
+    username = models.CharField({})  
+  }
+ 
+  models.migrate({
+    databaseName:'jest-test',
+    type: 'indexedDB',
+    version: 1,
+    models: [Person]
+  })
 
+```
+
+Create a callback function that fire every time a commit is made in the Person
+```javascript
+  let subscription = Person.transactionOnCommit( async () => {
+    console.log('commit')
+  })
+```
+
+unsubscribe
+```javascript
+  subscription.unsubscribe()
+```
+
+## Trigger { BEFORE | AFTER } { INSERT  | UPDATE  | DELETE}
+ coming soon
+ 
+<br>
+<br>
+<br>
 
 # LocalStorage base api implementation.
 
