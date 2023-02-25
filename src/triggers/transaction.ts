@@ -1,5 +1,5 @@
 import { IndexedDBWorkerQueue } from "../connection/worker.queue.js";
-import { ModelManager } from "../models/model-manager.js"
+import { ModelAPIRequest } from "../models/model-manager.js"
 import { Model } from "../models/model.js";
 import { uniqueGenerator } from "../utils.js";
 
@@ -34,7 +34,7 @@ export  class transactionOnCommit {
                 subscribe: true
             }
 
-            ModelManager.obj(DatabaseSchema, TableSchema).trigger(args, SubscriptionName, async () => {
+            ModelAPIRequest.obj(DatabaseSchema, TableSchema).trigger(args, SubscriptionName, async () => {
                 subscribe = true
 
                 IndexedDBWorkerQueue.updateFunction(SubscriptionName, () => {
@@ -54,7 +54,7 @@ export  class transactionOnCommit {
 
                     delete this.stores[databaseName][table][queryId]
                     if(Object.keys(this.stores[databaseName][table]).length == 0) {
-                        ModelManager.obj(DatabaseSchema, TableSchema).trigger(
+                        ModelAPIRequest.obj(DatabaseSchema, TableSchema).trigger(
                             { type: 'transactionOnCommit', subscribe: false }, 
                             SubscriptionName, async (data) => {
                                 delete this.subscription[SubscriptionName];

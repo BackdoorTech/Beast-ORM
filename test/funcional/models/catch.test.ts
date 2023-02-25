@@ -33,9 +33,11 @@ describe("catch model error", () => {
         models: [Person]
       })
 
+      
+
       const james = await Person.create({username:'james'})
 
-      try {
+      try { 
         const james1 = await Person.create({username:'james'})
       } catch (error) {
         document.body.innerHTML = JSON.stringify({username:james.username, id:james.id})

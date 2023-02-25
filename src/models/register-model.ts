@@ -6,7 +6,7 @@ import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js
 import { uncapitalize, uniqueGenerator } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js'
-import { ModelManager } from './model-manager.js';
+import { ModelAPIRequest } from './model-manager.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
 
 interface register {
@@ -125,7 +125,7 @@ export class registerModel {
 
 
     if(databaseSchema.type =='indexedDB') {
-      await ModelManager.obj(databaseSchema, tableSchema_ ).migrate()
+      await ModelAPIRequest.obj(databaseSchema, tableSchema_ ).migrate()
       ModelMigrations.migrationsState(databaseSchema.databaseName, true);
     }
     

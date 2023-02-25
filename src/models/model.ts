@@ -1,7 +1,7 @@
 import { hashCode, uniqueGenerator } from '../utils.js'
 import { Methods, getParams, Method } from './model.interface.js'
 import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchema  } from './register-modal.interface.js';
-import { ModelManager } from './model-manager.js';
+import { ModelAPIRequest } from './model-manager.js';
 import { models, modelsConfig, modelsConfigLocalStorage } from './register-model.js'
 import { FieldType } from '../sql/query/interface.js';
 import  * as Fields from './field/allFields.js'
@@ -13,11 +13,10 @@ let methods : Methods = {} = {}
 
 
 // inspire by https://github.com/brianschardt/browser-orm
-export class Model extends ModelManager{
+export class Model {
 
 
   constructor(obg?) {
-    super()
     Object.assign(this, obg)
   }
 
@@ -64,7 +63,7 @@ export class Model extends ModelManager{
     const methods:  Method[]  = [{methodName: 'save', arguments: Fields}]
     const queryId=uniqueGenerator()
 
-    await Model.obj(DBconfig, tableSchema).save(methods, queryId)
+    await ModelAPIRequest.obj(DBconfig, tableSchema).save(methods, queryId)
     IndexedDBWorkerQueue.finish(queryId)
   }
 
@@ -82,7 +81,7 @@ export class Model extends ModelManager{
 
     const queryId=uniqueGenerator()
 
-    await Model.obj(DBconfig, TableSchema).delete(_methods, queryId)
+    await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId)
     IndexedDBWorkerQueue.finish(queryId)
   }
   
@@ -99,7 +98,7 @@ export class Model extends ModelManager{
 
     const queryId=uniqueGenerator()
 
-    await Model.obj(DBconfig, TableSchema).delete(_methods, queryId)
+    await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId)
     IndexedDBWorkerQueue.finish(queryId)
   }
 
@@ -187,7 +186,7 @@ export class Model extends ModelManager{
     
     const queryId = uniqueGenerator()
 
-    const foundObj = await super.obj(DBconfig, TableSchema).get(_methods, queryId)
+    const foundObj = await ModelAPIRequest.obj(DBconfig, TableSchema).get(_methods, queryId)
     IndexedDBWorkerQueue.finish(queryId)
 
     if(!foundObj) {
@@ -198,7 +197,6 @@ export class Model extends ModelManager{
     
     let newInstance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: foundObj})
 
-    delete newInstance.obj
     return  newInstance
   }
   
@@ -314,7 +312,7 @@ export class Model extends ModelManager{
   
       const queryId = uniqueGenerator()
       
-      const createObjectRequest = super.obj(DBconfig, TableSchema).create(_methods, queryId)
+      const createObjectRequest = ModelAPIRequest.obj(DBconfig, TableSchema).create(_methods, queryId)
   
       const createObject  = await createObjectRequest
       IndexedDBWorkerQueue.finish(queryId)
@@ -419,7 +417,7 @@ export class Model extends ModelManager{
     const queryId = uniqueGenerator()
     
 
-    const result = await super.obj(DBconfig, TableSchema).update(_methods, queryId)
+    const result = await ModelAPIRequest.obj(DBconfig, TableSchema).update(_methods, queryId)
     IndexedDBWorkerQueue.finish(queryId)
     return result
   }
@@ -459,7 +457,7 @@ export class Model extends ModelManager{
 
           const _methods: Method[] = methods[queryId]
           methods[queryId] = []
-          const result = await super.obj(DBconfig, TableSchema).execute(_methods, queryId)
+          const result = await ModelAPIRequest.obj(DBconfig, TableSchema).execute(_methods, queryId)
           resolve(result);
 
           for(let i of result) {
@@ -472,13 +470,13 @@ export class Model extends ModelManager{
         methods[queryId].push({methodName: 'update', arguments: args})
         const _methods: Method[] = methods[queryId]
         methods[queryId] = []
-        return  await super.obj(DBconfig, TableSchema).update(_methods, queryId)
+        return  await ModelAPIRequest.obj(DBconfig, TableSchema).update(_methods, queryId)
       },
       delete: async() => {
         methods[queryId].push({methodName: 'delete', arguments: null})
         const _methods: Method[] = methods[queryId]
         methods[queryId] = []
-        return await super.obj(DBconfig, TableSchema).delete(_methods, queryId)
+        return await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId)
 
       },
       all: async(): Promise<any[]> => {
@@ -486,7 +484,7 @@ export class Model extends ModelManager{
           methods[queryId].push({methodName: 'all', arguments: null})
           const _methods: Method[] = methods[queryId]
           methods[queryId] = []
-          const result = await super.obj(DBconfig, TableSchema).all(_methods, queryId)
+          const result = await ModelAPIRequest.obj(DBconfig, TableSchema).all(_methods, queryId)
 
           resolve(result);
           for(let i of result) {

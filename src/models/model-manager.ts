@@ -4,7 +4,7 @@ import { DBSwitch } from '../connection/dbSwtich.js'
 import { ModelMigrations } from './mode-migrations.js'
 import { uniqueGenerator } from '../utils.js';
 
-export class ModelManager {
+export class ModelAPIRequest {
     
 	constructor() {}
 

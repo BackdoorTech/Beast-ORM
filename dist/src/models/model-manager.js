@@ -2,11 +2,11 @@ var _a;
 import { DBSwitch } from '../connection/dbSwtich.js';
 import { ModelMigrations } from './mode-migrations.js';
 import { uniqueGenerator } from '../utils.js';
-export class ModelManager {
+export class ModelAPIRequest {
     constructor() { }
 }
-_a = ModelManager;
-ModelManager.obj = (DatabaseSchema, TableSchema) => {
+_a = ModelAPIRequest;
+ModelAPIRequest.obj = (DatabaseSchema, TableSchema) => {
     return {
         create: async (arg, queryId) => {
             await ModelMigrations.waitMigration(DatabaseSchema.databaseName);

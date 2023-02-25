@@ -1,7 +1,6 @@
 import { getParams } from './model.interface.js';
 import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchema } from './register-modal.interface.js';
-import { ModelManager } from './model-manager.js';
-export declare class Model extends ModelManager {
+export declare class Model {
     constructor(obg?: any);
     get(arg: any): Promise<any>;
     getDBSchema(): DatabaseSchema;

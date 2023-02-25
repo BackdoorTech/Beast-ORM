@@ -1,6 +1,6 @@
-var _a, _b;
+var _a;
 import { hashCode, uniqueGenerator } from '../utils.js';
-import { ModelManager } from './model-manager.js';
+import { ModelAPIRequest } from './model-manager.js';
 import { models, modelsConfig, modelsConfigLocalStorage } from './register-model.js';
 import { FieldType } from '../sql/query/interface.js';
 import * as Fields from './field/allFields.js';
@@ -9,9 +9,8 @@ import { transactionOnCommit } from '../triggers/transaction.js';
 import { ReactiveList } from '../reactive/DynamicList.js';
 let methods = {} = {};
 // inspire by https://github.com/brianschardt/browser-orm
-export class Model extends (_b = ModelManager) {
+export class Model {
     constructor(obg) {
-        super();
         Object.assign(this, obg);
     }
     get(arg) {
@@ -47,7 +46,7 @@ export class Model extends (_b = ModelManager) {
         }
         const methods = [{ methodName: 'save', arguments: Fields }];
         const queryId = uniqueGenerator();
-        await Model.obj(DBconfig, tableSchema).save(methods, queryId);
+        await ModelAPIRequest.obj(DBconfig, tableSchema).save(methods, queryId);
         IndexedDBWorkerQueue.finish(queryId);
     }
     async delete() {
@@ -58,7 +57,7 @@ export class Model extends (_b = ModelManager) {
         createArg[idFieldName] = this[idFieldName];
         const _methods = [{ methodName: 'delete', arguments: createArg }];
         const queryId = uniqueGenerator();
-        await Model.obj(DBconfig, TableSchema).delete(_methods, queryId);
+        await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId);
         IndexedDBWorkerQueue.finish(queryId);
     }
     static async deleteAll() {
@@ -69,7 +68,7 @@ export class Model extends (_b = ModelManager) {
         createArg[idFieldName] = this[idFieldName];
         const _methods = [{ methodName: 'delete', arguments: '*' }];
         const queryId = uniqueGenerator();
-        await Model.obj(DBconfig, TableSchema).delete(_methods, queryId);
+        await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId);
         IndexedDBWorkerQueue.finish(queryId);
     }
     async all() {
@@ -104,10 +103,10 @@ export class Model extends (_b = ModelManager) {
         return true;
     }
     static async getModelsFields(arg) {
-        var _c;
+        var _b;
         const newArgs = {};
         const TableSchema = this.getTableSchema();
-        if ((_c = TableSchema.id) === null || _c === void 0 ? void 0 : _c.autoIncrement) {
+        if ((_b = TableSchema.id) === null || _b === void 0 ? void 0 : _b.autoIncrement) {
             TableSchema.fields.push({
                 keyPath: TableSchema.id.keyPath,
                 name: TableSchema.id.keyPath,
@@ -134,14 +133,13 @@ export class Model extends (_b = ModelManager) {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
         const queryId = uniqueGenerator();
-        const foundObj = await super.obj(DBconfig, TableSchema).get(_methods, queryId);
+        const foundObj = await ModelAPIRequest.obj(DBconfig, TableSchema).get(_methods, queryId);
         IndexedDBWorkerQueue.finish(queryId);
         if (!foundObj) {
             return false;
         }
         const ModelName = this.getModelName();
         let newInstance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: foundObj });
-        delete newInstance.obj;
         return newInstance;
     }
     static getId() {
@@ -220,7 +218,7 @@ export class Model extends (_b = ModelManager) {
             const _methods = [{ methodName: 'create', arguments: arg }];
             const DBconfig = this.getDBSchema();
             const queryId = uniqueGenerator();
-            const createObjectRequest = super.obj(DBconfig, TableSchema).create(_methods, queryId);
+            const createObjectRequest = ModelAPIRequest.obj(DBconfig, TableSchema).create(_methods, queryId);
             const createObject = await createObjectRequest;
             IndexedDBWorkerQueue.finish(queryId);
             if (createObject) {
@@ -298,7 +296,7 @@ export class Model extends (_b = ModelManager) {
         const TableSchema = this.getTableSchema();
         const _methods = [{ methodName: 'update', arguments: arg }];
         const queryId = uniqueGenerator();
-        const result = await super.obj(DBconfig, TableSchema).update(_methods, queryId);
+        const result = await ModelAPIRequest.obj(DBconfig, TableSchema).update(_methods, queryId);
         IndexedDBWorkerQueue.finish(queryId);
         return result;
     }
@@ -331,7 +329,7 @@ Model.object = ({ queryId, DBconfig, TableSchema, some = null }) => {
                 methods[queryId].push({ methodName: 'execute', arguments: null });
                 const _methods = methods[queryId];
                 methods[queryId] = [];
-                const result = await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).execute(_methods, queryId);
+                const result = await ModelAPIRequest.obj(DBconfig, TableSchema).execute(_methods, queryId);
                 resolve(result);
                 for (let i of result) {
                     result[i] = _a.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[i] });
@@ -342,20 +340,20 @@ Model.object = ({ queryId, DBconfig, TableSchema, some = null }) => {
             methods[queryId].push({ methodName: 'update', arguments: args });
             const _methods = methods[queryId];
             methods[queryId] = [];
-            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).update(_methods, queryId);
+            return await ModelAPIRequest.obj(DBconfig, TableSchema).update(_methods, queryId);
         },
         delete: async () => {
             methods[queryId].push({ methodName: 'delete', arguments: null });
             const _methods = methods[queryId];
             methods[queryId] = [];
-            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).delete(_methods, queryId);
+            return await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId);
         },
         all: async () => {
             return new Promise(async (resolve, reject) => {
                 methods[queryId].push({ methodName: 'all', arguments: null });
                 const _methods = methods[queryId];
                 methods[queryId] = [];
-                const result = await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).all(_methods, queryId);
+                const result = await ModelAPIRequest.obj(DBconfig, TableSchema).all(_methods, queryId);
                 resolve(result);
                 for (let i of result) {
                     result[i] = _a.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[i] });

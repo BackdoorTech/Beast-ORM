@@ -1,4 +1,4 @@
-import { ModelManager } from "../models/model-manager.js";
+import { ModelAPIRequest } from "../models/model-manager.js";
 import { Model } from "../models/model.js";
 import { hashCode, uniqueGenerator } from "../utils.js";
 
@@ -79,7 +79,7 @@ export class triggers {
             
         }
 
-        ModelManager.obj(Model.getDBSchema(), Model.getTableSchema()).trigger(args, Subscription, eventHandler)
+        ModelAPIRequest.obj(Model.getDBSchema(), Model.getTableSchema()).trigger(args, Subscription, eventHandler)
         
         return {
             SubscriptionName: SubscriptionName,
