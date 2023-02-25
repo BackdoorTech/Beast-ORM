@@ -1,5 +1,8 @@
 import * as _Fields from '../../../src/models/field/fields'
 import { models as  modelsType } from '../../../src/index'
+function uniqueGenerator() {
+  return (Math.random() +'uuid'+ new Date().getTime()).slice(2)
+}
 
 import fs from 'fs'
 const { Port } = JSON.parse(fs.readFileSync('./test/config/test.json', 'utf8'));
@@ -10,20 +13,21 @@ describe("catch model error", () => {
     await page.goto(`http://127.0.0.1:${Port}/test/index.html`)
   })
 
-  it('model create object', async () => {
+  it('create duplicate unique object', async () => {
   
     await page.waitForFunction(() => 'models' in window);
 
     await page.evaluate(async() => {
 
       const models: typeof modelsType = window['models']
+      document.title = 'create duplicate unique object'
       
       class Person extends models.Model {
         username =  models.CharField({maxLength:0, unique: true})
       } 
 
       models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]

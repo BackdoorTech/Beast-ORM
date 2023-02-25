@@ -3,7 +3,7 @@ import { LocalStorageModelReader, ModelReader } from './model.reader.js';
 import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchema, TableSchemaLocalStorage  } from './register-modal.interface.js';
 import { indexedDB  } from './../connection/indexedDb/indexedb.js';
 import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js';
-import { uncapitalize } from '../utils.js';
+import { uncapitalize, uniqueGenerator } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js'
 import { ModelManager } from './model-manager.js';
@@ -42,7 +42,7 @@ export class registerModel {
   static async register(entries: register) {
     
     const databaseSchema : DatabaseSchema  = {
-      databaseName: entries.databaseName,
+      databaseName: entries.databaseName || uniqueGenerator(),
       version: entries.version,
       type: entries.type,
       stores: []

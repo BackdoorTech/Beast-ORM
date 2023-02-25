@@ -1,7 +1,7 @@
 import { Model } from './model.js';
 import { LocalStorageModelReader, ModelReader } from './model.reader.js';
 import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js';
-import { uncapitalize } from '../utils.js';
+import { uncapitalize, uniqueGenerator } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js';
 import { ModelManager } from './model-manager.js';
@@ -22,7 +22,7 @@ export class registerModel {
     static async register(entries) {
         var _a, _b, _c;
         const databaseSchema = {
-            databaseName: entries.databaseName,
+            databaseName: entries.databaseName || uniqueGenerator(),
             version: entries.version,
             type: entries.type,
             stores: []

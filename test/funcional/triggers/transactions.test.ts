@@ -1,5 +1,6 @@
 import * as _Fields from '../../../src/models/field/fields'
 import { models as  modelsType } from '../../../src/index'
+import { uniqueGenerator } from '../../../src/utils'
 
 import fs from 'fs'
 const { Port } = JSON.parse(fs.readFileSync('./test/config/test.json', 'utf8'));
@@ -23,7 +24,7 @@ describe("Trigger", () => {
       } 
       
       models.migrate({
-        databaseName:'jest-test123',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -61,7 +62,7 @@ describe("Trigger", () => {
       } 
       
       models.migrate({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]

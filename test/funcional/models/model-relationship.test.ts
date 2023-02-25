@@ -31,7 +31,7 @@ describe("initial test for model", () => {
 
 
       await models.register({
-        databaseName:'jest-ftest'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Place, Restaurant]
@@ -71,7 +71,7 @@ describe("initial test for model", () => {
 
 
       await models.register({
-        databaseName:'jest-ftest'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Place, Restaurant]
@@ -111,7 +111,7 @@ describe("initial test for model", () => {
         }
 
         await models.register({
-            databaseName:'jesft-test'+ new Date().getTime(),
+            databaseName:'',
             type: 'indexedDB',
             version: 1,
             models: [Publication, Article]
@@ -152,7 +152,7 @@ describe("initial test for model", () => {
         }
 
         await models.register({
-          databaseName:'jesft-test'+ new Date().getTime(),
+          databaseName:'',
           type: 'indexedDB',
           version: 1,
           models: [Publication, Article]
@@ -200,7 +200,7 @@ describe("initial test for model", () => {
         }
 
         await models.register({
-          databaseName:'jest-ftest'+ new Date().getTime(),
+          databaseName:'',
           type: 'indexedDB',
           version: 1,
           models: [Publication, Article]
@@ -252,7 +252,7 @@ describe("initial test for model", () => {
 
   
       await models.register({
-        databaseName:'jesdt-test'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Reporter, Article]

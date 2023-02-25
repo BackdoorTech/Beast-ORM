@@ -23,7 +23,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-tefst'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -49,12 +49,13 @@ describe("initial test for model", () => {
 
       const models: typeof modelsType = window['models']
       
+      document.title = 'model create object'
       class Person extends models.Model {
         username =  models.CharField({maxLength:0})
       } 
 
       models.register({
-        databaseName:'jest-testcfreate'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -88,7 +89,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-ftest1'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -128,7 +129,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test2'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -165,7 +166,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test5'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -203,7 +204,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test4'+ new Date().getTime() ,
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -244,7 +245,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test-model create([{...}])',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -288,7 +289,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-stest3'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -327,7 +328,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-ftest4'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -366,7 +367,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test12'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -404,7 +405,7 @@ describe("initial test for model", () => {
       }
 
       models.register({
-        databaseName:'jest-test-documentation first example',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [User]
@@ -447,7 +448,7 @@ describe("initial test for model", () => {
       }
 
       models.register({
-        databaseName:'jest-test-model createOrFind case create',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [User]
@@ -489,7 +490,7 @@ describe("initial test for model", () => {
       }
 
       models.register({
-        databaseName:'jest-test-model updateOrCreate case create'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [User]
@@ -531,7 +532,7 @@ describe("initial test for model", () => {
       }
 
       models.register({
-        databaseName:'jest-test-model-updateOrCreate-case-update',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [User]
@@ -606,7 +607,7 @@ describe("operators", () => {
       
       
       models.register({
-        databaseName: 'chat-stofrage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [MessageModel, DeleteMessageModel]
@@ -657,7 +658,7 @@ describe("operators", () => {
       } 
 
       models.register({
-        databaseName:'jest-test-model create([{...}])fffff',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -717,7 +718,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storagedoc'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -753,7 +754,7 @@ describe("JSONField", () => {
       
       
       await models.register({
-        databaseName: 'chat-storageddf'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -788,7 +789,7 @@ describe("JSONField", () => {
       
       
       await models.register({
-        databaseName: 'chat-sto4rage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -834,7 +835,7 @@ describe("JSONField", () => {
       
       
       await models.register({
-        databaseName: 'chat-stor3age'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -873,7 +874,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-s2torage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -920,7 +921,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-stofrage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -959,7 +960,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-stofrage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -997,7 +998,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storagre'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1036,7 +1037,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-steorage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1083,7 +1084,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chat-stofrage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1136,7 +1137,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chat-fstorage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1185,7 +1186,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chat-sstorage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1223,7 +1224,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chast-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1262,7 +1263,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chat-stofrage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]

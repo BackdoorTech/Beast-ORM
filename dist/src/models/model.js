@@ -225,7 +225,7 @@ export class Model extends (_b = ModelManager) {
             IndexedDBWorkerQueue.finish(queryId);
             if (createObject) {
                 if (typeof createObject[TableSchema.id.keyPath] == 'object') {
-                    throw (createObject[TableSchema.id.keyPath].error);
+                    reject(createObject[TableSchema.id.keyPath].error);
                 }
                 else {
                     if (Array.isArray(createObject)) {
