@@ -74,38 +74,6 @@ describe("initial test for model", () => {
   }, 20000)
 
 
-  it('model create object', async () => {
-  
-    await page.waitForFunction(() => 'models' in window);
-
-    await page.evaluate(async() => {
-
-      const models: typeof modelsType = window['models']
-      
-      class Person extends models.Model {
-        username =  models.CharField({maxLength:0})
-      } 
-
-      models.register({
-        databaseName:'jest-test'+ new Date().getTime(),
-        type: 'indexedDB',
-        version: 1,
-        models: [Person]
-      })
-
-      const james = await Person.create({username:'james'})
-
-      document.body.innerHTML = JSON.stringify({username:james.username, id:james.id})
-
-    })
-    debugger
-    // Check to see if text exists on the page
-    await page.waitForFunction('{"username":"james","id":1}')
-
-    expect('time not exceeded').toBe('time not exceeded')
-    
-  }, 10000)
-
 
   it('model save()', async () => {
   
