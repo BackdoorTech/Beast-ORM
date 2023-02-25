@@ -446,7 +446,7 @@ export class Model extends ModelManager{
     return transactionOnCommit.subscribe(this as unknown as Model, callback)
   }
 
-  static ReactiveList (callback : (this) => void) {
+  static ReactiveList (callback : (Model: Model) => void) {
     return ReactiveList.subscribe(this as unknown as Model, callback)
   }
 

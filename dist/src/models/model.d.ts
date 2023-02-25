@@ -39,7 +39,7 @@ export declare class Model extends ModelManager {
         subscribe: boolean;
         unsubscribe: () => Promise<unknown>;
     };
-    static ReactiveList(callback: (this: any) => void): {
+    static ReactiveList(callback: (Model: Model) => void): {
         readonly value: any[];
         readonly subscribe: any;
         unsubscribe: () => Promise<any>;

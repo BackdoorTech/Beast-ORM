@@ -7,6 +7,7 @@ ORM for accessing indexedDB and localStorage.
 
 - IndexedDB
 - Sqlite **(Will be publish in version 2.0.0)**
+- localstorage 
 
 <br/>
 
@@ -664,6 +665,40 @@ Add the same article to a different article set
   const a = await await r1.article_setAdd({headline:"This is a test", pubDate:''})
 
 ```
+## Reactive List 
+
+```javascript
+  class Person extends models.Model {
+    username = models.CharField({})  
+    age = models.IntegerField({blank:true})
+  }
+ 
+  models.migrate({
+    databaseName:'jest-test',
+    type: 'indexedDB',
+    version: 1,
+    models: [Person]
+  })
+
+
+```
+Create a reactive List that update when a transaction is committed on the database.
+```javascript
+  const PersonList = Person.ReactiveList((model)=> model.all())
+  const PersonAge5List = Person.ReactiveList((model)=> model.filter({age: 5}).execute())
+```
+
+Get the value
+```javascript
+  PersonList.value
+// [<Person: Rufus>, <Person: Meg>]
+```
+
+unsubscribe the reactive list
+```javascript
+  PersonList.unsubscribe()
+```
+
 
 
 # LocalStorage base api implementation.
