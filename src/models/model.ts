@@ -199,6 +199,15 @@ export class Model {
 
     return  newInstance
   }
+
+  static async getOrCreate(arg: getParams) {
+    const object = await this.get(arg)
+    if(!object) {
+      return await this.create(arg)
+    } else {
+      return object
+    }
+  }
   
 
   private static getId() {
