@@ -13,17 +13,18 @@ declare class transactionRequest {
 export declare class transaction {
     store: any;
     done: Function;
-    db: any;
+    doneButFailed: Function;
     tx: IDBTransaction;
     trigger: {
         beforeInsert: boolean;
         afterInsert: boolean;
     };
-    constructor({ store, done, db, tx }: {
+    constructor({ store, done, db, tx, doneButFailed }: {
         store: any;
         done: any;
         db: any;
         tx: any;
+        doneButFailed: any;
     });
     request: any[];
     FinishRequest: any[];

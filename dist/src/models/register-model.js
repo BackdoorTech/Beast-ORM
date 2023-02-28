@@ -137,6 +137,16 @@ export class registerModel {
         });
     }
 }
+async function cachedValue(Model) {
+    const emptyFields = Model.getEmptyFields();
+    Model.getEmptyFields = function () {
+        return emptyFields;
+    };
+    const getModelName = Model.getModelName();
+    Model.getModelName = function () {
+        return getModelName;
+    };
+}
 export class registerLocalStorage {
     static async register(entries) {
         const databaseSchema = {

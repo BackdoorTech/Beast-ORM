@@ -11,6 +11,16 @@ export declare class IndexedDB {
             }[];
         };
     };
+    static transactionsToCommit: {
+        [key: string]: {
+            [key: string]: {
+                callback: Function;
+                queryId: string;
+                mode: string;
+                config: DatabaseSchema;
+            }[];
+        };
+    };
     static dbInstance: {
         [dbName: string]: IDBDatabase;
     };
@@ -21,7 +31,13 @@ export declare class IndexedDB {
     };
     static txInstance: {
         [dbName: string]: {
-            [store: string]: IDBTransaction;
+            [store: string]: {
+                [mode: string]: {
+                    IDBTransaction: IDBTransaction;
+                    IDBTransactionMode: IDBTransactionMode;
+                    active: boolean;
+                };
+            };
         };
     };
     static txInstanceMode: {
@@ -61,6 +77,7 @@ export declare class IndexedDB {
         config: any;
     }, mode: IDBTransactionMode, callback: (transaction: transaction) => void): void;
     private static createTransaction;
+    private static validateBeforeTransaction;
     static transactionOnCommitSubscribe(TableSchema: TableSchema, config: DatabaseSchema, SubscriptionName: any): {
         subscription: boolean;
         queryId: any;

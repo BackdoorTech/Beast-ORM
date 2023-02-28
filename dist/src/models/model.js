@@ -142,6 +142,15 @@ export class Model {
         let newInstance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: foundObj });
         return newInstance;
     }
+    static async getOrCreate(arg) {
+        const object = await this.get(arg);
+        if (!object) {
+            return await this.create(arg);
+        }
+        else {
+            return object;
+        }
+    }
     static getId() {
         return hashCode(this.toString());
     }

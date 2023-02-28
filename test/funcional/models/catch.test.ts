@@ -55,4 +55,52 @@ describe("catch model error", () => {
 
 
 
+  it('transaction failure', async () => {
+  
+    await page.waitForFunction(() => 'models' in window);
+
+    await page.evaluate(async() => {
+
+      const models: typeof modelsType = window['models']
+      document.title = 'create duplicate unique object'
+      
+      class Person extends models.Model {
+        username =  models.CharField({maxLength:0, unique: true})
+      } 
+
+      models.register({
+        databaseName:'',
+        type: 'indexedDB',
+        version: 1,
+        models: [Person]
+      })
+
+      let date = new Date().getTime()
+      
+
+      const james = Person.create({username: date.toString()})
+      const james1 = Person.create({username: date.toString()})
+      const james2 = Person.create({username: '123'})
+
+      const sub = Person.ReactiveList((model)=> model.all())
+
+      Person.transactionOnCommit( async () => {
+        setTimeout(() => {
+            document.body.innerHTML = JSON.stringify(sub.value)
+        }, 100)
+      })
+
+      Person.create({username: 'peter'})
+
+    })
+    debugger
+
+    await page.waitForFunction('[{"username":"1677615427486","id":1},{"username":"123","id":2},{"username":"peter","id":3}]')
+    
+    expect('time not exceeded').toBe('time not exceeded')
+    
+  }, 30000)
+
+
+
 })

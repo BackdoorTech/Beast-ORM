@@ -160,6 +160,12 @@ class indexedDBInterface {
                                 };
                             }
                         }
+                        else if (methods[0].arguments[TableSchema.id.keyPath]) {
+                            return {
+                                queryId: queryId,
+                                value: await this.getActions(TableSchema.name, config, queryId).getByID(args[TableSchema.id.keyPath])
+                            };
+                        }
                     }
                     else if (methods[methods.length - 1].methodName == 'execute') {
                         return new Promise(async (resolve, reject) => {

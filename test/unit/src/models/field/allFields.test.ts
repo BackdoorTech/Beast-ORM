@@ -20,7 +20,7 @@ describe("Field valid", () => {
     await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.CharField({blank:true})
+			const f1: any = Field.CharField({blank:true})
 			document.body.innerText = JSON.stringify(f1.valid(''))
 
     })
@@ -33,7 +33,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.CharField({blank:true})
+			const f1: any = Field.CharField({blank:true})
 			document.body.innerText = JSON.stringify(f1.valid('name'))
 
     })
@@ -53,7 +53,7 @@ describe("Field valid", () => {
     await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.CharField({blank:false})
+			const f1: any = Field.CharField({blank:false})
 			document.body.innerText = `{result:${JSON.stringify(f1.valid(null))}}`
 
     })
@@ -76,7 +76,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.CharField({blank:false})
+			const f1: any = Field.CharField({blank:false})
 			document.body.innerText = `{result:${JSON.stringify(f1.valid(9))}}`
 
     })
@@ -96,7 +96,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 	
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.CharField({blank:false, maxLength: 10})
+			const f1: any = Field.CharField({blank:false, maxLength: 10})
 			document.body.innerText = `{result:${JSON.stringify(f1.valid('12345678910121314151617'))}}`
 	
 		})
@@ -116,7 +116,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 	
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.CharField({blank:false, maxLength: 100})
+			const f1: any = Field.CharField({blank:false, maxLength: 100})
 			document.body.innerText = `{result:${JSON.stringify(f1.valid('12345678910121314151617'))}}`
 	
 		})
@@ -137,7 +137,7 @@ describe("Field valid", () => {
     await page.evaluate(() => {
 
 		const Field: typeof FieldsType = window['Field']
-		const f1 = Field.TextField({blank:true})
+		const f1: any = Field.TextField({blank:true})
 		document.body.innerText = JSON.stringify(f1.valid(''))
 
     })
@@ -150,7 +150,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.TextField({blank:true})
+			const f1: any = Field.TextField({blank:true})
 			document.body.innerText = JSON.stringify(f1.valid('name'))
 
     })
@@ -170,7 +170,7 @@ describe("Field valid", () => {
     await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.CharField({blank:false})
+			const f1: any = Field.CharField({blank:false})
 			document.body.innerText = `{result:${JSON.stringify(f1.valid(null))}}`
 
     })
@@ -192,7 +192,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.TextField({blank:false})
+			const f1: any = Field.TextField({blank:false})
 			document.body.innerText = `{result:${JSON.stringify(f1.valid(9))}}`
 
     })
@@ -212,7 +212,7 @@ describe("Field valid", () => {
     await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.IntegerField({})
+			const f1: any = Field.IntegerField({})
 			document.body.innerText = JSON.stringify(f1.valid(1))
 
     })
@@ -225,7 +225,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.IntegerField({})
+			const f1: any = Field.IntegerField({})
 			document.body.innerText = JSON.stringify(f1.valid(10))
 
     })
@@ -245,7 +245,7 @@ describe("Field valid", () => {
     await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.IntegerField({})
+			const f1: any = Field.IntegerField({})
 			document.body.innerText = `{result:${JSON.stringify(f1.valid(null))}}`
 
     })
@@ -266,7 +266,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.IntegerField({})
+			const f1: any = Field.IntegerField({})
 			document.body.innerText = `{result:${JSON.stringify(f1.valid(''))}}`
 
     })
@@ -286,7 +286,7 @@ describe("Field valid", () => {
     await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.BigIntegerField({})
+			const f1: any = Field.BigIntegerField({})
 			document.body.innerText = JSON.stringify(f1.valid(1))
 
     })
@@ -299,7 +299,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.BigIntegerField({})
+			const f1: any = Field.BigIntegerField({})
 			document.body.innerText = JSON.stringify(f1.valid(10))
 
     })
@@ -319,7 +319,7 @@ describe("Field valid", () => {
     await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.BigIntegerField({})
+			const f1: any = Field.BigIntegerField({})
 			document.body.innerText = `{result:${JSON.stringify(f1.valid(null))}}`
 
     })
@@ -340,7 +340,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.BigIntegerField({})
+			const f1: any = Field.BigIntegerField({})
 			document.body.innerText = `{result:${JSON.stringify(f1.valid(''))}}`
 
     })
@@ -362,7 +362,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.DateTimeField({})
+			const f1: any = Field.DateTimeField({})
 			document.body.innerText = JSON.stringify(f1.valid("01/24/2020 21:30"))
 
 		})
@@ -375,7 +375,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.DateTimeField({})
+			const f1: any = Field.DateTimeField({})
 			document.body.innerText = JSON.stringify(f1.valid(10))
 
 		})
@@ -395,7 +395,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.DateTimeField({})
+			const f1: any = Field.DateTimeField({})
 			document.body.innerText = `{result:${JSON.stringify(f1.valid(null))}}`
 
 		})
@@ -416,7 +416,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.DateTimeField({})
+			const f1: any = Field.DateTimeField({})
 			document.body.innerText = `{result:${JSON.stringify(f1.valid(0))}}`
 
 		})
@@ -436,7 +436,7 @@ describe("Field valid", () => {
 		await page.evaluate(() => {
 
 			const Field: typeof FieldsType = window['Field']
-			const f1 = Field.DateTimeField({})
+			const f1: any = Field.DateTimeField({})
 			document.body.innerText = `{result:${JSON.stringify(f1.valid(0))}}`
 
 		})
@@ -461,7 +461,7 @@ describe("Field valid", () => {
 
 			const { ArrayField, JsonField}  = Field.indexedDB.fields
 			
-			const f1 = JsonField({})
+			const f1: any = JsonField({})
 			document.body.innerText = JSON.stringify(f1.valid({}))
 
     })
@@ -476,7 +476,7 @@ describe("Field valid", () => {
 			const Field: typeof FieldsType = window['Field']
 			const { ArrayField, JsonField}  = Field.indexedDB.fields
 			
-			const f1 = JsonField({})
+			const f1: any = JsonField({})
 			
 			document.body.innerText = JSON.stringify(f1.valid({test:'test'}))
 
@@ -497,7 +497,7 @@ describe("Field valid", () => {
 
 			const Field: typeof FieldsType = window['Field']
 			const { ArrayField, JsonField}  = Field.indexedDB.fields
-			const f1 = JsonField({})
+			const f1: any = JsonField({})
 
 			document.body.innerText = `{result:${JSON.stringify(f1.valid([]))}}`
 
@@ -518,7 +518,7 @@ describe("Field valid", () => {
 
 				const Field: typeof FieldsType = window['Field']
 				const { ArrayField, JsonField}  = Field.indexedDB.fields
-				const f1 = JsonField({blank:true})
+				const f1: any = JsonField({blank:true})
 				document.body.innerText = `{result:${JSON.stringify(f1.valid(null))}}`
 
 		})
@@ -542,7 +542,7 @@ describe("Field valid", () => {
 
 			const { ArrayField, JsonField}  = Field.indexedDB.fields
 			
-			const f1 = ArrayField({})
+			const f1: any = ArrayField({})
 			document.body.innerText = JSON.stringify(f1.valid([]))
 
     })
@@ -557,7 +557,7 @@ describe("Field valid", () => {
 			const Field: typeof FieldsType = window['Field']
 			const { ArrayField, JsonField}  = Field.indexedDB.fields
 			
-			const f1 = ArrayField({})
+			const f1: any = ArrayField({})
 			
 			document.body.innerText = JSON.stringify(f1.valid(['1']))
 
@@ -578,7 +578,7 @@ describe("Field valid", () => {
 
 			const Field: typeof FieldsType = window['Field']
 			const { ArrayField, JsonField}  = Field.indexedDB.fields
-			const f1 = ArrayField({})
+			const f1: any = ArrayField({})
 
 			document.body.innerText = `{result:${JSON.stringify(f1.valid(8))}}`
 
@@ -599,7 +599,7 @@ describe("Field valid", () => {
 
 			const Field: typeof FieldsType = window['Field']
 			const { ArrayField, JsonField}  = Field.indexedDB.fields
-			const f1 = ArrayField({blank:true})
+			const f1: any = ArrayField({blank:true})
 			document.body.innerText = `{result:${JSON.stringify(f1.valid(null))}}`
 
 		})

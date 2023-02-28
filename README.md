@@ -12,7 +12,6 @@ ORM for accessing indexedDB and localStorage.
 <br/>
 
 ### Details
-- Unpacked size 236kB
 - The indexedDB implementation runs multiple request in a single transaction
 
 #### A promise base api implementation for accessing for accessing indexedDB 

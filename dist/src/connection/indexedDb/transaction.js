@@ -7,7 +7,7 @@ class transactionRequest {
     }
 }
 export class transaction {
-    constructor({ store, done, db, tx }) {
+    constructor({ store, done, db, tx, doneButFailed }) {
         this.trigger = {
             beforeInsert: false,
             afterInsert: false,
@@ -30,7 +30,7 @@ export class transaction {
                     };
                     addGetList.onerror = async (e) => {
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
-                        this.done();
+                        this.doneButFailed();
                     };
                     return request;
                 },
@@ -45,7 +45,7 @@ export class transaction {
                         request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
                     };
                     getList.onerror = (e) => {
-                        this.done();
+                        this.doneButFailed();
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
                     };
                     return request;
@@ -63,7 +63,7 @@ export class transaction {
                     };
                     updateRequest.onerror = async (e) => {
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
-                        this.done();
+                        this.doneButFailed();
                     };
                     return request;
                 },
@@ -79,7 +79,7 @@ export class transaction {
                     };
                     this.tx.onerror = async (e) => {
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
-                        this.done();
+                        this.doneButFailed();
                     };
                     return request;
                 },
@@ -95,7 +95,7 @@ export class transaction {
                     };
                     deleteRequest.onerror = async (e) => {
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
-                        this.done();
+                        this.doneButFailed();
                     };
                     return request;
                 },
@@ -110,7 +110,7 @@ export class transaction {
                         request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
                     };
                     getRequest.onerror = (e) => {
-                        this.done();
+                        this.doneButFailed();
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
                     };
                     return request;
@@ -127,7 +127,7 @@ export class transaction {
                         request === null || request === void 0 ? void 0 : request.onsuccessFunc(e);
                     };
                     getRequest.onerror = (e) => {
-                        this.done();
+                        this.doneButFailed();
                         request === null || request === void 0 ? void 0 : request.onerrorFunc(e);
                     };
                     return request;
@@ -135,8 +135,9 @@ export class transaction {
             };
         };
         // currentStore = store
+        this.doneButFailed = doneButFailed;
         this.done = done;
-        this.db = db;
+        // this.db = db
         this.tx = tx;
     }
 }

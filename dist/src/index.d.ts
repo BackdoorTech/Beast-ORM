@@ -4,21 +4,21 @@ import { ModelReader } from './models/model.reader.js';
 import { registerModel, migrate } from './models/register-model.js';
 export declare const models: {
     Value(arg: any): {};
-    CharField(data?: import("./models/field/interface.js").CharFieldParams): any;
-    BooleanField(data?: import("./models/field/interface.js").BooleanFieldParams): any;
-    TextField(data?: import("./models/field/interface.js").TextFieldParams): any;
-    IntegerField(data?: import("./models/field/interface.js").IntegerFieldParams): any;
-    DateField(data?: import("./models/field/interface.js").DateFieldParams): any;
-    DateTimeField(data?: import("./models/field/interface.js").DateTimeFieldParams): any;
-    BigIntegerField(data?: import("./models/field/interface.js").BigIntegerFieldParams): any;
+    CharField(data?: import("./models/field/interface.js").CharFieldParams): string;
+    BooleanField(data?: import("./models/field/interface.js").BooleanFieldParams): boolean;
+    TextField(data?: import("./models/field/interface.js").TextFieldParams): string;
+    IntegerField(data?: import("./models/field/interface.js").IntegerFieldParams): number;
+    DateField(data?: import("./models/field/interface.js").DateFieldParams): Date;
+    DateTimeField(data?: import("./models/field/interface.js").DateTimeFieldParams): string;
+    BigIntegerField(data?: import("./models/field/interface.js").BigIntegerFieldParams): number;
     AutoField(data?: import("./models/field/interface.js").AutoFieldParams): any;
-    OneToOneField(data: import("./models/field/interface.js").OneToOneFieldParams): any;
-    ForeignKey(data: import("./models/field/interface.js").ForeignKeyParams): any;
-    ManyToManyField(data?: import("./models/field/interface.js").ManyToManyFieldParams): any;
+    OneToOneField(data: import("./models/field/interface.js").OneToOneFieldParams): string | number;
+    ForeignKey(data: import("./models/field/interface.js").ForeignKeyParams): string | number;
+    ManyToManyField(data?: import("./models/field/interface.js").ManyToManyFieldParams): string | number;
     indexedDB: {
         fields: {
-            JsonField: (data?: import("./models/field/interface.js").IndexedDBJsonFieldParams) => any;
-            ArrayField: (data?: import("./models/field/interface.js").IndexedDBArrayFieldParams) => any;
+            JsonField: (data?: import("./models/field/interface.js").IndexedDBJsonFieldParams) => Object;
+            ArrayField: (data?: import("./models/field/interface.js").IndexedDBArrayFieldParams) => any[];
         };
     };
     Model: typeof Model;

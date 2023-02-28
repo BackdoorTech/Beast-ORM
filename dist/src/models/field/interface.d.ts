@@ -44,7 +44,7 @@ export interface IndexedDBArrayFieldParams {
     default?: any;
     maxLength?: number;
     minLength?: number;
-    field?: field;
+    field?: field | any;
     size?: number;
 }
 export interface DateTimeFieldParams {

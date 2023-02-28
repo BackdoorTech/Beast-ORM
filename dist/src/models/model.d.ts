@@ -20,6 +20,7 @@ export declare class Model {
     static getModelsFields(arg: any): Promise<void>;
     static all(): Promise<any[]>;
     static get(arg: getParams): Promise<any>;
+    static getOrCreate(arg: getParams): Promise<any>;
     private static getId;
     static getModelName(): string;
     static filter(...arg: any[]): any;
