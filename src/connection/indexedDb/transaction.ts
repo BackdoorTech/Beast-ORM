@@ -28,7 +28,8 @@ export class transaction {
     store
 
     done: Function
-    db
+    doneButFailed: Function
+   //  db
     tx: IDBTransaction
 
     trigger = {
@@ -36,10 +37,11 @@ export class transaction {
         afterInsert: false,
     }
 
-    constructor({store, done, db, tx}) {
+    constructor({store, done, db, tx, doneButFailed}) {
         // currentStore = store
+        this.doneButFailed = doneButFailed
         this.done = done
-        this.db = db
+        // this.db = db
         this.tx = tx
     }
 
@@ -56,7 +58,7 @@ export class transaction {
                 this.request.push(request)
     
                 let objectStore = this.tx.objectStore(currentStore);
-    
+                
                 let addGetList = objectStore.add(value);
                 
                 addGetList.onsuccess = async (e: any) => {
@@ -66,7 +68,7 @@ export class transaction {
 
                 addGetList.onerror = async (e) => {
                     request?.onerrorFunc(e)
-                    this.done()
+                    this.doneButFailed()
                 };
         
 
@@ -86,7 +88,7 @@ export class transaction {
                 };
 
                 getList.onerror = (e: any) => {
-                    this.done()
+                    this.doneButFailed()
                     request?.onerrorFunc(e)
                 };
 
@@ -109,7 +111,7 @@ export class transaction {
                 updateRequest.onerror =  async (e) => {
                     request?.onerrorFunc(e)
                     
-                    this.done()
+                    this.doneButFailed()
                 };
   
 
@@ -130,7 +132,7 @@ export class transaction {
                 };
                 this.tx.onerror = async (e) => {
                     request?.onerrorFunc(e)
-                    this.done()
+                    this.doneButFailed()
                 };
            
 
@@ -150,7 +152,7 @@ export class transaction {
                 };
                 deleteRequest.onerror = async (e) => {
                     request?.onerrorFunc(e)                    
-                    this.done()
+                    this.doneButFailed()
                 };
                
 
@@ -169,7 +171,7 @@ export class transaction {
                     request?.onsuccessFunc(e) 
                 };
                 getRequest.onerror = (e) => {
-                    this.done()
+                    this.doneButFailed()
                     request?.onerrorFunc(e)
                 };
    
@@ -189,7 +191,7 @@ export class transaction {
                     request?.onsuccessFunc(e) 
                 };
                 getRequest.onerror = (e) => {
-                    this.done()
+                    this.doneButFailed()
                     request?.onerrorFunc(e)                    
                 };
 
