@@ -289,16 +289,19 @@ class indexedDBInterface {
           const idValue = args[idFieldName]
 
           if(idValue) {
-            await this.getActions(TableSchema.name, config, queryId).update({value:args})
+            this.getActions(TableSchema.name, config, queryId).update({value:args})
           }  else {
-            await this.getActions(TableSchema.name, config, queryId).update({value:args, key:idValue})
+            this.getActions(TableSchema.name, config, queryId).update({value:args, key:idValue})
           }
 
-          postMessage({
-            run: 'callback',
-            queryId,
-            value: true
-          })
+          IndexedDB.getOrCreateTransaction({currentStore: TableSchema.name, queryId, config}, 'readwrite', (transaction) => {
+            postMessage({
+              run: 'callback',
+              queryId: queryId,
+              value: true
+            })
+            transaction.done()
+          });
       
         } else if(methods[0].methodName != 'update' && methods[methods.length - 1].methodName == 'update' ) {
 
@@ -313,14 +316,17 @@ class indexedDBInterface {
 
           for(let row of rows) {
             const updateRow = Object.assign(row, argsToUpdate)
-            await this.getActions(TableSchema.name, config, queryId).update({value:updateRow})
+            this.getActions(TableSchema.name, config, queryId).update({value:updateRow})
           }
           
-          postMessage({
-            run: 'callback',
-            queryId,
-            value: true
-          })
+          IndexedDB.getOrCreateTransaction({currentStore: TableSchema.name, queryId, config}, 'readwrite', (transaction) => {
+            postMessage({
+              run: 'callback',
+              queryId: queryId,
+              value: true
+            })
+            transaction.done()
+          });
 
         } else if (methods[0].methodName == 'update') {
           const argsToUpdate = methods[0].arguments
@@ -330,16 +336,19 @@ class indexedDBInterface {
           const idValue = argsToUpdate[idFieldName]
 
           if(idValue) {
-            await this.getActions(TableSchema.name, config, queryId).update({value: argsToUpdate})
+            this.getActions(TableSchema.name, config, queryId).update({value: argsToUpdate})
           }  else {
-            await this.getActions(TableSchema.name, config, queryId).update({value:argsToUpdate, key:idValue})
+            this.getActions(TableSchema.name, config, queryId).update({value:argsToUpdate, key:idValue})
           }
 
-          postMessage({
-            run: 'callback',
-            queryId,
-            value: true
-          })
+          IndexedDB.getOrCreateTransaction({currentStore: TableSchema.name, queryId, config}, 'readwrite', (transaction) => {
+            postMessage({
+              run: 'callback',
+              queryId: queryId,
+              value: true
+            })
+            transaction.done()
+          });
           
         }
       },
@@ -355,16 +364,18 @@ class indexedDBInterface {
           const rows = result.value
 
           for(let row of rows) {
-
             const id = row[TableSchema.id.keyPath]
-            await this.getActions(TableSchema.name, config, queryId).deleteByID(id)
+            this.getActions(TableSchema.name, config, queryId).deleteByID(id)
           }
 
-          postMessage({
-            run: 'callback',
-            queryId,
-            value: true
-          })
+          IndexedDB.getOrCreateTransaction({currentStore: TableSchema.name, queryId, config}, 'readwrite', (transaction) => {
+            postMessage({
+              run: 'callback',
+              queryId: queryId,
+              value: true
+            })
+            transaction.done()
+          });
 
         } else if ( methods[methods.length - 1].methodName == 'delete' && 
         typeof methods[methods.length - 1].arguments == 'object') {
@@ -372,7 +383,7 @@ class indexedDBInterface {
           const IdInObject = methods[methods.length - 1].arguments
           const idValue = IdInObject[TableSchema.id.keyPath]
 
-          postMessage( {
+          postMessage({
             run: 'callback',
             queryId: queryId,
             value: await this.getActions(TableSchema.name, config, queryId).deleteByID(idValue)
