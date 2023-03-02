@@ -60,7 +60,7 @@ export class MemoryConnector {
     }
   
     private async runMigrations(db:IDBDatabase, config: DatabaseSchema) {
-      await config.stores.forEach( async (storeSchema) => {
+      await Object.values(config.stores).forEach( async (storeSchema) => {
         if (!db.objectStoreNames.contains(storeSchema.name)) {
           const ObjectStore = db.createObjectStore(storeSchema.name, storeSchema.id);
           storeSchema.fields.forEach(c => {

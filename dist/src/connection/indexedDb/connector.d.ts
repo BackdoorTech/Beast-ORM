@@ -70,7 +70,7 @@ export declare class IndexedDB {
             [key: string]: boolean;
         };
     };
-    static executeTransaction(TableName: any, databaseName: any): void;
+    static executeTransaction(currentStore: any, databaseName: any): void;
     static getOrCreateTransaction({ TableName, queryId, DatabaseName }: {
         TableName: any;
         queryId: any;
