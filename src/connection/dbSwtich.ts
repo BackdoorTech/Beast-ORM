@@ -5,18 +5,22 @@ import { WorkerManager, WsRegister } from './workerManager.js'
 
 export class DBSwitch {
 
+  private static header ({TableName, DatabaseName, queryId, action, arg, dbType, callback}) : WsRegister | TaskHolderInterface {
+    return {
+      params: {TableName, DatabaseName, queryId, action, arg, dbType},
+      queryId: queryId,
+      method: 'execute',
+      callback: (message) => {
+        callback(message.value)
+      }
+    }
+  }
+
 	static async requestHandler(TableName: string, DatabaseName: string, dbType : dbType, action: actionParam, arg: any, queryId) {
 		
     return new Promise(async(resolve, reject) => {
 
-      const header: WsRegister | TaskHolderInterface = {
-        params: {TableName, DatabaseName, queryId, action, arg, dbType},
-        queryId: queryId,
-        method: 'execute',
-        callback: (message) => {
-          resolve(message.value)
-        }
-      }
+      const header = this.header({TableName, DatabaseName, queryId, action, arg, dbType, callback: resolve})
 
       if (typeof(Worker) !== "undefined" && WorkerManager.webWorkerModuleSupport) {
         WorkerManager.register(header)
@@ -29,14 +33,7 @@ export class DBSwitch {
 
 	static async callBackRequestHandler(TableName: string, DatabaseName: string, dbType : dbType, action: actionParam, arg: any, callback: Function, queryId: string) {
 
-    const header: WsRegister | TaskHolderInterface = {
-      params: {TableName, DatabaseName, queryId, action, arg, dbType},
-      queryId: queryId,
-      method: 'execute',
-      callback: (message) => {
-        callback(message.value)
-      }
-    }
+    const header = this.header({TableName, DatabaseName, queryId, action, arg, dbType, callback})
 
     if (typeof(Worker) !== "undefined" && WorkerManager.webWorkerModuleSupport) {
       WorkerManager.register(header)

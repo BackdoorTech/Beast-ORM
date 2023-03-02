@@ -7,7 +7,6 @@ try {
     }
     else {
         PostMessage = (data) => {
-            console.log("bug");
             taskHolder.onmessage(data);
         };
     }
