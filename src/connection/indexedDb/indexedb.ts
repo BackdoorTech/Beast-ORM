@@ -2,6 +2,7 @@ import { IndexedDB } from "./connector.js";
 import { DatabaseSchema, TableSchema } from "../../models/register-modal.interface.js";
 import { Method } from "../../models/model.interface.js";
 import { SqlObject } from "../../sql/sqlObject/sqlObject.js";
+import { Databases, Tables } from "./config.js";
 
 // inspire by https://github.com/hc-oss/use-indexeddb
 class indexedDBInterface {
@@ -186,10 +187,13 @@ class indexedDBInterface {
     }
   }
 
-  requestHandler = (TableSchema:TableSchema, config:DatabaseSchema, queryId) => {
+  requestHandler = (TableName:string, DatabaseName:string, queryId) => {
+
     return {
       select: async (methods: Method[]) => {
-        
+        const TableSchema = Tables[DatabaseName][TableName]
+        const config = Databases[DatabaseName]
+
         if(methods[0].methodName == 'all') {
           postMessage ({
             run: 'callback',
@@ -281,6 +285,8 @@ class indexedDBInterface {
 
       },
       update: async (methods: Method[]) => {
+        const TableSchema = Tables[DatabaseName][TableName]
+        const config = Databases[DatabaseName]
 
         if(methods[0].methodName == 'save') {
           
@@ -311,7 +317,7 @@ class indexedDBInterface {
           const customMethods: Method[] = Object.create(methods)
           customMethods[methods.length - 1].methodName = 'execute'
 
-          const result = await this.requestHandler(TableSchema, config, queryId).select(customMethods) as any
+          const result = await this.requestHandler(TableSchema.name, config.databaseName, queryId).select(customMethods) as any
           const rows = result.value
 
           for(let row of rows) {
@@ -353,6 +359,8 @@ class indexedDBInterface {
         }
       },
       delete: async (methods: Method[]) => {
+        const TableSchema = Tables[DatabaseName][TableName]
+        const config = Databases[DatabaseName]
 
         if(methods[methods.length - 1].methodName == 'delete' && 
         methods[methods.length - 1].arguments == null) {
@@ -360,7 +368,7 @@ class indexedDBInterface {
           const customMethods: Method[] = Object.create(methods)
           customMethods[methods.length - 1].methodName = 'execute'
 
-          const result = await this.requestHandler(TableSchema, config, queryId).select(customMethods) as any
+          const result = await this.requestHandler(TableSchema.name, config.databaseName, queryId).select(customMethods) as any
           const rows = result.value
 
           for(let row of rows) {
@@ -372,7 +380,7 @@ class indexedDBInterface {
             postMessage({
               run: 'callback',
               queryId: queryId,
-              value: true
+              value: result.length
             })
             transaction.done()
           });
@@ -398,6 +406,9 @@ class indexedDBInterface {
         }
       },
       insert: async (methods: Method[]) => {
+        const TableSchema = Tables[DatabaseName][TableName]
+        const config = Databases[DatabaseName]
+
         const rows = methods[0].arguments
         
         const add = (id, index) => {
@@ -423,9 +434,9 @@ class indexedDBInterface {
         });
 
       },
-      migrate: async() => {
-        await IndexedDB.migrate(config)
-        await IndexedDB.run(config)
+      migrate: async({DatabaseSchema, TableSchema}:{DatabaseSchema:DatabaseSchema, TableSchema:TableSchema}) => {
+        await IndexedDB.migrate(DatabaseSchema)
+        await IndexedDB.run(DatabaseSchema)
         postMessage ({
           run: 'callback',
           queryId: queryId,
@@ -433,6 +444,9 @@ class indexedDBInterface {
         })
       }, 
       trigger: async({type, subscribe}) => {
+        const TableSchema = Tables[DatabaseName][TableName]
+        const config = Databases[DatabaseName]
+
         if(type == 'transactionOnCommit') {
           if(subscribe) {
             return await IndexedDB.transactionOnCommitSubscribe(TableSchema, config, queryId)

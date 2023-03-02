@@ -5,9 +5,9 @@ import { actionParam, dbType } from './intreface.js';
 
 onmessage = async (oEvent) => {
 
-  const { TableSchema, DBconfig, queryId, action, arg } = oEvent.data
+  const { TableName, DatabaseName, queryId, action, arg } = oEvent.data
   
-  indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg).then((result) => {
+  indexedDB.requestHandler(TableName, DatabaseName, queryId)[action](arg).then((result) => {
 
     // console.log('result', result)
     // postMessage(result)

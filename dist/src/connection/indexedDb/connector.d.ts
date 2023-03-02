@@ -60,7 +60,7 @@ export declare class IndexedDB {
     constructor();
     static connect(config: DatabaseSchema): Promise<IDBDatabase>;
     static migrate(config: DatabaseSchema): Promise<boolean>;
-    static run(config: any): boolean;
+    static run(config: DatabaseSchema): boolean;
     static request({ queryId }: {
         queryId: any;
     }, callback: Function): void;

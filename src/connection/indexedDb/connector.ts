@@ -1,5 +1,6 @@
 import { DatabaseSchema, TableSchema } from "../../models/register-modal.interface.js";
 import { transaction } from './transaction.js';
+import { Databases, Tables} from './config.js' 
 
 // inspire by https://github.com/hc-oss/use-indexeddb
 
@@ -99,9 +100,11 @@ export class IndexedDB {
 
     });
   }
-  static run (config) {
-    if(!this.transactions[config.databaseName]) {
+  static run (config:DatabaseSchema) {
 
+    
+    if(!this.transactions[config.databaseName]) {
+      Databases[config.databaseName] = config
       this.transactions[config.databaseName] = {}
       this.executingTransaction[config.databaseName] = {}
       this.txInstance[config.databaseName] = {}
@@ -109,15 +112,17 @@ export class IndexedDB {
       this.txInstanceMode[config.databaseName] = {}
       this.transactionOnCommit[config.databaseName] = {}
       this.transactionsToCommit[config.databaseName] = {}
+      Tables[config.databaseName]= {}
 
-      for( const storeName of config.stores) {
-        if(!this.transactions[config.databaseName][storeName.name]) {
-          this.transactions[config.databaseName][storeName.name] = []
-          this.executingTransaction[config.databaseName][storeName.name] = false
-          this.txInstance[config.databaseName][storeName.name] = {}
-          this.txInstanceMode[config.databaseName][storeName.name] = {}
-          this.transactionOnCommit[config.databaseName][storeName.name] = {}
-          this.transactionsToCommit[config.databaseName][storeName.name] = []
+      for( const store of config.stores) {
+        if(!this.transactions[config.databaseName][store.name]) {
+          Tables[config.databaseName][store.name]= store
+          this.transactions[config.databaseName][store.name] = []
+          this.executingTransaction[config.databaseName][store.name] = false
+          this.txInstance[config.databaseName][store.name] = {}
+          this.txInstanceMode[config.databaseName][store.name] = {}
+          this.transactionOnCommit[config.databaseName][store.name] = {}
+          this.transactionsToCommit[config.databaseName][store.name] = []
         }
       }
     }

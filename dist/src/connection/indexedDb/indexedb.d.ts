@@ -25,12 +25,15 @@ declare class indexedDBInterface {
         deleteAll: () => Promise<any>;
         openCursor: (cursorCallback: any, keyRange?: IDBKeyRange) => Promise<void | IDBCursorWithValue>;
     };
-    requestHandler: (TableSchema: TableSchema, config: DatabaseSchema, queryId: any) => {
+    requestHandler: (TableName: string, DatabaseName: string, queryId: any) => {
         select: (methods: Method[]) => Promise<unknown>;
         update: (methods: Method[]) => Promise<void>;
         delete: (methods: Method[]) => Promise<void>;
         insert: (methods: Method[]) => Promise<void>;
-        migrate: () => Promise<void>;
+        migrate: ({ DatabaseSchema, TableSchema }: {
+            DatabaseSchema: DatabaseSchema;
+            TableSchema: TableSchema;
+        }) => Promise<void>;
         trigger: ({ type, subscribe }: {
             type: any;
             subscribe: any;

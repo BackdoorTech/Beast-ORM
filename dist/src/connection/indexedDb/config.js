@@ -1,2 +1,2 @@
-export const models = {};
-export const modelsConfig = {};
+export const Databases = {};
+export const Tables = {};

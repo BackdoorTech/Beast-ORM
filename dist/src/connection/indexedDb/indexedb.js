@@ -1,5 +1,6 @@
 import { IndexedDB } from "./connector.js";
 import { SqlObject } from "../../sql/sqlObject/sqlObject.js";
+import { Databases, Tables } from "./config.js";
 // inspire by https://github.com/hc-oss/use-indexeddb
 class indexedDBInterface {
     constructor() {
@@ -137,9 +138,11 @@ class indexedDBInterface {
                 },
             };
         };
-        this.requestHandler = (TableSchema, config, queryId) => {
+        this.requestHandler = (TableName, DatabaseName, queryId) => {
             return {
                 select: async (methods) => {
+                    const TableSchema = Tables[DatabaseName][TableName];
+                    const config = Databases[DatabaseName];
                     if (methods[0].methodName == 'all') {
                         postMessage({
                             run: 'callback',
@@ -221,6 +224,8 @@ class indexedDBInterface {
                     }
                 },
                 update: async (methods) => {
+                    const TableSchema = Tables[DatabaseName][TableName];
+                    const config = Databases[DatabaseName];
                     if (methods[0].methodName == 'save') {
                         const args = methods[0].arguments;
                         const idFieldName = TableSchema.id.keyPath;
@@ -244,7 +249,7 @@ class indexedDBInterface {
                         const argsToUpdate = methods[methods.length - 1].arguments;
                         const customMethods = Object.create(methods);
                         customMethods[methods.length - 1].methodName = 'execute';
-                        const result = await this.requestHandler(TableSchema, config, queryId).select(customMethods);
+                        const result = await this.requestHandler(TableSchema.name, config.databaseName, queryId).select(customMethods);
                         const rows = result.value;
                         for (let row of rows) {
                             const updateRow = Object.assign(row, argsToUpdate);
@@ -281,11 +286,13 @@ class indexedDBInterface {
                     }
                 },
                 delete: async (methods) => {
+                    const TableSchema = Tables[DatabaseName][TableName];
+                    const config = Databases[DatabaseName];
                     if (methods[methods.length - 1].methodName == 'delete' &&
                         methods[methods.length - 1].arguments == null) {
                         const customMethods = Object.create(methods);
                         customMethods[methods.length - 1].methodName = 'execute';
-                        const result = await this.requestHandler(TableSchema, config, queryId).select(customMethods);
+                        const result = await this.requestHandler(TableSchema.name, config.databaseName, queryId).select(customMethods);
                         const rows = result.value;
                         for (let row of rows) {
                             const id = row[TableSchema.id.keyPath];
@@ -295,7 +302,7 @@ class indexedDBInterface {
                             postMessage({
                                 run: 'callback',
                                 queryId: queryId,
-                                value: true
+                                value: result.length
                             });
                             transaction.done();
                         });
@@ -320,6 +327,8 @@ class indexedDBInterface {
                     }
                 },
                 insert: async (methods) => {
+                    const TableSchema = Tables[DatabaseName][TableName];
+                    const config = Databases[DatabaseName];
                     const rows = methods[0].arguments;
                     const add = (id, index) => {
                         postMessage({
@@ -341,9 +350,9 @@ class indexedDBInterface {
                         transaction.done();
                     });
                 },
-                migrate: async () => {
-                    await IndexedDB.migrate(config);
-                    await IndexedDB.run(config);
+                migrate: async ({ DatabaseSchema, TableSchema }) => {
+                    await IndexedDB.migrate(DatabaseSchema);
+                    await IndexedDB.run(DatabaseSchema);
                     postMessage({
                         run: 'callback',
                         queryId: queryId,
@@ -351,6 +360,8 @@ class indexedDBInterface {
                     });
                 },
                 trigger: async ({ type, subscribe }) => {
+                    const TableSchema = Tables[DatabaseName][TableName];
+                    const config = Databases[DatabaseName];
                     if (type == 'transactionOnCommit') {
                         if (subscribe) {
                             return await IndexedDB.transactionOnCommitSubscribe(TableSchema, config, queryId);

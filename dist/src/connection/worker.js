@@ -1,7 +1,7 @@
 import { indexedDB } from './indexedDb/indexedb.js';
 onmessage = async (oEvent) => {
-    const { TableSchema, DBconfig, queryId, action, arg } = oEvent.data;
-    indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg).then((result) => {
+    const { TableName, DatabaseName, queryId, action, arg } = oEvent.data;
+    indexedDB.requestHandler(TableName, DatabaseName, queryId)[action](arg).then((result) => {
         // console.log('result', result)
         // postMessage(result)
     }, (error) => {
