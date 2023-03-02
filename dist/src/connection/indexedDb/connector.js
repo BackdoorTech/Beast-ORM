@@ -1,5 +1,6 @@
 import { transaction } from './transaction.js';
 import { Databases, Tables } from './config.js';
+import { PostMessage } from "./postMessage.js";
 // inspire by https://github.com/hc-oss/use-indexeddb
 export class IndexedDB {
     constructor() { }
@@ -108,7 +109,7 @@ export class IndexedDB {
                         this.transactionsToCommit[databaseName][currentStore] = [];
                         (async () => {
                             for (let [queryId, value] of Object.entries(this.transactionOnCommit[databaseName][currentStore])) {
-                                postMessage({
+                                PostMessage({
                                     run: 'callback',
                                     queryId: queryId,
                                     value: true

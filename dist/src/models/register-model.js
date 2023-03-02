@@ -6,6 +6,7 @@ import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js';
 import { ModelAPIRequest } from './model-manager.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
+import { IndexedDB } from '../connection/indexedDb/connector.js';
 export const models = {};
 export const modelsConfig = {};
 export const modelsLocalStorage = {};
@@ -53,7 +54,6 @@ export class registerModel {
                     if (removeReferenceField === null || removeReferenceField === void 0 ? void 0 : removeReferenceField.model) {
                         removeReferenceField.model = removeReferenceField.model.getModelName();
                     }
-                    console.log(removeReferenceField);
                     databaseSchema.stores[index].fields.push({
                         name: fieldName,
                         keyPath: fieldName,
@@ -91,6 +91,7 @@ export class registerModel {
             transactionOnCommit.prepare(modelClassRepresentations);
         }
         if (databaseSchema.type == 'indexedDB') {
+            await IndexedDB.run(databaseSchema);
             await ModelAPIRequest.obj(databaseSchema, tableSchema_).migrate();
             ModelMigrations.migrationsState(databaseSchema.databaseName, true);
         }

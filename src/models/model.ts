@@ -5,7 +5,7 @@ import { ModelAPIRequest } from './model-manager.js';
 import { models, modelsConfig, modelsConfigLocalStorage } from './register-model.js'
 import { FieldType } from '../sql/query/interface.js';
 import  * as Fields from './field/allFields.js'
-import { IndexedDBWorkerQueue } from '../connection/worker.queue.js';
+import { taskHolder } from '../connection/taskHolder.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
 import { ReactiveList } from '../reactive/DynamicList.js';
 
@@ -64,7 +64,7 @@ export class Model {
     const queryId=uniqueGenerator()
 
     await ModelAPIRequest.obj(DBconfig, tableSchema).save(methods, queryId)
-    IndexedDBWorkerQueue.finish(queryId)
+    taskHolder.finish(queryId)
   }
 
 
@@ -82,7 +82,7 @@ export class Model {
     const queryId=uniqueGenerator()
 
     await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId)
-    IndexedDBWorkerQueue.finish(queryId)
+    taskHolder.finish(queryId)
   }
   
   static async  deleteAll() {
@@ -99,7 +99,7 @@ export class Model {
     const queryId=uniqueGenerator()
 
     await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId)
-    IndexedDBWorkerQueue.finish(queryId)
+    taskHolder.finish(queryId)
   }
 
   async all() {
@@ -108,7 +108,7 @@ export class Model {
     const queryId=uniqueGenerator()
 
     const result = await Model.object({queryId, DBconfig, TableSchema}).all()
-    IndexedDBWorkerQueue.finish(queryId)
+    taskHolder.finish(queryId)
     return result
   }
 
@@ -175,7 +175,7 @@ export class Model {
     const queryId = uniqueGenerator()
 
     const result = await Model.object({queryId, DBconfig, TableSchema}).all()
-    IndexedDBWorkerQueue.finish(queryId)
+    taskHolder.finish(queryId)
     return result
   }
   
@@ -187,7 +187,7 @@ export class Model {
     const queryId = uniqueGenerator()
 
     const foundObj = await ModelAPIRequest.obj(DBconfig, TableSchema).get(_methods, queryId)
-    IndexedDBWorkerQueue.finish(queryId)
+    taskHolder.finish(queryId)
 
     if(!foundObj) {
       return false
@@ -226,7 +226,7 @@ export class Model {
     const newInstanceModel = this.NewModelInstance()
 
     const result = Object.assign(newInstanceModel, this.object({queryId,DBconfig, TableSchema, some:['filter', arg]})) as any
-    IndexedDBWorkerQueue.finish(queryId)
+    taskHolder.finish(queryId)
     return result
   }
 
@@ -330,7 +330,7 @@ export class Model {
         result.push(instance)
       })
 
-      IndexedDBWorkerQueue.updateFunction(queryId, "done", () => {
+      taskHolder.updateFunction(queryId, "done", () => {
         
  
         if(arg.length == 1) {
@@ -338,7 +338,7 @@ export class Model {
         } else {
           resolve(result)
         }
-        IndexedDBWorkerQueue.finish(queryId)
+        taskHolder.finish(queryId)
       })
   
     });
@@ -425,7 +425,7 @@ export class Model {
     
 
     const result = await ModelAPIRequest.obj(DBconfig, TableSchema).update(_methods, queryId)
-    IndexedDBWorkerQueue.finish(queryId)
+    taskHolder.finish(queryId)
     return result
   }
 

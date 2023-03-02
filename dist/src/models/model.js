@@ -4,7 +4,7 @@ import { ModelAPIRequest } from './model-manager.js';
 import { models, modelsConfig, modelsConfigLocalStorage } from './register-model.js';
 import { FieldType } from '../sql/query/interface.js';
 import * as Fields from './field/allFields.js';
-import { IndexedDBWorkerQueue } from '../connection/worker.queue.js';
+import { taskHolder } from '../connection/taskHolder.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
 import { ReactiveList } from '../reactive/DynamicList.js';
 let methods = {} = {};
@@ -47,7 +47,7 @@ export class Model {
         const methods = [{ methodName: 'save', arguments: Fields }];
         const queryId = uniqueGenerator();
         await ModelAPIRequest.obj(DBconfig, tableSchema).save(methods, queryId);
-        IndexedDBWorkerQueue.finish(queryId);
+        taskHolder.finish(queryId);
     }
     async delete() {
         const DBconfig = this.getDBSchema();
@@ -58,7 +58,7 @@ export class Model {
         const _methods = [{ methodName: 'delete', arguments: createArg }];
         const queryId = uniqueGenerator();
         await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId);
-        IndexedDBWorkerQueue.finish(queryId);
+        taskHolder.finish(queryId);
     }
     static async deleteAll() {
         const DBconfig = this.getDBSchema();
@@ -69,14 +69,14 @@ export class Model {
         const _methods = [{ methodName: 'delete', arguments: '*' }];
         const queryId = uniqueGenerator();
         await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId);
-        IndexedDBWorkerQueue.finish(queryId);
+        taskHolder.finish(queryId);
     }
     async all() {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
         const queryId = uniqueGenerator();
         const result = await Model.object({ queryId, DBconfig, TableSchema }).all();
-        IndexedDBWorkerQueue.finish(queryId);
+        taskHolder.finish(queryId);
         return result;
     }
     getFields(arg) {
@@ -125,7 +125,7 @@ export class Model {
         const TableSchema = this.getTableSchema();
         const queryId = uniqueGenerator();
         const result = await Model.object({ queryId, DBconfig, TableSchema }).all();
-        IndexedDBWorkerQueue.finish(queryId);
+        taskHolder.finish(queryId);
         return result;
     }
     static async get(arg) {
@@ -134,7 +134,7 @@ export class Model {
         const TableSchema = this.getTableSchema();
         const queryId = uniqueGenerator();
         const foundObj = await ModelAPIRequest.obj(DBconfig, TableSchema).get(_methods, queryId);
-        IndexedDBWorkerQueue.finish(queryId);
+        taskHolder.finish(queryId);
         if (!foundObj) {
             return false;
         }
@@ -163,7 +163,7 @@ export class Model {
         const TableSchema = this.getTableSchema();
         const newInstanceModel = this.NewModelInstance();
         const result = Object.assign(newInstanceModel, this.object({ queryId, DBconfig, TableSchema, some: ['filter', arg] }));
-        IndexedDBWorkerQueue.finish(queryId);
+        taskHolder.finish(queryId);
         return result;
     }
     static NewModelInstance() {
@@ -234,14 +234,14 @@ export class Model {
                 const instance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: insert });
                 result.push(instance);
             });
-            IndexedDBWorkerQueue.updateFunction(queryId, "done", () => {
+            taskHolder.updateFunction(queryId, "done", () => {
                 if (arg.length == 1) {
                     resolve(result[0]);
                 }
                 else {
                     resolve(result);
                 }
-                IndexedDBWorkerQueue.finish(queryId);
+                taskHolder.finish(queryId);
             });
         });
     }
@@ -301,7 +301,7 @@ export class Model {
         const _methods = [{ methodName: 'update', arguments: arg }];
         const queryId = uniqueGenerator();
         const result = await ModelAPIRequest.obj(DBconfig, TableSchema).update(_methods, queryId);
-        IndexedDBWorkerQueue.finish(queryId);
+        taskHolder.finish(queryId);
         return result;
     }
     static transactionOnCommit(callback) {

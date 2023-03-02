@@ -1,4 +1,4 @@
-import { IndexedDBWorkerQueue } from "../connection/worker.queue.js";
+import { taskHolder } from "../connection/taskHolder.js";
 import { ModelAPIRequest } from "../models/model-manager.js";
 import { uniqueGenerator } from "../utils.js";
 export class transactionOnCommit {
@@ -27,7 +27,7 @@ export class transactionOnCommit {
             };
             ModelAPIRequest.obj(DatabaseSchema, TableSchema).trigger(args, SubscriptionName, async () => {
                 subscribe = true;
-                IndexedDBWorkerQueue.updateFunction(SubscriptionName, 'callback', () => {
+                taskHolder.updateFunction(SubscriptionName, 'callback', () => {
                     for (const [requestId, callback] of Object.entries(this.stores[databaseName][table])) {
                         callback();
                     }
@@ -43,7 +43,7 @@ export class transactionOnCommit {
                     if (Object.keys(this.stores[databaseName][table]).length == 0) {
                         ModelAPIRequest.obj(DatabaseSchema, TableSchema).trigger({ type: 'transactionOnCommit', subscribe: false }, SubscriptionName, async (data) => {
                             delete this.subscription[SubscriptionName];
-                            IndexedDBWorkerQueue.finish(SubscriptionName);
+                            taskHolder.finish(SubscriptionName);
                             resolve(data);
                         });
                     }

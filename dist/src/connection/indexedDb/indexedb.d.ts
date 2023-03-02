@@ -25,7 +25,7 @@ declare class indexedDBInterface {
         deleteAll: () => Promise<any>;
         openCursor: (cursorCallback: any, keyRange?: IDBKeyRange) => Promise<void | IDBCursorWithValue>;
     };
-    requestHandler: (TableName: string, DatabaseName: string, queryId: any) => {
+    requestHandler: (TableName: string, DatabaseName: string, queryId: any, PostMessage?: typeof postMessage) => {
         select: (methods: Method[]) => Promise<unknown>;
         update: (methods: Method[]) => Promise<void>;
         delete: (methods: Method[]) => Promise<void>;
@@ -37,12 +37,7 @@ declare class indexedDBInterface {
         trigger: ({ type, subscribe }: {
             type: any;
             subscribe: any;
-        }) => Promise<{
-            run: string;
-            subscription: boolean;
-            queryId: any;
-            value: boolean;
-        }>;
+        }) => Promise<void>;
     };
 }
 export declare const indexedDB: indexedDBInterface;

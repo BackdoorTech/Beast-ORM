@@ -8,6 +8,7 @@ import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js'
 import { ModelAPIRequest } from './model-manager.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
+import { IndexedDB } from '../connection/indexedDb/connector.js';
 
 interface register {
   databaseName: string,
@@ -84,7 +85,6 @@ export class registerModel {
             removeReferenceField.model =  removeReferenceField.model.getModelName()
           }
 
-          console.log(removeReferenceField)
 
           databaseSchema.stores[index].fields.push({
             name: fieldName,
@@ -132,6 +132,7 @@ export class registerModel {
 
 
     if(databaseSchema.type =='indexedDB') {
+      await IndexedDB.run(databaseSchema)
       await ModelAPIRequest.obj(databaseSchema, tableSchema_ ).migrate()
       ModelMigrations.migrationsState(databaseSchema.databaseName, true);
     }

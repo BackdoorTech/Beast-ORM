@@ -1,6 +1,7 @@
 import { IndexedDB } from "./connector.js";
 import { SqlObject } from "../../sql/sqlObject/sqlObject.js";
 import { Tables } from "./config.js";
+import { PostMessage as PostMessageWorker } from "./postMessage.js";
 // inspire by https://github.com/hc-oss/use-indexeddb
 class indexedDBInterface {
     constructor() {
@@ -138,12 +139,12 @@ class indexedDBInterface {
                 },
             };
         };
-        this.requestHandler = (TableName, DatabaseName, queryId) => {
+        this.requestHandler = (TableName, DatabaseName, queryId, PostMessage = PostMessageWorker) => {
             return {
                 select: async (methods) => {
                     const TableSchema = Tables[DatabaseName][TableName];
                     if (methods[0].methodName == 'all') {
-                        postMessage({
+                        PostMessage({
                             run: 'callback',
                             queryId: queryId,
                             value: await this.getActions(TableName, DatabaseName, queryId).getAll()
@@ -155,14 +156,14 @@ class indexedDBInterface {
                             const key = Object.keys(args)[0];
                             const value = args[key];
                             if (TableSchema.id.keyPath == key) {
-                                postMessage({
+                                PostMessage({
                                     run: 'callback',
                                     queryId: queryId,
                                     value: await this.getActions(TableName, DatabaseName, queryId).getByID(value)
                                 });
                             }
                             else {
-                                postMessage({
+                                PostMessage({
                                     run: 'callback',
                                     queryId: queryId,
                                     value: await this.getActions(TableName, DatabaseName, queryId).getOneByIndex(key, value)
@@ -170,7 +171,7 @@ class indexedDBInterface {
                             }
                         }
                         else if (methods[0].arguments[TableSchema.id.keyPath]) {
-                            postMessage({
+                            PostMessage({
                                 run: 'callback',
                                 queryId: queryId,
                                 value: await this.getActions(TableSchema.name, DatabaseName, queryId).getByID(args[TableSchema.id.keyPath])
@@ -191,7 +192,7 @@ class indexedDBInterface {
                         //} else {
                         sqlObject.doneRunFirstMethod();
                         sqlObject.run();
-                        postMessage({
+                        PostMessage({
                             run: 'callback',
                             queryId: queryId,
                             value: sqlObject.firstMethod.rows
@@ -212,7 +213,7 @@ class indexedDBInterface {
                                 else {
                                     sqlObject.doneRunFirstMethod();
                                     sqlObject.run();
-                                    postMessage({
+                                    PostMessage({
                                         run: 'callback',
                                         queryId: queryId,
                                         value: sqlObject.firstMethod.rows
@@ -235,7 +236,7 @@ class indexedDBInterface {
                             this.getActions(TableSchema.name, DatabaseName, queryId).update({ value: args, key: idValue });
                         }
                         IndexedDB.getOrCreateTransaction({ TableName: TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
-                            postMessage({
+                            PostMessage({
                                 run: 'callback',
                                 queryId: queryId,
                                 value: true
@@ -254,7 +255,7 @@ class indexedDBInterface {
                             this.getActions(TableSchema.name, DatabaseName, queryId).update({ value: updateRow });
                         }
                         IndexedDB.getOrCreateTransaction({ TableName: TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
-                            postMessage({
+                            PostMessage({
                                 run: 'callback',
                                 queryId: queryId,
                                 value: true
@@ -274,7 +275,7 @@ class indexedDBInterface {
                             this.getActions(TableSchema.name, DatabaseName, queryId).update({ value: argsToUpdate, key: idValue });
                         }
                         IndexedDB.getOrCreateTransaction({ TableName: TableSchema.name, queryId, DatabaseName }, 'readwrite', (transaction) => {
-                            postMessage({
+                            PostMessage({
                                 run: 'callback',
                                 queryId: queryId,
                                 value: true
@@ -296,7 +297,7 @@ class indexedDBInterface {
                             this.getActions(TableSchema.name, DatabaseName, queryId).deleteByID(id);
                         }
                         IndexedDB.getOrCreateTransaction({ TableName: TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
-                            postMessage({
+                            PostMessage({
                                 run: 'callback',
                                 queryId: queryId,
                                 value: result.length
@@ -308,7 +309,7 @@ class indexedDBInterface {
                         typeof methods[methods.length - 1].arguments == 'object') {
                         const IdInObject = methods[methods.length - 1].arguments;
                         const idValue = IdInObject[TableSchema.id.keyPath];
-                        postMessage({
+                        PostMessage({
                             run: 'callback',
                             queryId: queryId,
                             value: await this.getActions(TableName, DatabaseName, queryId).deleteByID(idValue)
@@ -316,7 +317,7 @@ class indexedDBInterface {
                     }
                     else if (methods[methods.length - 1].methodName == 'delete' &&
                         methods[methods.length - 1].arguments == '*') {
-                        postMessage({
+                        PostMessage({
                             run: 'callback',
                             queryId: queryId,
                             value: await this.getActions(TableName, DatabaseName, queryId).deleteAll()
@@ -326,7 +327,7 @@ class indexedDBInterface {
                 insert: async (methods) => {
                     const rows = methods[0].arguments;
                     const add = (id, index) => {
-                        postMessage({
+                        PostMessage({
                             run: 'callback',
                             queryId: queryId,
                             value: { id, index }
@@ -337,7 +338,7 @@ class indexedDBInterface {
                         this.getActions(TableName, DatabaseName, queryId).add({ value: insert, key: null, index: i, add });
                     }
                     IndexedDB.getOrCreateTransaction({ TableName: TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
-                        postMessage({
+                        PostMessage({
                             run: 'done',
                             queryId: queryId,
                             value: true
@@ -348,7 +349,7 @@ class indexedDBInterface {
                 migrate: async ({ DatabaseSchema, TableSchema }) => {
                     await IndexedDB.migrate(DatabaseSchema);
                     await IndexedDB.run(DatabaseSchema);
-                    postMessage({
+                    PostMessage({
                         run: 'callback',
                         queryId: queryId,
                         value: true
@@ -357,19 +358,19 @@ class indexedDBInterface {
                 trigger: async ({ type, subscribe }) => {
                     if (type == 'transactionOnCommit') {
                         if (subscribe) {
-                            return await IndexedDB.transactionOnCommitSubscribe(TableName, DatabaseName, queryId);
+                            PostMessage(IndexedDB.transactionOnCommitSubscribe(TableName, DatabaseName, queryId));
                         }
                         else {
-                            return await IndexedDB.transactionOnCommitUnSubscribe(TableName, DatabaseName, queryId);
+                            PostMessage(IndexedDB.transactionOnCommitUnSubscribe(TableName, DatabaseName, queryId));
                         }
                     }
                     else if (type == 'trigger') {
+                        PostMessage({
+                            run: 'callback',
+                            queryId: queryId,
+                            value: true
+                        });
                     }
-                    postMessage({
-                        run: 'callback',
-                        queryId: queryId,
-                        value: true
-                    });
                 }
             };
         };
