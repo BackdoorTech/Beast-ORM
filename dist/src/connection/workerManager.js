@@ -34,7 +34,6 @@ class _WorkerManager {
             return data.queryId;
         }
         catch (error) {
-            console.log(error);
             return false;
         }
     }

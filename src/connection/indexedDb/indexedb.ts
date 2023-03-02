@@ -318,22 +318,25 @@ class indexedDBInterface {
           const customMethods: Method[] = Object.create(methods)
           customMethods[methods.length - 1].methodName = 'execute'
 
-          const result = await this.requestHandler(TableSchema.name, DatabaseName, queryId).select(customMethods) as any
-          const rows = result.value
+          await this.requestHandler(TableSchema.name, DatabaseName, queryId, ({value})=> {
+            const rows = value
 
-          for(let row of rows) {
-            const updateRow = Object.assign(row, argsToUpdate)
-            this.getActions(TableSchema.name, DatabaseName, queryId).update({value:updateRow})
-          }
-          
-          IndexedDB.getOrCreateTransaction({TableName: TableName, queryId, DatabaseName}, 'readwrite', (transaction) => {
-            PostMessage({
-              run: 'callback',
-              queryId: queryId,
-              value: true
-            })
-            transaction.done()
-          });
+            for(let row of rows) {
+              const updateRow = Object.assign(row, argsToUpdate)
+              this.getActions(TableSchema.name, DatabaseName, queryId).update({value:updateRow})
+            }
+            
+            IndexedDB.getOrCreateTransaction({TableName: TableName, queryId, DatabaseName}, 'readwrite', (transaction) => {
+              PostMessage({
+                run: 'callback',
+                queryId: queryId,
+                value: true
+              })
+              transaction.done()
+            });
+
+          }).select(customMethods) as any
+
 
         } else if (methods[0].methodName == 'update') {
           const argsToUpdate = methods[0].arguments
@@ -369,22 +372,24 @@ class indexedDBInterface {
           const customMethods: Method[] = Object.create(methods)
           customMethods[methods.length - 1].methodName = 'execute'
 
-          const result = await this.requestHandler(TableName, DatabaseName, queryId).select(customMethods) as any
-          const rows = result.value
+          await this.requestHandler(TableName, DatabaseName, queryId, ({value}) => {
+            const rows = value
 
-          for(let row of rows) {
-            const id = row[TableSchema.id.keyPath]
-            this.getActions(TableSchema.name, DatabaseName, queryId).deleteByID(id)
-          }
+            for(let row of rows) {
+              const id = row[TableSchema.id.keyPath]
+              this.getActions(TableSchema.name, DatabaseName, queryId).deleteByID(id)
+            }
+  
+            IndexedDB.getOrCreateTransaction({TableName: TableName, queryId, DatabaseName}, 'readwrite', (transaction) => {
+              PostMessage({
+                run: 'callback',
+                queryId: queryId,
+                value: rows.length
+              })
+              transaction.done()
+            });
+          }).select(customMethods) as any
 
-          IndexedDB.getOrCreateTransaction({TableName: TableName, queryId, DatabaseName}, 'readwrite', (transaction) => {
-            PostMessage({
-              run: 'callback',
-              queryId: queryId,
-              value: result.length
-            })
-            transaction.done()
-          });
 
         } else if ( methods[methods.length - 1].methodName == 'delete' && 
         typeof methods[methods.length - 1].arguments == 'object') {

@@ -248,20 +248,21 @@ class indexedDBInterface {
                         const argsToUpdate = methods[methods.length - 1].arguments;
                         const customMethods = Object.create(methods);
                         customMethods[methods.length - 1].methodName = 'execute';
-                        const result = await this.requestHandler(TableSchema.name, DatabaseName, queryId).select(customMethods);
-                        const rows = result.value;
-                        for (let row of rows) {
-                            const updateRow = Object.assign(row, argsToUpdate);
-                            this.getActions(TableSchema.name, DatabaseName, queryId).update({ value: updateRow });
-                        }
-                        IndexedDB.getOrCreateTransaction({ TableName: TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
-                            PostMessage({
-                                run: 'callback',
-                                queryId: queryId,
-                                value: true
+                        await this.requestHandler(TableSchema.name, DatabaseName, queryId, ({ value }) => {
+                            const rows = value;
+                            for (let row of rows) {
+                                const updateRow = Object.assign(row, argsToUpdate);
+                                this.getActions(TableSchema.name, DatabaseName, queryId).update({ value: updateRow });
+                            }
+                            IndexedDB.getOrCreateTransaction({ TableName: TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
+                                PostMessage({
+                                    run: 'callback',
+                                    queryId: queryId,
+                                    value: true
+                                });
+                                transaction.done();
                             });
-                            transaction.done();
-                        });
+                        }).select(customMethods);
                     }
                     else if (methods[0].methodName == 'update') {
                         const argsToUpdate = methods[0].arguments;
@@ -290,20 +291,21 @@ class indexedDBInterface {
                         methods[methods.length - 1].arguments == null) {
                         const customMethods = Object.create(methods);
                         customMethods[methods.length - 1].methodName = 'execute';
-                        const result = await this.requestHandler(TableName, DatabaseName, queryId).select(customMethods);
-                        const rows = result.value;
-                        for (let row of rows) {
-                            const id = row[TableSchema.id.keyPath];
-                            this.getActions(TableSchema.name, DatabaseName, queryId).deleteByID(id);
-                        }
-                        IndexedDB.getOrCreateTransaction({ TableName: TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
-                            PostMessage({
-                                run: 'callback',
-                                queryId: queryId,
-                                value: result.length
+                        await this.requestHandler(TableName, DatabaseName, queryId, ({ value }) => {
+                            const rows = value;
+                            for (let row of rows) {
+                                const id = row[TableSchema.id.keyPath];
+                                this.getActions(TableSchema.name, DatabaseName, queryId).deleteByID(id);
+                            }
+                            IndexedDB.getOrCreateTransaction({ TableName: TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
+                                PostMessage({
+                                    run: 'callback',
+                                    queryId: queryId,
+                                    value: rows.length
+                                });
+                                transaction.done();
                             });
-                            transaction.done();
-                        });
+                        }).select(customMethods);
                     }
                     else if (methods[methods.length - 1].methodName == 'delete' &&
                         typeof methods[methods.length - 1].arguments == 'object') {

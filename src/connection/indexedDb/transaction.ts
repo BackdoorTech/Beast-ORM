@@ -1,8 +1,4 @@
 
-
-import { DatabaseSchema } from '../../models/register-modal.interface.js'
-import { indexedDB } from './indexedb.js'
-import { triggerSignal } from './triggers/triggers.js'
 class transactionRequest {
     type: string
     value: any

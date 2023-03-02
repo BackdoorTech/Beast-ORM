@@ -6,7 +6,10 @@ try {
         PostMessage = postMessage;
     }
     else {
-        PostMessage = taskHolder.onmessage;
+        PostMessage = (data) => {
+            console.log("bug");
+            taskHolder.onmessage(data);
+        };
     }
 }
 catch (error) {

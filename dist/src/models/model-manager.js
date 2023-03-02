@@ -21,6 +21,7 @@ ModelAPIRequest.obj = (DatabaseSchema, TableSchema) => {
             return await DBSwitch.requestHandler(TableSchema.name, DatabaseSchema.databaseName, DatabaseSchema.type, 'update', arg, queryId);
         },
         execute: async (arg, queryId) => {
+            console.log('queryId', queryId);
             await ModelMigrations.waitMigration(DatabaseSchema.databaseName);
             return await DBSwitch.requestHandler(TableSchema.name, DatabaseSchema.databaseName, DatabaseSchema.type, 'select', arg, queryId);
         },

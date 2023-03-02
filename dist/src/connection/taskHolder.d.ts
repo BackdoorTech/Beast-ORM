@@ -1,4 +1,4 @@
-interface TaskHolderInterface {
+export interface TaskHolderInterface {
     type?: 'response' | 'Register';
     queryId: string;
     params: any;
@@ -9,7 +9,7 @@ interface TaskHolderInterface {
 declare class _taskHolder {
     private tasks;
     register(data: TaskHolderInterface): void;
-    finish(queryId: any): void;
+    finish(queryId: string): void;
     updateFunction(queryId: any, run: any, func: Function): void;
     onmessage(data: any): Promise<void>;
 }

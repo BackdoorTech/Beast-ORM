@@ -1,4 +1,4 @@
-interface WsRegister {
+export interface WsRegister {
     type?: 'response' | 'Register';
     queryId: string;
     params: any;

@@ -1,7 +1,6 @@
-import { Methods, getParams, Method } from '../models/model.interface.js'
 import { taskHolder } from './taskHolder.js';
 
-interface WsRegister {
+export interface WsRegister {
 	type?: 'response' | 'Register',
 	queryId: string,
 	params: any,
@@ -53,7 +52,6 @@ class _WorkerManager {
 			taskHolder.register(data)
 			return data.queryId
 		} catch (error) {
-			console.log(error)
 			return false
 		}
 		

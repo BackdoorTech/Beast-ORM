@@ -1,6 +1,4 @@
-import { Methods, getParams, Method } from '../models/model.interface.js'
-
-interface TaskHolderInterface {
+export interface TaskHolderInterface {
 	type?: 'response' | 'Register',
 	queryId: string,
 	params: any,
@@ -17,7 +15,7 @@ class _taskHolder {
 		this.tasks[data.queryId] = data
 	}
 	
-	finish(queryId) {
+	finish(queryId: string) {
 		try {
 			delete this.tasks[queryId]
 		} catch (error) {}

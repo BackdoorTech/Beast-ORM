@@ -1,4 +1,4 @@
-import { DatabaseSchema, TableSchema } from "../../models/register-modal.interface.js";
+import { DatabaseSchema } from "../../models/register-modal.interface.js";
 import { transaction } from './transaction.js';
 import { Databases, Tables} from './config.js' 
 import { PostMessage } from "./postMessage.js";
