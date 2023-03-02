@@ -78,7 +78,14 @@ export class registerModel {
       for(const [fieldName, Field] of  Object.entries(fields)) {
         // dont register fields that is primary key and auto increment
         if(!(Field?.primaryKey && Field?.autoIncrement  ) && !fieldTypes['ManyToManyField']?.includes(fieldName) ) {
-  
+
+          const removeReferenceField  = {... Field}
+          if(removeReferenceField?.model) {
+            removeReferenceField.model =  removeReferenceField.model.getModelName()
+          }
+
+          console.log(removeReferenceField)
+
           databaseSchema.stores[index].fields.push({
             name: fieldName,
             keyPath: fieldName,
@@ -87,7 +94,7 @@ export class registerModel {
               type:  Field.type
             },
             className: Field?.fieldName,
-            fieldAttributes:  Object.assign({}, Field)
+            fieldAttributes:  Object.assign({}, removeReferenceField)
           })
 
         }
