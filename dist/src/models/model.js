@@ -1,17 +1,16 @@
-var _a, _b;
+var _a;
 import { hashCode, uniqueGenerator } from '../utils.js';
-import { ModelManager } from './model-manager.js';
+import { ModelAPIRequest } from './model-manager.js';
 import { models, modelsConfig, modelsConfigLocalStorage } from './register-model.js';
 import { FieldType } from '../sql/query/interface.js';
 import * as Fields from './field/allFields.js';
-import { IndexedDBWorkerQueue } from '../connection/worker.queue.js';
+import { taskHolder } from '../connection/taskHolder.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
 import { ReactiveList } from '../reactive/DynamicList.js';
 let methods = {} = {};
 // inspire by https://github.com/brianschardt/browser-orm
-export class Model extends (_b = ModelManager) {
+export class Model {
     constructor(obg) {
-        super();
         Object.assign(this, obg);
     }
     get(arg) {
@@ -47,8 +46,8 @@ export class Model extends (_b = ModelManager) {
         }
         const methods = [{ methodName: 'save', arguments: Fields }];
         const queryId = uniqueGenerator();
-        await Model.obj(DBconfig, tableSchema).save(methods, queryId);
-        IndexedDBWorkerQueue.finish(queryId);
+        await ModelAPIRequest.obj(DBconfig, tableSchema).save(methods, queryId);
+        taskHolder.finish(queryId);
     }
     async delete() {
         const DBconfig = this.getDBSchema();
@@ -58,8 +57,8 @@ export class Model extends (_b = ModelManager) {
         createArg[idFieldName] = this[idFieldName];
         const _methods = [{ methodName: 'delete', arguments: createArg }];
         const queryId = uniqueGenerator();
-        await Model.obj(DBconfig, TableSchema).delete(_methods, queryId);
-        IndexedDBWorkerQueue.finish(queryId);
+        await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId);
+        taskHolder.finish(queryId);
     }
     static async deleteAll() {
         const DBconfig = this.getDBSchema();
@@ -69,15 +68,15 @@ export class Model extends (_b = ModelManager) {
         createArg[idFieldName] = this[idFieldName];
         const _methods = [{ methodName: 'delete', arguments: '*' }];
         const queryId = uniqueGenerator();
-        await Model.obj(DBconfig, TableSchema).delete(_methods, queryId);
-        IndexedDBWorkerQueue.finish(queryId);
+        await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId);
+        taskHolder.finish(queryId);
     }
     async all() {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
         const queryId = uniqueGenerator();
         const result = await Model.object({ queryId, DBconfig, TableSchema }).all();
-        IndexedDBWorkerQueue.finish(queryId);
+        taskHolder.finish(queryId);
         return result;
     }
     getFields(arg) {
@@ -104,10 +103,10 @@ export class Model extends (_b = ModelManager) {
         return true;
     }
     static async getModelsFields(arg) {
-        var _c;
+        var _b;
         const newArgs = {};
         const TableSchema = this.getTableSchema();
-        if ((_c = TableSchema.id) === null || _c === void 0 ? void 0 : _c.autoIncrement) {
+        if ((_b = TableSchema.id) === null || _b === void 0 ? void 0 : _b.autoIncrement) {
             TableSchema.fields.push({
                 keyPath: TableSchema.id.keyPath,
                 name: TableSchema.id.keyPath,
@@ -126,7 +125,7 @@ export class Model extends (_b = ModelManager) {
         const TableSchema = this.getTableSchema();
         const queryId = uniqueGenerator();
         const result = await Model.object({ queryId, DBconfig, TableSchema }).all();
-        IndexedDBWorkerQueue.finish(queryId);
+        taskHolder.finish(queryId);
         return result;
     }
     static async get(arg) {
@@ -134,15 +133,23 @@ export class Model extends (_b = ModelManager) {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
         const queryId = uniqueGenerator();
-        const foundObj = await super.obj(DBconfig, TableSchema).get(_methods, queryId);
-        IndexedDBWorkerQueue.finish(queryId);
+        const foundObj = await ModelAPIRequest.obj(DBconfig, TableSchema).get(_methods, queryId);
+        taskHolder.finish(queryId);
         if (!foundObj) {
             return false;
         }
         const ModelName = this.getModelName();
         let newInstance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: foundObj });
-        delete newInstance.obj;
         return newInstance;
+    }
+    static async getOrCreate(arg) {
+        const object = await this.get(arg);
+        if (!object) {
+            return await this.create(arg);
+        }
+        else {
+            return object;
+        }
     }
     static getId() {
         return hashCode(this.toString());
@@ -156,7 +163,7 @@ export class Model extends (_b = ModelManager) {
         const TableSchema = this.getTableSchema();
         const newInstanceModel = this.NewModelInstance();
         const result = Object.assign(newInstanceModel, this.object({ queryId, DBconfig, TableSchema, some: ['filter', arg] }));
-        IndexedDBWorkerQueue.finish(queryId);
+        taskHolder.finish(queryId);
         return result;
     }
     static NewModelInstance() {
@@ -220,27 +227,22 @@ export class Model extends (_b = ModelManager) {
             const _methods = [{ methodName: 'create', arguments: arg }];
             const DBconfig = this.getDBSchema();
             const queryId = uniqueGenerator();
-            const createObjectRequest = super.obj(DBconfig, TableSchema).create(_methods, queryId);
-            const createObject = await createObjectRequest;
-            IndexedDBWorkerQueue.finish(queryId);
-            if (createObject) {
-                if (typeof createObject[TableSchema.id.keyPath] == 'object') {
-                    reject(createObject[TableSchema.id.keyPath].error);
+            const result = [];
+            await ModelAPIRequest.obj(DBconfig, TableSchema).create(_methods, queryId, ({ id, index }) => {
+                const insert = arg[index];
+                insert[TableSchema.id.keyPath] = id;
+                const instance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: insert });
+                result.push(instance);
+            });
+            taskHolder.updateFunction(queryId, "done", () => {
+                if (arg.length == 1) {
+                    resolve(result[0]);
                 }
                 else {
-                    if (Array.isArray(createObject)) {
-                        resolve(createObject);
-                        for (let a in createObject) {
-                            createObject[a] = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: createObject[a] });
-                        }
-                        return arg;
-                    }
-                    else {
-                        const instance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: createObject });
-                        resolve(instance);
-                    }
+                    resolve(result);
                 }
-            }
+                taskHolder.finish(queryId);
+            });
         });
     }
     static newInstance({ TableSchema, DBconfig, ModelName, dataToMerge }) {
@@ -298,8 +300,8 @@ export class Model extends (_b = ModelManager) {
         const TableSchema = this.getTableSchema();
         const _methods = [{ methodName: 'update', arguments: arg }];
         const queryId = uniqueGenerator();
-        const result = await super.obj(DBconfig, TableSchema).update(_methods, queryId);
-        IndexedDBWorkerQueue.finish(queryId);
+        const result = await ModelAPIRequest.obj(DBconfig, TableSchema).update(_methods, queryId);
+        taskHolder.finish(queryId);
         return result;
     }
     static transactionOnCommit(callback) {
@@ -331,7 +333,7 @@ Model.object = ({ queryId, DBconfig, TableSchema, some = null }) => {
                 methods[queryId].push({ methodName: 'execute', arguments: null });
                 const _methods = methods[queryId];
                 methods[queryId] = [];
-                const result = await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).execute(_methods, queryId);
+                const result = await ModelAPIRequest.obj(DBconfig, TableSchema).execute(_methods, queryId);
                 resolve(result);
                 for (let i of result) {
                     result[i] = _a.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[i] });
@@ -342,20 +344,20 @@ Model.object = ({ queryId, DBconfig, TableSchema, some = null }) => {
             methods[queryId].push({ methodName: 'update', arguments: args });
             const _methods = methods[queryId];
             methods[queryId] = [];
-            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).update(_methods, queryId);
+            return await ModelAPIRequest.obj(DBconfig, TableSchema).update(_methods, queryId);
         },
         delete: async () => {
             methods[queryId].push({ methodName: 'delete', arguments: null });
             const _methods = methods[queryId];
             methods[queryId] = [];
-            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).delete(_methods, queryId);
+            return await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId);
         },
         all: async () => {
             return new Promise(async (resolve, reject) => {
                 methods[queryId].push({ methodName: 'all', arguments: null });
                 const _methods = methods[queryId];
                 methods[queryId] = [];
-                const result = await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).all(_methods, queryId);
+                const result = await ModelAPIRequest.obj(DBconfig, TableSchema).all(_methods, queryId);
                 resolve(result);
                 for (let i of result) {
                     result[i] = _a.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[i] });

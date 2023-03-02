@@ -269,7 +269,7 @@ describe("initial test for model", () => {
     await page.waitForFunction('[{"headline":"This is a test","pubDate":"","reporter":1,"id":1}]')
 
     expect('time not exceeded').toBe('time not exceeded')
-  }, 990000)
+  }, 90000)
 
 })
 

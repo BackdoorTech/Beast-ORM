@@ -1,48 +1,37 @@
 import { indexedDB } from './indexedDb/indexedb.js';
-import { IndexedDBWorkerQueue } from './worker.queue.js';
+import { taskHolder } from './taskHolder.js';
+import { WorkerManager } from './workerManager.js';
 export class DBSwitch {
-    static async requestHandler(TableSchema, DBconfig, dbType, action, arg, queryId) {
-        if (typeof (Worker) !== "undefined" && IndexedDBWorkerQueue.webWorkerModuleSupport) {
-            //great, your browser supports web workers
-            return new Promise(async (resolve, reject) => {
-                const request = IndexedDBWorkerQueue.register({
-                    params: { TableSchema, DBconfig, queryId, action, arg, dbType },
-                    queryId: queryId,
-                    method: 'execute',
-                    func: (message) => {
-                        resolve(message === null || message === void 0 ? void 0 : message.value);
-                    },
-                });
-                if (request == false) {
-                    const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg);
-                    resolve(result === null || result === void 0 ? void 0 : result.value);
-                }
-            });
-        }
-        else {
-            const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg);
-            return result === null || result === void 0 ? void 0 : result.value;
-        }
-    }
-    static async callBackRequestHandler(TableSchema, DBconfig, dbType, action, arg, callback, queryId) {
-        if (typeof (Worker) !== "undefined" && IndexedDBWorkerQueue.webWorkerModuleSupport) {
-            //great, your browser supports web workers
-            const request = IndexedDBWorkerQueue.register({
-                params: { TableSchema, DBconfig, queryId, action, arg, dbType },
-                queryId: queryId,
-                method: 'execute',
-                func: (message) => {
-                    callback(message);
-                },
-            });
-            if (request == false) {
-                const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg);
-                arg.callback(result === null || result === void 0 ? void 0 : result.value);
+    static header({ TableName, DatabaseName, queryId, action, arg, dbType, callback }) {
+        return {
+            params: { TableName, DatabaseName, queryId, action, arg, dbType },
+            queryId: queryId,
+            method: 'execute',
+            callback: (message) => {
+                callback(message.value);
             }
+        };
+    }
+    static async requestHandler(TableName, DatabaseName, dbType, action, arg, queryId) {
+        return new Promise(async (resolve, reject) => {
+            const header = this.header({ TableName, DatabaseName, queryId, action, arg, dbType, callback: resolve });
+            if (typeof (Worker) !== "undefined" && WorkerManager.webWorkerModuleSupport) {
+                WorkerManager.register(header);
+            }
+            else {
+                taskHolder.register(header);
+                indexedDB.requestHandler(TableName, DatabaseName, queryId)[action](arg);
+            }
+        });
+    }
+    static async callBackRequestHandler(TableName, DatabaseName, dbType, action, arg, callback, queryId) {
+        const header = this.header({ TableName, DatabaseName, queryId, action, arg, dbType, callback });
+        if (typeof (Worker) !== "undefined" && WorkerManager.webWorkerModuleSupport) {
+            WorkerManager.register(header);
         }
         else {
-            const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg);
-            arg.callback(result === null || result === void 0 ? void 0 : result.value);
+            taskHolder.register(header);
+            indexedDB.requestHandler(TableName, DatabaseName, queryId)[action](arg);
         }
     }
 }

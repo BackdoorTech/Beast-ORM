@@ -1,19 +1,18 @@
 import { AutoFieldParams, BigIntegerFieldParams, BooleanFieldParams, CharFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams, TextFieldParams } from './interface.js';
-import * as Fields from './allFields.js';
-export declare function CharField(data?: CharFieldParams): Fields.CharField;
-export declare function BooleanField(data?: BooleanFieldParams): Fields.BooleanField;
-export declare function TextField(data?: TextFieldParams): Fields.TextField;
-export declare function IntegerField(data?: IntegerFieldParams): Fields.IntegerField;
-export declare function DateField(data?: DateFieldParams): Fields.DateField;
-export declare function DateTimeField(data?: DateTimeFieldParams): Fields.DateTimeField;
-export declare function BigIntegerField(data?: BigIntegerFieldParams): Fields.BigIntegerField;
-export declare function AutoField(data?: AutoFieldParams): Fields.AutoField;
+export declare function CharField(data?: CharFieldParams): string;
+export declare function BooleanField(data?: BooleanFieldParams): boolean;
+export declare function TextField(data?: TextFieldParams): string;
+export declare function IntegerField(data?: IntegerFieldParams): number;
+export declare function DateField(data?: DateFieldParams): Date;
+export declare function DateTimeField(data?: DateTimeFieldParams): string;
+export declare function BigIntegerField(data?: BigIntegerFieldParams): number;
+export declare function AutoField(data?: AutoFieldParams): any;
 export declare const indexedDB: {
     fields: {
-        JsonField: (data?: IndexedDBJsonFieldParams) => Fields.indexedDBJsonField;
-        ArrayField: (data?: IndexedDBArrayFieldParams) => Fields.indexedDBArrayField;
+        JsonField: (data?: IndexedDBJsonFieldParams) => Object;
+        ArrayField: (data?: IndexedDBArrayFieldParams) => any[];
     };
 };
-export declare function OneToOneField(data: OneToOneFieldParams): Fields.OneToOneField;
-export declare function ForeignKey(data: ForeignKeyParams): Fields.ForeignKey;
-export declare function ManyToManyField(data?: ManyToManyFieldParams): Fields.ManyToManyField;
+export declare function OneToOneField(data: OneToOneFieldParams): string | number;
+export declare function ForeignKey(data: ForeignKeyParams): string | number;
+export declare function ManyToManyField(data?: ManyToManyFieldParams): string | number;

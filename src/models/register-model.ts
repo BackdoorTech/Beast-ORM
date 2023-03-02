@@ -6,8 +6,9 @@ import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js
 import { uncapitalize, uniqueGenerator } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js'
-import { ModelManager } from './model-manager.js';
+import { ModelAPIRequest } from './model-manager.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
+import { IndexedDB } from '../connection/indexedDb/connector.js';
 
 interface register {
   databaseName: string,
@@ -78,7 +79,13 @@ export class registerModel {
       for(const [fieldName, Field] of  Object.entries(fields)) {
         // dont register fields that is primary key and auto increment
         if(!(Field?.primaryKey && Field?.autoIncrement  ) && !fieldTypes['ManyToManyField']?.includes(fieldName) ) {
-  
+
+          const removeReferenceField  = {... Field}
+          if(removeReferenceField?.model) {
+            removeReferenceField.model =  removeReferenceField.model.getModelName()
+          }
+
+
           databaseSchema.stores[index].fields.push({
             name: fieldName,
             keyPath: fieldName,
@@ -87,7 +94,7 @@ export class registerModel {
               type:  Field.type
             },
             className: Field?.fieldName,
-            fieldAttributes:  Object.assign({}, Field)
+            fieldAttributes:  Object.assign({}, removeReferenceField)
           })
 
         }
@@ -125,7 +132,8 @@ export class registerModel {
 
 
     if(databaseSchema.type =='indexedDB') {
-      await ModelManager.obj(databaseSchema, tableSchema_ ).migrate()
+      await IndexedDB.run(databaseSchema)
+      await ModelAPIRequest.obj(databaseSchema, tableSchema_ ).migrate()
       ModelMigrations.migrationsState(databaseSchema.databaseName, true);
     }
     
@@ -188,6 +196,17 @@ export class registerModel {
 
 }
 
+async function  cachedValue(Model) {
+  const emptyFields = Model.getEmptyFields()
+  Model.getEmptyFields = function() {
+    return emptyFields
+  }
+
+  const getModelName = Model.getModelName()
+  Model.getModelName = function() {
+    return getModelName
+  }
+}
 export class registerLocalStorage {
   static async register(entries: register) {
  

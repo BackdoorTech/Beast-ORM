@@ -4,8 +4,9 @@ import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js
 import { uncapitalize, uniqueGenerator } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js';
-import { ModelManager } from './model-manager.js';
+import { ModelAPIRequest } from './model-manager.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
+import { IndexedDB } from '../connection/indexedDb/connector.js';
 export const models = {};
 export const modelsConfig = {};
 export const modelsLocalStorage = {};
@@ -49,6 +50,10 @@ export class registerModel {
             for (const [fieldName, Field] of Object.entries(fields)) {
                 // dont register fields that is primary key and auto increment
                 if (!((Field === null || Field === void 0 ? void 0 : Field.primaryKey) && (Field === null || Field === void 0 ? void 0 : Field.autoIncrement)) && !((_c = fieldTypes['ManyToManyField']) === null || _c === void 0 ? void 0 : _c.includes(fieldName))) {
+                    const removeReferenceField = Object.assign({}, Field);
+                    if (removeReferenceField === null || removeReferenceField === void 0 ? void 0 : removeReferenceField.model) {
+                        removeReferenceField.model = removeReferenceField.model.getModelName();
+                    }
                     databaseSchema.stores[index].fields.push({
                         name: fieldName,
                         keyPath: fieldName,
@@ -57,7 +62,7 @@ export class registerModel {
                             type: Field.type
                         },
                         className: Field === null || Field === void 0 ? void 0 : Field.fieldName,
-                        fieldAttributes: Object.assign({}, Field)
+                        fieldAttributes: Object.assign({}, removeReferenceField)
                     });
                 }
                 if (Field instanceof OneToOneField) {
@@ -86,7 +91,8 @@ export class registerModel {
             transactionOnCommit.prepare(modelClassRepresentations);
         }
         if (databaseSchema.type == 'indexedDB') {
-            await ModelManager.obj(databaseSchema, tableSchema_).migrate();
+            await IndexedDB.run(databaseSchema);
+            await ModelAPIRequest.obj(databaseSchema, tableSchema_).migrate();
             ModelMigrations.migrationsState(databaseSchema.databaseName, true);
         }
     }
@@ -136,6 +142,16 @@ export class registerModel {
             TableSchema: databaseSchema.stores[id]
         });
     }
+}
+async function cachedValue(Model) {
+    const emptyFields = Model.getEmptyFields();
+    Model.getEmptyFields = function () {
+        return emptyFields;
+    };
+    const getModelName = Model.getModelName();
+    Model.getModelName = function () {
+        return getModelName;
+    };
 }
 export class registerLocalStorage {
     static async register(entries) {

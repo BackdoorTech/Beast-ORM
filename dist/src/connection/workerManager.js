@@ -1,7 +1,7 @@
-export class _IndexedDBWorkerQueue {
+import { taskHolder } from './taskHolder.js';
+class _WorkerManager {
     constructor() {
         this.webWorkerModuleSupport = false;
-        this.workerQueues = {};
         this.webWorkerModuleSupport = this.supportsWorkerType();
         if (this.webWorkerModuleSupport) {
             this.myWorker = new Worker(new URL('./worker.js', import.meta.url), { type: "module" });
@@ -30,28 +30,15 @@ export class _IndexedDBWorkerQueue {
     register(data) {
         try {
             this.myWorker.postMessage(data.params);
-            this.workerQueues[data.queryId] = data;
+            taskHolder.register(data);
             return data.queryId;
         }
         catch (error) {
-            console.log(error);
             return false;
         }
     }
     async onmessage(data) {
-        const value = this.workerQueues[data.queryId];
-        value[data.run](data);
-    }
-    finish(queryId) {
-        try {
-            delete this.workerQueues[queryId];
-        }
-        catch (error) { }
-    }
-    updateFunction(queryId, run, func) {
-        this.workerQueues[queryId][run] = (message) => {
-            func(message.value);
-        };
+        taskHolder.onmessage(data);
     }
 }
-export const IndexedDBWorkerQueue = new _IndexedDBWorkerQueue();
+export const WorkerManager = new _WorkerManager();

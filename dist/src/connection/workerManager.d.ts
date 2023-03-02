@@ -1,4 +1,4 @@
-interface WsRegister {
+export interface WsRegister {
     type?: 'response' | 'Register';
     queryId: string;
     params: any;
@@ -6,16 +6,13 @@ interface WsRegister {
     callback: Function;
     done?: Function;
 }
-export declare class _IndexedDBWorkerQueue {
+declare class _WorkerManager {
     private myWorker;
     webWorkerModuleSupport: boolean;
     constructor();
     supportsWorkerType(): boolean;
-    private workerQueues;
     register(data: WsRegister): string | false;
-    onmessage(data: any): Promise<void>;
-    finish(queryId: any): void;
-    updateFunction(queryId: any, run: any, func: Function): void;
+    private onmessage;
 }
-export declare const IndexedDBWorkerQueue: _IndexedDBWorkerQueue;
+export declare const WorkerManager: _WorkerManager;
 export {};

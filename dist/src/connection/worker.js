@@ -1,30 +1,11 @@
 import { indexedDB } from './indexedDb/indexedb.js';
 onmessage = async (oEvent) => {
-    const { TableSchema, DBconfig, queryId, action, arg } = oEvent.data;
-    indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg).then((result) => {
-        try {
-            postMessage(result);
-        }
-        catch (error) {
-            postMessage({
-                queryId: result.queryId,
-                value: undefined
-            });
-        }
-    }).catch((error) => {
-        try {
-            postMessage({
-                error: error,
-                queryId: queryId,
-                value: error
-            });
-        }
-        catch (error) {
-            postMessage({
-                error: error,
-                queryId: queryId,
-                value: error
-            });
-        }
+    const { TableName, DatabaseName, queryId, action, arg } = oEvent.data;
+    indexedDB.requestHandler(TableName, DatabaseName, queryId)[action](arg).then((result) => {
+        // console.log('result', result)
+        // postMessage(result)
+    }, (error) => {
+        // console.log('error', error)
+        // postMessage(error)
     });
 };

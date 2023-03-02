@@ -1,8 +1,4 @@
 
-
-import { DatabaseSchema } from '../../models/register-modal.interface.js'
-import { indexedDB } from './indexedb.js'
-import { triggerSignal } from './triggers/triggers.js'
 class transactionRequest {
     type: string
     value: any
@@ -28,7 +24,8 @@ export class transaction {
     store
 
     done: Function
-    db
+    doneButFailed: Function
+   //  db
     tx: IDBTransaction
 
     trigger = {
@@ -36,10 +33,11 @@ export class transaction {
         afterInsert: false,
     }
 
-    constructor({store, done, db, tx}) {
+    constructor({store, done, db, tx, doneButFailed}) {
         // currentStore = store
+        this.doneButFailed = doneButFailed
         this.done = done
-        this.db = db
+        // this.db = db
         this.tx = tx
     }
 
@@ -48,15 +46,14 @@ export class transaction {
 
     objectStore = (currentStore) => {
         return {
-            add:({value, key, config}) =>  {
+            add:({value}) =>  {
                 const request = new transactionRequest()
                 request.type = 'add'
                 request.value = value
-                request.key = key
                 this.request.push(request)
     
                 let objectStore = this.tx.objectStore(currentStore);
-    
+                
                 let addGetList = objectStore.add(value);
                 
                 addGetList.onsuccess = async (e: any) => {
@@ -66,13 +63,13 @@ export class transaction {
 
                 addGetList.onerror = async (e) => {
                     request?.onerrorFunc(e)
-                    this.done()
+                    this.doneButFailed()
                 };
         
 
                 return request
             },
-            getAll:(config:DatabaseSchema) => {
+            getAll:() => {
                 const request = new transactionRequest()
                 this.request.push(request)
 
@@ -86,13 +83,13 @@ export class transaction {
                 };
 
                 getList.onerror = (e: any) => {
-                    this.done()
+                    this.doneButFailed()
                     request?.onerrorFunc(e)
                 };
 
                 return request
             },
-            put: ({value, key = undefined, config}) => {
+            put: ({value, key = undefined}) => {
                 const request = new transactionRequest()
                 this.request.push(request)
 
@@ -109,13 +106,13 @@ export class transaction {
                 updateRequest.onerror =  async (e) => {
                     request?.onerrorFunc(e)
                     
-                    this.done()
+                    this.doneButFailed()
                 };
   
 
                 return request
             },
-            clear: ({config}) => {
+            clear: () => {
                 const request = new transactionRequest()
                 this.request.push(request)
 
@@ -130,13 +127,13 @@ export class transaction {
                 };
                 this.tx.onerror = async (e) => {
                     request?.onerrorFunc(e)
-                    this.done()
+                    this.doneButFailed()
                 };
            
 
                 return request
             },
-            delete: ({id, config}) => {
+            delete: ({id}) => {
                 const request = new transactionRequest()
                 this.request.push(request)
 
@@ -150,13 +147,13 @@ export class transaction {
                 };
                 deleteRequest.onerror = async (e) => {
                     request?.onerrorFunc(e)                    
-                    this.done()
+                    this.doneButFailed()
                 };
                
 
                 return request
             },
-            get:({id, config})=> {
+            get:({id})=> {
                 const request = new transactionRequest()
                 this.request.push(request)
 
@@ -169,13 +166,13 @@ export class transaction {
                     request?.onsuccessFunc(e) 
                 };
                 getRequest.onerror = (e) => {
-                    this.done()
+                    this.doneButFailed()
                     request?.onerrorFunc(e)
                 };
    
                 return request
             },
-            index: ({keyPath, value, config}) => {
+            index: ({keyPath, value}) => {
                 const request = new transactionRequest()
                 this.request.push(request)
 
@@ -189,7 +186,7 @@ export class transaction {
                     request?.onsuccessFunc(e) 
                 };
                 getRequest.onerror = (e) => {
-                    this.done()
+                    this.doneButFailed()
                     request?.onerrorFunc(e)                    
                 };
 

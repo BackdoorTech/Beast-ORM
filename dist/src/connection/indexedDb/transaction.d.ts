@@ -1,4 +1,3 @@
-import { DatabaseSchema } from '../../models/register-modal.interface.js';
 declare class transactionRequest {
     type: string;
     value: any;
@@ -13,47 +12,40 @@ declare class transactionRequest {
 export declare class transaction {
     store: any;
     done: Function;
-    db: any;
+    doneButFailed: Function;
     tx: IDBTransaction;
     trigger: {
         beforeInsert: boolean;
         afterInsert: boolean;
     };
-    constructor({ store, done, db, tx }: {
+    constructor({ store, done, db, tx, doneButFailed }: {
         store: any;
         done: any;
         db: any;
         tx: any;
+        doneButFailed: any;
     });
     request: any[];
     FinishRequest: any[];
     objectStore: (currentStore: any) => {
-        add: ({ value, key, config }: {
+        add: ({ value }: {
             value: any;
-            key: any;
-            config: any;
         }) => transactionRequest;
-        getAll: (config: DatabaseSchema) => transactionRequest;
-        put: ({ value, key, config }: {
+        getAll: () => transactionRequest;
+        put: ({ value, key }: {
             value: any;
             key?: any;
-            config: any;
         }) => transactionRequest;
-        clear: ({ config }: {
-            config: any;
-        }) => transactionRequest;
-        delete: ({ id, config }: {
+        clear: () => transactionRequest;
+        delete: ({ id }: {
             id: any;
-            config: any;
         }) => transactionRequest;
-        get: ({ id, config }: {
+        get: ({ id }: {
             id: any;
-            config: any;
         }) => transactionRequest;
-        index: ({ keyPath, value, config }: {
+        index: ({ keyPath, value }: {
             keyPath: any;
             value: any;
-            config: any;
         }) => transactionRequest;
     };
 }

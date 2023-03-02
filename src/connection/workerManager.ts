@@ -1,14 +1,15 @@
-import { Methods, getParams, Method } from '../models/model.interface.js'
+import { taskHolder } from './taskHolder.js';
 
-interface WsRegister {
+export interface WsRegister {
 	type?: 'response' | 'Register',
-	func: Function
 	queryId: string,
 	params: any,
 	method: 'execute' | 'migrate',
+	callback: Function,
+	done?: Function
 }
 
-export class _IndexedDBWorkerQueue {
+class _WorkerManager {
 
 	private myWorker:  Worker | null;
 	webWorkerModuleSupport = false
@@ -45,12 +46,10 @@ export class _IndexedDBWorkerQueue {
 		}
 	}
 
-	private  workerQueues: {[key: string]:  WsRegister} = {}
-
 	register(data: WsRegister) {
 		try { 
 			this.myWorker.postMessage(data.params);
-			this.workerQueues[data.queryId] = data
+			taskHolder.register(data)
 			return data.queryId
 		} catch (error) {
 			return false
@@ -58,23 +57,11 @@ export class _IndexedDBWorkerQueue {
 		
 	}
 
-	async onmessage (data: any) {
-		const value = this.workerQueues[data.queryId]
-		value.func(data)
-		
-	}
-
-	finish(queryId) {
-		try {
-			delete this.workerQueues[queryId]
-		} catch (error) {}
-	}
-
-	updateFunction(queryId, func:Function) {
-		this.workerQueues[queryId].func = func
+	private async onmessage (data: any) {
+        taskHolder.onmessage(data)
 	}
 
 }
 
 
-export const IndexedDBWorkerQueue = new _IndexedDBWorkerQueue()
+export const WorkerManager = new _WorkerManager()
