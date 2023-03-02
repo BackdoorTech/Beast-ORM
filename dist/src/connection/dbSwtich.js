@@ -9,19 +9,19 @@ export class DBSwitch {
                     params: { TableSchema, DBconfig, queryId, action, arg, dbType },
                     queryId: queryId,
                     method: 'execute',
-                    func: (message) => {
-                        resolve(message === null || message === void 0 ? void 0 : message.value);
-                    },
+                    callback: (message) => {
+                        resolve(message.value);
+                    }
                 });
                 if (request == false) {
+                    console.log(JSON.stringify({ TableSchema, DBconfig, queryId, action, arg, dbType }));
                     const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg);
                     resolve(result === null || result === void 0 ? void 0 : result.value);
                 }
             });
         }
         else {
-            const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg);
-            return result === null || result === void 0 ? void 0 : result.value;
+            throw ({ TableSchema, DBconfig, queryId, action, arg, dbType });
         }
     }
     static async callBackRequestHandler(TableSchema, DBconfig, dbType, action, arg, callback, queryId) {
@@ -31,18 +31,16 @@ export class DBSwitch {
                 params: { TableSchema, DBconfig, queryId, action, arg, dbType },
                 queryId: queryId,
                 method: 'execute',
-                func: (message) => {
-                    callback(message);
-                },
+                callback: (message) => {
+                    callback(message.value);
+                }
             });
             if (request == false) {
-                const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg);
-                arg.callback(result === null || result === void 0 ? void 0 : result.value);
+                throw ({ TableSchema, DBconfig, queryId, action, arg, dbType });
             }
         }
         else {
-            const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg);
-            arg.callback(result === null || result === void 0 ? void 0 : result.value);
+            throw ({ TableSchema, DBconfig, queryId, action, arg, dbType });
         }
     }
 }

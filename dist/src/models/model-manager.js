@@ -8,9 +8,9 @@ export class ModelAPIRequest {
 _a = ModelAPIRequest;
 ModelAPIRequest.obj = (DatabaseSchema, TableSchema) => {
     return {
-        create: async (arg, queryId) => {
+        create: async (args, queryId, callback) => {
             await ModelMigrations.waitMigration(DatabaseSchema.databaseName);
-            return await DBSwitch.requestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'insert', arg, queryId);
+            return await DBSwitch.callBackRequestHandler(TableSchema, DatabaseSchema, DatabaseSchema.type, 'insert', args, callback, queryId);
         },
         get: async (arg, queryId) => {
             await ModelMigrations.waitMigration(DatabaseSchema.databaseName);

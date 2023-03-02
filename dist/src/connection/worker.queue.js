@@ -34,12 +34,13 @@ export class _IndexedDBWorkerQueue {
             return data.queryId;
         }
         catch (error) {
+            console.log(error);
             return false;
         }
     }
     async onmessage(data) {
         const value = this.workerQueues[data.queryId];
-        value.func(data);
+        value[data.run](data);
     }
     finish(queryId) {
         try {
@@ -47,8 +48,10 @@ export class _IndexedDBWorkerQueue {
         }
         catch (error) { }
     }
-    updateFunction(queryId, func) {
-        this.workerQueues[queryId].func = func;
+    updateFunction(queryId, run, func) {
+        this.workerQueues[queryId][run] = (message) => {
+            func(message.value);
+        };
     }
 }
 export const IndexedDBWorkerQueue = new _IndexedDBWorkerQueue();

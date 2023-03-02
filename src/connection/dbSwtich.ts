@@ -15,20 +15,21 @@ export class DBSwitch {
 					params: {TableSchema, DBconfig, queryId, action, arg, dbType},
 					queryId: queryId,
 					method: 'execute',
-					func: (message) => {
-						resolve(message?.value)
-					},
+					callback: (message) => {
+						resolve(message.value)
+					}
 				})
 
 				if(request == false) {
+					console.log(JSON.stringify({TableSchema, DBconfig, queryId, action, arg, dbType}))
+					
 					const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg) as any
 					resolve(result?.value) 
 				}
 			});
 
 		} else {
-			const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg) as any
-			return result?.value
+			throw({TableSchema, DBconfig, queryId, action, arg, dbType})
 		}
 	}
 
@@ -39,19 +40,17 @@ export class DBSwitch {
 				params: {TableSchema, DBconfig, queryId, action, arg, dbType},
 				queryId: queryId,
 				method: 'execute',
-				func: (message) => {
-					callback(message)
-				},
+				callback: (message) => {
+					callback(message.value)
+				}
 			})
 
 			if(request == false) {
-				const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg) as any
-				arg.callback(result?.value) 
+				throw({TableSchema, DBconfig, queryId, action, arg, dbType})
 			}
 
 		} else {
-			const result = await indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg) as any
-			arg.callback(result?.value)
+			throw({TableSchema, DBconfig, queryId, action, arg, dbType})
 		}
 	}
 

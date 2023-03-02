@@ -54,6 +54,6 @@ describe("multiple Request", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 60000)
+  }, 20000)
 
 })

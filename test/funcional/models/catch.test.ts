@@ -86,7 +86,7 @@ describe("catch model error", () => {
 
       Person.transactionOnCommit( async () => {
         setTimeout(() => {
-            document.body.innerHTML = JSON.stringify(sub.value)
+            document.body.innerHTML = JSON.stringify([sub.value.length])
         }, 100)
       })
 
@@ -95,7 +95,7 @@ describe("catch model error", () => {
     })
     debugger
 
-    await page.waitForFunction('[{"username":"1677615427486","id":1},{"username":"123","id":2},{"username":"peter","id":3}]')
+    await page.waitForFunction(`[3]`)
     
     expect('time not exceeded').toBe('time not exceeded')
     

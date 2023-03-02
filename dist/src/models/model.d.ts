@@ -33,7 +33,7 @@ export declare class Model {
     private static newInstance;
     static createOrFind(getArg: any, defaultCreate: any): Promise<any[]>;
     static updateOrCreate(argToFind: any, argsToUpdate: any): Promise<any>;
-    static update(arg: any): Promise<any>;
+    static update(arg: any): Promise<unknown>;
     static transactionOnCommit(callback: () => void): {
         queryId: string;
         subscribe: boolean;
@@ -52,8 +52,8 @@ export declare class Model {
     }) => {
         filter: (...args: any[]) => any;
         execute: () => Promise<any[]>;
-        update: (args: any) => Promise<any>;
-        delete: () => Promise<any>;
+        update: (args: any) => Promise<unknown>;
+        delete: () => Promise<unknown>;
         all: () => Promise<any[]>;
     };
 }

@@ -164,7 +164,9 @@ export class IndexedDB {
             (async () => {
               for (let [queryId , value] of Object.entries(this.transactionOnCommit[databaseName][currentStore]) ) {
                 postMessage({
+                  run: 'callback',
                   queryId: queryId,
+                  value: true
                 })
               }
             })();
@@ -205,11 +207,11 @@ export class IndexedDB {
           "readwrite",
           currentStore,
           (error) => { 
-            // console.log('error1', error) 
+            //  
           },
           () => {},
           (onabort) => { 
-            // console.log('onabort', onabort) 
+            //  
             this.txInstance[config.databaseName][currentStore]["readwrite"].active = false
           }
         )
@@ -228,7 +230,7 @@ export class IndexedDB {
     }
 
     this.validateBeforeTransaction(this.dbInstance[config.databaseName], currentStore, (data) => {
-      console.log(data, "database close")
+      
     })
 
     const transactionInstance = new transaction({
@@ -247,16 +249,18 @@ export class IndexedDB {
     if (this.executingTransaction[config.databaseName][currentStore] == false) {
       this.executingTransaction[config.databaseName][currentStore] = true
       this.connect(config).then(() => {
+
+        
         const tx = this.createTransaction(
           this.dbInstance[config.databaseName],
           "readwrite",
           currentStore,
           (error) => { 
-            // console.log('error', error);
+            // ;
           },
           () => {},
           (onabort) => { 
-            // console.log('onabort', onabort) 
+            //  
             this.txInstance[config.databaseName][currentStore]["readwrite"].active = false
           }
         )
@@ -277,6 +281,10 @@ export class IndexedDB {
         this.dbInstanceUsing[config.databaseName][currentStore] = true
         this.executeTransaction(currentStore, config.databaseName)
       })
+    } else {
+      if(mode == 'readonly') {
+        
+      }
     }
   }
 
@@ -310,16 +318,20 @@ export class IndexedDB {
   static transactionOnCommitSubscribe(TableSchema:TableSchema, config:DatabaseSchema, SubscriptionName) {
     this.transactionOnCommit[config.databaseName][TableSchema.name][SubscriptionName] = {}
     return {
+      run: 'callback',
       subscription: true,
-      queryId: SubscriptionName
+      queryId: SubscriptionName,
+      value: true
     }
   }
 
   static transactionOnCommitUnSubscribe(TableSchema:TableSchema, config:DatabaseSchema, SubscriptionName) {
     delete this.transactionOnCommit[config.databaseName][TableSchema.name][SubscriptionName]
     return {
+      run: 'callback',
       subscription: false,
-      queryId: SubscriptionName
+      queryId: SubscriptionName,
+      value: true
     }
   }
 }

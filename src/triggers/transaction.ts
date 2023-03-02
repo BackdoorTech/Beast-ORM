@@ -37,7 +37,7 @@ export  class transactionOnCommit {
             ModelAPIRequest.obj(DatabaseSchema, TableSchema).trigger(args, SubscriptionName, async () => {
                 subscribe = true
 
-                IndexedDBWorkerQueue.updateFunction(SubscriptionName, () => {
+                IndexedDBWorkerQueue.updateFunction(SubscriptionName, 'callback', () => {
                     for(const [requestId, callback] of Object.entries(this.stores[databaseName][table])) {
                         callback()
                     }

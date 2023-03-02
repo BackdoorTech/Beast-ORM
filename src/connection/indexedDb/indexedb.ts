@@ -88,30 +88,36 @@ class indexedDBInterface {
       },
       getAll:() => {
         return new Promise<any[]>((resolve, reject) => {
+          
           IndexedDB.getOrCreateTransaction({currentStore, queryId, config}, 'readonly', (transaction) => {
             let objectStore = transaction.objectStore(currentStore)
             let request = objectStore.getAll(config);
+            
             request.onsuccess = async (e: any) => {
               resolve(e.target.result as any[]);
             };
           });
         });
       },
-      add:({value, key, func}) => {
-        IndexedDB.getOrCreateTransaction({currentStore, queryId, config}, 'readwrite', (transaction) => {
-          let objectStore = transaction.objectStore(currentStore)
-          let request = objectStore.add({value, key, config});
-          request.onsuccess = async(e: any) => {
-            func(e.target.result)
-          };
-
-          request.onerror = (e: any) => {
-            let data = {
-              error: e.target['error']
-            }
-            func(data)
-          };
-        });
+      add:({value, key, add, index}) => {
+        return new Promise((resolve, reject) => {
+          IndexedDB.getOrCreateTransaction({currentStore, queryId, config}, 'readwrite', (transaction) => {
+            let objectStore = transaction.objectStore(currentStore)
+            let request = objectStore.add({value});
+            request.onsuccess = async(e: any) => {
+              const id = e.target.result
+              add(id, index)
+              resolve(true)
+            };
+  
+            request.onerror = (e: any) => {
+              let data = {
+                error: e.target['error']
+              }
+              resolve(true)
+            };
+          });
+        })
       },
       update:({value, key = undefined}) => {
         return new Promise<any>((resolve, reject) => {
@@ -183,11 +189,13 @@ class indexedDBInterface {
   requestHandler = (TableSchema:TableSchema, config:DatabaseSchema, queryId) => {
     return {
       select: async (methods: Method[]) => {
+        
         if(methods[0].methodName == 'all') {
-          return {
+          postMessage ({
+            run: 'callback',
             queryId: queryId,
             value: await this.getActions(TableSchema.name, config, queryId).getAll()
-          }
+          })
 
         }
         else if(methods[0].methodName == 'get') {
@@ -198,48 +206,55 @@ class indexedDBInterface {
             const value = args[key]
             if(TableSchema.id.keyPath == key) {
 
-              return {
+              postMessage ({
+                run: 'callback',
                 queryId: queryId,
                 value: await this.getActions(TableSchema.name, config, queryId).getByID(value)
-              }
+              })
 
             } else {
 
-              return {
+              postMessage ({
+                run: 'callback',
                 queryId: queryId,
                 value: await this.getActions(TableSchema.name, config, queryId).getOneByIndex(key, value)
-              }
+              })
               
             }
           } else if (methods[0].arguments[TableSchema.id.keyPath]) {
-            return {
+            postMessage ({
+              run: 'callback',
               queryId: queryId,
               value: await this.getActions(TableSchema.name, config, queryId).getByID(args[TableSchema.id.keyPath])
-            }
+            })
           }
         } else if (methods[methods.length - 1].methodName == 'execute') {
-          return new Promise(async(resolve, reject) => {
-            const sqlObject =  new SqlObject(TableSchema, methods)
-            //await this.getActions(TableSchema.name, config, queryId).openCursor(async(event: any) => {
-              //var cursor = event.target.result;
-              //if(cursor) {
-                const rows = await this.getActions(TableSchema.name, config, queryId).getAll()
-                for (const row of rows) {
-                  //const row = cursor.value
-                  await sqlObject.runFirstMethod(row)
-                  //cursor.continue();
-                }
-                
-              //} else {
-                sqlObject.doneRunFirstMethod()
-                sqlObject.run()
-                resolve({
-                  queryId: queryId,
-                  value: sqlObject.firstMethod.rows
-                })
-              //}
-            //})
-          })
+          
+          const sqlObject =  new SqlObject(TableSchema, methods)
+          //await this.getActions(TableSchema.name, config, queryId).openCursor(async(event: any) => {
+            //var cursor = event.target.result;
+            //if(cursor) {
+              const rows = await this.getActions(TableSchema.name, config, queryId).getAll()
+
+              
+              for (const row of rows) {
+                //const row = cursor.value
+                await sqlObject.runFirstMethod(row)
+                //cursor.continue();
+              }
+              
+            //} else {
+              sqlObject.doneRunFirstMethod()
+              sqlObject.run()
+
+              
+              postMessage({
+                run: 'callback',
+                queryId: queryId,
+                value: sqlObject.firstMethod.rows
+              })
+            //}
+          //})
         } else if (methods[methods.length - 1].methodName == 'first') {
           return new Promise(async(resolve, reject) => {
             const sqlObject =  new SqlObject(TableSchema, methods)
@@ -253,7 +268,8 @@ class indexedDBInterface {
                 sqlObject.doneRunFirstMethod()
                 sqlObject.run()
                 
-                resolve({
+                postMessage ({
+                  run: 'callback',
                   queryId: queryId,
                   value: sqlObject.firstMethod.rows
                 })
@@ -278,9 +294,11 @@ class indexedDBInterface {
             await this.getActions(TableSchema.name, config, queryId).update({value:args, key:idValue})
           }
 
-          return {
-            queryId
-          }
+          postMessage({
+            run: 'callback',
+            queryId,
+            value: true
+          })
       
         } else if(methods[0].methodName != 'update' && methods[methods.length - 1].methodName == 'update' ) {
 
@@ -298,9 +316,11 @@ class indexedDBInterface {
             await this.getActions(TableSchema.name, config, queryId).update({value:updateRow})
           }
           
-          return {
-            queryId
-          }
+          postMessage({
+            run: 'callback',
+            queryId,
+            value: true
+          })
 
         } else if (methods[0].methodName == 'update') {
           const argsToUpdate = methods[0].arguments
@@ -315,9 +335,11 @@ class indexedDBInterface {
             await this.getActions(TableSchema.name, config, queryId).update({value:argsToUpdate, key:idValue})
           }
 
-          return {
-            queryId
-          }
+          postMessage({
+            run: 'callback',
+            queryId,
+            value: true
+          })
           
         }
       },
@@ -338,9 +360,11 @@ class indexedDBInterface {
             await this.getActions(TableSchema.name, config, queryId).deleteByID(id)
           }
 
-          return {
-            queryId
-          }
+          postMessage({
+            run: 'callback',
+            queryId,
+            value: true
+          })
 
         } else if ( methods[methods.length - 1].methodName == 'delete' && 
         typeof methods[methods.length - 1].arguments == 'object') {
@@ -348,39 +372,54 @@ class indexedDBInterface {
           const IdInObject = methods[methods.length - 1].arguments
           const idValue = IdInObject[TableSchema.id.keyPath]
 
-          return {
+          postMessage( {
+            run: 'callback',
             queryId: queryId,
             value: await this.getActions(TableSchema.name, config, queryId).deleteByID(idValue)
-          }
+          })
         } else if (methods[methods.length - 1].methodName == 'delete' && 
         methods[methods.length - 1].arguments == '*') {
-          return {
+          postMessage({
+            run: 'callback',
             queryId: queryId,
             value: await this.getActions(TableSchema.name, config, queryId).deleteAll()
-          }
+          })
         }
       },
       insert: async (methods: Method[]) => {
-       return  new Promise((resolve, reject) => {
-          const rows = methods[0].arguments
-  
-          for( let insert of rows) {
-            this.getActions(TableSchema.name, config, queryId).add({value: insert, key: null, func:(id) => {
-              insert[TableSchema.id.keyPath] = id
-              resolve({
-                queryId: queryId,
-                value: insert
-              })
-            }})
-          }
-        })
+        const rows = methods[0].arguments
+        
+        const add = (id, index) => {
+          postMessage({
+            run: 'callback',
+            queryId: queryId,
+            value: { id, index}
+          })
+        }
+
+        for( let i = 0; i < rows.length; i++) {
+          const insert = rows[i]
+          this.getActions(TableSchema.name, config, queryId).add({value: insert, key: null, index:i, add})
+        }
+
+        IndexedDB.getOrCreateTransaction({currentStore: TableSchema.name, queryId, config}, 'readwrite', (transaction) => {
+          postMessage({
+            run: 'done',
+            queryId: queryId,
+            value: true
+          })
+          transaction.done()
+        });
+
       },
       migrate: async() => {
         await IndexedDB.migrate(config)
         await IndexedDB.run(config)
-        return  {
-          queryId: queryId
-        }
+        postMessage ({
+          run: 'callback',
+          queryId: queryId,
+          value: true
+        })
       }, 
       trigger: async({type, subscribe}) => {
         if(type == 'transactionOnCommit') {
@@ -392,6 +431,12 @@ class indexedDBInterface {
         } else if (type == 'trigger') {
 
         }
+
+        postMessage({
+          run: 'callback',
+          queryId: queryId,
+          value: true
+        })
       }
     }
   }

@@ -50,11 +50,10 @@ export class transaction {
 
     objectStore = (currentStore) => {
         return {
-            add:({value, key, config}) =>  {
+            add:({value}) =>  {
                 const request = new transactionRequest()
                 request.type = 'add'
                 request.value = value
-                request.key = key
                 this.request.push(request)
     
                 let objectStore = this.tx.objectStore(currentStore);

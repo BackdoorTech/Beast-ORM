@@ -11,11 +11,12 @@ declare class indexedDBInterface {
         getOneByIndex: (keyPath: string, value: string | number) => Promise<any>;
         getManyByIndex: (keyPath: string, value: string | number) => Promise<any[]>;
         getAll: () => Promise<any[]>;
-        add: ({ value, key, func }: {
+        add: ({ value, key, add, index }: {
             value: any;
             key: any;
-            func: any;
-        }) => void;
+            add: any;
+            index: any;
+        }) => Promise<unknown>;
         update: ({ value, key }: {
             value: any;
             key?: any;
@@ -26,26 +27,18 @@ declare class indexedDBInterface {
     };
     requestHandler: (TableSchema: TableSchema, config: DatabaseSchema, queryId: any) => {
         select: (methods: Method[]) => Promise<unknown>;
-        update: (methods: Method[]) => Promise<{
-            queryId: any;
-        }>;
-        delete: (methods: Method[]) => Promise<{
-            queryId: any;
-            value?: undefined;
-        } | {
-            queryId: any;
-            value: any;
-        }>;
-        insert: (methods: Method[]) => Promise<unknown>;
-        migrate: () => Promise<{
-            queryId: any;
-        }>;
+        update: (methods: Method[]) => Promise<void>;
+        delete: (methods: Method[]) => Promise<void>;
+        insert: (methods: Method[]) => Promise<void>;
+        migrate: () => Promise<void>;
         trigger: ({ type, subscribe }: {
             type: any;
             subscribe: any;
         }) => Promise<{
+            run: string;
             subscription: boolean;
             queryId: any;
+            value: boolean;
         }>;
     };
 }

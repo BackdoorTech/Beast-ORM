@@ -96,7 +96,7 @@ describe("reactive", () => {
     
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 65000)
+  }, 20000)
 
 
 

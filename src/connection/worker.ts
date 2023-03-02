@@ -9,31 +9,12 @@ onmessage = async (oEvent) => {
   
   indexedDB.requestHandler(TableSchema, DBconfig, queryId)[action](arg).then((result) => {
 
-    try {
-      postMessage(result)
-    } catch (error) {
-      postMessage({
-        queryId: result.queryId,
-        value: undefined
-      })
-    }
-  }).catch((error) => {
-  
-    try {
-      postMessage({
-        error: error,
-        queryId: queryId,
-        value: error
-      })
-    } catch (error) {
-      postMessage({
-        error: error,
-        queryId: queryId,
-        value: error
-      })
-    }
-  })
+    // console.log('result', result)
+    // postMessage(result)
 
-  
-  
+  }, (error) => {
+    // console.log('error', error)
+    // postMessage(error)
+
+  })
 }; 

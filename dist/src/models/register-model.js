@@ -49,6 +49,11 @@ export class registerModel {
             for (const [fieldName, Field] of Object.entries(fields)) {
                 // dont register fields that is primary key and auto increment
                 if (!((Field === null || Field === void 0 ? void 0 : Field.primaryKey) && (Field === null || Field === void 0 ? void 0 : Field.autoIncrement)) && !((_c = fieldTypes['ManyToManyField']) === null || _c === void 0 ? void 0 : _c.includes(fieldName))) {
+                    const removeReferenceField = Object.assign({}, Field);
+                    if (removeReferenceField === null || removeReferenceField === void 0 ? void 0 : removeReferenceField.model) {
+                        removeReferenceField.model = removeReferenceField.model.getModelName();
+                    }
+                    console.log(removeReferenceField);
                     databaseSchema.stores[index].fields.push({
                         name: fieldName,
                         keyPath: fieldName,
@@ -57,7 +62,7 @@ export class registerModel {
                             type: Field.type
                         },
                         className: Field === null || Field === void 0 ? void 0 : Field.fieldName,
-                        fieldAttributes: Object.assign({}, Field)
+                        fieldAttributes: Object.assign({}, removeReferenceField)
                     });
                 }
                 if (Field instanceof OneToOneField) {

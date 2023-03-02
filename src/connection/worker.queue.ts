@@ -2,10 +2,11 @@ import { Methods, getParams, Method } from '../models/model.interface.js'
 
 interface WsRegister {
 	type?: 'response' | 'Register',
-	func: Function
 	queryId: string,
 	params: any,
 	method: 'execute' | 'migrate',
+	callback: Function,
+	done?: Function
 }
 
 export class _IndexedDBWorkerQueue {
@@ -53,6 +54,7 @@ export class _IndexedDBWorkerQueue {
 			this.workerQueues[data.queryId] = data
 			return data.queryId
 		} catch (error) {
+			console.log(error)
 			return false
 		}
 		
@@ -60,8 +62,7 @@ export class _IndexedDBWorkerQueue {
 
 	async onmessage (data: any) {
 		const value = this.workerQueues[data.queryId]
-		value.func(data)
-		
+		value[data.run](data)
 	}
 
 	finish(queryId) {
@@ -70,8 +71,11 @@ export class _IndexedDBWorkerQueue {
 		} catch (error) {}
 	}
 
-	updateFunction(queryId, func:Function) {
-		this.workerQueues[queryId].func = func
+	updateFunction(queryId, run , func:Function) {
+		
+		this.workerQueues[queryId][run] = (message) =>{
+			func(message.value)
+		}
 	}
 
 }

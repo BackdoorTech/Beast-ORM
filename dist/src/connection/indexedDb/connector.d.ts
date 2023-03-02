@@ -79,11 +79,15 @@ export declare class IndexedDB {
     private static createTransaction;
     private static validateBeforeTransaction;
     static transactionOnCommitSubscribe(TableSchema: TableSchema, config: DatabaseSchema, SubscriptionName: any): {
+        run: string;
         subscription: boolean;
         queryId: any;
+        value: boolean;
     };
     static transactionOnCommitUnSubscribe(TableSchema: TableSchema, config: DatabaseSchema, SubscriptionName: any): {
+        run: string;
         subscription: boolean;
         queryId: any;
+        value: boolean;
     };
 }

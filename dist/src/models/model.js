@@ -227,27 +227,22 @@ export class Model {
             const _methods = [{ methodName: 'create', arguments: arg }];
             const DBconfig = this.getDBSchema();
             const queryId = uniqueGenerator();
-            const createObjectRequest = ModelAPIRequest.obj(DBconfig, TableSchema).create(_methods, queryId);
-            const createObject = await createObjectRequest;
-            IndexedDBWorkerQueue.finish(queryId);
-            if (createObject) {
-                if (typeof createObject[TableSchema.id.keyPath] == 'object') {
-                    reject(createObject[TableSchema.id.keyPath].error);
+            const result = [];
+            await ModelAPIRequest.obj(DBconfig, TableSchema).create(_methods, queryId, ({ id, index }) => {
+                const insert = arg[index];
+                insert[TableSchema.id.keyPath] = id;
+                const instance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: insert });
+                result.push(instance);
+            });
+            IndexedDBWorkerQueue.updateFunction(queryId, "done", () => {
+                if (arg.length == 1) {
+                    resolve(result[0]);
                 }
                 else {
-                    if (Array.isArray(createObject)) {
-                        resolve(createObject);
-                        for (let a in createObject) {
-                            createObject[a] = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: createObject[a] });
-                        }
-                        return arg;
-                    }
-                    else {
-                        const instance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: createObject });
-                        resolve(instance);
-                    }
+                    resolve(result);
                 }
-            }
+                IndexedDBWorkerQueue.finish(queryId);
+            });
         });
     }
     static newInstance({ TableSchema, DBconfig, ModelName, dataToMerge }) {

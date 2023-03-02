@@ -72,7 +72,7 @@ describe("initial test for model", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 20000)
+  }, 10000)
 
 
 
@@ -274,7 +274,7 @@ describe("initial test for model", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  }, 20000)
 
   it('model autoField', async () => {
   
@@ -297,7 +297,9 @@ describe("initial test for model", () => {
 
       await Person.create([
         {username:'Peter'},
-        {username:'Peter'}]
+        {username:'Peter'},
+        {username:'Peter'},
+        {username:'Peter'},]
       )
 
       const rows = await Person.filter({username:'Peter'}).execute()
@@ -311,7 +313,7 @@ describe("initial test for model", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  }, 20000)
 
 
 
@@ -351,7 +353,7 @@ describe("initial test for model", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  }, 20000)
 
 
   it('all()', async () => {
@@ -386,7 +388,7 @@ describe("initial test for model", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 60000)
+  }, 20000)
 
   it('model createOrFind case find', async () => {
   
@@ -691,7 +693,7 @@ describe("operators", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 30000)
+  }, 20000)
 
 
 

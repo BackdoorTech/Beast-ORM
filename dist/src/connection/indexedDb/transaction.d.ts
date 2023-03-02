@@ -29,10 +29,8 @@ export declare class transaction {
     request: any[];
     FinishRequest: any[];
     objectStore: (currentStore: any) => {
-        add: ({ value, key, config }: {
+        add: ({ value }: {
             value: any;
-            key: any;
-            config: any;
         }) => transactionRequest;
         getAll: (config: DatabaseSchema) => transactionRequest;
         put: ({ value, key, config }: {
