@@ -323,7 +323,6 @@ export class Model {
       
       const result = []
       await ModelAPIRequest.obj(DBconfig, TableSchema).create(_methods, queryId, ({id, index}) => {
-        console.log('Push', id, index)
         const insert = arg[index]
         insert[TableSchema.id.keyPath] = id
         const instance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: insert})

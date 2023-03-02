@@ -23,7 +23,6 @@ export class ModelAPIRequest {
 				return await DBSwitch.requestHandler(TableSchema.name, DatabaseSchema.databaseName, DatabaseSchema.type ,'update' , arg, queryId)
 			},
 			execute:  async(arg:Methods  | Method[], queryId:string):Promise<any> => {
-				console.log('queryId', queryId)
 				await ModelMigrations.waitMigration(DatabaseSchema.databaseName)
 				return await DBSwitch.requestHandler(TableSchema.name, DatabaseSchema.databaseName, DatabaseSchema.type ,'select' , arg, queryId)
 			},
