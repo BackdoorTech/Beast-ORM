@@ -10,14 +10,14 @@ export class IndexedDB {
     callback: Function,
     queryId: string
     mode: string
-    config: DatabaseSchema
+    DatabaseName: string
   }[]} } = {}
 
   static transactionsToCommit: {[ key: string]:  {[ key: string]: {
     callback: Function,
     queryId: string
     mode: string
-    config: DatabaseSchema
+    DatabaseName: string
   }[]} } = {}
 
   static dbInstance: {[dbName: string]: IDBDatabase} = {}
@@ -35,21 +35,22 @@ export class IndexedDB {
 
   constructor() {}
 
-  static connect(config: DatabaseSchema): Promise<IDBDatabase> {
+  static connect(DatabaseName: string): Promise<IDBDatabase> {
 
     return new Promise<IDBDatabase>((resolve, reject) => {
 
-      if(this.dbInstance[config.databaseName]) {
-        resolve(this.dbInstance[config.databaseName])
+      const DatabaseSchema =  Databases[DatabaseName]
+      if(this.dbInstance[DatabaseSchema.databaseName]) {
+        resolve(this.dbInstance[DatabaseSchema.databaseName])
       }
 
       const idbInstance = indexedDB || self.indexedDB || (self as any).mozIndexedDB || (self as any).webkitIndexedDB || (self as any).msIndexedDB;
       
       if (idbInstance) {
-        const request: IDBOpenDBRequest = idbInstance.open(config.databaseName, config.version);
+        const request: IDBOpenDBRequest = idbInstance.open(DatabaseSchema.databaseName, DatabaseSchema.version);
   
         request.onsuccess = () => {
-          this.dbInstance[config.databaseName] = request.result
+          this.dbInstance[DatabaseSchema.databaseName] = request.result
           resolve(request.result as IDBDatabase);
         };
   
@@ -58,8 +59,8 @@ export class IndexedDB {
         };
   
         request.onupgradeneeded = async (e: any) => {
-          await this.migrate(config)
-          return await this.connect(config)
+          await this.migrate(DatabaseSchema)
+          return await this.connect(DatabaseSchema.databaseName)
         };
 
         // request.onblocked = async (e: any) => {
@@ -148,26 +149,26 @@ export class IndexedDB {
 
   static executingTransaction : {[ key: string]:  {[ key: string]: boolean }} = {}
 
-  static executeTransaction(currentStore, databaseName) {
+  static executeTransaction(TableName, databaseName) {
     
-    const {mode, callback, config} = this.transactions[databaseName][currentStore][0]
-    this.txInstanceMode[databaseName][currentStore][mode] = true
+    const {mode, callback, DatabaseName} = this.transactions[databaseName][TableName][0]
+    this.txInstanceMode[databaseName][TableName][mode] = true
 
     const done = async () => {
-      const transaction = this.transactions[databaseName][currentStore].shift();
-      this.transactionsToCommit[databaseName][currentStore].push(transaction)
+      const transaction = this.transactions[databaseName][TableName].shift();
+      this.transactionsToCommit[databaseName][TableName].push(transaction)
 
-      if(this.transactions[config.databaseName][currentStore].length == 0) {
-        this.executingTransaction[databaseName][currentStore] = false;
+      if(this.transactions[DatabaseName][TableName].length == 0) {
+        this.executingTransaction[databaseName][TableName] = false;
 
 
-        if(this.txInstanceMode[databaseName][currentStore]['readwrite']) {
+        if(this.txInstanceMode[databaseName][TableName]['readwrite']) {
           try {
-            (this.txInstance[databaseName][currentStore]["readwrite"].IDBTransaction as any)?.commit?.();
-            this.transactionsToCommit[databaseName][currentStore] = [];
+            (this.txInstance[databaseName][TableName]["readwrite"].IDBTransaction as any)?.commit?.();
+            this.transactionsToCommit[databaseName][TableName] = [];
 
             (async () => {
-              for (let [queryId , value] of Object.entries(this.transactionOnCommit[databaseName][currentStore]) ) {
+              for (let [queryId , value] of Object.entries(this.transactionOnCommit[databaseName][TableName]) ) {
                 postMessage({
                   run: 'callback',
                   queryId: queryId,
@@ -180,48 +181,48 @@ export class IndexedDB {
             // no commit need 
           }
         }
-        delete this.txInstance[databaseName][currentStore]["readwrite"]
-        this.txInstanceMode[databaseName][currentStore] = {}
+        delete this.txInstance[databaseName][TableName]["readwrite"]
+        this.txInstanceMode[databaseName][TableName] = {}
         
         
-        delete this.dbInstanceUsing[config.databaseName][currentStore]
-        if(Object.keys(this.dbInstanceUsing[config.databaseName]).length == 0) {
-          this.dbInstance[config.databaseName].close()
-          delete this.dbInstance[config.databaseName];
+        delete this.dbInstanceUsing[DatabaseName][TableName]
+        if(Object.keys(this.dbInstanceUsing[DatabaseName]).length == 0) {
+          this.dbInstance[DatabaseName].close()
+          delete this.dbInstance[DatabaseName];
         }
 
                 
       } else {
-        this.executeTransaction(currentStore, databaseName)
+        this.executeTransaction(TableName, databaseName)
       }
     }
 
 
     const doneButFailed = async() => {
-      this.transactions[databaseName][currentStore].shift();
-      if(this.transactions[config.databaseName][currentStore].length >= 1) {
+      this.transactions[databaseName][TableName].shift();
+      if(this.transactions[DatabaseName][TableName].length >= 1) {
 
-        this.txInstance[config.databaseName][currentStore]["readwrite"].active = false;
+        this.txInstance[DatabaseName][TableName]["readwrite"].active = false;
 
         try {
-          (this.txInstance[databaseName][currentStore]["readwrite"].IDBTransaction as any)?.commit?.();
+          (this.txInstance[databaseName][TableName]["readwrite"].IDBTransaction as any)?.commit?.();
         } catch (error) {} 
         
         const tx = this.createTransaction(
-          this.dbInstance[config.databaseName],
+          this.dbInstance[DatabaseName],
           "readwrite",
-          currentStore,
+          TableName,
           (error) => { 
             //  
           },
           () => {},
           (onabort) => { 
             //  
-            this.txInstance[config.databaseName][currentStore]["readwrite"].active = false
+            this.txInstance[DatabaseName][TableName]["readwrite"].active = false
           }
         )
 
-        this.txInstance[config.databaseName][currentStore] = {
+        this.txInstance[DatabaseName][TableName] = {
           readwrite: {
             IDBTransaction: tx,
             active: true,
@@ -230,48 +231,48 @@ export class IndexedDB {
         }
 
       
-        this.executeTransaction(currentStore, databaseName)
+        this.executeTransaction(TableName, databaseName)
       }
     }
 
-    this.validateBeforeTransaction(this.dbInstance[config.databaseName], currentStore, (data) => {
+    this.validateBeforeTransaction(this.dbInstance[DatabaseName], TableName, (data) => {
       
     })
 
     const transactionInstance = new transaction({
-      store: currentStore, 
+      store: TableName, 
       done, 
       doneButFailed,
-      db: this.dbInstance[config.databaseName],
-      tx: this.txInstance[databaseName][currentStore]["readwrite"].IDBTransaction
+      db: this.dbInstance[DatabaseName],
+      tx: this.txInstance[databaseName][TableName]["readwrite"].IDBTransaction
     })
     callback(transactionInstance)
     
   }
   
-  static getOrCreateTransaction({currentStore, queryId, config}, mode: IDBTransactionMode, callback:  (transaction:transaction) => void) {
-    this.transactions[config.databaseName][currentStore].push({config, queryId, mode, callback})
-    if (this.executingTransaction[config.databaseName][currentStore] == false) {
-      this.executingTransaction[config.databaseName][currentStore] = true
-      this.connect(config).then(() => {
+  static getOrCreateTransaction({TableName, queryId, DatabaseName}, mode: IDBTransactionMode, callback:  (transaction:transaction) => void) {
 
-        
+    this.transactions[DatabaseName][TableName].push({DatabaseName, queryId, mode, callback})
+    if (this.executingTransaction[DatabaseName][TableName] == false) {
+      this.executingTransaction[DatabaseName][TableName] = true
+      this.connect(DatabaseName).then(() => {
+
         const tx = this.createTransaction(
-          this.dbInstance[config.databaseName],
+          this.dbInstance[DatabaseName],
           "readwrite",
-          currentStore,
+          TableName,
           (error) => { 
             // ;
           },
           () => {},
           (onabort) => { 
             //  
-            this.txInstance[config.databaseName][currentStore]["readwrite"].active = false
+            this.txInstance[DatabaseName][TableName]["readwrite"].active = false
           }
         )
         
-        if(!this.txInstance[config.databaseName][currentStore]["readwrite"]) {
-          this.txInstance[config.databaseName][currentStore] = {
+        if(!this.txInstance[DatabaseName][TableName]["readwrite"]) {
+          this.txInstance[DatabaseName][TableName] = {
             readwrite: {
               IDBTransaction: tx,
               active: true,
@@ -280,11 +281,11 @@ export class IndexedDB {
           }
         }
         
-        this.txInstance[config.databaseName][currentStore]["readwrite"].IDBTransaction = tx
-        this.txInstance[config.databaseName][currentStore]["readwrite"].active = true
+        this.txInstance[DatabaseName][TableName]["readwrite"].IDBTransaction = tx
+        this.txInstance[DatabaseName][TableName]["readwrite"].active = true
 
-        this.dbInstanceUsing[config.databaseName][currentStore] = true
-        this.executeTransaction(currentStore, config.databaseName)
+        this.dbInstanceUsing[DatabaseName][TableName] = true
+        this.executeTransaction(TableName, DatabaseName)
       })
     } else {
       if(mode == 'readonly') {
@@ -297,12 +298,12 @@ export class IndexedDB {
   private static createTransaction(
     db: IDBDatabase,
     dbMode: IDBTransactionMode,
-    currentStore: string,
+    TableName: string,
     resolve,
     reject?,
     abort?
   ): IDBTransaction {
-    let tx: IDBTransaction = db.transaction(currentStore, dbMode);
+    let tx: IDBTransaction = db.transaction(TableName, dbMode);
     tx.onerror = reject;
     tx.oncomplete = resolve;
     tx.onabort = abort;
@@ -320,8 +321,8 @@ export class IndexedDB {
 
 
 
-  static transactionOnCommitSubscribe(TableSchema:TableSchema, config:DatabaseSchema, SubscriptionName) {
-    this.transactionOnCommit[config.databaseName][TableSchema.name][SubscriptionName] = {}
+  static transactionOnCommitSubscribe(TableName: string , DatabaseName:string, SubscriptionName) {
+    this.transactionOnCommit[DatabaseName][TableName][SubscriptionName] = {}
     return {
       run: 'callback',
       subscription: true,
@@ -330,8 +331,8 @@ export class IndexedDB {
     }
   }
 
-  static transactionOnCommitUnSubscribe(TableSchema:TableSchema, config:DatabaseSchema, SubscriptionName) {
-    delete this.transactionOnCommit[config.databaseName][TableSchema.name][SubscriptionName]
+  static transactionOnCommitUnSubscribe(TableName, DatabaseName:string, SubscriptionName) {
+    delete this.transactionOnCommit[DatabaseName][TableName][SubscriptionName]
     return {
       run: 'callback',
       subscription: false,

@@ -1,4 +1,3 @@
-import { DatabaseSchema } from '../../models/register-modal.interface.js';
 declare class transactionRequest {
     type: string;
     value: any;
@@ -32,27 +31,21 @@ export declare class transaction {
         add: ({ value }: {
             value: any;
         }) => transactionRequest;
-        getAll: (config: DatabaseSchema) => transactionRequest;
-        put: ({ value, key, config }: {
+        getAll: () => transactionRequest;
+        put: ({ value, key }: {
             value: any;
             key?: any;
-            config: any;
         }) => transactionRequest;
-        clear: ({ config }: {
-            config: any;
-        }) => transactionRequest;
-        delete: ({ id, config }: {
+        clear: () => transactionRequest;
+        delete: ({ id }: {
             id: any;
-            config: any;
         }) => transactionRequest;
-        get: ({ id, config }: {
+        get: ({ id }: {
             id: any;
-            config: any;
         }) => transactionRequest;
-        index: ({ keyPath, value, config }: {
+        index: ({ keyPath, value }: {
             keyPath: any;
             value: any;
-            config: any;
         }) => transactionRequest;
     };
 }

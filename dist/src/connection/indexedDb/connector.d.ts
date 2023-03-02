@@ -1,4 +1,4 @@
-import { DatabaseSchema, TableSchema } from "../../models/register-modal.interface.js";
+import { DatabaseSchema } from "../../models/register-modal.interface.js";
 import { transaction } from './transaction.js';
 export declare class IndexedDB {
     static transactions: {
@@ -7,7 +7,7 @@ export declare class IndexedDB {
                 callback: Function;
                 queryId: string;
                 mode: string;
-                config: DatabaseSchema;
+                DatabaseName: string;
             }[];
         };
     };
@@ -17,7 +17,7 @@ export declare class IndexedDB {
                 callback: Function;
                 queryId: string;
                 mode: string;
-                config: DatabaseSchema;
+                DatabaseName: string;
             }[];
         };
     };
@@ -58,7 +58,7 @@ export declare class IndexedDB {
         };
     };
     constructor();
-    static connect(config: DatabaseSchema): Promise<IDBDatabase>;
+    static connect(DatabaseName: string): Promise<IDBDatabase>;
     static migrate(config: DatabaseSchema): Promise<boolean>;
     static run(config: DatabaseSchema): boolean;
     static request({ queryId }: {
@@ -70,21 +70,21 @@ export declare class IndexedDB {
             [key: string]: boolean;
         };
     };
-    static executeTransaction(currentStore: any, databaseName: any): void;
-    static getOrCreateTransaction({ currentStore, queryId, config }: {
-        currentStore: any;
+    static executeTransaction(TableName: any, databaseName: any): void;
+    static getOrCreateTransaction({ TableName, queryId, DatabaseName }: {
+        TableName: any;
         queryId: any;
-        config: any;
+        DatabaseName: any;
     }, mode: IDBTransactionMode, callback: (transaction: transaction) => void): void;
     private static createTransaction;
     private static validateBeforeTransaction;
-    static transactionOnCommitSubscribe(TableSchema: TableSchema, config: DatabaseSchema, SubscriptionName: any): {
+    static transactionOnCommitSubscribe(TableName: string, DatabaseName: string, SubscriptionName: any): {
         run: string;
         subscription: boolean;
         queryId: any;
         value: boolean;
     };
-    static transactionOnCommitUnSubscribe(TableSchema: TableSchema, config: DatabaseSchema, SubscriptionName: any): {
+    static transactionOnCommitUnSubscribe(TableName: any, DatabaseName: string, SubscriptionName: any): {
         run: string;
         subscription: boolean;
         queryId: any;

@@ -23,12 +23,12 @@ class indexedDBInterface {
   private createTransaction(
     db: IDBDatabase,
     dbMode: IDBTransactionMode,
-    currentStore: string,
+    TableName: string,
     resolve,
     reject?,
     abort?
   ): IDBTransaction {
-    let tx: IDBTransaction = db.transaction(currentStore, dbMode);
+    let tx: IDBTransaction = db.transaction(TableName, dbMode);
     tx.onerror = reject;
     tx.oncomplete = resolve;
     tx.onabort = abort;
@@ -39,19 +39,19 @@ class indexedDBInterface {
     return IndexedDB.migrate(config)
   }
 
-  getConnection(config: DatabaseSchema): Promise<IDBDatabase> {
-    return IndexedDB.connect(config)
+  getConnection(DatabaseName): Promise<IDBDatabase> {
+    return IndexedDB.connect(DatabaseName)
   }
  
   
-  getActions = (currentStore, config, queryId) => {
+  getActions = (TableName: string, DatabaseName: string, queryId: string) => {
     return {
       getByID:(id: string | number) => {
         return new Promise<any>((resolve, reject) => {
 
-          IndexedDB.getOrCreateTransaction({currentStore, queryId, config}, 'readonly', (transaction) => {
-            let objectStore = transaction.objectStore(currentStore)
-            let request = objectStore.get({id, config});
+          IndexedDB.getOrCreateTransaction({TableName, queryId, DatabaseName}, 'readonly', (transaction) => {
+            let objectStore = transaction.objectStore(TableName)
+            let request = objectStore.get({id});
             request.onsuccess = async (e: any) => {
               resolve(e.target.result as any[]);
             };
@@ -61,9 +61,9 @@ class indexedDBInterface {
       getOneByIndex:(keyPath: string, value: string | number) => {
         return new Promise< any | undefined>((resolve, reject) => {
 
-          IndexedDB.getOrCreateTransaction({currentStore, queryId, config}, 'readonly', (transaction) => {
-            let objectStore = transaction.objectStore(currentStore)
-            let request = objectStore.index({keyPath, value, config});
+          IndexedDB.getOrCreateTransaction({TableName, queryId, DatabaseName}, 'readonly', (transaction) => {
+            let objectStore = transaction.objectStore(TableName)
+            let request = objectStore.index({keyPath, value});
             request.onsuccess = async (e: any) => {
               resolve(e.target.result as any[]);
             };
@@ -73,11 +73,11 @@ class indexedDBInterface {
       },
       getManyByIndex:(keyPath: string, value: string | number) => {
         return new Promise<any[]>((resolve, reject) => {
-          this.getConnection(config)
+          this.getConnection(DatabaseName)
             .then(db => {
-              this.validateBeforeTransaction(db, currentStore, reject);
-              let tx = this.createTransaction(db, "readonly", currentStore, resolve, reject);
-              let objectStore = tx.objectStore(currentStore);
+              this.validateBeforeTransaction(db, TableName, reject);
+              let tx = this.createTransaction(db, "readonly", TableName, resolve, reject);
+              let objectStore = tx.objectStore(TableName);
               let index = objectStore.index(keyPath);
               let request = index.getAll(value);
               request.onsuccess = (e: any) => {
@@ -90,9 +90,9 @@ class indexedDBInterface {
       getAll:() => {
         return new Promise<any[]>((resolve, reject) => {
           
-          IndexedDB.getOrCreateTransaction({currentStore, queryId, config}, 'readonly', (transaction) => {
-            let objectStore = transaction.objectStore(currentStore)
-            let request = objectStore.getAll(config);
+          IndexedDB.getOrCreateTransaction({TableName, queryId, DatabaseName}, 'readonly', (transaction) => {
+            let objectStore = transaction.objectStore(TableName)
+            let request = objectStore.getAll();
             
             request.onsuccess = async (e: any) => {
               resolve(e.target.result as any[]);
@@ -102,8 +102,8 @@ class indexedDBInterface {
       },
       add:({value, key, add, index}) => {
         return new Promise((resolve, reject) => {
-          IndexedDB.getOrCreateTransaction({currentStore, queryId, config}, 'readwrite', (transaction) => {
-            let objectStore = transaction.objectStore(currentStore)
+          IndexedDB.getOrCreateTransaction({TableName, queryId, DatabaseName}, 'readwrite', (transaction) => {
+            let objectStore = transaction.objectStore(TableName)
             let request = objectStore.add({value});
             request.onsuccess = async(e: any) => {
               const id = e.target.result
@@ -122,9 +122,9 @@ class indexedDBInterface {
       },
       update:({value, key = undefined}) => {
         return new Promise<any>((resolve, reject) => {
-          IndexedDB.getOrCreateTransaction({currentStore, queryId, config}, 'readwrite', (transaction) => {
-            let objectStore = transaction.objectStore(currentStore)
-            let request = objectStore.put({value, key, config});
+          IndexedDB.getOrCreateTransaction({TableName, queryId, DatabaseName}, 'readwrite', (transaction) => {
+            let objectStore = transaction.objectStore(TableName)
+            let request = objectStore.put({value, key});
             request.onsuccess = async (e: any) => {
               resolve(e.target.result);
             };
@@ -139,9 +139,9 @@ class indexedDBInterface {
       },
       deleteByID:(id: any) => {
         return new Promise<any>((resolve, reject) => {
-          IndexedDB.getOrCreateTransaction({currentStore, queryId, config}, 'readwrite', (transaction) => {
-            let objectStore = transaction.objectStore(currentStore)
-            let request = objectStore.delete({id, config});
+          IndexedDB.getOrCreateTransaction({TableName, queryId, DatabaseName}, 'readwrite', (transaction) => {
+            let objectStore = transaction.objectStore(TableName)
+            let request = objectStore.delete({id});
             request.onsuccess = async (e: any) => {
               resolve(e.target.result);
             };
@@ -157,9 +157,9 @@ class indexedDBInterface {
       deleteAll:() => {
         return new Promise<any>((resolve, reject) => {
           
-          IndexedDB.getOrCreateTransaction({currentStore, queryId, config}, 'readwrite', (transaction) => {
-            let objectStore = transaction.objectStore(currentStore)
-            let request = objectStore.clear({config});
+          IndexedDB.getOrCreateTransaction({TableName, queryId, DatabaseName}, 'readwrite', (transaction) => {
+            let objectStore = transaction.objectStore(TableName)
+            let request = objectStore.clear();
             request.onsuccess = async (e: any) => {
               resolve(e.target.result);
             };
@@ -169,11 +169,11 @@ class indexedDBInterface {
       },
       openCursor:(cursorCallback, keyRange?: IDBKeyRange) => {
         return new Promise<IDBCursorWithValue | void>((resolve, reject) => {
-          this.getConnection(config)
+          this.getConnection(DatabaseName)
             .then(db => {
-              this.validateBeforeTransaction(db, currentStore, reject);
-              let tx = this.createTransaction(db, "readonly", currentStore, resolve, reject);
-              let objectStore = tx.objectStore(currentStore);
+              this.validateBeforeTransaction(db, TableName, reject);
+              let tx = this.createTransaction(db, "readonly", TableName, resolve, reject);
+              let objectStore = tx.objectStore(TableName);
               let request = objectStore.openCursor(keyRange);
               request.onsuccess = e => {
                 cursorCallback(e);
@@ -192,13 +192,13 @@ class indexedDBInterface {
     return {
       select: async (methods: Method[]) => {
         const TableSchema = Tables[DatabaseName][TableName]
-        const config = Databases[DatabaseName]
+        
 
         if(methods[0].methodName == 'all') {
           postMessage ({
             run: 'callback',
             queryId: queryId,
-            value: await this.getActions(TableSchema.name, config, queryId).getAll()
+            value: await this.getActions(TableName, DatabaseName, queryId).getAll()
           })
 
         }
@@ -213,7 +213,7 @@ class indexedDBInterface {
               postMessage ({
                 run: 'callback',
                 queryId: queryId,
-                value: await this.getActions(TableSchema.name, config, queryId).getByID(value)
+                value: await this.getActions(TableName, DatabaseName, queryId).getByID(value)
               })
 
             } else {
@@ -221,7 +221,7 @@ class indexedDBInterface {
               postMessage ({
                 run: 'callback',
                 queryId: queryId,
-                value: await this.getActions(TableSchema.name, config, queryId).getOneByIndex(key, value)
+                value: await this.getActions(TableName, DatabaseName, queryId).getOneByIndex(key, value)
               })
               
             }
@@ -229,7 +229,7 @@ class indexedDBInterface {
             postMessage ({
               run: 'callback',
               queryId: queryId,
-              value: await this.getActions(TableSchema.name, config, queryId).getByID(args[TableSchema.id.keyPath])
+              value: await this.getActions(TableSchema.name, DatabaseName, queryId).getByID(args[TableSchema.id.keyPath])
             })
           }
         } else if (methods[methods.length - 1].methodName == 'execute') {
@@ -238,7 +238,7 @@ class indexedDBInterface {
           //await this.getActions(TableSchema.name, config, queryId).openCursor(async(event: any) => {
             //var cursor = event.target.result;
             //if(cursor) {
-              const rows = await this.getActions(TableSchema.name, config, queryId).getAll()
+              const rows = await this.getActions(TableName, DatabaseName, queryId).getAll()
 
               
               for (const row of rows) {
@@ -262,7 +262,7 @@ class indexedDBInterface {
         } else if (methods[methods.length - 1].methodName == 'first') {
           return new Promise(async(resolve, reject) => {
             const sqlObject =  new SqlObject(TableSchema, methods)
-            await this.getActions(TableSchema.name, config, queryId).openCursor(async(event: any) => {
+            await this.getActions(TableSchema.name, DatabaseName, queryId).openCursor(async(event: any) => {
               var cursor = event.target.result;
               if(cursor) {
                 const row = cursor.value
@@ -286,7 +286,7 @@ class indexedDBInterface {
       },
       update: async (methods: Method[]) => {
         const TableSchema = Tables[DatabaseName][TableName]
-        const config = Databases[DatabaseName]
+        
 
         if(methods[0].methodName == 'save') {
           
@@ -295,12 +295,12 @@ class indexedDBInterface {
           const idValue = args[idFieldName]
 
           if(idValue) {
-            this.getActions(TableSchema.name, config, queryId).update({value:args})
+            this.getActions(TableSchema.name, DatabaseName, queryId).update({value:args})
           }  else {
-            this.getActions(TableSchema.name, config, queryId).update({value:args, key:idValue})
+            this.getActions(TableSchema.name, DatabaseName, queryId).update({value:args, key:idValue})
           }
 
-          IndexedDB.getOrCreateTransaction({currentStore: TableSchema.name, queryId, config}, 'readwrite', (transaction) => {
+          IndexedDB.getOrCreateTransaction({TableName: TableName, queryId, DatabaseName}, 'readwrite', (transaction) => {
             postMessage({
               run: 'callback',
               queryId: queryId,
@@ -317,15 +317,15 @@ class indexedDBInterface {
           const customMethods: Method[] = Object.create(methods)
           customMethods[methods.length - 1].methodName = 'execute'
 
-          const result = await this.requestHandler(TableSchema.name, config.databaseName, queryId).select(customMethods) as any
+          const result = await this.requestHandler(TableSchema.name, DatabaseName, queryId).select(customMethods) as any
           const rows = result.value
 
           for(let row of rows) {
             const updateRow = Object.assign(row, argsToUpdate)
-            this.getActions(TableSchema.name, config, queryId).update({value:updateRow})
+            this.getActions(TableSchema.name, DatabaseName, queryId).update({value:updateRow})
           }
           
-          IndexedDB.getOrCreateTransaction({currentStore: TableSchema.name, queryId, config}, 'readwrite', (transaction) => {
+          IndexedDB.getOrCreateTransaction({TableName: TableName, queryId, DatabaseName}, 'readwrite', (transaction) => {
             postMessage({
               run: 'callback',
               queryId: queryId,
@@ -342,12 +342,12 @@ class indexedDBInterface {
           const idValue = argsToUpdate[idFieldName]
 
           if(idValue) {
-            this.getActions(TableSchema.name, config, queryId).update({value: argsToUpdate})
+            this.getActions(TableSchema.name, DatabaseName, queryId).update({value: argsToUpdate})
           }  else {
-            this.getActions(TableSchema.name, config, queryId).update({value:argsToUpdate, key:idValue})
+            this.getActions(TableSchema.name, DatabaseName, queryId).update({value:argsToUpdate, key:idValue})
           }
 
-          IndexedDB.getOrCreateTransaction({currentStore: TableSchema.name, queryId, config}, 'readwrite', (transaction) => {
+          IndexedDB.getOrCreateTransaction({TableName: TableSchema.name, queryId, DatabaseName}, 'readwrite', (transaction) => {
             postMessage({
               run: 'callback',
               queryId: queryId,
@@ -360,7 +360,7 @@ class indexedDBInterface {
       },
       delete: async (methods: Method[]) => {
         const TableSchema = Tables[DatabaseName][TableName]
-        const config = Databases[DatabaseName]
+        
 
         if(methods[methods.length - 1].methodName == 'delete' && 
         methods[methods.length - 1].arguments == null) {
@@ -368,15 +368,15 @@ class indexedDBInterface {
           const customMethods: Method[] = Object.create(methods)
           customMethods[methods.length - 1].methodName = 'execute'
 
-          const result = await this.requestHandler(TableSchema.name, config.databaseName, queryId).select(customMethods) as any
+          const result = await this.requestHandler(TableName, DatabaseName, queryId).select(customMethods) as any
           const rows = result.value
 
           for(let row of rows) {
             const id = row[TableSchema.id.keyPath]
-            this.getActions(TableSchema.name, config, queryId).deleteByID(id)
+            this.getActions(TableSchema.name, DatabaseName, queryId).deleteByID(id)
           }
 
-          IndexedDB.getOrCreateTransaction({currentStore: TableSchema.name, queryId, config}, 'readwrite', (transaction) => {
+          IndexedDB.getOrCreateTransaction({TableName: TableName, queryId, DatabaseName}, 'readwrite', (transaction) => {
             postMessage({
               run: 'callback',
               queryId: queryId,
@@ -394,21 +394,18 @@ class indexedDBInterface {
           postMessage({
             run: 'callback',
             queryId: queryId,
-            value: await this.getActions(TableSchema.name, config, queryId).deleteByID(idValue)
+            value: await this.getActions(TableName, DatabaseName, queryId).deleteByID(idValue)
           })
         } else if (methods[methods.length - 1].methodName == 'delete' && 
         methods[methods.length - 1].arguments == '*') {
           postMessage({
             run: 'callback',
             queryId: queryId,
-            value: await this.getActions(TableSchema.name, config, queryId).deleteAll()
+            value: await this.getActions(TableName, DatabaseName, queryId).deleteAll()
           })
         }
       },
       insert: async (methods: Method[]) => {
-        const TableSchema = Tables[DatabaseName][TableName]
-        const config = Databases[DatabaseName]
-
         const rows = methods[0].arguments
         
         const add = (id, index) => {
@@ -421,10 +418,10 @@ class indexedDBInterface {
 
         for( let i = 0; i < rows.length; i++) {
           const insert = rows[i]
-          this.getActions(TableSchema.name, config, queryId).add({value: insert, key: null, index:i, add})
+          this.getActions(TableName, DatabaseName, queryId).add({value: insert, key: null, index:i, add})
         }
 
-        IndexedDB.getOrCreateTransaction({currentStore: TableSchema.name, queryId, config}, 'readwrite', (transaction) => {
+        IndexedDB.getOrCreateTransaction({TableName: TableName, queryId, DatabaseName}, 'readwrite', (transaction) => {
           postMessage({
             run: 'done',
             queryId: queryId,
@@ -444,14 +441,12 @@ class indexedDBInterface {
         })
       }, 
       trigger: async({type, subscribe}) => {
-        const TableSchema = Tables[DatabaseName][TableName]
-        const config = Databases[DatabaseName]
 
         if(type == 'transactionOnCommit') {
           if(subscribe) {
-            return await IndexedDB.transactionOnCommitSubscribe(TableSchema, config, queryId)
+            return await IndexedDB.transactionOnCommitSubscribe(TableName, DatabaseName, queryId)
           } else {
-            return await IndexedDB.transactionOnCommitUnSubscribe(TableSchema, config, queryId)
+            return await IndexedDB.transactionOnCommitUnSubscribe(TableName, DatabaseName, queryId)
           }
         } else if (type == 'trigger') {
 

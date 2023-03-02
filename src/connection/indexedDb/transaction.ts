@@ -73,7 +73,7 @@ export class transaction {
 
                 return request
             },
-            getAll:(config:DatabaseSchema) => {
+            getAll:() => {
                 const request = new transactionRequest()
                 this.request.push(request)
 
@@ -93,7 +93,7 @@ export class transaction {
 
                 return request
             },
-            put: ({value, key = undefined, config}) => {
+            put: ({value, key = undefined}) => {
                 const request = new transactionRequest()
                 this.request.push(request)
 
@@ -116,7 +116,7 @@ export class transaction {
 
                 return request
             },
-            clear: ({config}) => {
+            clear: () => {
                 const request = new transactionRequest()
                 this.request.push(request)
 
@@ -137,7 +137,7 @@ export class transaction {
 
                 return request
             },
-            delete: ({id, config}) => {
+            delete: ({id}) => {
                 const request = new transactionRequest()
                 this.request.push(request)
 
@@ -157,7 +157,7 @@ export class transaction {
 
                 return request
             },
-            get:({id, config})=> {
+            get:({id})=> {
                 const request = new transactionRequest()
                 this.request.push(request)
 
@@ -176,7 +176,7 @@ export class transaction {
    
                 return request
             },
-            index: ({keyPath, value, config}) => {
+            index: ({keyPath, value}) => {
                 const request = new transactionRequest()
                 this.request.push(request)
 

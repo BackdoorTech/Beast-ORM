@@ -33,7 +33,7 @@ export class transaction {
                     };
                     return request;
                 },
-                getAll: (config) => {
+                getAll: () => {
                     const request = new transactionRequest();
                     this.request.push(request);
                     request.type = 'getAll';
@@ -49,7 +49,7 @@ export class transaction {
                     };
                     return request;
                 },
-                put: ({ value, key = undefined, config }) => {
+                put: ({ value, key = undefined }) => {
                     const request = new transactionRequest();
                     this.request.push(request);
                     request.type = 'put';
@@ -66,7 +66,7 @@ export class transaction {
                     };
                     return request;
                 },
-                clear: ({ config }) => {
+                clear: () => {
                     const request = new transactionRequest();
                     this.request.push(request);
                     request.type = 'clear';
@@ -82,7 +82,7 @@ export class transaction {
                     };
                     return request;
                 },
-                delete: ({ id, config }) => {
+                delete: ({ id }) => {
                     const request = new transactionRequest();
                     this.request.push(request);
                     request.type = 'delete';
@@ -98,7 +98,7 @@ export class transaction {
                     };
                     return request;
                 },
-                get: ({ id, config }) => {
+                get: ({ id }) => {
                     const request = new transactionRequest();
                     this.request.push(request);
                     request.type = 'get';
@@ -114,7 +114,7 @@ export class transaction {
                     };
                     return request;
                 },
-                index: ({ keyPath, value, config }) => {
+                index: ({ keyPath, value }) => {
                     const request = new transactionRequest();
                     this.request.push(request);
                     request.type = 'get';

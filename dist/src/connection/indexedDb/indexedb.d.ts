@@ -5,8 +5,8 @@ declare class indexedDBInterface {
     private validateBeforeTransaction;
     private createTransaction;
     migrate(config: DatabaseSchema): Promise<boolean>;
-    getConnection(config: DatabaseSchema): Promise<IDBDatabase>;
-    getActions: (currentStore: any, config: any, queryId: any) => {
+    getConnection(DatabaseName: any): Promise<IDBDatabase>;
+    getActions: (TableName: string, DatabaseName: string, queryId: string) => {
         getByID: (id: string | number) => Promise<any>;
         getOneByIndex: (keyPath: string, value: string | number) => Promise<any>;
         getManyByIndex: (keyPath: string, value: string | number) => Promise<any[]>;
