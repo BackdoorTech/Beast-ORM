@@ -7,7 +7,8 @@
     "watch": "rimraf dist/src && tsc  --watch",
     "test": "jest",
     "speed-test": "ts-node-dev ./test/funcional/speed/speed.ts",
-    "start": "live-server --ignore='node_modules'"
+    "start": "live-server --ignore='node_modules'",
+    "package:info":"npm publish --dry-run"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",

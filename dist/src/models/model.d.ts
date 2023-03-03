@@ -1,13 +1,21 @@
 import { getParams } from './model.interface.js';
 import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchema } from './register-modal.interface.js';
 export declare class Model {
-    constructor(obg?: any);
+    constructor();
     get(arg: any): Promise<any>;
     getDBSchema(): DatabaseSchema;
     getModelName(): string;
-    filter(...arg: any[]): any;
+    filter(...arg: any[]): {
+        filter: (...args: any[]) => void;
+        execute: () => Promise<any[]>;
+        update: (args: any) => Promise<unknown>;
+        delete: () => Promise<unknown>;
+        all: () => Promise<any[]>;
+    };
     getTableSchema(): TableSchema;
     getPrimaryKeyValue(): any;
+    private setDataToInstance;
+    private static setDataToInstance;
     save(): Promise<void>;
     delete(): Promise<void>;
     static deleteAll(): Promise<void>;
@@ -23,8 +31,13 @@ export declare class Model {
     static getOrCreate(arg: getParams): Promise<any>;
     private static getId;
     static getModelName(): string;
-    static filter(...arg: any[]): any;
-    static NewModelInstance(): any;
+    static filter(...arg: any[]): {
+        filter: (...args: any[]) => void;
+        execute: () => Promise<any[]>;
+        update: (args: any) => Promise<unknown>;
+        delete: () => Promise<unknown>;
+        all: () => Promise<any[]>;
+    };
     static getDBSchema(): DatabaseSchema;
     static getTableSchema(): TableSchema;
     private static getEmptyFields;
@@ -50,7 +63,7 @@ export declare class Model {
         TableSchema: any;
         some?: any;
     }) => {
-        filter: (...args: any[]) => any;
+        filter: (...args: any[]) => void;
         execute: () => Promise<any[]>;
         update: (args: any) => Promise<unknown>;
         delete: () => Promise<unknown>;

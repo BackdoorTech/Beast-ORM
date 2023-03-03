@@ -16,9 +16,7 @@ let methods : Methods = {} = {}
 export class Model {
 
 
-  constructor(obg?) {
-    Object.assign(this, obg)
-  }
+  constructor() {}
 
   get(arg) {
     return Model.get(arg)
@@ -48,17 +46,45 @@ export class Model {
     return this[idFieldName]
   }
 
+  private setDataToInstance(obj, Fields ={}) {
+    const tableSchema = this.getTableSchema()
+    const fiendsName = tableSchema.fields.map((field)=> field.name)
+
+    Fields = {}
+    for(let name of fiendsName) {
+      Fields[name] = obj[name]
+    }
+    
+    if(obj[tableSchema.id.keyPath]) {
+      Fields[tableSchema.id.keyPath] = obj[tableSchema.id.keyPath]
+    }
+
+    return Fields
+  } 
+
+
+  private static  setDataToInstance(obj, Fields ={}) {
+    const tableSchema = this.getTableSchema()
+    const fiendsName = tableSchema.fields.map((field)=> field.name)
+
+    Fields = {}
+    for(let name of fiendsName) {
+      Fields[name] = obj[name]
+    }
+    
+    if(obj[tableSchema.id.keyPath]) {
+      Fields[tableSchema.id.keyPath] = obj[tableSchema.id.keyPath]
+    }
+
+    return Fields
+  } 
+
+
   async save() {
     const DBconfig = this.getDBSchema()
     const tableSchema = this.getTableSchema()
 
-    const fiendsName = tableSchema.fields.map((field)=> field.name)
-    fiendsName.push(tableSchema.id.keyPath)
-
-    const Fields = {}
-    for(let name of fiendsName) {
-      Fields[name] = this[name]
-    }
+    const Fields = this.setDataToInstance(this);
 
     const methods:  Method[]  = [{methodName: 'save', arguments: Fields}]
     const queryId=uniqueGenerator()
@@ -223,19 +249,7 @@ export class Model {
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
 
-    const newInstanceModel = this.NewModelInstance()
-
-    const result = Object.assign(newInstanceModel, this.object({queryId,DBconfig, TableSchema, some:['filter', arg]})) as any
-    taskHolder.finish(queryId)
-    return result
-  }
-
-
-  static NewModelInstance() {
-    class newInstanceModel {
-    }
-    Object.assign(newInstanceModel, this);
-    return newInstanceModel as any
+    return this.object({queryId, DBconfig, TableSchema, some:['filter', arg]})
   }
 
   static getDBSchema(): DatabaseSchema  {
@@ -295,8 +309,7 @@ export class Model {
   
   
       for(let i in arg) {
-        arg[i] = Object.assign({...emptyFields} , this.getFields(arg[i]))
-  
+        arg[i] = this.setDataToInstance(this.getFields(arg[i]), emptyFields);
         if(!this.formValidation(arg[i])) {
           throw('invalid '+ JSON.stringify(arg[i]))
         }
@@ -454,8 +467,7 @@ export class Model {
     return {
       filter: (...args) => {
         methods[queryId].push({methodName: 'filter', arguments: args})
-        const newInstanceModel = this.NewModelInstance()
-        return Object.assign(newInstanceModel, this.object({DBconfig, TableSchema,queryId}))
+        this.object({DBconfig, TableSchema,queryId})
       },
       execute: async (): Promise<any[]> => {
         return new Promise(async(resolve, reject) => {

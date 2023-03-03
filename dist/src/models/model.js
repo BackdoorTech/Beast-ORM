@@ -10,9 +10,7 @@ import { ReactiveList } from '../reactive/DynamicList.js';
 let methods = {} = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model {
-    constructor(obg) {
-        Object.assign(this, obg);
-    }
+    constructor() { }
     get(arg) {
         return Model.get(arg);
     }
@@ -35,15 +33,34 @@ export class Model {
         const idFieldName = TableSchema.id.keyPath;
         return this[idFieldName];
     }
+    setDataToInstance(obj, Fields = {}) {
+        const tableSchema = this.getTableSchema();
+        const fiendsName = tableSchema.fields.map((field) => field.name);
+        Fields = {};
+        for (let name of fiendsName) {
+            Fields[name] = obj[name];
+        }
+        if (obj[tableSchema.id.keyPath]) {
+            Fields[tableSchema.id.keyPath] = obj[tableSchema.id.keyPath];
+        }
+        return Fields;
+    }
+    static setDataToInstance(obj, Fields = {}) {
+        const tableSchema = this.getTableSchema();
+        const fiendsName = tableSchema.fields.map((field) => field.name);
+        Fields = {};
+        for (let name of fiendsName) {
+            Fields[name] = obj[name];
+        }
+        if (obj[tableSchema.id.keyPath]) {
+            Fields[tableSchema.id.keyPath] = obj[tableSchema.id.keyPath];
+        }
+        return Fields;
+    }
     async save() {
         const DBconfig = this.getDBSchema();
         const tableSchema = this.getTableSchema();
-        const fiendsName = tableSchema.fields.map((field) => field.name);
-        fiendsName.push(tableSchema.id.keyPath);
-        const Fields = {};
-        for (let name of fiendsName) {
-            Fields[name] = this[name];
-        }
+        const Fields = this.setDataToInstance(this);
         const methods = [{ methodName: 'save', arguments: Fields }];
         const queryId = uniqueGenerator();
         await ModelAPIRequest.obj(DBconfig, tableSchema).save(methods, queryId);
@@ -161,16 +178,7 @@ export class Model {
         const queryId = uniqueGenerator();
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
-        const newInstanceModel = this.NewModelInstance();
-        const result = Object.assign(newInstanceModel, this.object({ queryId, DBconfig, TableSchema, some: ['filter', arg] }));
-        taskHolder.finish(queryId);
-        return result;
-    }
-    static NewModelInstance() {
-        class newInstanceModel {
-        }
-        Object.assign(newInstanceModel, this);
-        return newInstanceModel;
+        return this.object({ queryId, DBconfig, TableSchema, some: ['filter', arg] });
     }
     static getDBSchema() {
         const modalName = this.getModelName();
@@ -209,7 +217,7 @@ export class Model {
             const TableSchema = this.getTableSchema();
             const ModelName = TableSchema.name;
             for (let i in arg) {
-                arg[i] = Object.assign(Object.assign({}, emptyFields), this.getFields(arg[i]));
+                arg[i] = this.setDataToInstance(this.getFields(arg[i]), emptyFields);
                 if (!this.formValidation(arg[i])) {
                     throw ('invalid ' + JSON.stringify(arg[i]));
                 }
@@ -325,8 +333,7 @@ Model.object = ({ queryId, DBconfig, TableSchema, some = null }) => {
     return {
         filter: (...args) => {
             methods[queryId].push({ methodName: 'filter', arguments: args });
-            const newInstanceModel = _a.NewModelInstance();
-            return Object.assign(newInstanceModel, _a.object({ DBconfig, TableSchema, queryId }));
+            _a.object({ DBconfig, TableSchema, queryId });
         },
         execute: async () => {
             return new Promise(async (resolve, reject) => {

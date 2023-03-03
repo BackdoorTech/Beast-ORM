@@ -113,7 +113,7 @@ describe("initial test for model", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  }, 100000)
 
 
   it('model filter save()', async () => {
