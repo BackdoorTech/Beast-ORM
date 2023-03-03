@@ -3,6 +3,7 @@ test/config/test.json
 .env
 plugin_packages
 test
-src
+src/
 node_modules
 .github
+.gitignore
