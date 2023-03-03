@@ -6,9 +6,7 @@ try {
         PostMessage = postMessage;
     }
     else {
-        PostMessage = (data) => {
-            taskHolder.onmessage(data);
-        };
+        PostMessage = taskHolder.onmessage;
     }
 }
 catch (error) {

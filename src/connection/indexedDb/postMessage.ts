@@ -10,9 +10,7 @@ try {
     if (!window || window?.document === undefined) {
         PostMessage = postMessage
     } else {
-        PostMessage = (data) => {
-            taskHolder.onmessage(data)
-        }
+        PostMessage = taskHolder.onmessage
     }
 } catch (error) {
     PostMessage = postMessage
