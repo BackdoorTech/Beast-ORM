@@ -13,6 +13,16 @@ export interface Field {
     customData?: Function
 }
 
+export interface value  {
+    fieldName: string,
+    fieldPath: string,
+    operation: any,
+    operationArg: any,
+    operator: Function,
+    fieldClassName: any,
+    customData?: Function
+}
+
 export class argsAttributes {
 
     value: Array<FieldsMap<string, Field>>  = []

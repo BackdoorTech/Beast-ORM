@@ -14,7 +14,10 @@ export class DBSwitch {
     }
     static async requestHandler(TableName, DatabaseName, dbType, action, arg, queryId) {
         return new Promise(async (resolve, reject) => {
-            const header = this.header({ TableName, DatabaseName, queryId, action, arg, dbType, callback: resolve });
+            const header = this.header({ TableName, DatabaseName, queryId, action, arg, dbType, callback: (data) => {
+                    resolve(data);
+                    taskHolder.finish(queryId);
+                } });
             if (typeof (Worker) !== "undefined" && WorkerManager.webWorkerModuleSupport) {
                 WorkerManager.register(header);
             }

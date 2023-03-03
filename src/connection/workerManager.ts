@@ -47,14 +47,9 @@ class _WorkerManager {
 	}
 
 	register(data: WsRegister) {
-		try { 
-			this.myWorker.postMessage(data.params);
-			taskHolder.register(data)
-			return data.queryId
-		} catch (error) {
-			return false
-		}
-		
+		this.myWorker.postMessage(data.params);
+		taskHolder.register(data)
+		return data.queryId
 	}
 
 	private async onmessage (data: any) {
