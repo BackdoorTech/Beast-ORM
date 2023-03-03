@@ -1,6 +1,6 @@
 import { TableSchema } from '../../models/register-modal.interface.js';
 import { FieldsMap } from '../../models/field/fields.interface.js';
-import { argsAttributes, Field } from './args-attributes.js';
+import { argsAttributes, Field, value } from './args-attributes.js';
 
 export class ObjectConditionOperator {
 
@@ -24,11 +24,11 @@ export class ObjectConditionOperator {
 
 	}
 
-	private execute(objOperator: FieldsMap<string, Field> ): boolean {
+	private execute(objOperator ): boolean {
 
 		for(let objOperatorFieldName in objOperator) {
 
-			const field = objOperator[objOperatorFieldName]
+			const field: value = objOperator[objOperatorFieldName]
 				
 			const fieldName = field.fieldName
 			const fieldPath = field.fieldPath

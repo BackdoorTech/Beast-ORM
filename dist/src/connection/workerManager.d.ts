@@ -11,7 +11,7 @@ declare class _WorkerManager {
     webWorkerModuleSupport: boolean;
     constructor();
     supportsWorkerType(): boolean;
-    register(data: WsRegister): string | false;
+    register(data: WsRegister): string;
     private onmessage;
 }
 export declare const WorkerManager: _WorkerManager;

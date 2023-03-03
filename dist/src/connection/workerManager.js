@@ -28,14 +28,9 @@ class _WorkerManager {
         }
     }
     register(data) {
-        try {
-            this.myWorker.postMessage(data.params);
-            taskHolder.register(data);
-            return data.queryId;
-        }
-        catch (error) {
-            return false;
-        }
+        this.myWorker.postMessage(data.params);
+        taskHolder.register(data);
+        return data.queryId;
     }
     async onmessage(data) {
         taskHolder.onmessage(data);

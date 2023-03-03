@@ -10,6 +10,15 @@ export interface Field {
     fieldClassName: FieldKeys;
     customData?: Function;
 }
+export interface value {
+    fieldName: string;
+    fieldPath: string;
+    operation: any;
+    operationArg: any;
+    operator: Function;
+    fieldClassName: any;
+    customData?: Function;
+}
 export declare class argsAttributes {
     private TableSchema;
     value: Array<FieldsMap<string, Field>>;
