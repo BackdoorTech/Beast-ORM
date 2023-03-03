@@ -1,5 +1,4 @@
 node_modules
-dist/src/tsconfig.tsbuildinfo
 test/config/test.json
 .env
 plugin_packages
@@ -7,4 +6,3 @@ test
 src
 node_modules
 .github
-./*.js
