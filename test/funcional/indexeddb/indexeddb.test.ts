@@ -1,5 +1,6 @@
 import * as _Fields from '../../../src/models/field/fields'
 import { models as  modelsType } from '../../../src/index'
+import { uniqueGenerator } from '../../../src/utils'
 
 import fs from 'fs'
 const { Port } = JSON.parse(fs.readFileSync('./test/config/test.json', 'utf8'));
@@ -23,7 +24,7 @@ describe("initial test for model", () => {
 			} 
 
 			models.register({
-				databaseName:'jest-test',
+				databaseName:'',
 				type: 'indexedDB',
 				version: 1,
 				models: [Person]
@@ -31,7 +32,6 @@ describe("initial test for model", () => {
 
 			const promise = indexedDB.databases()
 			promise.then(databases => {
-				// console.log(databases)
 				document.body.innerHTML = JSON.stringify(databases)
 			})
 

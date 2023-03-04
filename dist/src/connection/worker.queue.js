@@ -9,6 +9,9 @@ export class _IndexedDBWorkerQueue {
                 const data = oEvent.data;
                 this.onmessage(data);
             };
+            this.myWorker.onerror = (error) => {
+                console.log('myWorker', error);
+            };
         }
     }
     // https://stackoverflow.com/a/62963963/14115342
@@ -25,19 +28,30 @@ export class _IndexedDBWorkerQueue {
         }
     }
     register(data) {
-        this.myWorker.postMessage(data.params);
-        this.workerQueues[data.queryId] = data;
-        return data.queryId;
-    }
-    async onmessage(data) {
-        for (const [key, value] of Object.entries(this.workerQueues)) {
-            const dontRepeat = await value.func(data);
-            if (dontRepeat || !data.queryId) {
-                delete this.workerQueues[key];
-            }
+        try {
+            this.myWorker.postMessage(data.params);
+            this.workerQueues[data.queryId] = data;
+            return data.queryId;
+        }
+        catch (error) {
+            console.log(error);
+            return false;
         }
     }
-    requestHandler() {
+    async onmessage(data) {
+        const value = this.workerQueues[data.queryId];
+        value[data.run](data);
+    }
+    finish(queryId) {
+        try {
+            delete this.workerQueues[queryId];
+        }
+        catch (error) { }
+    }
+    updateFunction(queryId, run, func) {
+        this.workerQueues[queryId][run] = (message) => {
+            func(message.value);
+        };
     }
 }
 export const IndexedDBWorkerQueue = new _IndexedDBWorkerQueue();

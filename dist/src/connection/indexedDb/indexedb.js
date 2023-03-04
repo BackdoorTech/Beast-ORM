@@ -1,48 +1,41 @@
-import { IndexedDBConnection } from "./connector.js";
+import { IndexedDB } from "./connector.js";
 import { SqlObject } from "../../sql/sqlObject/sqlObject.js";
+import { Tables } from "./config.js";
+import { PostMessage as PostMessageWorker } from "./postMessage.js";
 // inspire by https://github.com/hc-oss/use-indexeddb
-class _indexedDB {
+class indexedDBInterface {
     constructor() {
-        this.getActions = (currentStore, config) => {
+        this.getActions = (TableName, DatabaseName, queryId) => {
             return {
                 getByID: (id) => {
                     return new Promise((resolve, reject) => {
-                        this.getConnection(config)
-                            .then(db => {
-                            this.validateBeforeTransaction(db, currentStore, reject);
-                            let tx = this.createTransaction(db, "readonly", currentStore, resolve, reject);
-                            let objectStore = tx.objectStore(currentStore);
-                            let request = objectStore.get(id);
-                            request.onsuccess = (e) => {
+                        IndexedDB.getOrCreateTransaction({ TableName, queryId, DatabaseName }, 'readonly', (transaction) => {
+                            let objectStore = transaction.objectStore(TableName);
+                            let request = objectStore.get({ id });
+                            request.onsuccess = async (e) => {
                                 resolve(e.target.result);
                             };
-                        })
-                            .catch(reject);
+                        });
                     });
                 },
                 getOneByIndex: (keyPath, value) => {
                     return new Promise((resolve, reject) => {
-                        this.getConnection(config)
-                            .then(db => {
-                            this.validateBeforeTransaction(db, currentStore, reject);
-                            let tx = this.createTransaction(db, "readonly", currentStore, resolve, reject);
-                            let objectStore = tx.objectStore(currentStore);
-                            let index = objectStore.index(keyPath);
-                            let request = index.get(value);
-                            request.onsuccess = (e) => {
+                        IndexedDB.getOrCreateTransaction({ TableName, queryId, DatabaseName }, 'readonly', (transaction) => {
+                            let objectStore = transaction.objectStore(TableName);
+                            let request = objectStore.index({ keyPath, value });
+                            request.onsuccess = async (e) => {
                                 resolve(e.target.result);
                             };
-                        })
-                            .catch(reject);
+                        });
                     });
                 },
                 getManyByIndex: (keyPath, value) => {
                     return new Promise((resolve, reject) => {
-                        this.getConnection(config)
+                        this.getConnection(DatabaseName)
                             .then(db => {
-                            this.validateBeforeTransaction(db, currentStore, reject);
-                            let tx = this.createTransaction(db, "readonly", currentStore, resolve, reject);
-                            let objectStore = tx.objectStore(currentStore);
+                            this.validateBeforeTransaction(db, TableName, reject);
+                            let tx = this.createTransaction(db, "readonly", TableName, resolve, reject);
+                            let objectStore = tx.objectStore(TableName);
                             let index = objectStore.index(keyPath);
                             let request = index.getAll(value);
                             request.onsuccess = (e) => {
@@ -54,100 +47,91 @@ class _indexedDB {
                 },
                 getAll: () => {
                     return new Promise((resolve, reject) => {
-                        this.getConnection(config).then(db => {
-                            this.validateBeforeTransaction(db, currentStore, reject);
-                            let tx = this.createTransaction(db, "readonly", currentStore, resolve, reject);
-                            let objectStore = tx.objectStore(currentStore);
+                        IndexedDB.getOrCreateTransaction({ TableName, queryId, DatabaseName }, 'readonly', (transaction) => {
+                            let objectStore = transaction.objectStore(TableName);
                             let request = objectStore.getAll();
-                            request.onsuccess = (e) => {
+                            request.onsuccess = async (e) => {
                                 resolve(e.target.result);
                             };
-                        })
-                            .catch(reject);
+                        });
                     });
                 },
-                add: (value, key) => {
+                add: ({ value, key, add, index }) => {
                     return new Promise((resolve, reject) => {
-                        this.getConnection(config).then(db => {
-                            this.validateBeforeTransaction(db, currentStore, reject);
-                            let tx = this.createTransaction(db, "readwrite", currentStore, resolve, reject);
-                            let objectStore = tx.objectStore(currentStore);
-                            let request = objectStore.add(value, key);
-                            request.onsuccess = (e) => {
-                                var _a, _b;
-                                (_b = (_a = tx) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
-                                resolve(e.target.result);
+                        IndexedDB.getOrCreateTransaction({ TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
+                            let objectStore = transaction.objectStore(TableName);
+                            let request = objectStore.add({ value });
+                            request.onsuccess = async (e) => {
+                                const id = e.target.result;
+                                add(id, index);
+                                resolve(true);
                             };
-                        })
-                            .catch(reject);
+                            request.onerror = (e) => {
+                                let data = {
+                                    error: e.target['error']
+                                };
+                                resolve(true);
+                            };
+                        });
                     });
                 },
-                update: (value, key) => {
+                update: ({ value, key = undefined }) => {
                     return new Promise((resolve, reject) => {
-                        this.getConnection(config).then(db => {
-                            this.validateBeforeTransaction(db, currentStore, reject);
-                            let tx = this.createTransaction(db, "readwrite", currentStore, resolve, reject);
-                            let objectStore = tx.objectStore(currentStore);
-                            console.log(value, key);
-                            let request = objectStore.put(value, key);
-                            request.onsuccess = (e) => {
-                                var _a, _b;
-                                (_b = (_a = tx) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
+                        IndexedDB.getOrCreateTransaction({ TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
+                            let objectStore = transaction.objectStore(TableName);
+                            let request = objectStore.put({ value, key });
+                            request.onsuccess = async (e) => {
                                 resolve(e.target.result);
                             };
-                        })
-                            .catch(reject);
+                            request.onerror = (e) => {
+                                let data = {
+                                    error: e.target['error']
+                                };
+                                resolve(data);
+                            };
+                        });
                     });
                 },
                 deleteByID: (id) => {
                     return new Promise((resolve, reject) => {
-                        this.getConnection(config).then(db => {
-                            this.validateBeforeTransaction(db, currentStore, reject);
-                            let tx = this.createTransaction(db, "readwrite", currentStore, resolve, reject);
-                            let objectStore = tx.objectStore(currentStore);
-                            let request = objectStore.delete(id);
-                            request.onsuccess = (e) => {
-                                var _a, _b;
-                                (_b = (_a = tx) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
-                                resolve(e);
+                        IndexedDB.getOrCreateTransaction({ TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
+                            let objectStore = transaction.objectStore(TableName);
+                            let request = objectStore.delete({ id });
+                            request.onsuccess = async (e) => {
+                                resolve(e.target.result);
                             };
-                        })
-                            .catch(reject);
+                            request.onerror = (e) => {
+                                let data = {
+                                    error: e.target['error']
+                                };
+                                resolve(data);
+                            };
+                        });
                     });
                 },
                 deleteAll: () => {
                     return new Promise((resolve, reject) => {
-                        this.getConnection(config)
-                            .then(db => {
-                            this.validateBeforeTransaction(db, currentStore, reject);
-                            let tx = this.createTransaction(db, "readwrite", currentStore, resolve, reject);
-                            let objectStore = tx.objectStore(currentStore);
-                            objectStore.clear();
-                            tx.oncomplete = (e) => {
-                                var _a, _b;
-                                try {
-                                    (_b = (_a = tx) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
-                                    resolve(e);
-                                }
-                                catch (error) {
-                                    resolve(e);
-                                }
+                        IndexedDB.getOrCreateTransaction({ TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
+                            let objectStore = transaction.objectStore(TableName);
+                            let request = objectStore.clear();
+                            request.onsuccess = async (e) => {
+                                resolve(e.target.result);
                             };
-                        })
-                            .catch(reject);
+                        });
                     });
                 },
                 openCursor: (cursorCallback, keyRange) => {
                     return new Promise((resolve, reject) => {
-                        this.getConnection(config)
+                        this.getConnection(DatabaseName)
                             .then(db => {
-                            this.validateBeforeTransaction(db, currentStore, reject);
-                            let tx = this.createTransaction(db, "readonly", currentStore, resolve, reject);
-                            let objectStore = tx.objectStore(currentStore);
+                            this.validateBeforeTransaction(db, TableName, reject);
+                            let tx = this.createTransaction(db, "readonly", TableName, resolve, reject);
+                            let objectStore = tx.objectStore(TableName);
                             let request = objectStore.openCursor(keyRange);
                             request.onsuccess = e => {
                                 cursorCallback(e);
                                 resolve();
+                                db.close();
                             };
                         })
                             .catch(reject);
@@ -155,14 +139,16 @@ class _indexedDB {
                 },
             };
         };
-        this.requestHandler = (TableSchema, config, queryId) => {
+        this.requestHandler = (TableName, DatabaseName, queryId, PostMessage = PostMessageWorker) => {
             return {
                 select: async (methods) => {
+                    const TableSchema = Tables[DatabaseName][TableName];
                     if (methods[0].methodName == 'all') {
-                        return {
+                        PostMessage({
+                            run: 'callback',
                             queryId: queryId,
-                            value: await this.getActions(TableSchema.name, config).getAll()
-                        };
+                            value: await this.getActions(TableName, DatabaseName, queryId).getAll()
+                        });
                     }
                     else if (methods[0].methodName == 'get') {
                         const args = methods[0].arguments;
@@ -170,43 +156,54 @@ class _indexedDB {
                             const key = Object.keys(args)[0];
                             const value = args[key];
                             if (TableSchema.id.keyPath == key) {
-                                return {
+                                PostMessage({
+                                    run: 'callback',
                                     queryId: queryId,
-                                    value: await this.getActions(TableSchema.name, config).getByID(value)
-                                };
+                                    value: await this.getActions(TableName, DatabaseName, queryId).getByID(value)
+                                });
                             }
                             else {
-                                return {
+                                PostMessage({
+                                    run: 'callback',
                                     queryId: queryId,
-                                    value: await this.getActions(TableSchema.name, config).getOneByIndex(key, value)
-                                };
+                                    value: await this.getActions(TableName, DatabaseName, queryId).getOneByIndex(key, value)
+                                });
                             }
+                        }
+                        else if (methods[0].arguments[TableSchema.id.keyPath]) {
+                            PostMessage({
+                                run: 'callback',
+                                queryId: queryId,
+                                value: await this.getActions(TableSchema.name, DatabaseName, queryId).getByID(args[TableSchema.id.keyPath])
+                            });
                         }
                     }
                     else if (methods[methods.length - 1].methodName == 'execute') {
-                        return new Promise(async (resolve, reject) => {
-                            const sqlObject = new SqlObject(TableSchema, methods);
-                            await this.getActions(TableSchema.name, config).openCursor(async (event) => {
-                                var cursor = event.target.result;
-                                if (cursor) {
-                                    const row = cursor.value;
-                                    await sqlObject.runFirstMethod(row);
-                                    cursor.continue();
-                                }
-                                else {
-                                    sqlObject.run();
-                                    resolve({
-                                        queryId: queryId,
-                                        value: sqlObject.firstMethod.rows
-                                    });
-                                }
-                            });
+                        const sqlObject = new SqlObject(TableSchema, methods);
+                        //await this.getActions(TableSchema.name, config, queryId).openCursor(async(event: any) => {
+                        //var cursor = event.target.result;
+                        //if(cursor) {
+                        const rows = await this.getActions(TableName, DatabaseName, queryId).getAll();
+                        for (const row of rows) {
+                            //const row = cursor.value
+                            await sqlObject.runFirstMethod(row);
+                            //cursor.continue();
+                        }
+                        //} else {
+                        sqlObject.doneRunFirstMethod();
+                        sqlObject.run();
+                        PostMessage({
+                            run: 'callback',
+                            queryId: queryId,
+                            value: sqlObject.firstMethod.rows
                         });
+                        //}
+                        //})
                     }
                     else if (methods[methods.length - 1].methodName == 'first') {
                         return new Promise(async (resolve, reject) => {
                             const sqlObject = new SqlObject(TableSchema, methods);
-                            await this.getActions(TableSchema.name, config).openCursor(async (event) => {
+                            await this.getActions(TableSchema.name, DatabaseName, queryId).openCursor(async (event) => {
                                 var cursor = event.target.result;
                                 if (cursor) {
                                     const row = cursor.value;
@@ -214,8 +211,10 @@ class _indexedDB {
                                     cursor.continue();
                                 }
                                 else {
+                                    sqlObject.doneRunFirstMethod();
                                     sqlObject.run();
-                                    resolve({
+                                    PostMessage({
+                                        run: 'callback',
                                         queryId: queryId,
                                         value: sqlObject.firstMethod.rows
                                     });
@@ -225,105 +224,154 @@ class _indexedDB {
                     }
                 },
                 update: async (methods) => {
+                    const TableSchema = Tables[DatabaseName][TableName];
                     if (methods[0].methodName == 'save') {
-                        console.log(methods);
                         const args = methods[0].arguments;
                         const idFieldName = TableSchema.id.keyPath;
                         const idValue = args[idFieldName];
                         if (idValue) {
-                            await this.getActions(TableSchema.name, config).update(args);
+                            this.getActions(TableSchema.name, DatabaseName, queryId).update({ value: args });
                         }
                         else {
-                            await this.getActions(TableSchema.name, config).update(args, idValue);
+                            this.getActions(TableSchema.name, DatabaseName, queryId).update({ value: args, key: idValue });
                         }
-                        return {
-                            queryId
-                        };
+                        IndexedDB.getOrCreateTransaction({ TableName: TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
+                            PostMessage({
+                                run: 'callback',
+                                queryId: queryId,
+                                value: true
+                            });
+                            transaction.done();
+                        });
                     }
                     else if (methods[0].methodName != 'update' && methods[methods.length - 1].methodName == 'update') {
-                        console.log('update');
                         const argsToUpdate = methods[methods.length - 1].arguments;
                         const customMethods = Object.create(methods);
                         customMethods[methods.length - 1].methodName = 'execute';
-                        const result = await this.requestHandler(TableSchema, config, queryId).select(customMethods);
-                        const rows = result.value;
-                        for (let row of rows) {
-                            const updateRow = Object.assign(row, argsToUpdate);
-                            await this.getActions(TableSchema.name, config).update(updateRow);
-                        }
-                        return {
-                            queryId
-                        };
+                        await this.requestHandler(TableSchema.name, DatabaseName, queryId, ({ value }) => {
+                            const rows = value;
+                            for (let row of rows) {
+                                const updateRow = Object.assign(row, argsToUpdate);
+                                this.getActions(TableSchema.name, DatabaseName, queryId).update({ value: updateRow });
+                            }
+                            IndexedDB.getOrCreateTransaction({ TableName: TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
+                                PostMessage({
+                                    run: 'callback',
+                                    queryId: queryId,
+                                    value: true
+                                });
+                                transaction.done();
+                            });
+                        }).select(customMethods);
                     }
                     else if (methods[0].methodName == 'update') {
-                        console.log('update000');
                         const argsToUpdate = methods[0].arguments;
                         const idFieldName = TableSchema.id.keyPath;
                         //await this.getActions(TableSchema.name, config).update(argsToUpdate)
                         const idValue = argsToUpdate[idFieldName];
-                        console.log(argsToUpdate, idFieldName);
                         if (idValue) {
-                            await this.getActions(TableSchema.name, config).update(argsToUpdate);
+                            this.getActions(TableSchema.name, DatabaseName, queryId).update({ value: argsToUpdate });
                         }
                         else {
-                            await this.getActions(TableSchema.name, config).update(argsToUpdate, idValue);
+                            this.getActions(TableSchema.name, DatabaseName, queryId).update({ value: argsToUpdate, key: idValue });
                         }
-                        return {
-                            queryId
-                        };
+                        IndexedDB.getOrCreateTransaction({ TableName: TableSchema.name, queryId, DatabaseName }, 'readwrite', (transaction) => {
+                            PostMessage({
+                                run: 'callback',
+                                queryId: queryId,
+                                value: true
+                            });
+                            transaction.done();
+                        });
                     }
                 },
                 delete: async (methods) => {
+                    const TableSchema = Tables[DatabaseName][TableName];
                     if (methods[methods.length - 1].methodName == 'delete' &&
                         methods[methods.length - 1].arguments == null) {
                         const customMethods = Object.create(methods);
                         customMethods[methods.length - 1].methodName = 'execute';
-                        const result = await this.requestHandler(TableSchema, config, queryId).select(customMethods);
-                        const rows = result.value;
-                        for (let row of rows) {
-                            const id = row[TableSchema.id.keyPath];
-                            await this.getActions(TableSchema.name, config).deleteByID(id);
-                        }
-                        return {
-                            queryId
-                        };
+                        await this.requestHandler(TableName, DatabaseName, queryId, ({ value }) => {
+                            const rows = value;
+                            for (let row of rows) {
+                                const id = row[TableSchema.id.keyPath];
+                                this.getActions(TableSchema.name, DatabaseName, queryId).deleteByID(id);
+                            }
+                            IndexedDB.getOrCreateTransaction({ TableName: TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
+                                PostMessage({
+                                    run: 'callback',
+                                    queryId: queryId,
+                                    value: rows.length
+                                });
+                                transaction.done();
+                            });
+                        }).select(customMethods);
                     }
                     else if (methods[methods.length - 1].methodName == 'delete' &&
                         typeof methods[methods.length - 1].arguments == 'object') {
                         const IdInObject = methods[methods.length - 1].arguments;
                         const idValue = IdInObject[TableSchema.id.keyPath];
-                        return {
+                        PostMessage({
+                            run: 'callback',
                             queryId: queryId,
-                            value: await this.getActions(TableSchema.name, config).deleteByID(idValue)
-                        };
+                            value: await this.getActions(TableName, DatabaseName, queryId).deleteByID(idValue)
+                        });
                     }
                     else if (methods[methods.length - 1].methodName == 'delete' &&
                         methods[methods.length - 1].arguments == '*') {
-                        return {
+                        PostMessage({
+                            run: 'callback',
                             queryId: queryId,
-                            value: await this.getActions(TableSchema.name, config).deleteAll()
-                        };
+                            value: await this.getActions(TableName, DatabaseName, queryId).deleteAll()
+                        });
                     }
                 },
                 insert: async (methods) => {
-                    const createdObjKeys = [];
                     const rows = methods[0].arguments;
-                    for (let insert of rows) {
-                        const id = await this.getActions(TableSchema.name, config).add(insert);
-                        createdObjKeys.push(id);
-                    }
-                    // return first element
-                    if (rows.length == 1) {
-                        return {
+                    const add = (id, index) => {
+                        PostMessage({
+                            run: 'callback',
                             queryId: queryId,
-                            value: await this.getActions(TableSchema.name, config).getByID(createdObjKeys[0])
-                        };
+                            value: { id, index }
+                        });
+                    };
+                    for (let i = 0; i < rows.length; i++) {
+                        const insert = rows[i];
+                        this.getActions(TableName, DatabaseName, queryId).add({ value: insert, key: null, index: i, add });
                     }
-                    else {
-                        return {
+                    IndexedDB.getOrCreateTransaction({ TableName: TableName, queryId, DatabaseName }, 'readwrite', (transaction) => {
+                        PostMessage({
+                            run: 'done',
                             queryId: queryId,
-                            value: createdObjKeys
-                        };
+                            value: true
+                        });
+                        transaction.done();
+                    });
+                },
+                migrate: async ({ DatabaseSchema, TableSchema }) => {
+                    await IndexedDB.migrate(DatabaseSchema);
+                    await IndexedDB.run(DatabaseSchema);
+                    PostMessage({
+                        run: 'callback',
+                        queryId: queryId,
+                        value: true
+                    });
+                },
+                trigger: async ({ type, subscribe }) => {
+                    if (type == 'transactionOnCommit') {
+                        if (subscribe) {
+                            PostMessage(IndexedDB.transactionOnCommitSubscribe(TableName, DatabaseName, queryId));
+                        }
+                        else {
+                            PostMessage(IndexedDB.transactionOnCommitUnSubscribe(TableName, DatabaseName, queryId));
+                        }
+                    }
+                    else if (type == 'trigger') {
+                        PostMessage({
+                            run: 'callback',
+                            queryId: queryId,
+                            value: true
+                        });
                     }
                 }
             };
@@ -340,18 +388,18 @@ class _indexedDB {
             reject(`Store ${storeName} not found`);
         }
     }
-    createTransaction(db, dbMode, currentStore, resolve, reject, abort) {
-        let tx = db.transaction(currentStore, dbMode);
+    createTransaction(db, dbMode, TableName, resolve, reject, abort) {
+        let tx = db.transaction(TableName, dbMode);
         tx.onerror = reject;
         tx.oncomplete = resolve;
         tx.onabort = abort;
         return tx;
     }
     migrate(config) {
-        return new IndexedDBConnection().migrate(config);
+        return IndexedDB.migrate(config);
     }
-    getConnection(config) {
-        return new IndexedDBConnection().connect(config);
+    getConnection(DatabaseName) {
+        return IndexedDB.connect(DatabaseName);
     }
 }
-export const indexedDB = new _indexedDB();
+export const indexedDB = new indexedDBInterface();

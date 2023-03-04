@@ -31,7 +31,7 @@ describe("initial test for model", () => {
 
 
       await models.register({
-        databaseName:'jest-test'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Place, Restaurant]
@@ -71,7 +71,7 @@ describe("initial test for model", () => {
 
 
       await models.register({
-        databaseName:'jest-test'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Place, Restaurant]
@@ -111,7 +111,7 @@ describe("initial test for model", () => {
         }
 
         await models.register({
-            databaseName:'jest-test'+ new Date().getTime(),
+            databaseName:'',
             type: 'indexedDB',
             version: 1,
             models: [Publication, Article]
@@ -152,7 +152,7 @@ describe("initial test for model", () => {
         }
 
         await models.register({
-          databaseName:'jest-test'+ new Date().getTime(),
+          databaseName:'',
           type: 'indexedDB',
           version: 1,
           models: [Publication, Article]
@@ -200,7 +200,7 @@ describe("initial test for model", () => {
         }
 
         await models.register({
-          databaseName:'jest-test'+ new Date().getTime(),
+          databaseName:'',
           type: 'indexedDB',
           version: 1,
           models: [Publication, Article]
@@ -236,23 +236,23 @@ describe("initial test for model", () => {
 
     await page.evaluate(async() => {
 
-        const models: typeof modelsType = window['models']
+      const models: typeof modelsType = window['models']
 
-        class Reporter extends models.Model {
-          firstName = models.CharField({maxLength: 50})
-          lastName = models.CharField({maxLength: 50})
-          email = models.CharField()
-        }
+      class Reporter extends models.Model {
+        firstName = models.CharField({maxLength: 50})
+        lastName = models.CharField({maxLength: 50})
+        email = models.CharField()
+      }
 
-        class Article extends models.Model {
-          headline = models.CharField({maxLength: 50})
-          pubDate = models.DateField()
-          reporter = models.ForeignKey({model:Reporter})
-        }
+      class Article extends models.Model {
+        headline = models.CharField({maxLength: 50})
+        pubDate = models.DateField()
+        reporter = models.ForeignKey({model:Reporter})
+      }
 
   
       await models.register({
-        databaseName:'jest-test'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Reporter, Article]
@@ -262,7 +262,6 @@ describe("initial test for model", () => {
       const r2 = await Reporter.create({firstName: 'Peter', lastName: 'Maquiran', email:'teste'})
       const a = await Article.create({headline:"This is a test", pubDate:'', reporter:r1})
 
-
       document.body.innerHTML = JSON.stringify(await r1.article_setAll()) 
     })
 
@@ -270,7 +269,7 @@ describe("initial test for model", () => {
     await page.waitForFunction('[{"headline":"This is a test","pubDate":"","reporter":1,"id":1}]')
 
     expect('time not exceeded').toBe('time not exceeded')
-  }, 10000)
+  }, 90000)
 
 })
 

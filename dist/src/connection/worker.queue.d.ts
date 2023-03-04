@@ -1,9 +1,10 @@
 interface WsRegister {
     type?: 'response' | 'Register';
-    func: Function;
-    queryId?: string;
+    queryId: string;
     params: any;
     method: 'execute' | 'migrate';
+    callback: Function;
+    done?: Function;
 }
 export declare class _IndexedDBWorkerQueue {
     private myWorker;
@@ -11,9 +12,10 @@ export declare class _IndexedDBWorkerQueue {
     constructor();
     supportsWorkerType(): boolean;
     private workerQueues;
-    register(data: WsRegister): string;
+    register(data: WsRegister): string | false;
     onmessage(data: any): Promise<void>;
-    requestHandler(): void;
+    finish(queryId: any): void;
+    updateFunction(queryId: any, run: any, func: Function): void;
 }
 export declare const IndexedDBWorkerQueue: _IndexedDBWorkerQueue;
 export {};

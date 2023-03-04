@@ -1,17 +1,29 @@
 import { Model } from './model.js';
-import { ModelReader } from './model.reader.js';
-import { indexedDB } from './../connection/indexedDb/indexedb.js';
+import { LocalStorageModelReader, ModelReader } from './model.reader.js';
 import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js';
-import { uncapitalize } from '../utils.js';
+import { uncapitalize, uniqueGenerator } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js';
+import { ModelAPIRequest } from './model-manager.js';
+import { transactionOnCommit } from '../triggers/transaction.js';
+import { IndexedDB } from '../connection/indexedDb/connector.js';
 export const models = {};
 export const modelsConfig = {};
+export const modelsLocalStorage = {};
+export const modelsConfigLocalStorage = {};
+export function migrate(register) {
+    if (register.type == 'indexedDB') {
+        registerModel.register(register);
+    }
+    else if (register.type == 'localStorage') {
+        registerLocalStorage.register(register);
+    }
+}
 export class registerModel {
     static async register(entries) {
         var _a, _b, _c;
         const databaseSchema = {
-            databaseName: entries.databaseName,
+            databaseName: entries.databaseName || uniqueGenerator(),
             version: entries.version,
             type: entries.type,
             stores: []
@@ -38,6 +50,10 @@ export class registerModel {
             for (const [fieldName, Field] of Object.entries(fields)) {
                 // dont register fields that is primary key and auto increment
                 if (!((Field === null || Field === void 0 ? void 0 : Field.primaryKey) && (Field === null || Field === void 0 ? void 0 : Field.autoIncrement)) && !((_c = fieldTypes['ManyToManyField']) === null || _c === void 0 ? void 0 : _c.includes(fieldName))) {
+                    const removeReferenceField = Object.assign({}, Field);
+                    if (removeReferenceField === null || removeReferenceField === void 0 ? void 0 : removeReferenceField.model) {
+                        removeReferenceField.model = removeReferenceField.model.getModelName();
+                    }
                     databaseSchema.stores[index].fields.push({
                         name: fieldName,
                         keyPath: fieldName,
@@ -46,7 +62,7 @@ export class registerModel {
                             type: Field.type
                         },
                         className: Field === null || Field === void 0 ? void 0 : Field.fieldName,
-                        fieldAttributes: Object.assign({}, Field)
+                        fieldAttributes: Object.assign({}, removeReferenceField)
                     });
                 }
                 if (Field instanceof OneToOneField) {
@@ -61,19 +77,24 @@ export class registerModel {
             }
             index++;
         }
+        let tableSchema_;
         for (const modelClassRepresentations of entries.models) {
             const ModelName = modelClassRepresentations.getModelName();
             models[ModelName] = modelClassRepresentations;
             const tableSchema = databaseSchema.stores.find((e) => e.name == ModelName);
+            tableSchema_ = tableSchema;
             modelsConfig[ModelName] = {
                 DatabaseSchema: databaseSchema,
                 TableSchema: tableSchema
             };
+            ModelMigrations.prepare(databaseSchema.databaseName);
+            transactionOnCommit.prepare(modelClassRepresentations);
         }
         if (databaseSchema.type == 'indexedDB') {
-            await indexedDB.migrate(databaseSchema);
+            await IndexedDB.run(databaseSchema);
+            await ModelAPIRequest.obj(databaseSchema, tableSchema_).migrate();
+            ModelMigrations.migrationsState(databaseSchema.databaseName, true);
         }
-        ModelMigrations.migrationsState(true);
     }
     static manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema) {
         const foreignKeyFieldModel = foreignKeyField.model;
@@ -120,6 +141,74 @@ export class registerModel {
             ModelName: tableName,
             TableSchema: databaseSchema.stores[id]
         });
+    }
+}
+async function cachedValue(Model) {
+    const emptyFields = Model.getEmptyFields();
+    Model.getEmptyFields = function () {
+        return emptyFields;
+    };
+    const getModelName = Model.getModelName();
+    Model.getModelName = function () {
+        return getModelName;
+    };
+}
+export class registerLocalStorage {
+    static async register(entries) {
+        const databaseSchema = {
+            databaseName: entries.databaseName,
+            version: entries.version,
+            type: 'localStorage',
+            stores: []
+        };
+        for (const modelClassRepresentations of entries.models) {
+            const ModelName = modelClassRepresentations.getModelName();
+            modelsLocalStorage[ModelName] = modelClassRepresentations;
+        }
+        let index = 0;
+        for (const modelClassRepresentations of entries.models) {
+            const { fields, modelName, attributes, fieldTypes } = LocalStorageModelReader.read(modelClassRepresentations);
+            // const idFieldName = attributes?.primaryKey?.shift()
+            databaseSchema.stores.push({
+                name: modelName,
+                id: {
+                    keyPath: modelName,
+                    type: FieldType.VARCHAR,
+                    autoIncrement: false
+                },
+                attributes: attributes,
+                fields: [],
+                fieldTypes
+            });
+            for (const [fieldName, Field] of Object.entries(fields)) {
+                databaseSchema.stores[index].fields.push({
+                    name: fieldName,
+                    keyPath: fieldName,
+                    options: {
+                        unique: false,
+                        type: null
+                    },
+                    className: Field === null || Field === void 0 ? void 0 : Field.fieldName,
+                    fieldAttributes: Object.assign({}, Field)
+                });
+            }
+            index++;
+        }
+        for (const modelClassRepresentations of entries.models) {
+            const ModelName = modelClassRepresentations.getModelName();
+            const tableSchema = databaseSchema.stores.find((e) => e.name == ModelName);
+            modelClassRepresentations.getDBSchema = () => {
+                return databaseSchema;
+            };
+            modelClassRepresentations.getTableSchema = () => {
+                return tableSchema;
+            };
+            modelsConfigLocalStorage[ModelName] = {
+                DatabaseSchema: databaseSchema,
+                TableSchema: tableSchema
+            };
+            modelsLocalStorage[ModelName] = modelClassRepresentations;
+        }
     }
 }
 export class ModelEditor {
@@ -191,8 +280,6 @@ export class ModelEditor {
                     let params = {};
                     params[`iD${_model.getModelName()}`] = _model.getPrimaryKeyValue();
                     const middleTableResult = await middleTable['filter'](params).execute();
-                    console.log(middleTableResult);
-                    console.log(foreignKeyField, FieldName, modelName, databaseSchema);
                     foreignKeyField.model;
                     return middleTableResult;
                 }
@@ -205,7 +292,6 @@ export class ModelEditor {
             params[`iD${_model.getModelName()}`] = _model.getPrimaryKeyValue();
             const middleTableResult = await middleTable['filter'](params).execute();
             let ids;
-            console.log('middleTableResult', middleTableResult, await middleTable['all']());
             if (middleTableResult) {
                 const TableSchema = foreignKeyField.model.getTableSchema();
                 ids = middleTableResult.map((e) => {
@@ -231,10 +317,8 @@ export class ModelEditor {
             params[`iD${_model.getModelName()}`] = _model.getPrimaryKeyValue();
             const middleTableResult = await middleTable['filter'](params).execute();
             let ids;
-            console.log(middleTableResult);
             if (middleTableResult) {
                 const TableSchema = currentModel.getTableSchema();
-                console.log();
                 ids = middleTableResult.map((e) => {
                     return e[`iD${modelName}`];
                 });

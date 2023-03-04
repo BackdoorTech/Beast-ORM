@@ -1,14 +1,16 @@
-var _a, _b;
+var _a;
 import { hashCode, uniqueGenerator } from '../utils.js';
-import { ModelManager } from './model-manager.js';
-import { models, modelsConfig } from './register-model.js';
+import { ModelAPIRequest } from './model-manager.js';
+import { models, modelsConfig, modelsConfigLocalStorage } from './register-model.js';
 import { FieldType } from '../sql/query/interface.js';
 import * as Fields from './field/allFields.js';
+import { taskHolder } from '../connection/taskHolder.js';
+import { transactionOnCommit } from '../triggers/transaction.js';
+import { ReactiveList } from '../reactive/DynamicList.js';
 let methods = {} = {};
 // inspire by https://github.com/brianschardt/browser-orm
-export class Model extends (_b = ModelManager) {
+export class Model {
     constructor(obg) {
-        super();
         Object.assign(this, obg);
     }
     get(arg) {
@@ -44,7 +46,8 @@ export class Model extends (_b = ModelManager) {
         }
         const methods = [{ methodName: 'save', arguments: Fields }];
         const queryId = uniqueGenerator();
-        await Model.obj(DBconfig, tableSchema).save(methods, queryId);
+        await ModelAPIRequest.obj(DBconfig, tableSchema).save(methods, queryId);
+        taskHolder.finish(queryId);
     }
     async delete() {
         const DBconfig = this.getDBSchema();
@@ -54,7 +57,8 @@ export class Model extends (_b = ModelManager) {
         createArg[idFieldName] = this[idFieldName];
         const _methods = [{ methodName: 'delete', arguments: createArg }];
         const queryId = uniqueGenerator();
-        await Model.obj(DBconfig, TableSchema).delete(_methods, queryId);
+        await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId);
+        taskHolder.finish(queryId);
     }
     static async deleteAll() {
         const DBconfig = this.getDBSchema();
@@ -64,12 +68,16 @@ export class Model extends (_b = ModelManager) {
         createArg[idFieldName] = this[idFieldName];
         const _methods = [{ methodName: 'delete', arguments: '*' }];
         const queryId = uniqueGenerator();
-        await Model.obj(DBconfig, TableSchema).delete(_methods, queryId);
+        await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId);
+        taskHolder.finish(queryId);
     }
     async all() {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
-        return await Model.object({ DBconfig, TableSchema }).all();
+        const queryId = uniqueGenerator();
+        const result = await Model.object({ queryId, DBconfig, TableSchema }).all();
+        taskHolder.finish(queryId);
+        return result;
     }
     getFields(arg) {
         return Model.getFields(arg);
@@ -95,10 +103,10 @@ export class Model extends (_b = ModelManager) {
         return true;
     }
     static async getModelsFields(arg) {
-        var _c;
+        var _b;
         const newArgs = {};
         const TableSchema = this.getTableSchema();
-        if ((_c = TableSchema.id) === null || _c === void 0 ? void 0 : _c.autoIncrement) {
+        if ((_b = TableSchema.id) === null || _b === void 0 ? void 0 : _b.autoIncrement) {
             TableSchema.fields.push({
                 keyPath: TableSchema.id.keyPath,
                 name: TableSchema.id.keyPath,
@@ -115,27 +123,33 @@ export class Model extends (_b = ModelManager) {
     static async all() {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
-        return await Model.object({ DBconfig, TableSchema }).all();
+        const queryId = uniqueGenerator();
+        const result = await Model.object({ queryId, DBconfig, TableSchema }).all();
+        taskHolder.finish(queryId);
+        return result;
     }
     static async get(arg) {
         const _methods = [{ methodName: 'get', arguments: arg }];
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
         const queryId = uniqueGenerator();
-        const foundObj = await super.obj(DBconfig, TableSchema).get(_methods, queryId);
+        const foundObj = await ModelAPIRequest.obj(DBconfig, TableSchema).get(_methods, queryId);
+        taskHolder.finish(queryId);
         if (!foundObj) {
             return false;
         }
         const ModelName = this.getModelName();
-        let newInstance = new models[ModelName]();
-        Object.assign(newInstance, Object.assign({}, foundObj));
-        if (TableSchema.fieldTypes['ManyToManyField']) {
-            for (const fieldName of TableSchema.fieldTypes['ManyToManyField']) {
-                delete newInstance[fieldName];
-            }
-        }
-        delete newInstance.obj;
+        let newInstance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: foundObj });
         return newInstance;
+    }
+    static async getOrCreate(arg) {
+        const object = await this.get(arg);
+        if (!object) {
+            return await this.create(arg);
+        }
+        else {
+            return object;
+        }
     }
     static getId() {
         return hashCode(this.toString());
@@ -148,7 +162,9 @@ export class Model extends (_b = ModelManager) {
         const DBconfig = this.getDBSchema();
         const TableSchema = this.getTableSchema();
         const newInstanceModel = this.NewModelInstance();
-        return Object.assign(newInstanceModel, this.object({ queryId, DBconfig, TableSchema, some: ['filter', arg] }));
+        const result = Object.assign(newInstanceModel, this.object({ queryId, DBconfig, TableSchema, some: ['filter', arg] }));
+        taskHolder.finish(queryId);
+        return result;
     }
     static NewModelInstance() {
         class newInstanceModel {
@@ -185,44 +201,70 @@ export class Model extends (_b = ModelManager) {
         return filteredArgs;
     }
     static async create(arg) {
-        if (arg.constructor.name != 'Array') {
-            arg = [arg];
-        }
-        const emptyFields = await this.getEmptyFields();
-        const TableSchema = this.getTableSchema();
-        for (let i in arg) {
-            arg[i] = Object.assign(Object.assign({}, emptyFields), this.getFields(arg[i]));
-            if (!this.formValidation(arg[i])) {
-                throw ('invalid ' + JSON.stringify(arg[i]));
+        return new Promise(async (resolve, reject) => {
+            if (arg.constructor.name != 'Array') {
+                arg = [arg];
             }
-        }
-        for (let i in arg) {
-            if (TableSchema.attributes.foreignKey) {
-                for (let field of TableSchema.attributes.foreignKey) {
-                    try {
-                        arg[i][field] = arg[i][field].getPrimaryKeyValue();
-                    }
-                    catch (error) { }
+            const emptyFields = await this.getEmptyFields();
+            const TableSchema = this.getTableSchema();
+            const ModelName = TableSchema.name;
+            for (let i in arg) {
+                arg[i] = Object.assign(Object.assign({}, emptyFields), this.getFields(arg[i]));
+                if (!this.formValidation(arg[i])) {
+                    throw ('invalid ' + JSON.stringify(arg[i]));
                 }
             }
-        }
-        const _methods = [{ methodName: 'create', arguments: arg }];
-        const DBconfig = this.getDBSchema();
-        const queryId = uniqueGenerator();
-        const createObject = await super.obj(DBconfig, TableSchema).create(_methods, queryId);
-        if (createObject) {
-            const ModelName = this.getModelName();
-            let newInstance = new models[ModelName]();
-            Object.assign(newInstance, createObject);
-            delete newInstance.obj;
-            return newInstance;
-        }
-        else {
-        }
+            for (let i in arg) {
+                if (TableSchema.attributes.foreignKey) {
+                    for (let field of TableSchema.attributes.foreignKey) {
+                        try {
+                            arg[i][field] = arg[i][field].getPrimaryKeyValue();
+                        }
+                        catch (error) { }
+                    }
+                }
+            }
+            const _methods = [{ methodName: 'create', arguments: arg }];
+            const DBconfig = this.getDBSchema();
+            const queryId = uniqueGenerator();
+            const result = [];
+            await ModelAPIRequest.obj(DBconfig, TableSchema).create(_methods, queryId, ({ id, index }) => {
+                const insert = arg[index];
+                insert[TableSchema.id.keyPath] = id;
+                const instance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: insert });
+                result.push(instance);
+            });
+            taskHolder.updateFunction(queryId, "done", () => {
+                if (arg.length == 1) {
+                    resolve(result[0]);
+                }
+                else {
+                    resolve(result);
+                }
+                taskHolder.finish(queryId);
+            });
+        });
     }
     static newInstance({ TableSchema, DBconfig, ModelName, dataToMerge }) {
         let newInstance = new models[ModelName]();
-        Object.assign(newInstance, Object.assign({}, dataToMerge));
+        delete newInstance[TableSchema.id.keyPath];
+        if (TableSchema.fieldTypes.ManyToManyField) {
+            for (let field of TableSchema.fieldTypes.ManyToManyField) {
+                newInstance[field] = null;
+            }
+        }
+        if (TableSchema.fieldTypes.OneToOneField) {
+            for (let field of TableSchema.fieldTypes.ManyToManyField) {
+                newInstance[field] = null;
+            }
+        }
+        Object.assign(newInstance, dataToMerge);
+        if (newInstance[TableSchema.id.keyPath]) {
+            Object.defineProperty(newInstance, TableSchema.id.keyPath, {
+                configurable: false,
+                writable: false
+            });
+        }
         delete newInstance.obj;
         return newInstance;
     }
@@ -258,11 +300,20 @@ export class Model extends (_b = ModelManager) {
         const TableSchema = this.getTableSchema();
         const _methods = [{ methodName: 'update', arguments: arg }];
         const queryId = uniqueGenerator();
-        return await super.obj(DBconfig, TableSchema).update(_methods, queryId);
+        const result = await ModelAPIRequest.obj(DBconfig, TableSchema).update(_methods, queryId);
+        taskHolder.finish(queryId);
+        return result;
+    }
+    static transactionOnCommit(callback) {
+        return transactionOnCommit.subscribe(this, callback);
+    }
+    static ReactiveList(callback) {
+        return ReactiveList.subscribe(this, callback);
     }
 }
 _a = Model;
-Model.object = ({ queryId = uniqueGenerator(), DBconfig, TableSchema, some = null }) => {
+Model.object = ({ queryId, DBconfig, TableSchema, some = null }) => {
+    const ModelName = TableSchema.name;
     if (!methods[queryId]) {
         methods[queryId] = [];
     }
@@ -278,28 +329,119 @@ Model.object = ({ queryId = uniqueGenerator(), DBconfig, TableSchema, some = nul
             return Object.assign(newInstanceModel, _a.object({ DBconfig, TableSchema, queryId }));
         },
         execute: async () => {
-            methods[queryId].push({ methodName: 'execute', arguments: null });
-            const _methods = methods[queryId];
-            methods[queryId] = [];
-            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).execute(_methods, queryId);
+            return new Promise(async (resolve, reject) => {
+                methods[queryId].push({ methodName: 'execute', arguments: null });
+                const _methods = methods[queryId];
+                methods[queryId] = [];
+                const result = await ModelAPIRequest.obj(DBconfig, TableSchema).execute(_methods, queryId);
+                resolve(result);
+                for (let i of result) {
+                    result[i] = _a.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[i] });
+                }
+            });
         },
         update: async (args) => {
             methods[queryId].push({ methodName: 'update', arguments: args });
             const _methods = methods[queryId];
             methods[queryId] = [];
-            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).update(_methods, queryId);
+            return await ModelAPIRequest.obj(DBconfig, TableSchema).update(_methods, queryId);
         },
         delete: async () => {
             methods[queryId].push({ methodName: 'delete', arguments: null });
             const _methods = methods[queryId];
             methods[queryId] = [];
-            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).delete(_methods, queryId);
+            return await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId);
         },
         all: async () => {
-            methods[queryId].push({ methodName: 'all', arguments: null });
-            const _methods = methods[queryId];
-            methods[queryId] = [];
-            return await Reflect.get(_b, "obj", _a).call(_a, DBconfig, TableSchema).all(_methods, queryId);
+            return new Promise(async (resolve, reject) => {
+                methods[queryId].push({ methodName: 'all', arguments: null });
+                const _methods = methods[queryId];
+                methods[queryId] = [];
+                const result = await ModelAPIRequest.obj(DBconfig, TableSchema).all(_methods, queryId);
+                resolve(result);
+                for (let i of result) {
+                    result[i] = _a.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[i] });
+                }
+            });
         }
     };
 };
+export class LocalStorage {
+    constructor() { }
+    static save(data = {}) {
+        const dataToSave = this.getFields(Object.assign(this, Object.assign({}, data)));
+        const key = this.getTableSchema().id;
+        localStorage.setItem(key.keyPath, JSON.stringify(dataToSave));
+    }
+    static get() {
+        const key = this.getTableSchema().id;
+        const restedData = JSON.parse(localStorage.getItem(key.keyPath));
+        Object.assign(this, Object.assign({}, restedData));
+        return restedData;
+    }
+    static getModelName() {
+        return this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
+    }
+    static getDBSchema() {
+        const modalName = this.getModelName();
+        return modelsConfigLocalStorage[modalName].DatabaseSchema;
+    }
+    static getTableSchema() {
+        const modalName = this.getModelName();
+        return modelsConfigLocalStorage[modalName].TableSchema;
+    }
+    static getIgnoreAttributes() {
+        return false;
+    }
+    static ignoreAttributes(attributesStartWidth = []) {
+        if (!this.getIgnoreAttributes()) {
+            this.getIgnoreAttributes = () => {
+                return attributesStartWidth;
+            };
+        }
+    }
+    static getFields(arg) {
+        const TableSchema = this.getTableSchema();
+        const filteredArgs = {};
+        const fieldsName = TableSchema.fields.map((field) => field.name);
+        const Attributes = this.getIgnoreAttributes();
+        const fieldNameFilter = fieldsName.filter((fieldName) => {
+            if (Attributes) {
+                for (let Attribute of Attributes) {
+                    if (fieldName.startsWith(Attribute)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        });
+        for (let fieldName of fieldNameFilter) {
+            if (arg.hasOwnProperty(fieldName)) {
+                filteredArgs[fieldName] = arg[fieldName];
+            }
+        }
+        return filteredArgs;
+    }
+    static formValidation(data) {
+        const TableSchema = this.getTableSchema();
+        for (let field of TableSchema.fields) {
+            const Field = new Fields[field.className](field.fieldAttributes);
+            const FieldValue = data[field.name];
+            if (!Field.valid(FieldValue)) {
+                throw ('invalid insert into ' + TableSchema.name + ', invalid value for field ' + field.name + ' = ' + JSON.stringify(FieldValue));
+            }
+        }
+        return true;
+    }
+    static clear() {
+        this.clearComponent();
+        this.clearStorage();
+    }
+    static clearComponent() {
+        const key = this.getTableSchema().id;
+    }
+    static clearStorage() {
+        const key = this.getTableSchema().id;
+        localStorage.removeItem(key.keyPath);
+    }
+}

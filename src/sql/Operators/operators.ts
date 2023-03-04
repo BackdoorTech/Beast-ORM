@@ -1,9 +1,8 @@
 
-import { TableSchema } from '../../models/register-modal.interface.js';
 import { getDeep } from '../../utils.js'
 
 export class gt {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 		let _rowFieldValue
 
 		try {
@@ -20,7 +19,7 @@ export class gt {
 }
 
 export class iexact {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 		let _rowFieldValue
 
 		try {
@@ -36,7 +35,7 @@ export class iexact {
 	}
 }
 export class gte {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 		let _rowFieldValue
 
 		try {
@@ -54,7 +53,7 @@ export class gte {
 
 
 export class lt {
-	static validate({fieldName, arg,  row, fieldPath}):boolean{
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean{
 
 		let _rowFieldValue
 
@@ -113,7 +112,7 @@ export class not {
 }
 
 export class eq {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 		let _rowFieldValue
 
 		try {
@@ -130,7 +129,7 @@ export class eq {
 }
 
 export class contains {
-	static validate({fieldName, arg,  row, fieldPath}) {
+	static validate({fieldName, arg,  row, fieldPath, customData}) {
 
 		let _rowFieldValue
 
@@ -149,11 +148,36 @@ export class contains {
 }
 
 
-/**
- * @returns true when the given dict of key-value pairs are all contained in the field
- */
+
+export class info {
+	static run({row, fieldPath}): {value, present} {
+		let _rowFieldValue
+		try {
+			_rowFieldValue = getDeep(row, fieldPath)
+			if (_rowFieldValue === undefined) {
+				return {
+					present: false,
+					value: undefined
+				} 
+			}
+		} catch (error) {
+			return {
+				present: false,
+				value: undefined
+			}
+		}
+
+		return {
+			present: true,
+			value: undefined
+		} 
+	}
+}
+
+
 export class containsOBj {
-	static validate({fieldName, arg,  row, fieldPath}) {
+
+	static validate({fieldName, arg,  row, fieldPath, customData}) {
 
 		let _rowFieldValue
 
@@ -180,7 +204,7 @@ export class containsOBj {
 
 
 export class containedBy {
-	static validate({fieldName, arg,  row, fieldPath}) {
+	static validate({fieldName, arg,  row, fieldPath, customData}) {
 
 		let _rowFieldValue
 
@@ -207,7 +231,7 @@ export class containedBy {
 
 
 export class overlap {
-	static validate({fieldName, arg,  row, fieldPath}) {
+	static validate({fieldName, arg,  row, fieldPath, customData}) {
 		let _rowFieldValue
 
 		try {
@@ -225,7 +249,7 @@ export class overlap {
 
 
 export class len {
-	static validate({fieldName, arg, rowFieldValue = [], row, fieldPath}) {
+	static validate({fieldName, arg, rowFieldValue = [], row, fieldPath, customData}) {
 
 		let _rowFieldValue
 
@@ -243,7 +267,7 @@ export class len {
 }
 
 export class hasKey {
-	static validate({fieldName, arg, rowFieldValue = [], row, fieldPath}) {
+	static validate({fieldName, arg, rowFieldValue = [], row, fieldPath, customData}) {
 
 		let _rowFieldValue
 
@@ -269,7 +293,7 @@ export class hasKey {
 }
 
 export class hasAnyKeys {
-	static validate({fieldName, arg,  row, fieldPath}) {
+	static validate({fieldName, arg,  row, fieldPath, customData}) {
 
 		let _rowFieldValue
 
@@ -308,7 +332,7 @@ export 	class hasKeys {
 
 
 export class isNull {
-	static validate({fieldName, arg,  row, fieldPath}) {
+	static validate({fieldName, arg,  row, fieldPath, customData}) {
 
 		let _rowFieldValue
 
@@ -327,7 +351,7 @@ export class isNull {
 
 // object
 export class objectIsnull {
-	static validate({fieldName, arg,  row, fieldPath}) {
+	static validate({fieldName, arg,  row, fieldPath, customData}) {
 		
 		let rowFieldValue;
 
@@ -362,7 +386,7 @@ export class objectIsnull {
 }
 
 export class objectEq {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 
 		let _rowFieldValue
 
@@ -374,9 +398,6 @@ export class objectEq {
 		} catch (error) {
 			return false
 		}
-
-
-		console.log({row, fieldPath,  arg})
 
 		if (JSON.stringify(_rowFieldValue = getDeep(row, fieldPath)
 		) == '{}' && '{}' == JSON.stringify(arg)) {
@@ -395,8 +416,7 @@ export class objectEq {
 }
 
 export class objectContains {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
-		console.log(fieldName, arg, row)
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 
 		let rowValue;
 
@@ -426,9 +446,7 @@ export class objectContains {
 
 
 export class objectContains_by {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
-		
-		// console.log(fieldName, arg, row);
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 
 		let rowValue;
 		const keyCount = Object.keys(arg).length
@@ -452,7 +470,6 @@ export class objectContains_by {
 			return false
 		}
 
-		// console.log('keyFoundNEqual', keyFoundNEqual, 'keyCount', keyCount);
 		if(keyFoundNEqual == 0) {
 			return true
 		} else if (keyFoundNEqual == keyCount ) {
@@ -464,8 +481,7 @@ export class objectContains_by {
 }
 
 export class objectHasKey {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
-		console.log(fieldName, arg, row)
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 
 		let rowValue;
 
@@ -488,7 +504,7 @@ export class objectHasKey {
 
 
 export class objectHasKeys {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 
 		let rowValue;
 
@@ -515,7 +531,7 @@ export class objectHasKeys {
 
 
 export class objectHasnyKeys {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 
 		let rowValue;
 
@@ -543,7 +559,7 @@ export class objectHasnyKeys {
 // array shit
 
 export class ArrayFieldEq {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 		let _rowFieldValue
 
 		try {
@@ -555,7 +571,6 @@ export class ArrayFieldEq {
 			return false
 		}
 
-		console.log({row, fieldPath,  arg})
 
 		if (JSON.stringify(_rowFieldValue) == '[]' && '[]' == JSON.stringify(arg)) {
 			return true
@@ -573,8 +588,7 @@ export class ArrayFieldEq {
 }
 
 export class ArrayFieldContains {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
-		console.log(fieldName, arg, row)
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 
 		let rowValue;
 
@@ -603,7 +617,7 @@ export class ArrayFieldContains {
 	}
 }
 export class ArrayFieldContains_by {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 
 		let rowValue;
 
@@ -632,8 +646,7 @@ export class ArrayFieldContains_by {
 	}
 }
 export class ArrayFieldContains_overlap {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
-		console.log(fieldName, arg, row)
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 
 		let rowValue;
 
@@ -662,8 +675,7 @@ export class ArrayFieldContains_overlap {
 	}
 }
 export class ArrayFieldContains_len {
-	static validate({fieldName, arg,  row, fieldPath}):boolean {
-		console.log(fieldName, arg, row)
+	static validate({fieldName, arg,  row, fieldPath, customData}):boolean {
 
 		let rowValue;
 

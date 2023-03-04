@@ -4,10 +4,10 @@ export class filter {
         this.arg = arg;
         this.TableSchema = TableSchema;
         this.rows = [];
+        this.operator = new ObjectConditionOperator(this.TableSchema, this.arg);
     }
     async cursor(row, resolve, limit) {
-        const operator = new ObjectConditionOperator(row, this.TableSchema);
-        const operationsResult = await operator.run(this.arg);
+        const operationsResult = await this.operator.run(row);
         if (operationsResult == true) {
             this.rows.push(row);
             if (this.rows.length == limit) {
@@ -18,8 +18,7 @@ export class filter {
     async run(rows) {
         const newRows = [];
         for (let row of rows) {
-            const operator = new ObjectConditionOperator(row, this.TableSchema);
-            const operationsResult = await operator.run(this.arg);
+            const operationsResult = await this.operator.run(row);
             if (operationsResult == true) {
                 newRows.push(row);
             }

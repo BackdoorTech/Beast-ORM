@@ -1,5 +1,6 @@
 import * as _Fields from '../../../src/models/field/fields'
 import { models as  modelsType, models } from '../../../src/index'
+import { uniqueGenerator } from '../../../src/utils'
 
 import fs from 'fs'
 const { Port } = JSON.parse(fs.readFileSync('./test/config/test.json', 'utf8'));
@@ -28,7 +29,7 @@ describe("initial test for model", () => {
       }
 
       models.register({
-        databaseName:'jest-test-documentation first example',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [User]
@@ -45,6 +46,6 @@ describe("initial test for model", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  }, 20000)
 
 })

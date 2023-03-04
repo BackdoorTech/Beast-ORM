@@ -1,5 +1,6 @@
 import * as _Fields from '../../../src/models/field/fields'
 import { models as  modelsType } from '../../../src/index'
+import { uniqueGenerator } from '../../../src/utils'
 
 import fs from 'fs'
 const { Port } = JSON.parse(fs.readFileSync('./test/config/test.json', 'utf8'));
@@ -30,7 +31,7 @@ describe("ArryField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [ChessBoardUser]
@@ -73,7 +74,7 @@ describe("ArryField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [Post]
@@ -112,7 +113,7 @@ describe("ArryField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [Post]
@@ -158,7 +159,7 @@ describe("ArryField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [Post]
@@ -197,7 +198,7 @@ describe("ArryField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [Post]
@@ -244,7 +245,7 @@ describe("ArryField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [Post]
@@ -283,7 +284,7 @@ describe("ArryField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [Post]
@@ -328,7 +329,7 @@ describe("ArryField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [Post]

@@ -1,14 +1,15 @@
-import { Methods, getParams, Method } from '../models/model.interface.js'
+import { taskHolder } from './taskHolder.js';
 
-interface WsRegister {
+export interface WsRegister {
 	type?: 'response' | 'Register',
-	func: Function
-	queryId?: string,
+	queryId: string,
 	params: any,
 	method: 'execute' | 'migrate',
+	callback: Function,
+	done?: Function
 }
 
-export class _IndexedDBWorkerQueue {
+class _WorkerManager {
 
 	private myWorker:  Worker | null;
 	webWorkerModuleSupport = false
@@ -25,6 +26,10 @@ export class _IndexedDBWorkerQueue {
 				const data = oEvent.data
 				this.onmessage(data)
 			}
+
+			this.myWorker.onerror = (error) => {
+				console.log('myWorker', error);
+			};
 		}
 	}
 
@@ -41,31 +46,17 @@ export class _IndexedDBWorkerQueue {
 		}
 	}
 
-	private  workerQueues: {[key: string]:  WsRegister} = {}
-
 	register(data: WsRegister) {
-
 		this.myWorker.postMessage(data.params);
-		this.workerQueues[data.queryId] = data
+		taskHolder.register(data)
 		return data.queryId
 	}
 
-	async onmessage (data: any) {
-
-		for (const [key, value] of Object.entries(this.workerQueues)) {
-			const dontRepeat = await value.func(data)
-
-			if(dontRepeat || !data.queryId) {
-				delete this.workerQueues[key]
-			}
-		}
-	}
-
-	requestHandler () {
-			
+	private async onmessage (data: any) {
+        taskHolder.onmessage(data)
 	}
 
 }
 
 
-export const IndexedDBWorkerQueue = new _IndexedDBWorkerQueue()
+export const WorkerManager = new _WorkerManager()

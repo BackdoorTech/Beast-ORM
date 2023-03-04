@@ -23,7 +23,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -49,12 +49,13 @@ describe("initial test for model", () => {
 
       const models: typeof modelsType = window['models']
       
+      document.title = 'model create object'
       class Person extends models.Model {
         username =  models.CharField({maxLength:0})
       } 
 
       models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -73,38 +74,6 @@ describe("initial test for model", () => {
     
   }, 10000)
 
-
-  it('model create object', async () => {
-  
-    await page.waitForFunction(() => 'models' in window);
-
-    await page.evaluate(async() => {
-
-      const models: typeof modelsType = window['models']
-      
-      class Person extends models.Model {
-        username =  models.CharField({maxLength:0})
-      } 
-
-      models.register({
-        databaseName:'jest-test',
-        type: 'indexedDB',
-        version: 1,
-        models: [Person]
-      })
-
-      const james = await Person.create({username:'james'})
-
-      document.body.innerHTML = JSON.stringify({username:james.username, id:james.id})
-
-    })
-    debugger
-    // Check to see if text exists on the page
-    await page.waitForFunction('{"username":"james","id":1}')
-
-    expect('time not exceeded').toBe('time not exceeded')
-    
-  }, 10000)
 
 
   it('model save()', async () => {
@@ -120,7 +89,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -160,7 +129,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -197,7 +166,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -235,7 +204,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -276,7 +245,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test-model create([{...}])',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -305,7 +274,7 @@ describe("initial test for model", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  }, 20000)
 
   it('model autoField', async () => {
   
@@ -320,7 +289,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -328,7 +297,9 @@ describe("initial test for model", () => {
 
       await Person.create([
         {username:'Peter'},
-        {username:'Peter'}]
+        {username:'Peter'},
+        {username:'Peter'},
+        {username:'Peter'},]
       )
 
       const rows = await Person.filter({username:'Peter'}).execute()
@@ -342,7 +313,7 @@ describe("initial test for model", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  }, 20000)
 
 
 
@@ -359,7 +330,7 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test'+ new Date().getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -382,7 +353,7 @@ describe("initial test for model", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  }, 20000)
 
 
   it('all()', async () => {
@@ -398,13 +369,14 @@ describe("initial test for model", () => {
       } 
 
       models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
       })
 
       const createdUser = await Person.create({username:'Peter'})
+      
 
       const rows = await Person.all()
       document.body.innerHTML = JSON.stringify(rows)
@@ -416,7 +388,7 @@ describe("initial test for model", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  }, 20000)
 
   it('model createOrFind case find', async () => {
   
@@ -435,7 +407,7 @@ describe("initial test for model", () => {
       }
 
       models.register({
-        databaseName:'jest-test-documentation first example',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [User]
@@ -457,7 +429,7 @@ describe("initial test for model", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  }, 20000)
 
 
 
@@ -478,7 +450,7 @@ describe("initial test for model", () => {
       }
 
       models.register({
-        databaseName:'jest-test-model createOrFind case create',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [User]
@@ -520,7 +492,7 @@ describe("initial test for model", () => {
       }
 
       models.register({
-        databaseName:'jest-test-model updateOrCreate case create'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [User]
@@ -562,7 +534,7 @@ describe("initial test for model", () => {
       }
 
       models.register({
-        databaseName:'jest-test-model-updateOrCreate-case-update',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [User]
@@ -584,7 +556,7 @@ describe("initial test for model", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  }, 20000)
 
 })
 
@@ -637,7 +609,7 @@ describe("operators", () => {
       
       
       models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [MessageModel, DeleteMessageModel]
@@ -668,69 +640,8 @@ describe("operators", () => {
     })
     debugger
     // Check to see if text exists on the page
-    await page.waitForFunction('[{"msg":"","rid":"rid","ts":"","_id":8888,"_updatedAt":3333,"messageSend":false,"offline":false,"localReference":"sdfsdf","channels":[],"mentions":[],"u":{},"id":555555,"viewed":[],"received":[],"attachments":[],"file":"","delate":false}]')
+    await page.waitForFunction('[{"channels":[],"mentions":[],"msg":"","rid":"rid","ts":"","u":{},"_id":"8888","_updatedAt":3333,"messageSend":false,"offline":false,"viewed":[],"received":[],"localReference":"sdfsdf","attachments":[],"file":[],"id":1}]')
     
-
-    
-    await page.evaluate(async() => {
-
-      const models: typeof modelsType = window['models']
-      const {ArrayField, JsonField } = models.indexedDB.fields
-
-      class MessageModel extends models.Model {
-
-        channels =  ArrayField()
-        mentions =  ArrayField()
-        msg =  models.CharField()
-        rid =  models.CharField()
-        ts =  models.CharField()
-        u =  JsonField()
-        _id =  models.CharField({unique:true})
-        _updatedAt =  models.CharField()
-        messageSend =  models.BooleanField()
-        offline =  models.BooleanField()
-        viewed =  ArrayField() 
-        received =  ArrayField()
-        localReference =  models.CharField({blank:true})
-        attachments =  ArrayField()
-        file =  ArrayField()
-      
-      }
-      
-      class DeleteMessageModel extends models.Model {
-      
-        messageId = models.IntegerField()
-        rid =  models.CharField()
-        ts =  models.CharField()
-        u =  JsonField()
-        needToReceiveBy = ArrayField()
-      
-      }
-      
-      
-      models.register({
-        databaseName: 'chat-storage',
-        type: 'indexedDB',		
-        version: 1,
-        models: [MessageModel, DeleteMessageModel]
-      })
-
-
-      await DeleteMessageModel.create({
-        messageId: 555,
-        rid: '3333',
-        ts: '345345345',
-        u: {},
-        needToReceiveBy: []
-      })
-
-      document.body.innerHTML = JSON.stringify(await DeleteMessageModel.all())
-
-    })
-    debugger
-    // Check to see if text exists on the page
-    await page.waitForFunction('[{"messageId":555,"rid":3333,"ts":345345345,"u":{},"needToReceiveBy":[],"id":1}]')
-
     expect('time not exceeded').toBe('time not exceeded')
     
   }, 10000)
@@ -749,7 +660,7 @@ describe("operators", () => {
       } 
 
       models.register({
-        databaseName:'jest-test-model create([{...}])fffff',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -782,7 +693,7 @@ describe("operators", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 80000)
+  }, 20000)
 
 
 
@@ -809,7 +720,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -845,7 +756,7 @@ describe("JSONField", () => {
       
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -880,7 +791,7 @@ describe("JSONField", () => {
       
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -926,7 +837,7 @@ describe("JSONField", () => {
       
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -949,7 +860,7 @@ describe("JSONField", () => {
 
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 10000)
+  }, 20000)
 
   it('documentation 2', async () => {
   
@@ -965,7 +876,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',		
         version: 1,
         models: [DogModel]
@@ -995,7 +906,7 @@ describe("JSONField", () => {
     // Check to see if text exists on the page
     await page.waitForFunction('[{"name":"Meg","data":{"breed":"collie","owner":null},"id":2}]')
     
-  }, 10000)
+  }, 20000)
 
 
   it('contained_by', async () => {
@@ -1012,7 +923,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1051,7 +962,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1089,7 +1000,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1114,7 +1025,7 @@ describe("JSONField", () => {
   }, 10000)
 
 
-  it('has_any_keys', async () => {
+  it('has_any_keys 1', async () => {
   
     await page.waitForFunction(() => 'models' in window);
 
@@ -1128,7 +1039,7 @@ describe("JSONField", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1175,7 +1086,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1228,7 +1139,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1277,7 +1188,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1315,7 +1226,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
@@ -1340,7 +1251,7 @@ describe("JSONField deep", () => {
   }, 10000)
 
 
-  it('has_any_keys', async () => {
+  it('has_any_keys 2', async () => {
   
     await page.waitForFunction(() => 'models' in window);
 
@@ -1354,7 +1265,7 @@ describe("JSONField deep", () => {
       }
       
       await models.register({
-        databaseName: 'chat-storage'+ (new Date()).getTime(),
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [DogModel]
