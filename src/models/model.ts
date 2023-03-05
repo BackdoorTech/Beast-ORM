@@ -206,6 +206,9 @@ export class Model {
   }
   
   static async get(arg: getParams) {
+    if(Object.values(arg).length >= 2) {
+      throw("get only works with one field")
+    }
     const _methods:  Method[] = [{methodName: 'get', arguments: arg}]
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
