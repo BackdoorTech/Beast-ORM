@@ -1,1 +1,2 @@
-export const data = {};
+export const Databases = {};
+export const Tables = {};

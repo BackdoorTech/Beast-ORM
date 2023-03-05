@@ -70,6 +70,7 @@ export declare class IndexedDB {
             [key: string]: boolean;
         };
     };
+    static transactionTrigger(currentStore: any, databaseName: any): Promise<void>;
     static executeTransaction(currentStore: any, databaseName: any): void;
     static getOrCreateTransaction({ TableName, queryId, DatabaseName }: {
         TableName: any;

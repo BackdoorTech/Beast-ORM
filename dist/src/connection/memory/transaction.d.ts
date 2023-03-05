@@ -3,22 +3,50 @@ declare class transactionRequest {
     value: any;
     key: any;
     result: any;
+    store: string;
+    onsuccessFunc: Function;
+    onerrorFunc: Function;
     set onsuccess(func: any);
+    set onerror(func: any);
 }
 export declare class transaction {
-    data: {
-        [key: string]: any[];
+    store: any;
+    done: Function;
+    doneButFailed: Function;
+    tx: IDBTransaction;
+    trigger: {
+        beforeInsert: boolean;
+        afterInsert: boolean;
     };
-    constructor({ store }: {
+    constructor({ store, done, db, tx, doneButFailed }: {
         store: any;
+        done: any;
+        db: any;
+        tx: any;
+        doneButFailed: any;
     });
     request: any[];
-    objectStore: (name: any) => {
-        add: (value: any, key?: any) => transactionRequest;
+    FinishRequest: any[];
+    objectStore: (currentStore: any) => {
+        add: ({ value }: {
+            value: any;
+        }) => transactionRequest;
         getAll: () => transactionRequest;
+        put: ({ value, key }: {
+            value: any;
+            key?: any;
+        }) => transactionRequest;
+        clear: () => transactionRequest;
+        delete: ({ id }: {
+            id: any;
+        }) => transactionRequest;
+        get: ({ id }: {
+            id: any;
+        }) => transactionRequest;
+        index: ({ keyPath, value }: {
+            keyPath: any;
+            value: any;
+        }) => transactionRequest;
     };
-    onerror(): void;
-    oncomplete(): void;
-    onabort(): void;
 }
 export {};

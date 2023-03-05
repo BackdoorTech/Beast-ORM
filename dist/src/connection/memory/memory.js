@@ -1,7 +1,7 @@
 var _a;
-import { MemoryConnector } from "./connector.js";
 import { SqlObject } from "../../sql/sqlObject/sqlObject.js";
 import { DatabaseMemory } from './db.js';
+// import { transaction } from "./transaction.js";
 // inspire by https://github.com/hc-oss/use-indexeddb
 export class Memory {
     static validateStore(db, storeName) {
@@ -16,10 +16,10 @@ export class Memory {
         }
     }
     static migrate(config) {
-        return new MemoryConnector().migrate(config);
+        // return new MemoryConnector().migrate(config)
     }
     static getConnection(config) {
-        return new MemoryConnector().connect(config);
+        // return new MemoryConnector().connect(config)
     }
 }
 _a = Memory;

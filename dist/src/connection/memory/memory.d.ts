@@ -4,7 +4,7 @@ import { DatabaseMemory } from './db.js';
 export declare class Memory {
     private static validateStore;
     private static validateBeforeTransaction;
-    static migrate(config: DatabaseSchema): Promise<boolean>;
+    static migrate(config: DatabaseSchema): void;
     static getConnection(config: DatabaseSchema): Promise<DatabaseMemory>;
     static getActions: (currentStore: any, config: any) => {
         getAll: () => Promise<any[]>;
