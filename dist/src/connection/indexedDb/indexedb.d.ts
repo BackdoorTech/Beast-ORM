@@ -1,4 +1,4 @@
-import { DatabaseSchema, TableSchema } from "../../models/register-modal.interface.js";
+import { DatabaseSchema } from "../../models/register-modal.interface.js";
 import { Method } from "../../models/model.interface.js";
 declare class indexedDBInterface {
     private validateStore;
