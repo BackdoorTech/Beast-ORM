@@ -1,6 +1,7 @@
 # Beast ORM
 
-ORM for accessing indexedDB and localStorage.
+ORM for accessing indexedDB and localStorage. <br>
+Offline first with beast-orm made easy.
 
 
 ## DBMS Support
@@ -13,6 +14,8 @@ ORM for accessing indexedDB and localStorage.
 
 ### Details
 - The indexedDB implementation runs multiple request in a single transaction
+- Handle thousands request per seconds.
+- Build in transaction error handler
 
 #### A promise base api implementation for accessing for accessing indexedDB 
 ## Create model
@@ -25,7 +28,7 @@ import { models } from 'beast-orm';
 class User extends models.Model {
 
   userId = models.AutoField({primaryKey:true})
-  username = models.CharField({maxLength: 100})
+  username = models.CharField({maxLength: 100, unique:true})
   email = models.CharField({blank: true, maxLength: 100})
   age = models.IntegerField()
 }
@@ -63,12 +66,12 @@ const user = await User.create({username:'kobe', email:'kobe.bryant@lakers.com'}
 
 To add multiple records in one go
 ```javascript
-const users = [
+const usersToCreate = [
   {username:'kobe', email:'kobe.bryant@forever.com', age: 30},
   {username:'michael', email:'michael.jackson@forever.com', age: 30}
 ]
 
-const users = await User.create(users)
+const users = await User.create(usersToCreate)
 
 ```
 ## Saving changes to objects
@@ -76,9 +79,9 @@ this example changes its name and updates its record in the database
 
 ```javascript
 
-const u1 = await User.get({userId:1})
-u1.username = 'New name'
-u1.save()
+const user = await User.get({userId:1})
+user.username = 'New name'
+user.save()
 
 ```
 
@@ -90,7 +93,7 @@ The query is not executed as soon as the function is called
 ### Retrieving all objects
 The simplest way to retrieve objects from a table is to get all of them. To do this, use the all() 
 ```javascript
-User.all()
+await User.all()
 ```
 
 <br/>
@@ -112,7 +115,7 @@ const user = await User.get({username:'kobe'})
 console.log(user.username) // kobe
 
 ```
-**get** only works with unique fields
+**get** works only with one field only, one lookup parameter
 
 
 Filter can have complex lookup parameters
@@ -669,7 +672,7 @@ Add the same article to a different article set
 
 ```
 ## Reactive List 
-
+Reactive data, updates when a transaction is about to close. Store the query and run when a transaction is being committed. Great way to synchronize view with database.
 ```javascript
   class Person extends models.Model {
     username = models.CharField({})  
@@ -685,7 +688,7 @@ Add the same article to a different article set
 
 
 ```
-Create a reactive List that update when a transaction is committed on the database.
+Create a reactive data that update the value when a transaction is committed on the database.
 ```javascript
   const PersonList = Person.ReactiveList((model)=> model.all())
   const PersonAge5List = Person.ReactiveList((model)=> model.filter({age: 5}).execute())
