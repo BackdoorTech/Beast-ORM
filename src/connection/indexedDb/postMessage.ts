@@ -3,15 +3,15 @@ import { taskHolder } from '../taskHolder.js'
 
 export let PostMessage: typeof postMessage | null = postMessage
 
-
-// run this in global scope of window or worker. since window.self = window, we're ok
-
 try {
     if (!window || window?.document === undefined) {
+        // web worker
         PostMessage = postMessage
     } else {
+        // main thread
         PostMessage = taskHolder.onmessage
     }
 } catch (error) {
+    // web worker
     PostMessage = postMessage
 }
