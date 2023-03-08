@@ -14,7 +14,11 @@ interface register {
   databaseName: string,
   version: number,
   type: 'indexedDB' | 'localStorage'
-  models: typeof Model[] | typeof LocalStorage[]
+  models: typeof Model[] | typeof LocalStorage[],
+  /**
+   * @description restore values from localStorage for LocalStorage Models
+   */
+  restore?: boolean
 }
 
 export const models = {}
