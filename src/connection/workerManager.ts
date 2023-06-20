@@ -42,11 +42,12 @@ class _WorkerManager {
 		try {
 			const worker = new Worker('blob://', tester as any);
 		} finally {
-			return supports;
+			return supports && (window as any || {})?.document;
 		}
 	}
 
 	register(data: WsRegister) {
+
 		this.myWorker.postMessage(data.params);
 		taskHolder.register(data)
 		return data.queryId

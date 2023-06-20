@@ -4,12 +4,15 @@ export class _ModelMigrations {
   migrated: {[dbName: string]: boolean} = {}
 
   prepare(databaseName) {
-    this.callback[databaseName] = []
-  }
+    if(!this.callback[databaseName]) {
+      this.callback[databaseName] = []
+    }
+}
 
   migrationsState(databaseName:string, value: boolean) {
 
     this.migrated[databaseName] = value
+    this.prepare(databaseName)
 
     if(this.migrated[databaseName]) {
       this.callback[databaseName].forEach((callback, index, object) => {
@@ -25,6 +28,7 @@ export class _ModelMigrations {
   async waitMigration(databaseName: string) {
     return new Promise((resolve, reject) => {
       if(!this.migrated[databaseName]) {
+        this.prepare(databaseName)
         this.callback[databaseName].push(() => {
           resolve('ready');
         })

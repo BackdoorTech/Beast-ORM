@@ -27,3 +27,4 @@ export declare const models: {
     migrate: typeof migrate;
     register: typeof registerModel.register;
 };
+export default models;

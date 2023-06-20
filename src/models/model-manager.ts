@@ -8,7 +8,7 @@ export class ModelAPIRequest {
     
 	constructor() {}
 
-	static obj = (DatabaseSchema :DatabaseSchema, TableSchema: TableSchema) => {
+	static obj = (DatabaseSchema :DatabaseSchema, TableSchema?: TableSchema) => {
 		return {
 			create: async (args:Method[], queryId:string, callback) => {
 				await ModelMigrations.waitMigration(DatabaseSchema.databaseName)
@@ -39,7 +39,7 @@ export class ModelAPIRequest {
 				return await DBSwitch.requestHandler(TableSchema.name, DatabaseSchema.databaseName, DatabaseSchema.type ,'select' , arg, queryId)
 			},
 			migrate: async (queryId:string = uniqueGenerator()) => {
-				return await DBSwitch.requestHandler(TableSchema.name, DatabaseSchema.databaseName, DatabaseSchema.type ,'migrate' , {DatabaseSchema, TableSchema}, queryId)
+				return await DBSwitch.requestHandler(null , DatabaseSchema.databaseName, DatabaseSchema.type ,'migrate' , {DatabaseSchema, TableSchema}, queryId)
 			}, trigger: async (args, Subscription: string, callback: Function) => {
 				await ModelMigrations.waitMigration(DatabaseSchema.databaseName)
 				DBSwitch.callBackRequestHandler(TableSchema.name, DatabaseSchema.databaseName, DatabaseSchema.type ,'trigger' , args, callback, Subscription)

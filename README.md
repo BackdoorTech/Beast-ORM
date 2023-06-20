@@ -768,8 +768,9 @@ import { Session } from './models/user.js';
 models.migrate({
   databaseName: 'tutorial',
   version: 1,
-  type: 'indexedDB',
-  models: [Session]
+  type: 'localStorage',
+  models: [Session],
+  restore: true,
 })
 ```
 

@@ -8,15 +8,22 @@ export  class ReactiveList {
 
     static subscribe(Model: Model, callback) {
         let transactionOnCommitSubscription;
-        let value = [];
-
-        (async () => {
-            value = await callback(Model)    
-        })();
+        let value;
+        let updateUi;
         
         transactionOnCommitSubscription = transactionOnCommit.subscribe(Model, async () => {
             value = await  callback(Model)
+            if(updateUi) {
+                updateUi()
+            }
         })
+
+        callback(Model).then(result => {
+            value = result
+            if(updateUi) {
+                updateUi()
+            }
+        });
         
         return {
             get value () {
@@ -27,6 +34,9 @@ export  class ReactiveList {
             },
             unsubscribe: async () => {
                 return await transactionOnCommitSubscription.unsubscribe()
+            },
+            setUpdateUi(func) {
+                updateUi  = func
             }
         }
     }

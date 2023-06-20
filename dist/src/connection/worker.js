@@ -5,7 +5,6 @@ onmessage = async (oEvent) => {
         // console.log('result', result)
         // postMessage(result)
     }, (error) => {
-        // console.log('error', error)
-        // postMessage(error)
+        console.log('error', error);
     });
 };

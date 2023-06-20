@@ -16,6 +16,7 @@ class _WorkerManager {
     }
     // https://stackoverflow.com/a/62963963/14115342
     supportsWorkerType() {
+        var _a;
         let supports = false;
         const tester = {
             get type() { return supports = true; } // it's been called, it's supported
@@ -24,7 +25,7 @@ class _WorkerManager {
             const worker = new Worker('blob://', tester);
         }
         finally {
-            return supports;
+            return supports && ((_a = (window || {})) === null || _a === void 0 ? void 0 : _a.document);
         }
     }
     register(data) {

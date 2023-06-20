@@ -1,12 +1,12 @@
 
 import { taskHolder } from '../taskHolder.js'
 
-export let PostMessage: typeof postMessage | null = postMessage
+export let PostMessage: typeof postMessage
 
 try {
     if (!window || window?.document === undefined) {
         // web worker
-        PostMessage = postMessage
+        PostMessage = (this as any || {})?.postMessage
     } else {
         // main thread
         PostMessage = taskHolder.onmessage

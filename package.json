@@ -8,7 +8,7 @@
     "test": "jest",
     "speed-test": "ts-node-dev ./test/funcional/speed/speed.ts",
     "start": "live-server --ignore='node_modules'",
-    "package:info":"npm publish --dry-run"
+    "package:info": "npm publish --dry-run"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",
@@ -18,7 +18,6 @@
     "jest-puppeteer": "^6.1.0",
     "jest-test-performance": "^1.0.1",
     "live-plugin-manager": "^0.17.1",
-    "live-server": "^1.2.1",
     "performance-test-runner": "^0.1.2",
     "puppeteer": "^13.4.0",
     "puppeteer-core": "^13.4.0",
@@ -62,5 +61,8 @@
     "per",
     "transaction"
   ],
-  "homepage": "https://github.com/BackdoorTech/Beast-ORM#readme"
+  "homepage": "https://github.com/BackdoorTech/Beast-ORM#readme",
+  "dependencies": {
+    "live-server": "^1.2.2"
+  }
 }

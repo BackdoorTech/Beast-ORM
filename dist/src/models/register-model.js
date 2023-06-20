@@ -6,7 +6,6 @@ import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js';
 import { ModelAPIRequest } from './model-manager.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
-import { IndexedDB } from '../connection/indexedDb/connector.js';
 export const models = {};
 export const modelsConfig = {};
 export const modelsLocalStorage = {};
@@ -28,12 +27,10 @@ export class registerModel {
             type: entries.type,
             stores: []
         };
+        let index = 0;
         for (const modelClassRepresentations of entries.models) {
             const ModelName = modelClassRepresentations.getModelName();
             models[ModelName] = modelClassRepresentations;
-        }
-        let index = 0;
-        for (const modelClassRepresentations of entries.models) {
             const { fields, modelName, attributes, fieldTypes } = ModelReader.read(modelClassRepresentations);
             const idFieldName = (_a = attributes === null || attributes === void 0 ? void 0 : attributes.primaryKey) === null || _a === void 0 ? void 0 : _a.shift();
             databaseSchema.stores.push({
@@ -75,24 +72,17 @@ export class registerModel {
                     await ModelEditor.addMethodManyToManyField(Field, fieldName, modelName, databaseSchema);
                 }
             }
-            index++;
-        }
-        let tableSchema_;
-        for (const modelClassRepresentations of entries.models) {
-            const ModelName = modelClassRepresentations.getModelName();
             models[ModelName] = modelClassRepresentations;
             const tableSchema = databaseSchema.stores.find((e) => e.name == ModelName);
-            tableSchema_ = tableSchema;
             modelsConfig[ModelName] = {
                 DatabaseSchema: databaseSchema,
                 TableSchema: tableSchema
             };
-            ModelMigrations.prepare(databaseSchema.databaseName);
             transactionOnCommit.prepare(modelClassRepresentations);
+            index++;
         }
         if (databaseSchema.type == 'indexedDB') {
-            await IndexedDB.run(databaseSchema);
-            await ModelAPIRequest.obj(databaseSchema, tableSchema_).migrate();
+            await ModelAPIRequest.obj(databaseSchema).migrate();
             ModelMigrations.migrationsState(databaseSchema.databaseName, true);
         }
     }
@@ -208,6 +198,9 @@ export class registerLocalStorage {
                 TableSchema: tableSchema
             };
             modelsLocalStorage[ModelName] = modelClassRepresentations;
+            if (entries === null || entries === void 0 ? void 0 : entries.restore) {
+                modelClassRepresentations.get(null);
+            }
         }
     }
 }

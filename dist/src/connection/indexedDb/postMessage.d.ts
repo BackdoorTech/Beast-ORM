@@ -1,1 +1,1 @@
-export declare let PostMessage: typeof postMessage | null;
+export declare let PostMessage: typeof postMessage;

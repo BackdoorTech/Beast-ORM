@@ -9,3 +9,4 @@ export const models = Object.assign(Object.assign({ Model,
             return {};
         }
     } });
+export default models;

@@ -1,14 +1,12 @@
 import { Model, LocalStorage } from './model.js';
 import { LocalStorageModelReader, ModelReader } from './model.reader.js';
 import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchema, TableSchemaLocalStorage  } from './register-modal.interface.js';
-import { indexedDB  } from './../connection/indexedDb/indexedb.js';
 import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js';
 import { uncapitalize, uniqueGenerator } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js'
 import { ModelAPIRequest } from './model-manager.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
-import { IndexedDB } from '../connection/indexedDb/connector.js';
 
 interface register {
   databaseName: string,
@@ -54,14 +52,12 @@ export class registerModel {
     };
 
 
+    let index = 0;
     for (const modelClassRepresentations of entries.models) {
+
       const ModelName = modelClassRepresentations.getModelName()
       models[ModelName] = modelClassRepresentations 
 
-    }
-
-    let index = 0;
-    for (const modelClassRepresentations of entries.models) {
       const {fields, modelName, attributes , fieldTypes} = ModelReader.read(modelClassRepresentations)
       
       const idFieldName = attributes?.primaryKey?.shift()
@@ -112,32 +108,22 @@ export class registerModel {
         }
       }
 
-      index++;
-    }
-
-
-
-    let tableSchema_
-    for(const modelClassRepresentations of entries.models) {
-      const ModelName = modelClassRepresentations.getModelName()
       models[ModelName] = modelClassRepresentations
 
       const tableSchema = databaseSchema.stores.find((e)=> e.name == ModelName)
-      tableSchema_ = tableSchema
 
       modelsConfig[ModelName] = {
         DatabaseSchema: databaseSchema,
         TableSchema: tableSchema
       }
 
-      ModelMigrations.prepare(databaseSchema.databaseName)
       transactionOnCommit.prepare(modelClassRepresentations as any)
+
+      index++;
     }
 
-
-    if(databaseSchema.type =='indexedDB') {
-      await IndexedDB.run(databaseSchema)
-      await ModelAPIRequest.obj(databaseSchema, tableSchema_ ).migrate()
+    if(databaseSchema.type == 'indexedDB') {
+      await ModelAPIRequest.obj(databaseSchema).migrate()
       ModelMigrations.migrationsState(databaseSchema.databaseName, true);
     }
     
@@ -281,6 +267,10 @@ export class registerLocalStorage {
         TableSchema: tableSchema
       }
       modelsLocalStorage[ModelName] = modelClassRepresentations
+
+      if(entries?.restore) {
+        modelClassRepresentations.get(null)
+      }
     }
     
   }

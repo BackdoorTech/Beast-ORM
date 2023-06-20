@@ -1,15 +1,10 @@
-import { DatabaseSchema } from "../../models/register-modal.interface.js";
+import { DatabaseSchema, TableSchema } from "../../models/register-modal.interface.js";
 import { Method } from "../../models/model.interface.js";
+import { Database } from "./database.js";
 declare class indexedDBInterface {
-    private validateStore;
-    private validateBeforeTransaction;
-    private createTransaction;
-    migrate(config: DatabaseSchema): Promise<boolean>;
-    getConnection(DatabaseName: any): Promise<IDBDatabase>;
-    getActions: (TableName: string, DatabaseName: string, queryId: string) => {
+    getActions: (TableName: string, Database: Database, queryId: string) => {
         getByID: (id: string | number) => Promise<any>;
         getOneByIndex: (keyPath: string, value: string | number) => Promise<any>;
-        getManyByIndex: (keyPath: string, value: string | number) => Promise<any[]>;
         getAll: () => Promise<any[]>;
         add: ({ value, key, add, index }: {
             value: any;
@@ -23,7 +18,6 @@ declare class indexedDBInterface {
         }) => Promise<any>;
         deleteByID: (id: any) => Promise<any>;
         deleteAll: () => Promise<any>;
-        openCursor: (cursorCallback: any, keyRange?: IDBKeyRange) => Promise<void | IDBCursorWithValue>;
     };
     requestHandler: (TableName: string, DatabaseName: string, queryId: any, PostMessage?: typeof postMessage) => {
         select: (methods: Method[]) => Promise<unknown>;

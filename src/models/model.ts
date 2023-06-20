@@ -135,6 +135,7 @@ export class Model {
 
     const result = await Model.object({queryId, DBconfig, TableSchema}).all()
     taskHolder.finish(queryId)
+
     return result
   }
 
@@ -237,8 +238,6 @@ export class Model {
       return object
     }
   }
-  
-
   private static getId() {
     return hashCode(this.toString())
   }
@@ -347,8 +346,8 @@ export class Model {
 
       taskHolder.updateFunction(queryId, "done", () => {
         
- 
         if(arg.length == 1) {
+          console.log('done', result[0])
           resolve(result[0])
         } else {
           resolve(result)
@@ -414,17 +413,79 @@ export class Model {
     return [instance, created]
   }
 
-  static async updateOrCreate(argToFind, argsToUpdate) {
-    
-    let [instance , created] = await this.createOrFind(argToFind, argsToUpdate)
+  static async updateOrCreate(...args) {
 
-    if(!created) {
-      const params = Object.assign(argToFind, argsToUpdate)
-      instance = Object.assign(instance, params)
+    if(args.length == 1) {
+      if(Array.isArray(args)) {
+        const TableSchema = this.getTableSchema()
+        let created = []
+        let updated = []
+        const list = args
+        const uniqueFields = TableSchema.attributes["unique"].concat(TableSchema.id.keyPath)
 
-      await instance.save()
+        for (const object of list) {
+
+          const uniqueFieldName = uniqueFields.find((fieldName)=> {
+            if(object[fieldName]) {
+              return true
+            }
+            return false
+          })
+
+          const params = {}
+          params[uniqueFieldName] = object[uniqueFieldName]
+          
+          try {
+            const instanceModel = await this.get(params)
+            updated.push(instanceModel)
+          } catch (error) {
+            const instanceModel = await this.create(params)
+            created.push(instanceModel)
+          }
+        }
+        
+        return { created, updated }
+      } else {
+        const TableSchema = this.getTableSchema()
+        let instance;
+        let created = false
+
+        const uniqueFields = TableSchema.attributes["unique"].concat(TableSchema.id.keyPath)
+        const uniqueFieldName = uniqueFields.find((fieldName)=> {
+          if(args[fieldName]) {
+            return true
+          }
+          return false
+        })
+
+        const params = {}
+        params[uniqueFieldName] = args[uniqueFieldName]
+        
+        try {
+          const object = await this.get(params)
+          instance = object
+          await object.save(args)
+        } catch (error) {
+          instance = await this.create(params)
+          return instance
+        }
+        
+        return {instance, created}
+      }
+    } else {
+      let argToFind = args[0]
+      let argsToUpdate = args[1]
+      
+      let [instance , created] = await this.createOrFind(argToFind, argsToUpdate)
+  
+      if(!created) {
+        const params = Object.assign(argToFind, argsToUpdate)
+        instance = Object.assign(instance, params)
+  
+        await instance.save()
+      }
+      return instance
     }
-    return instance
 
   }
 

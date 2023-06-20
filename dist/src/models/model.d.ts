@@ -45,7 +45,7 @@ export declare class Model {
     static create(arg: any): Promise<any>;
     private static newInstance;
     static createOrFind(getArg: any, defaultCreate: any): Promise<any[]>;
-    static updateOrCreate(argToFind: any, argsToUpdate: any): Promise<any>;
+    static updateOrCreate(...args: any[]): Promise<any>;
     static update(arg: any): Promise<unknown>;
     static transactionOnCommit(callback: () => void): {
         queryId: string;
@@ -53,9 +53,10 @@ export declare class Model {
         unsubscribe: () => Promise<unknown>;
     };
     static ReactiveList(callback: (Model: Model) => void): {
-        readonly value: any[];
+        readonly value: any;
         readonly subscribe: any;
         unsubscribe: () => Promise<any>;
+        setUpdateUi(func: any): void;
     };
     static object: ({ queryId, DBconfig, TableSchema, some }: {
         queryId: any;

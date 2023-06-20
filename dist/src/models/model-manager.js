@@ -37,7 +37,7 @@ ModelAPIRequest.obj = (DatabaseSchema, TableSchema) => {
             return await DBSwitch.requestHandler(TableSchema.name, DatabaseSchema.databaseName, DatabaseSchema.type, 'select', arg, queryId);
         },
         migrate: async (queryId = uniqueGenerator()) => {
-            return await DBSwitch.requestHandler(TableSchema.name, DatabaseSchema.databaseName, DatabaseSchema.type, 'migrate', { DatabaseSchema, TableSchema }, queryId);
+            return await DBSwitch.requestHandler(null, DatabaseSchema.databaseName, DatabaseSchema.type, 'migrate', { DatabaseSchema, TableSchema }, queryId);
         }, trigger: async (args, Subscription, callback) => {
             await ModelMigrations.waitMigration(DatabaseSchema.databaseName);
             DBSwitch.callBackRequestHandler(TableSchema.name, DatabaseSchema.databaseName, DatabaseSchema.type, 'trigger', args, callback, Subscription);
