@@ -208,18 +208,20 @@ export class ModelEditor {
     static addMethodOneToOneField(foreignKeyField, FieldName, modelName, databaseSchema) {
         const foreignKeyFieldModel = foreignKeyField.model;
         const currentModel = models[modelName];
+        // place
         foreignKeyFieldModel['prototype'][modelName] = async function (body) {
             const foreignModel = currentModel;
             const TableSchema = foreignModel.getTableSchema();
             const obj = {};
-            obj[TableSchema.id.keyPath] = this.getPrimaryKeyValue();
+            obj[FieldName] = this.getPrimaryKeyValue();
             return await foreignModel.get(obj);
         };
+        // restaurant  
         currentModel['prototype'][foreignKeyFieldModel['name']] = async function () {
             const foreignModel = foreignKeyFieldModel;
             let params = {};
             const TableSchema = foreignModel.getTableSchema();
-            params[TableSchema.id.keyPath] = this.getPrimaryKeyValue();
+            params[TableSchema.id.keyPath] = this[FieldName];
             return await foreignModel.get(params);
         };
     }

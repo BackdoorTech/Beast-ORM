@@ -342,7 +342,7 @@ export class ForeignKey extends field {
 
 export class OneToOneField extends field {
 	
-	fieldName: FieldKeys = 'ManyToManyField'
+	fieldName: FieldKeys = 'OneToOneField'
 	foreignKey = true
 	model
 	blank?: boolean

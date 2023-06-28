@@ -373,7 +373,7 @@ export class Model {
     }
 
     if(TableSchema.fieldTypes.OneToOneField) {
-      for (let field of TableSchema.fieldTypes.ManyToManyField) {
+      for (let field of TableSchema.fieldTypes.OneToOneField) {
         newInstance[field] = null 
       }
     }

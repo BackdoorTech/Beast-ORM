@@ -6,3 +6,4 @@ plugin_packages
 src/DBMS
 dist/src/connection/***.d.ts
 dist/src/sql/***.d.ts
+ .vscode/

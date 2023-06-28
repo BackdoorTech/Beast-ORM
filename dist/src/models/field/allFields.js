@@ -229,7 +229,7 @@ export class ForeignKey extends field {
 export class OneToOneField extends field {
     constructor(data) {
         super();
-        this.fieldName = 'ManyToManyField';
+        this.fieldName = 'OneToOneField';
         this.foreignKey = true;
         Object.assign(this, data);
     }
