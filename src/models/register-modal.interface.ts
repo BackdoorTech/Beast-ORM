@@ -42,5 +42,6 @@ export interface DatabaseSchemaLocalStorage {
 	type: 'localStorage'
 	version: number;
 	webWorker?:boolean,
-	stores?: TableSchemaLocalStorage[]
+	stores?: TableSchemaLocalStorage[],
+	ignoreFieldsStartWidth?: string[]
 }

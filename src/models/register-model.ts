@@ -16,7 +16,8 @@ interface register {
   /**
    * @description restore values from localStorage for LocalStorage Models
    */
-  restore?: boolean
+  restore?: boolean,
+  ignoreFieldsStartWidth?: string[]
 }
 
 export const models = {}
@@ -217,7 +218,7 @@ export class registerLocalStorage {
     let index = 0;
 
     for (const modelClassRepresentations of entries.models) {
-      const {fields, modelName, attributes , fieldTypes} = LocalStorageModelReader.read(modelClassRepresentations)
+      const {fields, modelName, attributes , fieldTypes} = LocalStorageModelReader.read(modelClassRepresentations, entries.ignoreFieldsStartWidth || [])
       // const idFieldName = attributes?.primaryKey?.shift()
 
       databaseSchema.stores.push({

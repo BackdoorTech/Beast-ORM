@@ -3,6 +3,7 @@ import { LocalStorage } from './models/model.js'
 import * as Fields from './models/field/fields.js'
 import { ModelReader } from './models/model.reader.js'
 import { registerModel, migrate } from './models/register-model.js'
+import { signals } from './models/signal.js'
 
 
 export const models = {
@@ -17,6 +18,9 @@ export const models = {
 			return {}
 		}
 	},
+	core: {
+		signals
+	}
 }
 
 export default models

@@ -15,7 +15,8 @@ export const FieldKeysArray = [
     'indexedDBJsonField',
     'indexedDBArrayField',
     'DateTimeField',
-    'DateField'
+    'DateField',
+    'Unknown'
 
 ] as const; // TS3.4 syntax
 

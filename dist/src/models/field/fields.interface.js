@@ -13,7 +13,8 @@ export const FieldKeysArray = [
     'indexedDBJsonField',
     'indexedDBArrayField',
     'DateTimeField',
-    'DateField'
+    'DateField',
+    'Unknown'
 ]; // TS3.4 syntax
 export const AttributesArray = [
     'maxLength',

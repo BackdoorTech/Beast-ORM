@@ -57,13 +57,12 @@ describe("LocalStorage", () => {
         static $age = 55
       } 
 
-      Person.ignoreAttributes(['$'])
-      
       models.migrate({
         databaseName:'jest-test',
         type: 'localStorage',
         version: 1,
-        models: [Person]
+        models: [Person],
+        ignoreFieldsStartWidth: ["$"]
       })
 
       Person.username = 'save'

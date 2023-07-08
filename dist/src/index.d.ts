@@ -4,6 +4,16 @@ import { ModelReader } from './models/model.reader.js';
 import { registerModel, migrate } from './models/register-model.js';
 export declare const models: {
     Value(arg: any): {};
+    core: {
+        signals: {
+            postSave: {
+                connect(callback: any, models: (typeof LocalStorage)[]): void;
+            };
+            rewriteGet: {
+                connect(callback: Function, models: (typeof LocalStorage)[]): void;
+            };
+        };
+    };
     CharField(data?: import("./models/field/interface.js").CharFieldParams): string;
     BooleanField(data?: import("./models/field/interface.js").BooleanFieldParams): boolean;
     TextField(data?: import("./models/field/interface.js").TextFieldParams): string;

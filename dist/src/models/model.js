@@ -7,6 +7,7 @@ import * as Fields from './field/allFields.js';
 import { taskHolder } from '../connection/taskHolder.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
 import { ReactiveList } from '../reactive/DynamicList.js';
+import { signalExecutor, signals } from './signal.js';
 let methods = {} = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model {
@@ -436,15 +437,28 @@ Model.object = ({ queryId, DBconfig, TableSchema, some = null }) => {
 export class LocalStorage {
     constructor() { }
     static save(data = {}) {
-        const dataToSave = this.getFields(Object.assign(this, Object.assign({}, data)));
         const key = this.getTableSchema().id;
-        localStorage.setItem(key.keyPath, JSON.stringify(dataToSave));
+        const _data = typeof data == 'object' ? data : {};
+        const dataToSave = this.getFields(Object.assign(this, Object.assign({}, _data)));
+        const hasSignal = signals.hasRewriteSave(key.keyPath);
+        if (hasSignal) {
+            signalExecutor.rewriteSave(key.keyPath, this, dataToSave);
+        }
+        else {
+            localStorage.setItem(key.keyPath, JSON.stringify(dataToSave));
+        }
     }
     static get() {
         const key = this.getTableSchema().id;
-        const restedData = JSON.parse(localStorage.getItem(key.keyPath));
-        Object.assign(this, Object.assign({}, restedData));
-        return restedData;
+        const hasSignal = signals.hasRewriteGet(key.keyPath);
+        if (hasSignal) {
+            signalExecutor.rewriteGet(key.keyPath, this);
+        }
+        else {
+            const restedData = JSON.parse(localStorage.getItem(key.keyPath));
+            Object.assign(this, Object.assign({}, restedData));
+            return restedData;
+        }
     }
     static getModelName() {
         return this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
@@ -457,27 +471,16 @@ export class LocalStorage {
         const modalName = this.getModelName();
         return modelsConfigLocalStorage[modalName].TableSchema;
     }
-    static getIgnoreAttributes() {
-        return false;
-    }
-    static ignoreAttributes(attributesStartWidth = []) {
-        if (!this.getIgnoreAttributes()) {
-            this.getIgnoreAttributes = () => {
-                return attributesStartWidth;
-            };
-        }
-    }
     static getFields(arg) {
         const TableSchema = this.getTableSchema();
+        const DBSchema = this.getDBSchema();
+        const ignoreFieldsStartWidth = (DBSchema === null || DBSchema === void 0 ? void 0 : DBSchema.ignoreFieldsStartWidth) || [];
         const filteredArgs = {};
         const fieldsName = TableSchema.fields.map((field) => field.name);
-        const Attributes = this.getIgnoreAttributes();
         const fieldNameFilter = fieldsName.filter((fieldName) => {
-            if (Attributes) {
-                for (let Attribute of Attributes) {
-                    if (fieldName.startsWith(Attribute)) {
-                        return false;
-                    }
+            for (let Attribute of ignoreFieldsStartWidth) {
+                if (fieldName.startsWith(Attribute)) {
+                    return false;
                 }
             }
             return true;
@@ -509,6 +512,12 @@ export class LocalStorage {
     }
     static clearStorage() {
         const key = this.getTableSchema().id;
-        localStorage.removeItem(key.keyPath);
+        const hasSignal = signals.hasRewriteDelete(key.keyPath);
+        if (hasSignal) {
+            signalExecutor.rewriteDelete(key.keyPath, this);
+        }
+        else {
+            localStorage.removeItem(key.keyPath);
+        }
     }
 }

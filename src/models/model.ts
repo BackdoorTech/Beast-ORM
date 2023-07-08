@@ -8,6 +8,7 @@ import  * as Fields from './field/allFields.js'
 import { taskHolder } from '../connection/taskHolder.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
 import { ReactiveList } from '../reactive/DynamicList.js';
+import { signalExecutor, signals } from './signal.js';
 
 let methods : Methods = {} = {}
 
@@ -584,17 +585,34 @@ export class LocalStorage {
   constructor() {}
 
   static save(data: Object = {}) {
-    const dataToSave = this.getFields(Object.assign(this, {...data}))
+
     const key = this.getTableSchema().id
-    localStorage.setItem(key.keyPath, JSON.stringify(dataToSave))
+    const _data = typeof data == 'object'? data : {};
+    const dataToSave = this.getFields(Object.assign(this, {..._data}))
+
+    const hasSignal = signals.hasRewriteSave(key.keyPath)
+    if(hasSignal) {
+      signalExecutor.rewriteSave(key.keyPath, this, dataToSave)
+    } else {
+      
+      localStorage.setItem(key.keyPath, JSON.stringify(dataToSave))
+    }
+
   }
 
   static get() {
     const key = this.getTableSchema().id
-    const restedData = JSON.parse(localStorage.getItem(key.keyPath))
-    Object.assign(this, {...restedData})
 
-    return restedData
+    const hasSignal = signals.hasRewriteGet(key.keyPath)
+    if(hasSignal) {
+      
+      signalExecutor.rewriteGet(key.keyPath, this)
+
+    } else {
+      const restedData = JSON.parse(localStorage.getItem(key.keyPath))
+      Object.assign(this, {...restedData})
+      return restedData
+    }
   }
 
   static getModelName() {
@@ -611,36 +629,24 @@ export class LocalStorage {
     return modelsConfigLocalStorage[modalName].TableSchema;
   }
 
-  private static getIgnoreAttributes(): false | [] {
-    return false
-  }
-
-  static ignoreAttributes(attributesStartWidth: string[] = []) {
-    if(!this.getIgnoreAttributes()) {
-      this.getIgnoreAttributes = (): any => {
-        return attributesStartWidth
-      }
-    }
-  }
-
   private static getFields(arg) {
 
     const TableSchema = this.getTableSchema()
+    const DBSchema = this.getDBSchema()
+
+    const ignoreFieldsStartWidth = DBSchema?.ignoreFieldsStartWidth || []
+
     const filteredArgs = {}
 
     const fieldsName = TableSchema.fields.map((field)=>field.name)
-    const Attributes = this.getIgnoreAttributes()
     
     const fieldNameFilter = fieldsName.filter((fieldName) => {
-      
-      if(Attributes) {
-        for(let Attribute of Attributes) {
-          if(fieldName.startsWith(Attribute)) {
-            return false
-          }
+      for(let Attribute of ignoreFieldsStartWidth) {
+        if(fieldName.startsWith(Attribute)) {
+          return false
         }
       }
-      
+
       return true
     })
 
@@ -680,7 +686,16 @@ export class LocalStorage {
 
   static clearStorage() {
     const key = this.getTableSchema().id
-    localStorage.removeItem(key.keyPath)
+
+    const hasSignal = signals.hasRewriteDelete(key.keyPath)
+    if(hasSignal) {
+      
+      signalExecutor.rewriteDelete(key.keyPath, this)
+  
+    } else {
+      localStorage.removeItem(key.keyPath)
+    }
+
   }
 
 }

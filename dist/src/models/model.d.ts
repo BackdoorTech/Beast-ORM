@@ -78,8 +78,6 @@ export declare class LocalStorage {
     static getModelName(): string;
     static getDBSchema(): DatabaseSchemaLocalStorage;
     static getTableSchema(): TableSchema;
-    private static getIgnoreAttributes;
-    static ignoreAttributes(attributesStartWidth?: string[]): void;
     private static getFields;
     private static formValidation;
     static clear(): void;

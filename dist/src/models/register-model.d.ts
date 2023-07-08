@@ -10,6 +10,7 @@ interface register {
      * @description restore values from localStorage for LocalStorage Models
      */
     restore?: boolean;
+    ignoreFieldsStartWidth?: string[];
 }
 export declare const models: {};
 export declare const modelsConfig: {
