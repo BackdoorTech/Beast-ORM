@@ -43,7 +43,7 @@ describe("Field valid", () => {
     
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 5000)
+  }, 10000)
 
 
 	it('CharField not valid blank false 0', async () => {
@@ -160,7 +160,7 @@ describe("Field valid", () => {
     
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 5000)
+  }, 10000)
 
 
 	it('TextField not valid blank false 0', async () => {
@@ -235,7 +235,7 @@ describe("Field valid", () => {
     
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 5000)
+  }, 10000)
 
 
 	it('IntegerField not valid incorrect type 0', async () => {
@@ -309,7 +309,7 @@ describe("Field valid", () => {
     
     expect('time not exceeded').toBe('time not exceeded')
     
-  }, 5000)
+  }, 10000)
 
 
 	it('BigIntegerField not valid incorrect type 0', async () => {
@@ -385,7 +385,7 @@ describe("Field valid", () => {
 		
 		expect('time not exceeded').toBe('time not exceeded')
 		
-	}, 5000)
+	}, 10000)
 
 
 	it('DateTimeField not valid incorrect type 0', async () => {

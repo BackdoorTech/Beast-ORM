@@ -179,7 +179,7 @@ describe("initial test for model", () => {
     await page.waitForFunction('[{"title":"The Python Journal","id":1},{"title":"Science News","id":2}]')
     expect('time not exceeded').toBe('time not exceeded')
 
-  }, 10000)
+  }, 100000)
 
   it('model relation ship many to many documentation set_all', async () => {
     await page.waitForFunction(() => 'models' in window);

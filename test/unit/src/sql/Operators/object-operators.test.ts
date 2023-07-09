@@ -24,7 +24,7 @@ describe("comparisonOperator", () => {
 			} 
 
 			models.register({
-				databaseName:'jest-test',
+				databaseName:'',
 				type: 'indexedDB',
 				version: 1,
 				models: [Person]
@@ -58,7 +58,7 @@ describe("comparisonOperator", () => {
 			} 
 
 			models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -98,7 +98,7 @@ describe("comparisonOperator", () => {
 			} 
 
 			models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -139,7 +139,7 @@ describe("comparisonOperator", () => {
 			} 
 
 			models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -180,7 +180,7 @@ describe("comparisonOperator", () => {
 			} 
 
 			models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -223,7 +223,7 @@ describe("comparisonOperator", () => {
 			} 
 
 			models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -265,7 +265,7 @@ describe("comparisonOperator", () => {
 			} 
 
 			models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -307,7 +307,7 @@ describe("comparisonOperator", () => {
 			} 
 
 			models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -351,7 +351,7 @@ describe("comparisonOperator", () => {
 			}
 
 			models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -386,7 +386,7 @@ describe("comparisonOperator", () => {
 			}
 
 			models.register({
-        databaseName:'jest-test',
+        databaseName:'',
         type: 'indexedDB',
         version: 1,
         models: [Person]
@@ -421,7 +421,7 @@ describe("comparisonOperator", () => {
 
 				const models: typeof modelsType = window['models']
 				const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
-			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
+				const argsAttributes: typeof argsAttributesType = window['argsAttributes']
 				
 				const { ArrayField, JsonField} = models.indexedDB.fields
 
@@ -431,7 +431,7 @@ describe("comparisonOperator", () => {
 				}
 
 				models.register({
-					databaseName:'jest-test',
+					databaseName:'',
 					type: 'indexedDB',
 					version: 1,
 					models: [Person]
@@ -450,9 +450,9 @@ describe("comparisonOperator", () => {
 
 				const filterParams = [{data__owner__isNull:  true }]
 
-							const args = new argsAttributes(filterParams, tableSchema)
+				const args = new argsAttributes(filterParams, tableSchema)
 
-			const operator = new ObjectOperator(tableSchema, args)
+				const operator = new ObjectOperator(tableSchema, args)
 				const result: Boolean = await operator.run(row)
 				
 				document.body.innerHTML = 'result: '+ JSON.stringify(result) 
@@ -475,7 +475,7 @@ describe("comparisonOperator", () => {
 			}
 
 			models.register({
-				databaseName:'jest-test',
+				databaseName:'',
 				type: 'indexedDB',
 				version: 1,
 				models: [Person]

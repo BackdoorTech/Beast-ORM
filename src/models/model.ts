@@ -1,8 +1,8 @@
 import { hashCode, uniqueGenerator } from '../utils.js'
 import { Methods, getParams, Method } from './model.interface.js'
-import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchema  } from './register-modal.interface.js';
+import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchema, TableSchemaLocalStorage  } from './register-modal.interface.js';
 import { ModelAPIRequest } from './model-manager.js';
-import { models, modelsConfig, modelsConfigLocalStorage } from './register-model.js'
+import { objModels } from './register-model.js'
 import { FieldType } from '../sql/query/interface.js';
 import  * as Fields from './field/allFields.js'
 import { taskHolder } from '../connection/taskHolder.js';
@@ -23,22 +23,21 @@ export class Model {
     return Model.get(arg)
   }
 
-  getDBSchema(): DatabaseSchema  {
-    const modelName = this.constructor.name
-    return modelsConfig[modelName].DatabaseSchema
-  }
 
   getModelName() {
     return this.constructor.name
   }
   
-  filter(...arg) {
-    return Model.filter(arg)
+
+  getDBSchema(): DatabaseSchema  {
+    return {} as DatabaseSchema 
   }
 
   getTableSchema(): TableSchema {
-    const modelName = this.constructor.name
-    return modelsConfig[modelName].TableSchema
+    return {} as TableSchema
+  }
+  filter(...arg) {
+    return Model.filter(arg)
   }
 
   getPrimaryKeyValue() {
@@ -223,10 +222,8 @@ export class Model {
     if(!foundObj) {
       return false
     }
-
-    const ModelName = this.getModelName()
     
-    let newInstance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: foundObj})
+    let newInstance = this.newInstance({ TableSchema, DBconfig, dataToMerge: foundObj})
 
     return  newInstance
   }
@@ -256,15 +253,11 @@ export class Model {
   }
 
   static getDBSchema(): DatabaseSchema  {
-
-    const modalName = this.getModelName()
-    return modelsConfig[modalName].DatabaseSchema 
+    return {} as DatabaseSchema 
   }
 
   static getTableSchema(): TableSchema {
-
-    const modalName = this.getModelName()
-    return modelsConfig[modalName].TableSchema;
+    return {} as TableSchema
   }
 
 
@@ -341,14 +334,13 @@ export class Model {
       await ModelAPIRequest.obj(DBconfig, TableSchema).create(_methods, queryId, ({id, index}) => {
         const insert = arg[index]
         insert[TableSchema.id.keyPath] = id
-        const instance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: insert})
+        const instance = this.newInstance({ TableSchema, DBconfig, dataToMerge: insert})
         result.push(instance)
       })
 
       taskHolder.updateFunction(queryId, "done", () => {
         
         if(arg.length == 1) {
-          console.log('done', result[0])
           resolve(result[0])
         } else {
           resolve(result)
@@ -361,8 +353,14 @@ export class Model {
 
   }
 
-  private static newInstance({ TableSchema, DBconfig, ModelName, dataToMerge }) {
-    let newInstance = new models[ModelName]();
+  static getMode(TableSchema) {
+   return  objModels[TableSchema.databaseName+TableSchema.name]
+  }
+
+  private static newInstance({ TableSchema, DBconfig, dataToMerge }) {
+    const model = this.getMode(TableSchema)
+
+    let newInstance = new model();
 
     delete newInstance[TableSchema.id.keyPath]
 
@@ -398,14 +396,13 @@ export class Model {
     const result: any[] = await this.filter(getArg).execute()
     const TableSchema = this.getTableSchema()
     const DBconfig = this.getDBSchema()
-    const ModelName = this.getModelName();
 
     let instance;
     let created;
     
     if(result.length == 1) {
       created = false
-      instance =  await this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[0] })
+      instance =  await this.newInstance({ TableSchema, DBconfig, dataToMerge: result[0] })
     } else {
       created = true
       instance = await this.create(Object.assign(getArg, defaultCreate))
@@ -508,11 +505,11 @@ export class Model {
 
 
   static transactionOnCommit (callback : () => void) {
-    return transactionOnCommit.subscribe(this as unknown as Model, callback)
+    return transactionOnCommit.subscribe(this as typeof Model, callback)
   }
 
   static ReactiveList (callback : (Model: Model) => void) {
-    return ReactiveList.subscribe(this as unknown as Model, callback)
+    return ReactiveList.subscribe(this as typeof Model, callback)
   }
 
   static object = ({queryId, DBconfig, TableSchema,  some = null}) => {
@@ -544,7 +541,7 @@ export class Model {
           resolve(result);
 
           for(let i of result) {
-            result[i] = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[i]})
+            result[i] = this.newInstance({ TableSchema, DBconfig, dataToMerge: result[i]})
           }
         })
         
@@ -571,7 +568,7 @@ export class Model {
 
           resolve(result);
           for(let i of result) {
-            result[i] = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[i]})
+            result[i] = this.newInstance({ TableSchema, DBconfig, dataToMerge: result[i]})
           }
         });
       }
@@ -616,17 +613,15 @@ export class LocalStorage {
   }
 
   static getModelName() {
-    return this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
+    return this['$keyName'] || this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
   }
 
   static getDBSchema(): DatabaseSchemaLocalStorage  {
-    const modalName = this.getModelName()
-    return modelsConfigLocalStorage[modalName].DatabaseSchema 
+    return 
   }
 
-  static getTableSchema(): TableSchema {
-    const modalName = this.getModelName()
-    return modelsConfigLocalStorage[modalName].TableSchema;
+  static getTableSchema(): TableSchemaLocalStorage {
+    return 
   }
 
   private static getFields(arg) {

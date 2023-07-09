@@ -10,8 +10,8 @@ export declare class transactionOnCommit {
     static subscription: {
         [SubscriptionName: string]: boolean;
     };
-    static prepare(Model: Model): void;
-    static subscribe(Model: Model, callback: any): {
+    static prepare(model: typeof Model): void;
+    static subscribe(model: typeof Model, callback: any): {
         queryId: string;
         subscribe: boolean;
         unsubscribe: () => Promise<unknown>;

@@ -1,10 +1,11 @@
 import { getParams } from './model.interface.js';
-import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchema } from './register-modal.interface.js';
+import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchema, TableSchemaLocalStorage } from './register-modal.interface.js';
 export declare class Model {
     constructor();
     get(arg: any): Promise<any>;
-    getDBSchema(): DatabaseSchema;
     getModelName(): string;
+    getDBSchema(): DatabaseSchema;
+    getTableSchema(): TableSchema;
     filter(...arg: any[]): {
         filter: (...args: any[]) => void;
         execute: () => Promise<any[]>;
@@ -12,7 +13,6 @@ export declare class Model {
         delete: () => Promise<unknown>;
         all: () => Promise<any[]>;
     };
-    getTableSchema(): TableSchema;
     getPrimaryKeyValue(): any;
     private setDataToInstance;
     private static setDataToInstance;
@@ -43,6 +43,7 @@ export declare class Model {
     private static getEmptyFields;
     private static getFields;
     static create(arg: any): Promise<any>;
+    static getMode(TableSchema: any): any;
     private static newInstance;
     static createOrFind(getArg: any, defaultCreate: any): Promise<any[]>;
     static updateOrCreate(...args: any[]): Promise<any>;
@@ -75,9 +76,9 @@ export declare class LocalStorage {
     constructor();
     static save(data?: Object): void;
     static get(): any;
-    static getModelName(): string;
+    static getModelName(): any;
     static getDBSchema(): DatabaseSchemaLocalStorage;
-    static getTableSchema(): TableSchema;
+    static getTableSchema(): TableSchemaLocalStorage;
     private static getFields;
     private static formValidation;
     static clear(): void;

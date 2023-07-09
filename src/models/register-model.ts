@@ -2,11 +2,12 @@ import { Model, LocalStorage } from './model.js';
 import { LocalStorageModelReader, ModelReader } from './model.reader.js';
 import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchema, TableSchemaLocalStorage  } from './register-modal.interface.js';
 import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js';
-import { uncapitalize, uniqueGenerator } from '../utils.js';
+import { hashCode, uncapitalize, uniqueGenerator } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js'
 import { ModelAPIRequest } from './model-manager.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
+import { DatabaseManagerSchema } from './schema/databae-manager-schema.js';
 
 interface register {
   databaseName: string,
@@ -20,7 +21,10 @@ interface register {
   ignoreFieldsStartWidth?: string[]
 }
 
-export const models = {}
+const models = {}
+
+export const objModels = {}
+
 export const modelsConfig: {[key:string]: {
   DatabaseSchema:DatabaseSchema,
   TableSchema:TableSchema,
@@ -28,8 +32,8 @@ export const modelsConfig: {[key:string]: {
 }} = {}
 
 
-export const modelsLocalStorage = {}
-export const modelsConfigLocalStorage: {[key:string]: { 
+const modelsLocalStorage = {}
+const modelsConfigLocalStorage: {[key:string]: { 
   DatabaseSchema:DatabaseSchemaLocalStorage,
   TableSchema:TableSchemaLocalStorage
 }} = {}
@@ -43,6 +47,10 @@ export function migrate(register: register) {
   }
 }
 export class registerModel {
+
+
+  static ModalName() {}
+
   static async register(entries: register) {
     
     const databaseSchema : DatabaseSchema  = {
@@ -57,13 +65,14 @@ export class registerModel {
     for (const modelClassRepresentations of entries.models) {
 
       const ModelName = modelClassRepresentations.getModelName()
-      models[ModelName] = modelClassRepresentations 
+      models[ModelName] = modelClassRepresentations as typeof Model
 
       const {fields, modelName, attributes , fieldTypes} = ModelReader.read(modelClassRepresentations)
       
       const idFieldName = attributes?.primaryKey?.shift()
 
       databaseSchema.stores.push({
+        databaseName: databaseSchema.databaseName,
         name: modelName,
         id: {
           keyPath: idFieldName || 'id', //by default primary key is id
@@ -79,7 +88,7 @@ export class registerModel {
 
       for(const [fieldName, Field] of  Object.entries(fields)) {
         // dont register fields that is primary key and auto increment
-        if(!(Field?.primaryKey && Field?.autoIncrement  ) && !fieldTypes['ManyToManyField']?.includes(fieldName) ) {
+        if(!(Field?.primaryKey && Field?.autoIncrement  ) && !fieldTypes['ManyToManyField']?.includes(fieldName) && !fieldTypes['Unknown']?.includes(fieldName) ) {
 
           const removeReferenceField  = {... Field}
           if(removeReferenceField?.model) {
@@ -109,7 +118,7 @@ export class registerModel {
         }
       }
 
-      models[ModelName] = modelClassRepresentations
+      models[ModelName] = modelClassRepresentations as  typeof Model 
 
       const tableSchema = databaseSchema.stores.find((e)=> e.name == ModelName)
 
@@ -118,9 +127,24 @@ export class registerModel {
         TableSchema: tableSchema
       }
 
-      transactionOnCommit.prepare(modelClassRepresentations as any)
-
       index++;
+    }
+
+    DatabaseManagerSchema.prepare(databaseSchema)
+    
+    
+    for (const stores of databaseSchema.stores) {
+      const model = models[stores.name] as typeof Model
+      const DbName = databaseSchema.databaseName
+      
+      ModelEditor.setTableSchema(model, DbName)
+      ModelEditor.getDBSchema(model, DbName)
+
+      // ModelEditor.setModel(model, DbName)
+      DatabaseManagerSchema.getDb(DbName).getTable(stores.name).setModel(model)
+      transactionOnCommit.prepare(model)
+
+      objModels[DbName+stores.name] = model
     }
 
     if(databaseSchema.type == 'indexedDB') {
@@ -141,6 +165,7 @@ export class registerModel {
     const tableName = currentModelName+foreignKeyFieldModelName
 
     const num = databaseSchema.stores.push({
+      databaseName: databaseSchema.databaseName,
       name: tableName,
       id: { keyPath:'id', autoIncrement: true, type: FieldType.INT},
       fields: [
@@ -210,21 +235,18 @@ export class registerLocalStorage {
     };
 
 
-    for (const modelClassRepresentations of entries.models) {
-      const ModelName = modelClassRepresentations.getModelName()
-      modelsLocalStorage[ModelName] = modelClassRepresentations 
-    }
-
     let index = 0;
 
     for (const modelClassRepresentations of entries.models) {
+      const ModelName = this.ModelName(modelClassRepresentations as typeof LocalStorage)
+      modelsLocalStorage[ModelName] = modelClassRepresentations 
+
       const {fields, modelName, attributes , fieldTypes} = LocalStorageModelReader.read(modelClassRepresentations, entries.ignoreFieldsStartWidth || [])
-      // const idFieldName = attributes?.primaryKey?.shift()
 
       databaseSchema.stores.push({
-        name: modelName,
+        name: ModelName,
         id: {
-          keyPath: modelName, //by default primary key is id
+          keyPath: ModelName, //by default primary key is id
           type: FieldType.VARCHAR,
           autoIncrement: false
         },
@@ -245,14 +267,21 @@ export class registerLocalStorage {
           fieldAttributes:  Object.assign({}, Field)
         })
       }
-
+      
       index++;
     }
 
-   
-    for(const modelClassRepresentations of entries.models) {
-      
-      const ModelName = modelClassRepresentations.getModelName()
+    for (const stores of databaseSchema.stores) {
+      const model = modelsLocalStorage[stores.name] as typeof LocalStorage
+
+      ModelEditor.setTableSchemaLocalStorage(model, stores)
+      ModelEditor.getDBSchemaLocalStorage(model, databaseSchema)
+    }
+    
+  }
+
+
+  static edit(ModelName: any, databaseSchema: any, modelClassRepresentations: any, entries: any) {
       const tableSchema = databaseSchema.stores.find((e)=> e.name == ModelName)
          
       modelClassRepresentations.getDBSchema = (): any => {
@@ -261,6 +290,10 @@ export class registerLocalStorage {
 
       modelClassRepresentations.getTableSchema = (): any => {
         return tableSchema
+      }
+
+      modelClassRepresentations.getModelName = (): any => {
+        return ModelName
       }
 
       modelsConfigLocalStorage[ModelName] = {
@@ -272,12 +305,90 @@ export class registerLocalStorage {
       if(entries?.restore) {
         modelClassRepresentations.get(null)
       }
-    }
+  }
+
+  static ModelName(modelClassRepresentations: typeof LocalStorage): string {
+    const ModelName = modelClassRepresentations.getModelName()
     
+    if(modelsLocalStorage[ModelName]) {
+      return hashCode(modelClassRepresentations.toString()).toString() 
+    } 
+
+    return ModelName
   }
 }
 
 export class ModelEditor {
+
+  static setTableSchemaLocalStorage(ModelToEdit: typeof LocalStorage, TableSchema: TableSchemaLocalStorage) {
+    ModelToEdit.getTableSchema = () => {
+      return TableSchema
+    }
+  }
+
+  static getDBSchemaLocalStorage(ModelToEdit: typeof LocalStorage, DatabaseSchema: DatabaseSchemaLocalStorage) {
+
+    ModelToEdit.getDBSchema = () => {
+      return DatabaseSchema
+    }
+  }
+
+  static setTableSchema(ModelToEdit: typeof Model, DbName) {
+
+    const ModelName = ModelToEdit.getModelName()
+    const DBSchema = DatabaseManagerSchema.getDb(DbName)
+    const TableSchemaClass = DBSchema.getTable(ModelName)
+
+    ModelToEdit.prototype.getTableSchema = () => {
+      return TableSchemaClass.config
+    }
+    ModelToEdit.getTableSchema = () => {
+      return TableSchemaClass.config
+    }
+  }
+
+  static getDBSchema(ModelToEdit: typeof Model, DbName) {
+
+    const ModelName = ModelToEdit.getModelName()
+    const DBSchema = DatabaseManagerSchema.getDb(DbName)
+
+    ModelToEdit.prototype.getDBSchema = () => {
+      return DBSchema.config
+    }
+    ModelToEdit.getDBSchema = () => {
+      return DBSchema.config
+    }
+  }
+
+  // static setModel(ModelToEdit: typeof Model, DbName) {
+
+  //   const ModelName = ModelToEdit.getModelName()
+  //   const DBSchema = DatabaseManagerSchema.getDb(DbName)
+  //   const TableSchemaClass = DBSchema.getTable(ModelName)
+
+  //   console.log('set model '+ ModelName)
+
+  //   ModelToEdit.prototype.getModel = () => {
+  //     const model = TableSchemaClass.getModel()
+
+  //     if(!model) {
+  //       console.log('model!!!!!!!!!!!!!', model, ModelName)
+  //     }
+
+  //     return new model()
+  //   }
+  //   ModelToEdit.getModel = () => {
+      
+  //     const model = TableSchemaClass.getModel()
+      
+  //     if(!model) {
+  //       console.log('model!!!!!!!!!!!!!', model, ModelName)
+  //     }
+  //     return new model()
+  //   }
+
+  // }
+
   static addMethodOneToOneField(foreignKeyField:OneToOneField, FieldName:string, modelName:string, databaseSchema:DatabaseSchema) {
 
     const foreignKeyFieldModel: Model = foreignKeyField.model
@@ -354,9 +465,12 @@ export class ModelEditor {
 
     const currentModel: Model = models[modelName]
 
-    const middleTable = await registerModel.manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema)
+    const _middleTable = await registerModel.manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema)
 
     currentModel['prototype'][FieldName+'_add'] = async function (modelInstances) {
+
+      const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel()
+
       if(modelInstances.constructor.name != 'Array') {
         modelInstances = [modelInstances]
       }
@@ -378,12 +492,15 @@ export class ModelEditor {
 
     currentModel['prototype'][FieldName] = function()  {
       
+      const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel()
+
       let _model = this
 
       return  {
         async all () {
           let params = {}
           params[`iD${_model.getModelName()}`] = _model.getPrimaryKeyValue()
+
           const middleTableResult = await middleTable['filter'](params).execute()
 
           foreignKeyField.model
@@ -395,7 +512,8 @@ export class ModelEditor {
 
 
     currentModel['prototype'][FieldName+'_all'] = async function()  {
-      
+      const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel()
+
       let _model = this
 
       let params = {}
@@ -430,6 +548,8 @@ export class ModelEditor {
 
     foreignKeyField.model['prototype'][uncapitalize(modelName)+'_set_all'] = async function()  {
       let _model = this
+      const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel()
+
 
       let params = {}
       let result = []
@@ -467,6 +587,7 @@ function generateGenericModel ({DBSchema, ModelName, TableSchema}) {
   class GenericModel extends  Model {}
 
 
+
   for (const [Field, value] of Object.entries(Model)) {
     GenericModel[Field] = value
   }
@@ -484,6 +605,15 @@ function generateGenericModel ({DBSchema, ModelName, TableSchema}) {
   GenericModel.prototype['getTableSchema'] = () => {
     return TableSchema
   }
+
+  // GenericModel.prototype.getModel = (): any => {
+  //   return new GenericModel()
+  // }
+
+  // GenericModel.getModel = (): any => {
+  //   return new GenericModel()
+  // }
+
 
 
   GenericModel['getDBSchema'] = () => {

@@ -1,15 +1,17 @@
 import { Model } from './model.js';
 import { LocalStorageModelReader, ModelReader } from './model.reader.js';
 import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js';
-import { uncapitalize, uniqueGenerator } from '../utils.js';
+import { hashCode, uncapitalize, uniqueGenerator } from '../utils.js';
 import { FieldType } from '../sql/query/interface.js';
 import { ModelMigrations } from './mode-migrations.js';
 import { ModelAPIRequest } from './model-manager.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
-export const models = {};
+import { DatabaseManagerSchema } from './schema/databae-manager-schema.js';
+const models = {};
+export const objModels = {};
 export const modelsConfig = {};
-export const modelsLocalStorage = {};
-export const modelsConfigLocalStorage = {};
+const modelsLocalStorage = {};
+const modelsConfigLocalStorage = {};
 export function migrate(register) {
     if (register.type == 'indexedDB') {
         registerModel.register(register);
@@ -19,8 +21,9 @@ export function migrate(register) {
     }
 }
 export class registerModel {
+    static ModalName() { }
     static async register(entries) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         const databaseSchema = {
             databaseName: entries.databaseName || uniqueGenerator(),
             version: entries.version,
@@ -34,6 +37,7 @@ export class registerModel {
             const { fields, modelName, attributes, fieldTypes } = ModelReader.read(modelClassRepresentations);
             const idFieldName = (_a = attributes === null || attributes === void 0 ? void 0 : attributes.primaryKey) === null || _a === void 0 ? void 0 : _a.shift();
             databaseSchema.stores.push({
+                databaseName: databaseSchema.databaseName,
                 name: modelName,
                 id: {
                     keyPath: idFieldName || 'id',
@@ -46,7 +50,7 @@ export class registerModel {
             });
             for (const [fieldName, Field] of Object.entries(fields)) {
                 // dont register fields that is primary key and auto increment
-                if (!((Field === null || Field === void 0 ? void 0 : Field.primaryKey) && (Field === null || Field === void 0 ? void 0 : Field.autoIncrement)) && !((_c = fieldTypes['ManyToManyField']) === null || _c === void 0 ? void 0 : _c.includes(fieldName))) {
+                if (!((Field === null || Field === void 0 ? void 0 : Field.primaryKey) && (Field === null || Field === void 0 ? void 0 : Field.autoIncrement)) && !((_c = fieldTypes['ManyToManyField']) === null || _c === void 0 ? void 0 : _c.includes(fieldName)) && !((_d = fieldTypes['Unknown']) === null || _d === void 0 ? void 0 : _d.includes(fieldName))) {
                     const removeReferenceField = Object.assign({}, Field);
                     if (removeReferenceField === null || removeReferenceField === void 0 ? void 0 : removeReferenceField.model) {
                         removeReferenceField.model = removeReferenceField.model.getModelName();
@@ -78,8 +82,18 @@ export class registerModel {
                 DatabaseSchema: databaseSchema,
                 TableSchema: tableSchema
             };
-            transactionOnCommit.prepare(modelClassRepresentations);
             index++;
+        }
+        DatabaseManagerSchema.prepare(databaseSchema);
+        for (const stores of databaseSchema.stores) {
+            const model = models[stores.name];
+            const DbName = databaseSchema.databaseName;
+            ModelEditor.setTableSchema(model, DbName);
+            ModelEditor.getDBSchema(model, DbName);
+            // ModelEditor.setModel(model, DbName)
+            DatabaseManagerSchema.getDb(DbName).getTable(stores.name).setModel(model);
+            transactionOnCommit.prepare(model);
+            objModels[DbName + stores.name] = model;
         }
         if (databaseSchema.type == 'indexedDB') {
             await ModelAPIRequest.obj(databaseSchema).migrate();
@@ -93,6 +107,7 @@ export class registerModel {
         const currentModelName = models[modelName].getModelName();
         const tableName = currentModelName + foreignKeyFieldModelName;
         const num = databaseSchema.stores.push({
+            databaseName: databaseSchema.databaseName,
             name: tableName,
             id: { keyPath: 'id', autoIncrement: true, type: FieldType.INT },
             fields: [
@@ -151,18 +166,15 @@ export class registerLocalStorage {
             type: 'localStorage',
             stores: []
         };
-        for (const modelClassRepresentations of entries.models) {
-            const ModelName = modelClassRepresentations.getModelName();
-            modelsLocalStorage[ModelName] = modelClassRepresentations;
-        }
         let index = 0;
         for (const modelClassRepresentations of entries.models) {
+            const ModelName = this.ModelName(modelClassRepresentations);
+            modelsLocalStorage[ModelName] = modelClassRepresentations;
             const { fields, modelName, attributes, fieldTypes } = LocalStorageModelReader.read(modelClassRepresentations, entries.ignoreFieldsStartWidth || []);
-            // const idFieldName = attributes?.primaryKey?.shift()
             databaseSchema.stores.push({
-                name: modelName,
+                name: ModelName,
                 id: {
-                    keyPath: modelName,
+                    keyPath: ModelName,
                     type: FieldType.VARCHAR,
                     autoIncrement: false
                 },
@@ -184,27 +196,92 @@ export class registerLocalStorage {
             }
             index++;
         }
-        for (const modelClassRepresentations of entries.models) {
-            const ModelName = modelClassRepresentations.getModelName();
-            const tableSchema = databaseSchema.stores.find((e) => e.name == ModelName);
-            modelClassRepresentations.getDBSchema = () => {
-                return databaseSchema;
-            };
-            modelClassRepresentations.getTableSchema = () => {
-                return tableSchema;
-            };
-            modelsConfigLocalStorage[ModelName] = {
-                DatabaseSchema: databaseSchema,
-                TableSchema: tableSchema
-            };
-            modelsLocalStorage[ModelName] = modelClassRepresentations;
-            if (entries === null || entries === void 0 ? void 0 : entries.restore) {
-                modelClassRepresentations.get(null);
-            }
+        for (const stores of databaseSchema.stores) {
+            const model = modelsLocalStorage[stores.name];
+            ModelEditor.setTableSchemaLocalStorage(model, stores);
+            ModelEditor.getDBSchemaLocalStorage(model, databaseSchema);
         }
+    }
+    static edit(ModelName, databaseSchema, modelClassRepresentations, entries) {
+        const tableSchema = databaseSchema.stores.find((e) => e.name == ModelName);
+        modelClassRepresentations.getDBSchema = () => {
+            return databaseSchema;
+        };
+        modelClassRepresentations.getTableSchema = () => {
+            return tableSchema;
+        };
+        modelClassRepresentations.getModelName = () => {
+            return ModelName;
+        };
+        modelsConfigLocalStorage[ModelName] = {
+            DatabaseSchema: databaseSchema,
+            TableSchema: tableSchema
+        };
+        modelsLocalStorage[ModelName] = modelClassRepresentations;
+        if (entries === null || entries === void 0 ? void 0 : entries.restore) {
+            modelClassRepresentations.get(null);
+        }
+    }
+    static ModelName(modelClassRepresentations) {
+        const ModelName = modelClassRepresentations.getModelName();
+        if (modelsLocalStorage[ModelName]) {
+            return hashCode(modelClassRepresentations.toString()).toString();
+        }
+        return ModelName;
     }
 }
 export class ModelEditor {
+    static setTableSchemaLocalStorage(ModelToEdit, TableSchema) {
+        ModelToEdit.getTableSchema = () => {
+            return TableSchema;
+        };
+    }
+    static getDBSchemaLocalStorage(ModelToEdit, DatabaseSchema) {
+        ModelToEdit.getDBSchema = () => {
+            return DatabaseSchema;
+        };
+    }
+    static setTableSchema(ModelToEdit, DbName) {
+        const ModelName = ModelToEdit.getModelName();
+        const DBSchema = DatabaseManagerSchema.getDb(DbName);
+        const TableSchemaClass = DBSchema.getTable(ModelName);
+        ModelToEdit.prototype.getTableSchema = () => {
+            return TableSchemaClass.config;
+        };
+        ModelToEdit.getTableSchema = () => {
+            return TableSchemaClass.config;
+        };
+    }
+    static getDBSchema(ModelToEdit, DbName) {
+        const ModelName = ModelToEdit.getModelName();
+        const DBSchema = DatabaseManagerSchema.getDb(DbName);
+        ModelToEdit.prototype.getDBSchema = () => {
+            return DBSchema.config;
+        };
+        ModelToEdit.getDBSchema = () => {
+            return DBSchema.config;
+        };
+    }
+    // static setModel(ModelToEdit: typeof Model, DbName) {
+    //   const ModelName = ModelToEdit.getModelName()
+    //   const DBSchema = DatabaseManagerSchema.getDb(DbName)
+    //   const TableSchemaClass = DBSchema.getTable(ModelName)
+    //   console.log('set model '+ ModelName)
+    //   ModelToEdit.prototype.getModel = () => {
+    //     const model = TableSchemaClass.getModel()
+    //     if(!model) {
+    //       console.log('model!!!!!!!!!!!!!', model, ModelName)
+    //     }
+    //     return new model()
+    //   }
+    //   ModelToEdit.getModel = () => {
+    //     const model = TableSchemaClass.getModel()
+    //     if(!model) {
+    //       console.log('model!!!!!!!!!!!!!', model, ModelName)
+    //     }
+    //     return new model()
+    //   }
+    // }
     static addMethodOneToOneField(foreignKeyField, FieldName, modelName, databaseSchema) {
         const foreignKeyFieldModel = foreignKeyField.model;
         const currentModel = models[modelName];
@@ -251,8 +328,9 @@ export class ModelEditor {
         const foreignKeyFieldModel = foreignKeyField.model;
         FieldName = FieldName;
         const currentModel = models[modelName];
-        const middleTable = await registerModel.manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema);
+        const _middleTable = await registerModel.manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema);
         currentModel['prototype'][FieldName + '_add'] = async function (modelInstances) {
+            const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel();
             if (modelInstances.constructor.name != 'Array') {
                 modelInstances = [modelInstances];
             }
@@ -269,6 +347,7 @@ export class ModelEditor {
             }
         };
         currentModel['prototype'][FieldName] = function () {
+            const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel();
             let _model = this;
             return {
                 async all() {
@@ -281,6 +360,7 @@ export class ModelEditor {
             };
         };
         currentModel['prototype'][FieldName + '_all'] = async function () {
+            const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel();
             let _model = this;
             let params = {};
             let result = [];
@@ -307,6 +387,7 @@ export class ModelEditor {
         };
         foreignKeyField.model['prototype'][uncapitalize(modelName) + '_set_all'] = async function () {
             let _model = this;
+            const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel();
             let params = {};
             let result = [];
             params[`iD${_model.getModelName()}`] = _model.getPrimaryKeyValue();
@@ -348,6 +429,12 @@ function generateGenericModel({ DBSchema, ModelName, TableSchema }) {
     GenericModel.prototype['getTableSchema'] = () => {
         return TableSchema;
     };
+    // GenericModel.prototype.getModel = (): any => {
+    //   return new GenericModel()
+    // }
+    // GenericModel.getModel = (): any => {
+    //   return new GenericModel()
+    // }
     GenericModel['getDBSchema'] = () => {
         return DBSchema;
     };

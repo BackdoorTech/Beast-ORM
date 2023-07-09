@@ -11,7 +11,7 @@ export declare class ModelReader {
 }
 export declare class LocalStorageModelReader {
     static read(modelClassRepresentation: any, ignoreFieldsStartWidth: string[]): {
-        modelName: string;
+        modelName: any;
         fields: {
             [key: string]: any;
         };

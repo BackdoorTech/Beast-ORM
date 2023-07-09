@@ -14,11 +14,13 @@ export interface FieldSchema {
 }
 
 export interface TableSchema {
+	databaseName: string
 	name: string,
 	id: { keyPath: string , autoIncrement?: boolean , type:  FieldType},
 	fields: FieldSchema[]
 	attributes: AttributesMap<FieldAttributesKeys, string[]> 
 	fieldTypes: FieldsMap<FieldKeys, string[]>
+	middle?: boolean
 }
 
 export interface DatabaseSchema {

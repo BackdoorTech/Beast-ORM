@@ -1,7 +1,7 @@
 var _a;
 import { hashCode, uniqueGenerator } from '../utils.js';
 import { ModelAPIRequest } from './model-manager.js';
-import { models, modelsConfig, modelsConfigLocalStorage } from './register-model.js';
+import { objModels } from './register-model.js';
 import { FieldType } from '../sql/query/interface.js';
 import * as Fields from './field/allFields.js';
 import { taskHolder } from '../connection/taskHolder.js';
@@ -15,19 +15,17 @@ export class Model {
     get(arg) {
         return Model.get(arg);
     }
-    getDBSchema() {
-        const modelName = this.constructor.name;
-        return modelsConfig[modelName].DatabaseSchema;
-    }
     getModelName() {
         return this.constructor.name;
     }
-    filter(...arg) {
-        return Model.filter(arg);
+    getDBSchema() {
+        return {};
     }
     getTableSchema() {
-        const modelName = this.constructor.name;
-        return modelsConfig[modelName].TableSchema;
+        return {};
+    }
+    filter(...arg) {
+        return Model.filter(arg);
     }
     getPrimaryKeyValue() {
         const TableSchema = this.getTableSchema();
@@ -159,8 +157,7 @@ export class Model {
         if (!foundObj) {
             return false;
         }
-        const ModelName = this.getModelName();
-        let newInstance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: foundObj });
+        let newInstance = this.newInstance({ TableSchema, DBconfig, dataToMerge: foundObj });
         return newInstance;
     }
     static async getOrCreate(arg) {
@@ -185,12 +182,10 @@ export class Model {
         return this.object({ queryId, DBconfig, TableSchema, some: ['filter', arg] });
     }
     static getDBSchema() {
-        const modalName = this.getModelName();
-        return modelsConfig[modalName].DatabaseSchema;
+        return {};
     }
     static getTableSchema() {
-        const modalName = this.getModelName();
-        return modelsConfig[modalName].TableSchema;
+        return {};
     }
     static async getEmptyFields() {
         const TableSchema = this.getTableSchema();
@@ -243,12 +238,11 @@ export class Model {
             await ModelAPIRequest.obj(DBconfig, TableSchema).create(_methods, queryId, ({ id, index }) => {
                 const insert = arg[index];
                 insert[TableSchema.id.keyPath] = id;
-                const instance = this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: insert });
+                const instance = this.newInstance({ TableSchema, DBconfig, dataToMerge: insert });
                 result.push(instance);
             });
             taskHolder.updateFunction(queryId, "done", () => {
                 if (arg.length == 1) {
-                    console.log('done', result[0]);
                     resolve(result[0]);
                 }
                 else {
@@ -258,8 +252,12 @@ export class Model {
             });
         });
     }
-    static newInstance({ TableSchema, DBconfig, ModelName, dataToMerge }) {
-        let newInstance = new models[ModelName]();
+    static getMode(TableSchema) {
+        return objModels[TableSchema.databaseName + TableSchema.name];
+    }
+    static newInstance({ TableSchema, DBconfig, dataToMerge }) {
+        const model = this.getMode(TableSchema);
+        let newInstance = new model();
         delete newInstance[TableSchema.id.keyPath];
         if (TableSchema.fieldTypes.ManyToManyField) {
             for (let field of TableSchema.fieldTypes.ManyToManyField) {
@@ -285,12 +283,11 @@ export class Model {
         const result = await this.filter(getArg).execute();
         const TableSchema = this.getTableSchema();
         const DBconfig = this.getDBSchema();
-        const ModelName = this.getModelName();
         let instance;
         let created;
         if (result.length == 1) {
             created = false;
-            instance = await this.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[0] });
+            instance = await this.newInstance({ TableSchema, DBconfig, dataToMerge: result[0] });
         }
         else {
             created = true;
@@ -404,7 +401,7 @@ Model.object = ({ queryId, DBconfig, TableSchema, some = null }) => {
                 const result = await ModelAPIRequest.obj(DBconfig, TableSchema).execute(_methods, queryId);
                 resolve(result);
                 for (let i of result) {
-                    result[i] = _a.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[i] });
+                    result[i] = _a.newInstance({ TableSchema, DBconfig, dataToMerge: result[i] });
                 }
             });
         },
@@ -428,7 +425,7 @@ Model.object = ({ queryId, DBconfig, TableSchema, some = null }) => {
                 const result = await ModelAPIRequest.obj(DBconfig, TableSchema).all(_methods, queryId);
                 resolve(result);
                 for (let i of result) {
-                    result[i] = _a.newInstance({ TableSchema, DBconfig, ModelName, dataToMerge: result[i] });
+                    result[i] = _a.newInstance({ TableSchema, DBconfig, dataToMerge: result[i] });
                 }
             });
         }
@@ -461,15 +458,13 @@ export class LocalStorage {
         }
     }
     static getModelName() {
-        return this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
+        return this['$keyName'] || this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
     }
     static getDBSchema() {
-        const modalName = this.getModelName();
-        return modelsConfigLocalStorage[modalName].DatabaseSchema;
+        return;
     }
     static getTableSchema() {
-        const modalName = this.getModelName();
-        return modelsConfigLocalStorage[modalName].TableSchema;
+        return;
     }
     static getFields(arg) {
         const TableSchema = this.getTableSchema();

@@ -2,17 +2,17 @@ import { taskHolder } from "../connection/taskHolder.js";
 import { ModelAPIRequest } from "../models/model-manager.js";
 import { uniqueGenerator } from "../utils.js";
 export class transactionOnCommit {
-    static prepare(Model) {
-        const TableSchema = Model.getTableSchema();
-        const DatabaseSchema = Model.getDBSchema();
+    static prepare(model) {
+        const TableSchema = model.getTableSchema();
+        const DatabaseSchema = model.getDBSchema();
         const databaseName = DatabaseSchema.databaseName;
         const table = TableSchema.name;
         this.stores[databaseName] = {};
         this.stores[databaseName][table] = {};
     }
-    static subscribe(Model, callback) {
-        const TableSchema = Model.getTableSchema();
-        const DatabaseSchema = Model.getDBSchema();
+    static subscribe(model, callback) {
+        const TableSchema = model.getTableSchema();
+        const DatabaseSchema = model.getDBSchema();
         const databaseName = DatabaseSchema.databaseName;
         const table = TableSchema.name;
         const SubscriptionName = databaseName + table;
