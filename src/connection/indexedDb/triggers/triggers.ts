@@ -17,12 +17,12 @@ function setUpSignal() {}
 export class triggerSignal {
 
     static beforeInsertExist(Model) {
-        const ModelName = Model.getModelName()
+        const ModelName = Model.getTableSchema().name
         const databaseName = Model.getDBSchema().databaseName
         return triggerBeforeInsert?.[databaseName]?.[ModelName]
     }
     static async beforeInsert(instance) {
-        const ModelName = instance.getModelName()
+        const ModelName = instance.getTableSchema().name
         const databaseName = instance.getDBSchema().databaseName
         postMessage({
             queryId: triggerBeforeInsert[databaseName][ModelName].SubscriptionName,
@@ -31,12 +31,12 @@ export class triggerSignal {
     }
 
     static AfterInsertExist(Model) {
-        const ModelName = Model.getModelName()
+        const ModelName = Model.getTableSchema().name
         const databaseName = Model.getDBSchema().databaseName
         return triggerAfterInsert?.[databaseName]?.[ModelName]
     }
     static async AfterInsert(instance) {
-        const ModelName = instance.getModelName()
+        const ModelName = instance.getTableSchema().name
         const databaseName = instance.getDBSchema().databaseName
         postMessage({
             queryId: triggerBeforeInsert[databaseName][ModelName].SubscriptionName,
@@ -46,7 +46,7 @@ export class triggerSignal {
     }
 
     static AfterDeleteExist(Model) {
-        const ModelName = Model.getModelName()
+        const ModelName = Model.getTableSchema().name
         const databaseName = Model.getDBSchema().databaseName
         return triggerAfterDelete?.[databaseName]?.[ModelName]
     }
@@ -55,7 +55,7 @@ export class triggerSignal {
     }
 
     static BeforeDeleteExist(Model) {
-        const ModelName = Model.getModelName()
+        const ModelName = Model.getTableSchema().name
         const databaseName = Model.getDBSchema().databaseName
         return triggerBeforeDelete?.[databaseName]?.[ModelName]
     }

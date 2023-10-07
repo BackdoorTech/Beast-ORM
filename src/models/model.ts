@@ -8,7 +8,7 @@ import  * as Fields from './field/allFields.js'
 import { taskHolder } from '../connection/taskHolder.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
 import { ReactiveList } from '../reactive/DynamicList.js';
-import { signalExecutor, signals } from './signal.js';
+import { signalExecutor, rewrite } from './signal.js';
 
 let methods : Methods = {} = {}
 
@@ -236,12 +236,13 @@ export class Model {
       return object
     }
   }
+
   private static getId() {
     return hashCode(this.toString())
   }
 
   static getModelName () {
-    return this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
+    return this['$tableName'] || this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
   }
 
   static filter(...arg) {
@@ -291,9 +292,9 @@ export class Model {
   }
 
 
-  static async create(arg): Promise<any> {
+  static async create<R>(arg): Promise<R> {
 
-    return new Promise(async (resolve, reject)=> {
+    return new Promise<R>(async (resolve, reject)=> {
 
       if (arg.constructor.name != 'Array') {
         arg = [arg]
@@ -343,7 +344,7 @@ export class Model {
         if(arg.length == 1) {
           resolve(result[0])
         } else {
-          resolve(result)
+          resolve(result as any)
         }
         taskHolder.finish(queryId)
       })
@@ -391,7 +392,7 @@ export class Model {
   }
 
 
-  static async createOrFind(getArg, defaultCreate) {
+  static async createOrFind<R>(getArg, defaultCreate): Promise<[R[], R[]]> {
     
     const result: any[] = await this.filter(getArg).execute()
     const TableSchema = this.getTableSchema()
@@ -408,7 +409,7 @@ export class Model {
       instance = await this.create(Object.assign(getArg, defaultCreate))
     }
 
-    return [instance, created]
+    return [instance, created] as  [R[], R[]]
   }
 
   static async updateOrCreate(...args) {
@@ -474,7 +475,7 @@ export class Model {
       let argToFind = args[0]
       let argsToUpdate = args[1]
       
-      let [instance , created] = await this.createOrFind(argToFind, argsToUpdate)
+      let [instance , created]: any = await this.createOrFind(argToFind, argsToUpdate)
   
       if(!created) {
         const params = Object.assign(argToFind, argsToUpdate)
@@ -488,7 +489,7 @@ export class Model {
   }
 
 
-  static async update(arg) {
+  static async update (arg) {
     
     arg = this.getFields(arg)
 
@@ -540,7 +541,7 @@ export class Model {
           const result = await ModelAPIRequest.obj(DBconfig, TableSchema).execute(_methods, queryId)
           resolve(result);
 
-          for(let i of result) {
+          for(let i in result) {
             result[i] = this.newInstance({ TableSchema, DBconfig, dataToMerge: result[i]})
           }
         })
@@ -567,7 +568,7 @@ export class Model {
           const result = await ModelAPIRequest.obj(DBconfig, TableSchema).all(_methods, queryId)
 
           resolve(result);
-          for(let i of result) {
+          for(let i in result) {
             result[i] = this.newInstance({ TableSchema, DBconfig, dataToMerge: result[i]})
           }
         });
@@ -587,7 +588,7 @@ export class LocalStorage {
     const _data = typeof data == 'object'? data : {};
     const dataToSave = this.getFields(Object.assign(this, {..._data}))
 
-    const hasSignal = signals.hasRewriteSave(key.keyPath)
+    const hasSignal = rewrite.hasRewriteSave(key.keyPath)
     if(hasSignal) {
       signalExecutor.rewriteSave(key.keyPath, this, dataToSave)
     } else {
@@ -600,7 +601,7 @@ export class LocalStorage {
   static get() {
     const key = this.getTableSchema().id
 
-    const hasSignal = signals.hasRewriteGet(key.keyPath)
+    const hasSignal = rewrite.hasRewriteGet(key.keyPath)
     if(hasSignal) {
       
       signalExecutor.rewriteGet(key.keyPath, this)
@@ -682,7 +683,7 @@ export class LocalStorage {
   static clearStorage() {
     const key = this.getTableSchema().id
 
-    const hasSignal = signals.hasRewriteDelete(key.keyPath)
+    const hasSignal = rewrite.hasRewriteDelete(key.keyPath)
     if(hasSignal) {
       
       signalExecutor.rewriteDelete(key.keyPath, this)

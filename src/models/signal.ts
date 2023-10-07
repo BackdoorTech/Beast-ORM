@@ -1,12 +1,5 @@
 import { LocalStorage } from "./model.js"
-
-
-interface params {
-    key: string,  
-    localStorage: typeof localStorage, 
-    instance: typeof LocalStorage[],
-    dataToSave: any
-}
+import { params } from './signal.interface.js'
 
 
 const signalServiceData = {
@@ -15,11 +8,11 @@ const signalServiceData = {
     rewriteDelete: {},
 }
 
-export const signals = {
+export const rewrite = {
     rewriteGet: {
         connect(callback: (params: params) => void, models: typeof LocalStorage[]) {
             for(let model of models) {
-                const modelName = model.getModelName()
+                const modelName = model.getTableSchema().id.keyPath
                 signalServiceData.rewriteGet[modelName] = callback
             }
         }
@@ -27,7 +20,7 @@ export const signals = {
     rewriteSave: {
         connect(callback: (params: params) => void, models: typeof LocalStorage[]) {
             for(let model of models) {
-                const modelName = model.getModelName()
+                const modelName = model.getTableSchema().id.keyPath
                 signalServiceData.rewriteSave[modelName] = callback
             }
         }
@@ -35,7 +28,7 @@ export const signals = {
     rewriteDelete: {
         connect(callback: (params: params) => void, models: typeof LocalStorage[]) {
             for(let model of models) {
-                const modelName = model.getModelName()
+                const modelName = model.getTableSchema().id.keyPath
                 signalServiceData.rewriteDelete[modelName] = callback
             }
         }

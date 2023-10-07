@@ -8,7 +8,6 @@ import { ModelMigrations } from './mode-migrations.js'
 import { ModelAPIRequest } from './model-manager.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
 import { DatabaseManagerSchema } from './schema/databae-manager-schema.js';
-
 interface register {
   databaseName: string,
   version: number,
@@ -25,18 +24,8 @@ const models = {}
 
 export const objModels = {}
 
-export const modelsConfig: {[key:string]: {
-  DatabaseSchema:DatabaseSchema,
-  TableSchema:TableSchema,
-  OneToOneField?: {[key:string]: {}} 
-}} = {}
-
-
 const modelsLocalStorage = {}
-const modelsConfigLocalStorage: {[key:string]: { 
-  DatabaseSchema:DatabaseSchemaLocalStorage,
-  TableSchema:TableSchemaLocalStorage
-}} = {}
+
 
 
 export function migrate(register: register) {
@@ -60,20 +49,26 @@ export class registerModel {
       stores: []
     };
 
+    const storeNames = []
+
 
     let index = 0;
     for (const modelClassRepresentations of entries.models) {
 
-      const ModelName = modelClassRepresentations.getModelName()
+      let ModelName = modelClassRepresentations.getModelName()
+      if(storeNames.includes(ModelName)) {
+        ModelName = uniqueGenerator()
+      }
+
       models[ModelName] = modelClassRepresentations as typeof Model
 
-      const {fields, modelName, attributes , fieldTypes} = ModelReader.read(modelClassRepresentations)
+      const {fields, attributes , fieldTypes} = ModelReader.read(modelClassRepresentations)
       
       const idFieldName = attributes?.primaryKey?.shift()
 
       databaseSchema.stores.push({
         databaseName: databaseSchema.databaseName,
-        name: modelName,
+        name: ModelName,
         id: {
           keyPath: idFieldName || 'id', //by default primary key is id
           autoIncrement:   fields[idFieldName]? fields[idFieldName]?.primaryKey == true: true,
@@ -92,7 +87,7 @@ export class registerModel {
 
           const removeReferenceField  = {... Field}
           if(removeReferenceField?.model) {
-            removeReferenceField.model =  removeReferenceField.model.getModelName()
+            removeReferenceField.model =  removeReferenceField.model.getTableSchema().name
           }
 
 
@@ -110,22 +105,17 @@ export class registerModel {
         } 
 
         if(Field instanceof OneToOneField) {
-          await ModelEditor.addMethodOneToOneField(Field, fieldName, modelName, databaseSchema)
+          await ModelEditor.addMethodOneToOneField(Field, fieldName, ModelName, databaseSchema)
         } else if (Field instanceof ForeignKey) {
-          await ModelEditor.addMethodForeignKey(Field, fieldName, modelName, databaseSchema)
+          await ModelEditor.addMethodForeignKey(Field, fieldName, ModelName, databaseSchema)
         } else if (Field instanceof ManyToManyField) {
-          await ModelEditor.addMethodManyToManyField(Field, fieldName, modelName, databaseSchema)
+          await ModelEditor.addMethodManyToManyField(Field, fieldName, ModelName, databaseSchema)
         }
       }
 
       models[ModelName] = modelClassRepresentations as  typeof Model 
 
       const tableSchema = databaseSchema.stores.find((e)=> e.name == ModelName)
-
-      modelsConfig[ModelName] = {
-        DatabaseSchema: databaseSchema,
-        TableSchema: tableSchema
-      }
 
       index++;
     }
@@ -238,7 +228,7 @@ export class registerLocalStorage {
     let index = 0;
 
     for (const modelClassRepresentations of entries.models) {
-      const ModelName = this.ModelName(modelClassRepresentations as typeof LocalStorage)
+      const ModelName = this.ModelName(modelClassRepresentations as typeof LocalStorage, entries.databaseName)
       modelsLocalStorage[ModelName] = modelClassRepresentations 
 
       const {fields, modelName, attributes , fieldTypes} = LocalStorageModelReader.read(modelClassRepresentations, entries.ignoreFieldsStartWidth || [])
@@ -296,10 +286,7 @@ export class registerLocalStorage {
         return ModelName
       }
 
-      modelsConfigLocalStorage[ModelName] = {
-        DatabaseSchema: databaseSchema,
-        TableSchema: tableSchema
-      }
+
       modelsLocalStorage[ModelName] = modelClassRepresentations
 
       if(entries?.restore) {
@@ -307,11 +294,11 @@ export class registerLocalStorage {
       }
   }
 
-  static ModelName(modelClassRepresentations: typeof LocalStorage): string {
-    const ModelName = modelClassRepresentations.getModelName()
+  static ModelName(modelClassRepresentations: typeof LocalStorage, DbName): string {
+    const ModelName = DbName +'/'+ modelClassRepresentations.getModelName() 
     
     if(modelsLocalStorage[ModelName]) {
-      return hashCode(modelClassRepresentations.toString()).toString() 
+      return hashCode(DbName +'/'+modelClassRepresentations.toString()).toString() 
     } 
 
     return ModelName
@@ -404,6 +391,19 @@ export class ModelEditor {
 
       return await foreignModel.get(obj)
     }
+
+    Object.defineProperty(foreignKeyFieldModel['prototype'], modelName, {
+      get() {
+        console.log("Get age:", this.name, this._age) // getting
+
+        let object = undefined
+        return {
+          get: () => {},
+          object: object
+        }
+      }
+    })
+    
 
 
     // restaurant  
