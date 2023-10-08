@@ -30,7 +30,7 @@ export declare class Model {
     static get(arg: getParams): Promise<any>;
     static getOrCreate(arg: getParams): Promise<any>;
     private static getId;
-    static getModelName(): string;
+    static getModelName(): any;
     static filter(...arg: any[]): {
         filter: (...args: any[]) => void;
         execute: () => Promise<any[]>;
@@ -45,7 +45,7 @@ export declare class Model {
     static create(arg: any): Promise<any>;
     static getMode(TableSchema: any): any;
     private static newInstance;
-    static createOrFind(getArg: any, defaultCreate: any): Promise<any[]>;
+    static createOrFind(getArg: any, defaultCreate: any): Promise<[any, any]>;
     static updateOrCreate(...args: any[]): Promise<any>;
     static update(arg: any): Promise<unknown>;
     static transactionOnCommit(callback: () => void): {

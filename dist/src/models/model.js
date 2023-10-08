@@ -7,7 +7,7 @@ import * as Fields from './field/allFields.js';
 import { taskHolder } from '../connection/taskHolder.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
 import { ReactiveList } from '../reactive/DynamicList.js';
-import { signalExecutor, signals } from './signal.js';
+import { signalExecutor, rewrite } from './signal.js';
 let methods = {} = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model {
@@ -173,7 +173,7 @@ export class Model {
         return hashCode(this.toString());
     }
     static getModelName() {
-        return this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
+        return this['$tableName'] || this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1];
     }
     static filter(...arg) {
         const queryId = uniqueGenerator();
@@ -261,11 +261,6 @@ export class Model {
         delete newInstance[TableSchema.id.keyPath];
         if (TableSchema.fieldTypes.ManyToManyField) {
             for (let field of TableSchema.fieldTypes.ManyToManyField) {
-                newInstance[field] = null;
-            }
-        }
-        if (TableSchema.fieldTypes.OneToOneField) {
-            for (let field of TableSchema.fieldTypes.OneToOneField) {
                 newInstance[field] = null;
             }
         }
@@ -400,7 +395,7 @@ Model.object = ({ queryId, DBconfig, TableSchema, some = null }) => {
                 methods[queryId] = [];
                 const result = await ModelAPIRequest.obj(DBconfig, TableSchema).execute(_methods, queryId);
                 resolve(result);
-                for (let i of result) {
+                for (let i in result) {
                     result[i] = _a.newInstance({ TableSchema, DBconfig, dataToMerge: result[i] });
                 }
             });
@@ -424,7 +419,7 @@ Model.object = ({ queryId, DBconfig, TableSchema, some = null }) => {
                 methods[queryId] = [];
                 const result = await ModelAPIRequest.obj(DBconfig, TableSchema).all(_methods, queryId);
                 resolve(result);
-                for (let i of result) {
+                for (let i in result) {
                     result[i] = _a.newInstance({ TableSchema, DBconfig, dataToMerge: result[i] });
                 }
             });
@@ -437,7 +432,7 @@ export class LocalStorage {
         const key = this.getTableSchema().id;
         const _data = typeof data == 'object' ? data : {};
         const dataToSave = this.getFields(Object.assign(this, Object.assign({}, _data)));
-        const hasSignal = signals.hasRewriteSave(key.keyPath);
+        const hasSignal = rewrite.hasRewriteSave(key.keyPath);
         if (hasSignal) {
             signalExecutor.rewriteSave(key.keyPath, this, dataToSave);
         }
@@ -447,7 +442,7 @@ export class LocalStorage {
     }
     static get() {
         const key = this.getTableSchema().id;
-        const hasSignal = signals.hasRewriteGet(key.keyPath);
+        const hasSignal = rewrite.hasRewriteGet(key.keyPath);
         if (hasSignal) {
             signalExecutor.rewriteGet(key.keyPath, this);
         }
@@ -507,7 +502,7 @@ export class LocalStorage {
     }
     static clearStorage() {
         const key = this.getTableSchema().id;
-        const hasSignal = signals.hasRewriteDelete(key.keyPath);
+        const hasSignal = rewrite.hasRewriteDelete(key.keyPath);
         if (hasSignal) {
             signalExecutor.rewriteDelete(key.keyPath, this);
         }

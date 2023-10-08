@@ -1,5 +1,5 @@
 import { Model, LocalStorage } from './model.js';
-import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchema, TableSchemaLocalStorage } from './register-modal.interface.js';
+import { DatabaseSchema, DatabaseSchemaLocalStorage, TableSchemaLocalStorage } from './register-modal.interface.js';
 import { OneToOneField, ForeignKey, ManyToManyField } from './field/allFields.js';
 interface register {
     databaseName: string;
@@ -13,15 +13,6 @@ interface register {
     ignoreFieldsStartWidth?: string[];
 }
 export declare const objModels: {};
-export declare const modelsConfig: {
-    [key: string]: {
-        DatabaseSchema: DatabaseSchema;
-        TableSchema: TableSchema;
-        OneToOneField?: {
-            [key: string]: {};
-        };
-    };
-};
 export declare function migrate(register: register): void;
 export declare class registerModel {
     static ModalName(): void;
@@ -31,7 +22,7 @@ export declare class registerModel {
 export declare class registerLocalStorage {
     static register(entries: register): Promise<void>;
     static edit(ModelName: any, databaseSchema: any, modelClassRepresentations: any, entries: any): void;
-    static ModelName(modelClassRepresentations: typeof LocalStorage): string;
+    static ModelName(modelClassRepresentations: typeof LocalStorage, DbName: any): string;
 }
 export declare class ModelEditor {
     static setTableSchemaLocalStorage(ModelToEdit: typeof LocalStorage, TableSchema: TableSchemaLocalStorage): void;

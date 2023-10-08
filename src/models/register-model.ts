@@ -41,7 +41,7 @@ export class registerModel {
   static ModalName() {}
 
   static async register(entries: register) {
-    
+
     const databaseSchema : DatabaseSchema  = {
       databaseName: entries.databaseName || uniqueGenerator(),
       version: entries.version,
@@ -63,7 +63,7 @@ export class registerModel {
       models[ModelName] = modelClassRepresentations as typeof Model
 
       const {fields, attributes , fieldTypes} = ModelReader.read(modelClassRepresentations)
-      
+
       const idFieldName = attributes?.primaryKey?.shift()
 
       databaseSchema.stores.push({
@@ -79,7 +79,7 @@ export class registerModel {
         fieldTypes
       })
 
-      
+
 
       for(const [fieldName, Field] of  Object.entries(fields)) {
         // dont register fields that is primary key and auto increment
@@ -102,7 +102,7 @@ export class registerModel {
             fieldAttributes:  Object.assign({}, removeReferenceField)
           })
 
-        } 
+        }
 
         if(Field instanceof OneToOneField) {
           await ModelEditor.addMethodOneToOneField(Field, fieldName, ModelName, databaseSchema)
@@ -113,7 +113,7 @@ export class registerModel {
         }
       }
 
-      models[ModelName] = modelClassRepresentations as  typeof Model 
+      models[ModelName] = modelClassRepresentations as  typeof Model
 
       const tableSchema = databaseSchema.stores.find((e)=> e.name == ModelName)
 
@@ -121,12 +121,12 @@ export class registerModel {
     }
 
     DatabaseManagerSchema.prepare(databaseSchema)
-    
-    
+
+
     for (const stores of databaseSchema.stores) {
       const model = models[stores.name] as typeof Model
       const DbName = databaseSchema.databaseName
-      
+
       ModelEditor.setTableSchema(model, DbName)
       ModelEditor.getDBSchema(model, DbName)
 
@@ -141,7 +141,7 @@ export class registerModel {
       await ModelAPIRequest.obj(databaseSchema).migrate()
       ModelMigrations.migrationsState(databaseSchema.databaseName, true);
     }
-    
+
   }
 
   static manyToManyRelationShip(foreignKeyField:ManyToManyField, FieldName:string, modelName:string, databaseSchema:DatabaseSchema): Model {
@@ -215,7 +215,7 @@ async function  cachedValue(Model) {
 }
 export class registerLocalStorage {
   static async register(entries: register) {
- 
+
 
     const databaseSchema : DatabaseSchemaLocalStorage = {
       databaseName: entries.databaseName,
@@ -229,7 +229,7 @@ export class registerLocalStorage {
 
     for (const modelClassRepresentations of entries.models) {
       const ModelName = this.ModelName(modelClassRepresentations as typeof LocalStorage, entries.databaseName)
-      modelsLocalStorage[ModelName] = modelClassRepresentations 
+      modelsLocalStorage[ModelName] = modelClassRepresentations
 
       const {fields, modelName, attributes , fieldTypes} = LocalStorageModelReader.read(modelClassRepresentations, entries.ignoreFieldsStartWidth || [])
 
@@ -257,7 +257,7 @@ export class registerLocalStorage {
           fieldAttributes:  Object.assign({}, Field)
         })
       }
-      
+
       index++;
     }
 
@@ -267,13 +267,13 @@ export class registerLocalStorage {
       ModelEditor.setTableSchemaLocalStorage(model, stores)
       ModelEditor.getDBSchemaLocalStorage(model, databaseSchema)
     }
-    
+
   }
 
 
   static edit(ModelName: any, databaseSchema: any, modelClassRepresentations: any, entries: any) {
       const tableSchema = databaseSchema.stores.find((e)=> e.name == ModelName)
-         
+
       modelClassRepresentations.getDBSchema = (): any => {
         return databaseSchema
       }
@@ -295,11 +295,11 @@ export class registerLocalStorage {
   }
 
   static ModelName(modelClassRepresentations: typeof LocalStorage, DbName): string {
-    const ModelName = DbName +'/'+ modelClassRepresentations.getModelName() 
-    
+    const ModelName = DbName +'/'+ modelClassRepresentations.getModelName()
+
     if(modelsLocalStorage[ModelName]) {
-      return hashCode(DbName +'/'+modelClassRepresentations.toString()).toString() 
-    } 
+      return hashCode(DbName +'/'+modelClassRepresentations.toString()).toString()
+    }
 
     return ModelName
   }
@@ -365,9 +365,9 @@ export class ModelEditor {
   //     return new model()
   //   }
   //   ModelToEdit.getModel = () => {
-      
+
   //     const model = TableSchemaClass.getModel()
-      
+
   //     if(!model) {
   //       console.log('model!!!!!!!!!!!!!', model, ModelName)
   //     }
@@ -381,48 +381,54 @@ export class ModelEditor {
     const foreignKeyFieldModel: Model = foreignKeyField.model
     const currentModel: Model = models[modelName]
 
-    // place
-    foreignKeyFieldModel['prototype'][modelName] = async function (body) {
-      
-      const foreignModel: Model = currentModel
-      const TableSchema = foreignModel.getTableSchema()
-      const obj ={}
-      obj[FieldName] = this.getPrimaryKeyValue()
-
-      return await foreignModel.get(obj)
-    }
-
-    Object.defineProperty(foreignKeyFieldModel['prototype'], modelName, {
+    // restaurant
+    let object = undefined
+    Object.defineProperty(currentModel['prototype'], foreignKeyFieldModel['name'], {
       get() {
-        console.log("Get age:", this.name, this._age) // getting
-
-        let object = undefined
         return {
-          get: () => {},
-          object: object
+          get: async () => {
+            const foreignModel: Model = currentModel
+            const obj = {}
+            obj[FieldName] = this.getPrimaryKeyValue()
+            const result = await foreignModel.get(obj)
+            object = result
+            return result
+          },
+          get object() {
+            return object
+          }
         }
       }
     })
-    
 
+    // place
+    let object1 = undefined
+    Object.defineProperty(foreignKeyFieldModel['prototype'], modelName, {
+      get() {
+        return {
+          get: async () => {
+            const foreignModel: Model = currentModel
+            let params = {}
+            const TableSchema = foreignModel.getTableSchema()
 
-    // restaurant  
-    currentModel['prototype'][foreignKeyFieldModel['name']] = async function () { 
+            console.log(FieldName, "this", this)
+            params[TableSchema.id.keyPath] = this[TableSchema.id.keyPath]
 
-      const foreignModel: Model = foreignKeyFieldModel
-      let params = {}
-
-      const TableSchema = foreignModel.getTableSchema()
-
-      params[TableSchema.id.keyPath] = this[FieldName]
-
-      return await foreignModel.get(params)
-    }
-
+            console.log({params})
+            const result = await foreignModel.get(params)
+            object1 = result
+            return result
+          },
+          get object() {
+            return object1
+          }
+        }
+      }
+    })
   }
 
   static addMethodForeignKey(foreignKeyField:ForeignKey, FieldName:string, modelName:string, databaseSchema:DatabaseSchema) {
-    
+
     const foreignKeyFieldModel: Model = foreignKeyField.model
     const currentModel: Model = models[modelName]
     const FunctionName = uncapitalize(modelName)
@@ -431,7 +437,7 @@ export class ModelEditor {
 
       const obj = {}
       obj[FieldName] = this.getPrimaryKeyValue()
-      
+
       const currentModel: Model = models[modelName]
 
       return await currentModel.filter(obj).execute()
@@ -444,13 +450,13 @@ export class ModelEditor {
       return currentModel['create'](arg)
     }
 
-    
+
     currentModel['prototype'][foreignKeyFieldModel.getModelName()] = async function () {
 
       const TableSchema = foreignKeyFieldModel.getTableSchema()
       const obj = {}
 
-      obj[TableSchema.id.keyPath] = this[FieldName] 
+      obj[TableSchema.id.keyPath] = this[FieldName]
       return foreignKeyFieldModel.filter(obj).execute()
     }
 
@@ -458,8 +464,8 @@ export class ModelEditor {
   }
 
   static  async addMethodManyToManyField(foreignKeyField:ManyToManyField, FieldName:string, modelName:string, databaseSchema:DatabaseSchema) {
-    
-   
+
+
     const foreignKeyFieldModel: any = foreignKeyField.model
     FieldName = FieldName
 
@@ -467,6 +473,7 @@ export class ModelEditor {
 
     const _middleTable = await registerModel.manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema)
 
+    console.log({FieldName})
     currentModel['prototype'][FieldName+'_add'] = async function (modelInstances) {
 
       const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel()
@@ -479,10 +486,10 @@ export class ModelEditor {
 
         if(modelInstance instanceof foreignKeyFieldModel) {
           let params = {}
-  
+
           params[`iD${currentModel.getModelName()}`] = this.getPrimaryKeyValue()
           params[`iD${modelInstance.getModelName()}`] =  modelInstance.getPrimaryKeyValue()
-  
+
           await middleTable['create'](params)
         } else {
           throw('Need to be instance of '+ foreignKeyFieldModel.getModelName())
@@ -490,8 +497,9 @@ export class ModelEditor {
       }
     }
 
+    console.log({FieldName})
     currentModel['prototype'][FieldName] = function()  {
-      
+
       const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel()
 
       let _model = this
@@ -504,7 +512,7 @@ export class ModelEditor {
           const middleTableResult = await middleTable['filter'](params).execute()
 
           foreignKeyField.model
-  
+
           return middleTableResult
         }
       }
@@ -526,7 +534,7 @@ export class ModelEditor {
         const TableSchema = foreignKeyField.model.getTableSchema()
 
         ids = middleTableResult.map((e)=> {
-          return e[`iD${foreignKeyField.model.name}`]  
+          return e[`iD${foreignKeyField.model.name}`]
         })
 
         let params = {}
@@ -557,11 +565,14 @@ export class ModelEditor {
       const middleTableResult = await middleTable['filter'](params).execute()
       let ids
 
+      console.log({middleTableResult})
+      console.log({currentModel})
+
       if(middleTableResult) {
         const TableSchema = currentModel.getTableSchema()
 
         ids = middleTableResult.map((e)=> {
-          return e[`iD${modelName}`]  
+          return e[`iD${modelName}`]
         })
 
         let params = {}
@@ -570,6 +581,9 @@ export class ModelEditor {
           try {
             params[TableSchema.id.keyPath] = id
             const row = await currentModel.get(params)
+
+            console.log(row)
+
             result.push(row)
           } catch(error) {
           }
@@ -583,7 +597,7 @@ export class ModelEditor {
 
 
 function generateGenericModel ({DBSchema, ModelName, TableSchema}) {
-  
+
   class GenericModel extends  Model {}
 
 
@@ -591,9 +605,9 @@ function generateGenericModel ({DBSchema, ModelName, TableSchema}) {
   for (const [Field, value] of Object.entries(Model)) {
     GenericModel[Field] = value
   }
-  
+
   // GenericModel.prototype = Model.prototype
-  
+
   GenericModel.prototype['getDBSchema'] = () => {
     return DBSchema
   }

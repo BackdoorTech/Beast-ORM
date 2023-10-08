@@ -9,9 +9,7 @@ import { transactionOnCommit } from '../triggers/transaction.js';
 import { DatabaseManagerSchema } from './schema/databae-manager-schema.js';
 const models = {};
 export const objModels = {};
-export const modelsConfig = {};
 const modelsLocalStorage = {};
-const modelsConfigLocalStorage = {};
 export function migrate(register) {
     if (register.type == 'indexedDB') {
         registerModel.register(register);
@@ -30,15 +28,19 @@ export class registerModel {
             type: entries.type,
             stores: []
         };
+        const storeNames = [];
         let index = 0;
         for (const modelClassRepresentations of entries.models) {
-            const ModelName = modelClassRepresentations.getModelName();
+            let ModelName = modelClassRepresentations.getModelName();
+            if (storeNames.includes(ModelName)) {
+                ModelName = uniqueGenerator();
+            }
             models[ModelName] = modelClassRepresentations;
-            const { fields, modelName, attributes, fieldTypes } = ModelReader.read(modelClassRepresentations);
+            const { fields, attributes, fieldTypes } = ModelReader.read(modelClassRepresentations);
             const idFieldName = (_a = attributes === null || attributes === void 0 ? void 0 : attributes.primaryKey) === null || _a === void 0 ? void 0 : _a.shift();
             databaseSchema.stores.push({
                 databaseName: databaseSchema.databaseName,
-                name: modelName,
+                name: ModelName,
                 id: {
                     keyPath: idFieldName || 'id',
                     autoIncrement: fields[idFieldName] ? ((_b = fields[idFieldName]) === null || _b === void 0 ? void 0 : _b.primaryKey) == true : true,
@@ -53,7 +55,7 @@ export class registerModel {
                 if (!((Field === null || Field === void 0 ? void 0 : Field.primaryKey) && (Field === null || Field === void 0 ? void 0 : Field.autoIncrement)) && !((_c = fieldTypes['ManyToManyField']) === null || _c === void 0 ? void 0 : _c.includes(fieldName)) && !((_d = fieldTypes['Unknown']) === null || _d === void 0 ? void 0 : _d.includes(fieldName))) {
                     const removeReferenceField = Object.assign({}, Field);
                     if (removeReferenceField === null || removeReferenceField === void 0 ? void 0 : removeReferenceField.model) {
-                        removeReferenceField.model = removeReferenceField.model.getModelName();
+                        removeReferenceField.model = removeReferenceField.model.getTableSchema().name;
                     }
                     databaseSchema.stores[index].fields.push({
                         name: fieldName,
@@ -67,21 +69,17 @@ export class registerModel {
                     });
                 }
                 if (Field instanceof OneToOneField) {
-                    await ModelEditor.addMethodOneToOneField(Field, fieldName, modelName, databaseSchema);
+                    await ModelEditor.addMethodOneToOneField(Field, fieldName, ModelName, databaseSchema);
                 }
                 else if (Field instanceof ForeignKey) {
-                    await ModelEditor.addMethodForeignKey(Field, fieldName, modelName, databaseSchema);
+                    await ModelEditor.addMethodForeignKey(Field, fieldName, ModelName, databaseSchema);
                 }
                 else if (Field instanceof ManyToManyField) {
-                    await ModelEditor.addMethodManyToManyField(Field, fieldName, modelName, databaseSchema);
+                    await ModelEditor.addMethodManyToManyField(Field, fieldName, ModelName, databaseSchema);
                 }
             }
             models[ModelName] = modelClassRepresentations;
             const tableSchema = databaseSchema.stores.find((e) => e.name == ModelName);
-            modelsConfig[ModelName] = {
-                DatabaseSchema: databaseSchema,
-                TableSchema: tableSchema
-            };
             index++;
         }
         DatabaseManagerSchema.prepare(databaseSchema);
@@ -168,7 +166,7 @@ export class registerLocalStorage {
         };
         let index = 0;
         for (const modelClassRepresentations of entries.models) {
-            const ModelName = this.ModelName(modelClassRepresentations);
+            const ModelName = this.ModelName(modelClassRepresentations, entries.databaseName);
             modelsLocalStorage[ModelName] = modelClassRepresentations;
             const { fields, modelName, attributes, fieldTypes } = LocalStorageModelReader.read(modelClassRepresentations, entries.ignoreFieldsStartWidth || []);
             databaseSchema.stores.push({
@@ -213,19 +211,15 @@ export class registerLocalStorage {
         modelClassRepresentations.getModelName = () => {
             return ModelName;
         };
-        modelsConfigLocalStorage[ModelName] = {
-            DatabaseSchema: databaseSchema,
-            TableSchema: tableSchema
-        };
         modelsLocalStorage[ModelName] = modelClassRepresentations;
         if (entries === null || entries === void 0 ? void 0 : entries.restore) {
             modelClassRepresentations.get(null);
         }
     }
-    static ModelName(modelClassRepresentations) {
-        const ModelName = modelClassRepresentations.getModelName();
+    static ModelName(modelClassRepresentations, DbName) {
+        const ModelName = DbName + '/' + modelClassRepresentations.getModelName();
         if (modelsLocalStorage[ModelName]) {
-            return hashCode(modelClassRepresentations.toString()).toString();
+            return hashCode(DbName + '/' + modelClassRepresentations.toString()).toString();
         }
         return ModelName;
     }
@@ -285,22 +279,47 @@ export class ModelEditor {
     static addMethodOneToOneField(foreignKeyField, FieldName, modelName, databaseSchema) {
         const foreignKeyFieldModel = foreignKeyField.model;
         const currentModel = models[modelName];
+        // restaurant
+        let object = undefined;
+        Object.defineProperty(currentModel['prototype'], foreignKeyFieldModel['name'], {
+            get() {
+                return {
+                    get: async () => {
+                        const foreignModel = currentModel;
+                        const obj = {};
+                        obj[FieldName] = this.getPrimaryKeyValue();
+                        const result = await foreignModel.get(obj);
+                        object = result;
+                        return result;
+                    },
+                    get object() {
+                        return object;
+                    }
+                };
+            }
+        });
         // place
-        foreignKeyFieldModel['prototype'][modelName] = async function (body) {
-            const foreignModel = currentModel;
-            const TableSchema = foreignModel.getTableSchema();
-            const obj = {};
-            obj[FieldName] = this.getPrimaryKeyValue();
-            return await foreignModel.get(obj);
-        };
-        // restaurant  
-        currentModel['prototype'][foreignKeyFieldModel['name']] = async function () {
-            const foreignModel = foreignKeyFieldModel;
-            let params = {};
-            const TableSchema = foreignModel.getTableSchema();
-            params[TableSchema.id.keyPath] = this[FieldName];
-            return await foreignModel.get(params);
-        };
+        let object1 = undefined;
+        Object.defineProperty(foreignKeyFieldModel['prototype'], modelName, {
+            get() {
+                return {
+                    get: async () => {
+                        const foreignModel = currentModel;
+                        let params = {};
+                        const TableSchema = foreignModel.getTableSchema();
+                        console.log(FieldName, "this", this);
+                        params[TableSchema.id.keyPath] = this[TableSchema.id.keyPath];
+                        console.log({ params });
+                        const result = await foreignModel.get(params);
+                        object1 = result;
+                        return result;
+                    },
+                    get object() {
+                        return object1;
+                    }
+                };
+            }
+        });
     }
     static addMethodForeignKey(foreignKeyField, FieldName, modelName, databaseSchema) {
         const foreignKeyFieldModel = foreignKeyField.model;
@@ -329,6 +348,7 @@ export class ModelEditor {
         FieldName = FieldName;
         const currentModel = models[modelName];
         const _middleTable = await registerModel.manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema);
+        console.log({ FieldName });
         currentModel['prototype'][FieldName + '_add'] = async function (modelInstances) {
             const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel();
             if (modelInstances.constructor.name != 'Array') {
@@ -346,6 +366,7 @@ export class ModelEditor {
                 }
             }
         };
+        console.log({ FieldName });
         currentModel['prototype'][FieldName] = function () {
             const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel();
             let _model = this;
@@ -393,6 +414,8 @@ export class ModelEditor {
             params[`iD${_model.getModelName()}`] = _model.getPrimaryKeyValue();
             const middleTableResult = await middleTable['filter'](params).execute();
             let ids;
+            console.log({ middleTableResult });
+            console.log({ currentModel });
             if (middleTableResult) {
                 const TableSchema = currentModel.getTableSchema();
                 ids = middleTableResult.map((e) => {
@@ -403,6 +426,7 @@ export class ModelEditor {
                     try {
                         params[TableSchema.id.keyPath] = id;
                         const row = await currentModel.get(params);
+                        console.log(row);
                         result.push(row);
                     }
                     catch (error) {

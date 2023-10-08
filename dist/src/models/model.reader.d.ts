@@ -1,7 +1,7 @@
 import { FieldsMap, AttributesMap } from './field/fields.interface.js';
 export declare class ModelReader {
     static read(modelClassRepresentation: any): {
-        modelName: string;
+        modelName: any;
         fields: {
             [key: string]: any;
         };

@@ -1,11 +1,6 @@
 import { LocalStorage } from "./model.js";
-interface params {
-    key: string;
-    localStorage: typeof localStorage;
-    instance: typeof LocalStorage[];
-    dataToSave: any;
-}
-export declare const signals: {
+import { params } from './signal.interface.js';
+export declare const rewrite: {
     rewriteGet: {
         connect(callback: (params: params) => void, models: (typeof LocalStorage)[]): void;
     };
@@ -24,4 +19,3 @@ export declare const signalExecutor: {
     rewriteSave(ModalName: string, instance: any, dataToSave: any): any;
     rewriteDelete(ModalName: string, instance: any): any;
 };
-export {};

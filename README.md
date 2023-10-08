@@ -1,6 +1,6 @@
 # Beast ORM
 
-ORM for accessing indexedDB and localStorage. <br>
+Beast ORM is a powerful Object-Relational Mapping (ORM) library designed for working with IndexedDB and LocalStorage in web applications. If you're familiar with Django ORM, you'll find Beast ORM to be a similar tool for managing your data storage needs in a browser-based environment. <br>
 Offline first with beast-orm made easy.
 
 
@@ -12,15 +12,29 @@ Offline first with beast-orm made easy.
 
 <br/>
 
-### Details
-- The indexedDB implementation runs multiple request in a single transaction
-- Handle thousands request per seconds.
-- Build in transaction error handler
+# Features
+- **IndexedDB Support**: Beast ORM provides a high-level API for working with IndexedDB, allowing you to create, retrieve, update, and delete objects in an offline-first manner.
 
-#### A promise base api implementation for accessing for accessing indexedDB 
+- **LocalStorage Support**: You can also use Beast ORM to interact with LocalStorage, making it a versatile solution for managing client-side data storage.
+
+- **Model Definitions**: Define your data models in a class-based format, similar to Django models. Define fields, set primary keys, and manage relationships effortlessly.
+
+- **Transactions**: Beast ORM handles IndexedDB transactions efficiently, ensuring data consistency and reliability. It can run multiple requests within a single transaction and includes a built-in transaction error handler.
+
+- **Querying**: Use Beast ORM's query API to filter and retrieve objects from your data models with ease. You can filter, sort, and apply complex lookup parameters to your queries.
+
+- **ArrayField**: Store lists of data using the ArrayField, which supports nested arrays and provides various lookup options for querying array contents.
+
+- **JSONField**: Store JSON data and perform queries on JSON objects. Beast ORM supports key, index, and path transforms for querying JSON data effectively.
+
+- **Many-to-Many, One-to-One, and Many-to-One Relationship**s: Define relationships between your models, such as many-to-many, one-to-one, and many-to-one. Access related objects easily.
+
+- **Reactive List**: Create reactive data lists that automatically update when a transaction is about to close, making it easy to synchronize your views with the database.
+
+#### A promise base api implementation for accessing indexedDB 
 ## Create model
 
-A model is a representation of a database table. Feel free to place your models anywhere that can be exported
+Start by defining your data models using the class-based syntax. Here's an example of a User model:
 
 ```javascript
 import { models } from 'beast-orm';
@@ -38,11 +52,10 @@ class User extends models.Model {
 <br/>
 
 ## Register model
-Once you’ve register your data models, automatically gives you a database-abstraction API for accessing indexedDB as a promise base api implementation that lets you create, retrieve, update and delete objects. Models that belongs to the same database should be register at the same time.
+Once you've defined your models, register them with Beast ORM, specifying the database name, version, type (IndexedDB or LocalStorage), and the models to register.
 
 ```javascript
 import { models } from 'beast-orm';
-import { User } from './models/user.js';
 
 models.register({
   databaseName: 'tutorial',
@@ -52,13 +65,12 @@ models.register({
 })
 
 ```
-
 <br/>
 
 ## Creating objects
 
 
-An instance of that class represents a particular record in the database table
+You can create objects from your models and save them to the database:
 ```javascript
 const user = await User.create({username:'kobe', email:'kobe.bryant@lakers.com'})
 
@@ -74,7 +86,7 @@ const usersToCreate = [
 const users = await User.create(usersToCreate)
 
 ```
-## Saving changes to objects
+## Updating Object
 this example changes its name and updates its record in the database
 
 ```javascript
@@ -88,9 +100,9 @@ user.save()
 
 <br/>
 
-## Retrieving objects
+## Querying  objects
 The query is not executed as soon as the function is called 
-### Retrieving all objects
+### Querying  all objects
 The simplest way to retrieve objects from a table is to get all of them. To do this, use the all() 
 ```javascript
 await User.all()
@@ -98,7 +110,7 @@ await User.all()
 
 <br/>
 
-### Retrieving specific objects with filters
+### Querying  specific objects with filters
 
 #### 
 
@@ -750,9 +762,9 @@ A model is a representation of a database table. Feel free to place your models 
 import { models } from 'beast-orm';
 
 class Session extends models.LocalStorage {
-  static username = ''  
-  static userId = 55
-  static token = ''
+  static username = models.preset()  
+  static userId = models.preset()
+  static token = models.preset()
 } 
 ```
 
@@ -763,7 +775,6 @@ Once you’ve register your data models, automatically gives you a abstraction A
 
 ```javascript
 import { models } from 'beast-orm';
-import { Session } from './models/user.js';
 
 models.migrate({
   databaseName: 'tutorial',
@@ -793,11 +804,53 @@ The delete method, conveniently, is named delete(). This method immediately dele
   Session.delete()
 ```
 
+## Module models.core.localStorage.rewrite
+With this module you can rewrite get, save and delete function
+
+```javascript
+  import { AES, SHA1 } from  "crypto-js";
+  const { rewriteSave, rewriteGet, rewriteDelete }  = models.core.localStorage.rewrite
+
+  function GET({key, localStorage, instance}) {
+    const newKey = SHA1(key).toString()
+
+    const cipherText = localStorage.getItem(newKey)
+    const bytes = AES.decrypt(cipherText, newKey)
+    var decryptedData = bytes.toString(enc.Utf8);
+    const restoredData = JSON.parse(decryptedData)
+
+    Object.assign(instance, restoredData);
+
+    return restoredData
+  }
+
+
+  function SAVE({key, localStorage, instance, dataToSave}) {
+
+    const newKey = SHA1(key).toString()   
+
+    const stringifyData  = JSON.stringify(dataToSave)
+    const cipherText = AES.encrypt(stringifyData, newKey).toString();
+    localStorage.setItem(newKey, cipherText)
+  }
+
+  function DELETE({key, localStorage, instance}) {
+    const newKey = SHA1(key).toString()
+    localStorage.removeItem(newKey)
+  }
+
+  rewriteGet.connect(GET, [Session])
+  rewriteSave.connect(SAVE, [Session])
+  rewriteDelete.connect(DELETE, [Session])
+```
+
+
 ## Languages and Tools
 <p align="left">   <a href="https://git-scm.com/" target="_blank"> <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="git" width="40" height="40"/>  </a> <a href="https://jestjs.io" target="_blank"> <img src="https://www.vectorlogo.zone/logos/jestjsio/jestjsio-icon.svg" alt="jest" width="40" height="40"/> </a>    <a href="https://github.com/puppeteer/puppeteer" target="_blank"> <img src="https://www.vectorlogo.zone/logos/pptrdev/pptrdev-official.svg" alt="puppeteer" width="40" height="40"/>  </a>  <a href="https://www.typescriptlang.org/" target="_blank"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="typescript" width="40" height="40"/> </a>
 </p>
 
-## Credits
+## Documentation Credits
+
 
 - This library takes inspiration from [django orm](https://docs.djangoproject.com/en/4.0/topics/db/queries/)
 - [browser-orm](https://github.com/brianschardt/browser-orm)

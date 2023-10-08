@@ -18,7 +18,7 @@ describe("Signal", () => {
     await page.evaluate(async() => {
 
       const models: typeof modelsType = window['models']
-      const { rewriteSave, rewriteGet, rewriteDelete }  = models.core.signals
+      const { rewriteSave, rewriteGet, rewriteDelete }  = models.core.localStorage.rewrite
 
       class Person extends models.LocalStorage {
         static username = ''  

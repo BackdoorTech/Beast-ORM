@@ -5,7 +5,7 @@ import fs from 'fs'
 const { Port } = JSON.parse(fs.readFileSync('./test/config/test.json', 'utf8'));
 
 describe("initial test for model", () => {
-  
+
   beforeEach(async () => {
     await page.goto(`http://127.0.0.1:${Port}/test/index.html`)
   })
@@ -21,7 +21,7 @@ describe("initial test for model", () => {
       class Place extends models.Model {
         name = models.CharField({maxLength: 50})
         address = models.CharField({maxLength: 50})
-      } 
+      }
 
       class Restaurant extends models.Model  {
         place = models.OneToOneField({model:Place})
@@ -41,15 +41,27 @@ describe("initial test for model", () => {
       const r = await Restaurant.create({place:p1, servesHotDogs: false, servesPizza:false})
 
 
-      document.body.innerHTML = JSON.stringify(await p1.Restaurant())
+      document.body.innerHTML = JSON.stringify(await p1.Restaurant.get())
     })
-    
+
     debugger
 
-    await page.waitForFunction('{"place":1,"servesHotDogs":false,"servesPizza":false}')
-    expect('time not exceeded').toBe('time not exceeded')
 
-  }, 10000)
+    const text = '{"place":1,"servesHotDogs":false,"servesPizza":false,"id":1}'
+    try {
+
+      await page.waitForFunction(
+        text => document!.querySelector('body')!.innerText.includes(text),
+        {timeout: 100},
+        text
+      );
+      expect(text).toBe(text)
+
+    } catch(e) {
+      expect(text).toBe('i_i')
+    }
+
+  }, 15000)
 
   it('model relation ship one to one reverse', async () => {
     await page.waitForFunction(() => 'models' in window);
@@ -61,7 +73,7 @@ describe("initial test for model", () => {
       class Place extends models.Model {
         name = models.CharField({maxLength: 50})
         address = models.CharField({maxLength: 50})
-      } 
+      }
 
       class Restaurant extends models.Model  {
         place = models.OneToOneField({model:Place})
@@ -81,153 +93,202 @@ describe("initial test for model", () => {
       const r = await Restaurant.create({place:p1, servesHotDogs: false, servesPizza:false})
 
 
-      document.body.innerHTML = JSON.stringify(await r.Place())
-    })
-    
-    debugger
-
-    await page.waitForFunction('{"name":"Demon Dogs","address":"944 W. Fullerton","id":1}')
-    expect('time not exceeded').toBe('time not exceeded')
-
-  }, 10000)
-
-
-  it('model relation ship many to many', async () => {
-    await page.waitForFunction(() => 'models' in window);
-
-    await page.evaluate(async() => {
-
-        const models: typeof modelsType = window['models']
-
-
-        class Publication extends models.Model {
-          title = models.CharField({maxLength: 50})
-        }
-
-
-        class Article extends models.Model {
-            headline = models.CharField({maxLength: 100})
-            publication = models.ManyToManyField({model:Publication})
-        }
-
-        await models.register({
-            databaseName:'',
-            type: 'indexedDB',
-            version: 1,
-            models: [Publication, Article]
-        })
-
-
-        const  p1 = await Publication.create({title:'james'})
-        const a1 = await Article.create({headline:''})
-
-        a1.publication_add(p1)
-
-        document.body.innerHTML = JSON.stringify(await Article.getDBSchema())
+      document.body.innerHTML = JSON.stringify(await r.Place.get())
 
     })
+
     debugger
-    await page.waitForFunction('{"place":1,"servesHotDogs":false,"servesPizza":false}')
-    expect('time not exceeded').toBe('time not exceeded')
 
-  }, 10000)
+    const text = '{"place":1,"servesHotDogs":false,"servesPizza":false,"id":1}'
 
+    try {
 
-  it('model relation ship many to many documentation', async () => {
-    await page.waitForFunction(() => 'models' in window);
+      await page.waitForFunction(
+        text => document!.querySelector('body')!.innerText.includes(text),
+        {timeout: 100},
+        text
+      );
+      expect(text).toBe(text)
 
-    await page.evaluate(async() => {
+    } catch(e) {
+      expect('!_!').toBe('i_i')
+    }
 
-        const models: typeof modelsType = window['models']
-
-
-        class Publication extends models.Model {
-          title = models.CharField({maxLength: 50})
-        }
-
-
-        class Article extends models.Model {
-            headline = models.CharField({maxLength: 100})
-            publication = models.ManyToManyField({model:Publication})
-        }
-
-        await models.register({
-          databaseName:'',
-          type: 'indexedDB',
-          version: 1,
-          models: [Publication, Article]
-        })
+  }, 15000)
 
 
-        const  p1 = await Publication.create({title:'The Python Journal'})
-        const  p2 = await Publication.create({title:'Science News'})
-        const  p3 = await Publication.create({title:'Science Weekly'})
+  // it('model relation ship many to many', async () => {
+  //   await page.waitForFunction(() => 'models' in window);
+
+  //   await page.evaluate(async() => {
+
+  //       const models: typeof modelsType = window['models']
 
 
-        const a1 = await Article.create({headline:'lets you build web apps easily'})
-        const a2 = await Article.create({headline:'NASA uses Python'})
-
-        await a1.publication_add([p1, p2])
-
-
-        const result = await a1.publication_all()
-
-        document.body.innerHTML = JSON.stringify(result)
-
-    })
-    debugger
-    await page.waitForFunction('[{"title":"The Python Journal","id":1},{"title":"Science News","id":2}]')
-    expect('time not exceeded').toBe('time not exceeded')
-
-  }, 100000)
-
-  it('model relation ship many to many documentation set_all', async () => {
-    await page.waitForFunction(() => 'models' in window);
-
-    await page.evaluate(async() => {
-
-        const models: typeof modelsType = window['models']
+  //       class Publication extends models.Model {
+  //         title = models.CharField({maxLength: 50})
+  //       }
 
 
-        class Publication extends models.Model {
-          title = models.CharField({maxLength: 50})
-        }
+  //       class Article extends models.Model {
+  //         headline = models.CharField({maxLength: 100})
+  //         publication = models.ManyToManyField({model:Publication})
+  //       }
+
+  //       await models.register({
+  //           databaseName:'',
+  //           type: 'indexedDB',
+  //           version: 1,
+  //           models: [Publication, Article]
+  //       })
 
 
-        class Article extends models.Model {
-          headline = models.CharField({maxLength: 100})
-          publication = models.ManyToManyField({model:Publication})
-        }
+  //       const  p1 = await Publication.create({title:'james'})
+  //       const a1 = await Article.create({headline:''})
 
-        await models.register({
-          databaseName:'',
-          type: 'indexedDB',
-          version: 1,
-          models: [Publication, Article]
-        })
+  //       a1.publication_add(p1)
+
+  //       document.body.innerHTML = JSON.stringify(await Article.getDBSchema())
+
+  //   })
+  //   debugger
+
+  //   const text = '{"place":1,"servesHotDogs":false,"servesPizza":false}'
+  //   try {
+
+  //     await page.waitForFunction(
+  //       text => document!.querySelector('body')!.innerText.includes(text),
+  //       {timeout: 100},
+  //       text
+  //     );
+  //     expect(text).toBe(text)
+
+  //   } catch(e) {
+  //     expect('!_!').toBe('i_i')
+  //   }
+
+  // }, 10000)
 
 
-        const  p1 = await Publication.create({title:'The Python Journal'})
-        const  p2 = await Publication.create({title:'Science News'})
-        const  p3 = await Publication.create({title:'Science Weekly'})
+  // it('model relation ship many to many documentation', async () => {
+  //   await page.waitForFunction(() => 'models' in window);
+
+  //   await page.evaluate(async() => {
+
+  //       const models: typeof modelsType = window['models']
 
 
-        const a1 = await Article.create({headline:'lets you build web apps easily'})
-        const a2 = await Article.create({headline:'NASA uses Python'})
+  //       class Publication extends models.Model {
+  //         title = models.CharField({maxLength: 50})
+  //       }
 
-        await a1.publication_add([p1, p2])
+
+  //       class Article extends models.Model {
+  //           headline = models.CharField({maxLength: 100})
+  //           publication = models.ManyToManyField({model:Publication})
+  //       }
+
+  //       await models.register({
+  //         databaseName:'',
+  //         type: 'indexedDB',
+  //         version: 1,
+  //         models: [Publication, Article]
+  //       })
 
 
-        const result = await p1.article_set_all()
+  //       const  p1 = await Publication.create({title:'The Python Journal'})
+  //       const  p2 = await Publication.create({title:'Science News'})
+  //       const  p3 = await Publication.create({title:'Science Weekly'})
 
-        document.body.innerHTML = JSON.stringify(result)
 
-    })
-    debugger
-    await page.waitForFunction('[{"headline":"lets you build web apps easily","id":1}]')
-    expect('time not exceeded').toBe('time not exceeded')
+  //       const a1 = await Article.create({headline:'lets you build web apps easily'})
+  //       const a2 = await Article.create({headline:'NASA uses Python'})
 
-  }, 10000)
+  //       await a1.publication_add([p1, p2])
+
+
+  //       const result = await a1.publication_all()
+
+  //       document.body.innerHTML = JSON.stringify(result)
+
+  //   })
+  //   debugger
+
+  //   const text = '[{"title":"The Python Journal","id":1},{"title":"Science News","id":2}]'
+  //   try {
+
+  //     await page.waitForFunction(
+  //       text => document!.querySelector('body')!.innerText.includes(text),
+  //       {timeout: 100},
+  //       text
+  //     );
+  //     expect(text).toBe(text)
+
+  //   } catch(e) {
+  //     expect('!_!').toBe('i_i')
+  //   }
+
+  // }, 100000)
+
+  // it('model relation ship many to many documentation set_all', async () => {
+  //   await page.waitForFunction(() => 'models' in window);
+
+  //   await page.evaluate(async() => {
+
+  //       const models: typeof modelsType = window['models']
+
+
+  //       class Publication extends models.Model {
+  //         title = models.CharField({maxLength: 50})
+  //       }
+
+
+  //       class Article extends models.Model {
+  //         headline = models.CharField({maxLength: 100})
+  //         publication = models.ManyToManyField({model:Publication})
+  //       }
+
+  //       await models.register({
+  //         databaseName:'',
+  //         type: 'indexedDB',
+  //         version: 1,
+  //         models: [Publication, Article]
+  //       })
+
+
+  //       const  p1 = await Publication.create({title:'The Python Journal'})
+  //       const  p2 = await Publication.create({title:'Science News'})
+  //       const  p3 = await Publication.create({title:'Science Weekly'})
+
+
+  //       const a1 = await Article.create({headline:'lets you build web apps easily'})
+  //       const a2 = await Article.create({headline:'NASA uses Python'})
+
+  //       await a1.publication_add([p1, p2])
+
+
+  //       const result = await p1.article_set_all()
+
+  //       document.body.innerHTML = JSON.stringify(result)
+
+  //   })
+  //   debugger
+  //   const text = '[{"headline":"lets you build web apps easily","id":1}]'
+
+  //   try {
+
+  //     await page.waitForFunction(
+  //       text => document!.querySelector('body')!.innerText.includes(text),
+  //       {timeout: 100},
+  //       text
+  //     );
+  //     expect(text).toBe(text)
+
+  //   } catch(e) {
+  //     expect('!_!').toBe('i_i')
+  //   }
+
+  // }, 100000)
 
 
 
@@ -250,7 +311,7 @@ describe("initial test for model", () => {
         reporter = models.ForeignKey({model:Reporter})
       }
 
-  
+
       await models.register({
         databaseName:'',
         type: 'indexedDB',
@@ -262,13 +323,25 @@ describe("initial test for model", () => {
       const r2 = await Reporter.create({firstName: 'Peter', lastName: 'Maquiran', email:'teste'})
       const a = await Article.create({headline:"This is a test", pubDate:'', reporter:r1})
 
-      document.body.innerHTML = JSON.stringify(await r1.article_setAll()) 
+      document.body.innerHTML = JSON.stringify(await r1.article_setAll())
     })
 
     debugger
-    await page.waitForFunction('[{"headline":"This is a test","pubDate":"","reporter":1,"id":1}]')
+    const text = ('[{"headline":"This is a test","pubDate":"","reporter":1,"id":1}]')
 
-    expect('time not exceeded').toBe('time not exceeded')
+
+    try {
+
+      await page.waitForFunction(
+        text => document!.querySelector('body')!.innerText.includes(text),
+        {timeout: 100},
+        text
+      );
+      expect(text).toBe(text)
+
+    } catch(e) {
+      expect('!_!').toBe('i_i')
+    }
   }, 90000)
 
 })

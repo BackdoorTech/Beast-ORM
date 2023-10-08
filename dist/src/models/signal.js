@@ -3,11 +3,11 @@ const signalServiceData = {
     rewriteSave: {},
     rewriteDelete: {},
 };
-export const signals = {
+export const rewrite = {
     rewriteGet: {
         connect(callback, models) {
             for (let model of models) {
-                const modelName = model.getModelName();
+                const modelName = model.getTableSchema().id.keyPath;
                 signalServiceData.rewriteGet[modelName] = callback;
             }
         }
@@ -15,7 +15,7 @@ export const signals = {
     rewriteSave: {
         connect(callback, models) {
             for (let model of models) {
-                const modelName = model.getModelName();
+                const modelName = model.getTableSchema().id.keyPath;
                 signalServiceData.rewriteSave[modelName] = callback;
             }
         }
@@ -23,7 +23,7 @@ export const signals = {
     rewriteDelete: {
         connect(callback, models) {
             for (let model of models) {
-                const modelName = model.getModelName();
+                const modelName = model.getTableSchema().id.keyPath;
                 signalServiceData.rewriteDelete[modelName] = callback;
             }
         }

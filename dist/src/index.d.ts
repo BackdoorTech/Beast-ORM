@@ -4,13 +4,22 @@ import { ModelReader } from './models/model.reader.js';
 import { registerModel, migrate } from './models/register-model.js';
 export declare const models: {
     Value(arg: any): {};
+    preset(): any;
     core: {
-        signals: {
-            postSave: {
-                connect(callback: any, models: (typeof LocalStorage)[]): void;
-            };
-            rewriteGet: {
-                connect(callback: Function, models: (typeof LocalStorage)[]): void;
+        localStorage: {
+            rewrite: {
+                rewriteGet: {
+                    connect(callback: (params: import("./models/signal.interface.js").params) => void, models: (typeof LocalStorage)[]): void;
+                };
+                rewriteSave: {
+                    connect(callback: (params: import("./models/signal.interface.js").params) => void, models: (typeof LocalStorage)[]): void;
+                };
+                rewriteDelete: {
+                    connect(callback: (params: import("./models/signal.interface.js").params) => void, models: (typeof LocalStorage)[]): void;
+                };
+                hasRewriteGet(ModalName: string): boolean;
+                hasRewriteSave(ModalName: string): boolean;
+                hasRewriteDelete(ModalName: string): boolean;
             };
         };
     };

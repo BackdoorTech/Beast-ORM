@@ -27,10 +27,10 @@ export class Model {
   getModelName() {
     return this.constructor.name
   }
-  
+
 
   getDBSchema(): DatabaseSchema  {
-    return {} as DatabaseSchema 
+    return {} as DatabaseSchema
   }
 
   getTableSchema(): TableSchema {
@@ -54,13 +54,13 @@ export class Model {
     for(let name of fiendsName) {
       Fields[name] = obj[name]
     }
-    
+
     if(obj[tableSchema.id.keyPath]) {
       Fields[tableSchema.id.keyPath] = obj[tableSchema.id.keyPath]
     }
 
     return Fields
-  } 
+  }
 
 
   private static  setDataToInstance(obj, Fields ={}) {
@@ -71,13 +71,13 @@ export class Model {
     for(let name of fiendsName) {
       Fields[name] = obj[name]
     }
-    
+
     if(obj[tableSchema.id.keyPath]) {
       Fields[tableSchema.id.keyPath] = obj[tableSchema.id.keyPath]
     }
 
     return Fields
-  } 
+  }
 
 
   async save() {
@@ -110,7 +110,7 @@ export class Model {
     await ModelAPIRequest.obj(DBconfig, TableSchema).delete(_methods, queryId)
     taskHolder.finish(queryId)
   }
-  
+
   static async  deleteAll() {
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
@@ -156,7 +156,7 @@ export class Model {
   static Value(args) {
     return ''
   }
-  
+
   static formValidation(data) {
     const TableSchema = this.getTableSchema()
 
@@ -174,7 +174,7 @@ export class Model {
   }
 
   static async getModelsFields(arg) {
-    
+
     const newArgs = {}
 
     const TableSchema = this.getTableSchema()
@@ -205,7 +205,7 @@ export class Model {
     taskHolder.finish(queryId)
     return result
   }
-  
+
   static async get(arg: getParams) {
     if(Object.values(arg).length >= 2) {
       throw("get only works with one field")
@@ -213,7 +213,7 @@ export class Model {
     const _methods:  Method[] = [{methodName: 'get', arguments: arg}]
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
-    
+
     const queryId = uniqueGenerator()
 
     const foundObj = await ModelAPIRequest.obj(DBconfig, TableSchema).get(_methods, queryId)
@@ -222,7 +222,7 @@ export class Model {
     if(!foundObj) {
       return false
     }
-    
+
     let newInstance = this.newInstance({ TableSchema, DBconfig, dataToMerge: foundObj})
 
     return  newInstance
@@ -254,7 +254,7 @@ export class Model {
   }
 
   static getDBSchema(): DatabaseSchema  {
-    return {} as DatabaseSchema 
+    return {} as DatabaseSchema
   }
 
   static getTableSchema(): TableSchema {
@@ -292,45 +292,45 @@ export class Model {
   }
 
 
-  static async create<R>(arg): Promise<R> {
+  static async create(arg): Promise<any> {
 
-    return new Promise<R>(async (resolve, reject)=> {
+    return new Promise<any>(async (resolve, reject)=> {
 
       if (arg.constructor.name != 'Array') {
         arg = [arg]
       }
-  
+
       const emptyFields = await this.getEmptyFields()
       const TableSchema = this.getTableSchema()
       const ModelName = TableSchema.name
-  
-  
+
+
       for(let i in arg) {
         arg[i] = this.setDataToInstance(this.getFields(arg[i]), emptyFields);
         if(!this.formValidation(arg[i])) {
           throw('invalid '+ JSON.stringify(arg[i]))
         }
-  
+
       }
-  
+
       for(let i in arg) {
-  
+
         if (TableSchema.attributes.foreignKey) {
           for (let field of TableSchema.attributes.foreignKey) {
             try {
               arg[i][field] = arg[i][field].getPrimaryKeyValue()
             } catch (error){}
-            
+
           }
         }
-  
+
       }
-  
+
       const _methods: Method[] = [{methodName: 'create', arguments: arg}]
       const DBconfig = this.getDBSchema()
-  
+
       const queryId = uniqueGenerator()
-      
+
       const result = []
       await ModelAPIRequest.obj(DBconfig, TableSchema).create(_methods, queryId, ({id, index}) => {
         const insert = arg[index]
@@ -340,7 +340,7 @@ export class Model {
       })
 
       taskHolder.updateFunction(queryId, "done", () => {
-        
+
         if(arg.length == 1) {
           resolve(result[0])
         } else {
@@ -348,9 +348,9 @@ export class Model {
         }
         taskHolder.finish(queryId)
       })
-  
+
     });
-    
+
 
   }
 
@@ -368,22 +368,16 @@ export class Model {
     if(TableSchema.fieldTypes.ManyToManyField) {
       for (let field of TableSchema.fieldTypes.ManyToManyField) {
         newInstance[field] = null
-        
       }
     }
 
-    if(TableSchema.fieldTypes.OneToOneField) {
-      for (let field of TableSchema.fieldTypes.OneToOneField) {
-        newInstance[field] = null 
-      }
-    }
     Object.assign(newInstance, dataToMerge);
 
     if(newInstance[TableSchema.id.keyPath]) {
-      Object.defineProperty(newInstance, TableSchema.id.keyPath, 
-        { 
-          configurable: false, 
-          writable: false 
+      Object.defineProperty(newInstance, TableSchema.id.keyPath,
+        {
+          configurable: false,
+          writable: false
         }
       );
     }
@@ -392,15 +386,15 @@ export class Model {
   }
 
 
-  static async createOrFind<R>(getArg, defaultCreate): Promise<[R[], R[]]> {
-    
+  static async createOrFind(getArg, defaultCreate): Promise<[any, any]> {
+
     const result: any[] = await this.filter(getArg).execute()
     const TableSchema = this.getTableSchema()
     const DBconfig = this.getDBSchema()
 
     let instance;
     let created;
-    
+
     if(result.length == 1) {
       created = false
       instance =  await this.newInstance({ TableSchema, DBconfig, dataToMerge: result[0] })
@@ -409,7 +403,7 @@ export class Model {
       instance = await this.create(Object.assign(getArg, defaultCreate))
     }
 
-    return [instance, created] as  [R[], R[]]
+    return [instance, created] as  [any, any]
   }
 
   static async updateOrCreate(...args) {
@@ -433,7 +427,7 @@ export class Model {
 
           const params = {}
           params[uniqueFieldName] = object[uniqueFieldName]
-          
+
           try {
             const instanceModel = await this.get(params)
             updated.push(instanceModel)
@@ -442,7 +436,7 @@ export class Model {
             created.push(instanceModel)
           }
         }
-        
+
         return { created, updated }
       } else {
         const TableSchema = this.getTableSchema()
@@ -459,7 +453,7 @@ export class Model {
 
         const params = {}
         params[uniqueFieldName] = args[uniqueFieldName]
-        
+
         try {
           const object = await this.get(params)
           instance = object
@@ -468,19 +462,19 @@ export class Model {
           instance = await this.create(params)
           return instance
         }
-        
+
         return {instance, created}
       }
     } else {
       let argToFind = args[0]
       let argsToUpdate = args[1]
-      
+
       let [instance , created]: any = await this.createOrFind(argToFind, argsToUpdate)
-  
+
       if(!created) {
         const params = Object.assign(argToFind, argsToUpdate)
         instance = Object.assign(instance, params)
-  
+
         await instance.save()
       }
       return instance
@@ -490,14 +484,14 @@ export class Model {
 
 
   static async update (arg) {
-    
+
     arg = this.getFields(arg)
 
     const DBconfig = this.getDBSchema()
     const TableSchema = this.getTableSchema()
     const _methods: Method[] = [{methodName: 'update', arguments: arg}]
     const queryId = uniqueGenerator()
-    
+
 
     const result = await ModelAPIRequest.obj(DBconfig, TableSchema).update(_methods, queryId)
     taskHolder.finish(queryId)
@@ -545,8 +539,8 @@ export class Model {
             result[i] = this.newInstance({ TableSchema, DBconfig, dataToMerge: result[i]})
           }
         })
-        
-      }, 
+
+      },
       update: async(args) => {
         methods[queryId].push({methodName: 'update', arguments: args})
         const _methods: Method[] = methods[queryId]
@@ -592,7 +586,7 @@ export class LocalStorage {
     if(hasSignal) {
       signalExecutor.rewriteSave(key.keyPath, this, dataToSave)
     } else {
-      
+
       localStorage.setItem(key.keyPath, JSON.stringify(dataToSave))
     }
 
@@ -603,7 +597,7 @@ export class LocalStorage {
 
     const hasSignal = rewrite.hasRewriteGet(key.keyPath)
     if(hasSignal) {
-      
+
       signalExecutor.rewriteGet(key.keyPath, this)
 
     } else {
@@ -618,11 +612,11 @@ export class LocalStorage {
   }
 
   static getDBSchema(): DatabaseSchemaLocalStorage  {
-    return 
+    return
   }
 
   static getTableSchema(): TableSchemaLocalStorage {
-    return 
+    return
   }
 
   private static getFields(arg) {
@@ -635,7 +629,7 @@ export class LocalStorage {
     const filteredArgs = {}
 
     const fieldsName = TableSchema.fields.map((field)=>field.name)
-    
+
     const fieldNameFilter = fieldsName.filter((fieldName) => {
       for(let Attribute of ignoreFieldsStartWidth) {
         if(fieldName.startsWith(Attribute)) {
@@ -685,9 +679,9 @@ export class LocalStorage {
 
     const hasSignal = rewrite.hasRewriteDelete(key.keyPath)
     if(hasSignal) {
-      
+
       signalExecutor.rewriteDelete(key.keyPath, this)
-  
+
     } else {
       localStorage.removeItem(key.keyPath)
     }
