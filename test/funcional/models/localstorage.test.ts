@@ -13,7 +13,7 @@ describe("LocalStorage", () => {
 
   it('register model localStorage', async () => {
   
-    await page.waitForFunction(() => 'models' in window);
+    await  page.waitForFunction(() => 'models' in window);
 
     await page.evaluate(async() => {
 
@@ -24,7 +24,7 @@ describe("LocalStorage", () => {
       } 
       
       models.migrate({
-        databaseName:'jest-test',
+        databaseName:'jest-test123',
         type: 'localStorage',
         version: 1,
         models: [Person]
@@ -36,16 +36,16 @@ describe("LocalStorage", () => {
 
     
     // Check to see if text exists on the page
-    await page.waitForFunction('{"databaseName":"jest-test","version":1,"type":"localStorage","stores":[{"name":"Person","id":{"keyPath":"Person","type":4,"autoIncrement":false},"attributes":{},"fields":[{"name":"username","keyPath":"username","options":{"unique":false,"type":null},"fieldAttributes":{}}],"fieldTypes":{}}]}')
+    const text =  ('{"databaseName":"jest-test123","version":1,"type":"localStorage","stores":[{"name":"jest-test123/Person","id":{"keyPath":"jest-test123/Person","type":4,"autoIncrement":false},"attributes":{},"fields":[{"name":"username","keyPath":"username","options":{"unique":false,"type":null},"fieldAttributes":{}}],"fieldTypes":{"Unknown":["username"]}}]}')
     
-    expect('time not exceeded').toBe('time not exceeded')
+    expect(text).toBe(await page.$eval('body', el => (el as any).innerText))
     
   }, 25000)
 
 
   it('localStorage save', async () => {
   
-    await page.waitForFunction(() => 'models' in window);
+    await  page.waitForFunction(() => 'models' in window);
 
     await page.evaluate(async() => {
 
@@ -74,9 +74,9 @@ describe("LocalStorage", () => {
 
     
     // Check to see if text exists on the page
-    await page.waitForFunction('{"databaseName":"jest-test","version":1,"type":"localStorage","stores":[{"name":"Person","id":{"keyPath":"Person","type":4,"autoIncrement":false},"attributes":{},"fields":[{"name":"username","keyPath":"username","options":{"unique":false,"type":null},"fieldAttributes":{}}],"fieldTypes":{}}]}')
+    const text =  ('{"databaseName":"jest-test","version":1,"type":"localStorage","stores":[{"name":"jest-test/Person","id":{"keyPath":"jest-test/Person","type":4,"autoIncrement":false},"attributes":{},"fields":[{"name":"username","keyPath":"username","options":{"unique":false,"type":null},"fieldAttributes":{}},{"name":"age","keyPath":"age","options":{"unique":false,"type":null},"fieldAttributes":{}}],"fieldTypes":{"Unknown":["username","age"]}}]}')
     
-    expect('time not exceeded').toBe('time not exceeded')
+    expect(text).toBe(await page.$eval('body', el => (el as any).innerText))
     
   }, 25000)
 

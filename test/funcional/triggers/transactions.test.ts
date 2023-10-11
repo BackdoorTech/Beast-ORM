@@ -13,7 +13,7 @@ describe("Trigger", () => {
 
   it('transactionOnCommit', async () => {
   
-    await page.waitForFunction(() => 'models' in window);
+    await  page.waitForFunction(() => 'models' in window);
 
     await page.evaluate(async() => {
 
@@ -42,16 +42,28 @@ describe("Trigger", () => {
 
     
     // Check to see if text exists on the page
-    await page.waitForFunction('[{"username":"peter","id":1}]')
+    const text = ('[{"username":"peter","id":1}]')    
+
+    try {
+
+      await page.waitForFunction(
+        text => document!.querySelector('body')!.innerText.includes(text),
+        {timeout: 1000},
+        text
+      );
+      expect(text).toBe(text)
+
+    } catch(e) {
+      expect(text).toBe(await page.$eval('body', el => (el as any).innerText))
+    }
     
-    expect('time not exceeded').toBe('time not exceeded')
     
   }, 65000)
 
 
   it('transactionOnCommit UnSubscribe', async () => {
   
-    await page.waitForFunction(() => 'models' in window);
+    await  page.waitForFunction(() => 'models' in window);
 
     await page.evaluate(async() => {
 
@@ -71,7 +83,8 @@ describe("Trigger", () => {
       Person.create({username: 'peter'})
 
       let subscription = Person.transactionOnCommit( async () => {
-        document.body.innerHTML = JSON.stringify(await subscription.unsubscribe())
+        console.log('one')
+        document.body.innerHTML = (await subscription.unsubscribe())+ '.'
       })
 
     })
@@ -79,9 +92,20 @@ describe("Trigger", () => {
 
     
     // Check to see if text exists on the page
-    await page.waitForFunction('{"subscription":false,"queryId":"jest-testPerson"}')
+    const text = 'true.'
     
-    expect('time not exceeded').toBe('time not exceeded')
+    try {
+
+      await page.waitForFunction(
+        text => document!.querySelector('body')!.innerText.includes(text),
+        {timeout: 1000},
+        text
+      );
+      expect(text).toBe(text)
+
+    } catch(e) {
+      expect(text).toBe(await page.$eval('body', el => (el as any).innerText))
+    }
     
   }, 65000)
 

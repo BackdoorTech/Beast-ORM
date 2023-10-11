@@ -21,7 +21,7 @@ export declare class Database {
     getOrCreateTransaction({ TableName, queryId }: {
         TableName: any;
         queryId: any;
-    }, mode: any, callback: any): Promise<void>;
+    }, mode: IDBTransactionMode, callback: any): Promise<void>;
     getObjectStore(TableName: any): ObjectStore;
     transactionFinish: (TableName: any) => void;
     migrate(): Promise<boolean>;

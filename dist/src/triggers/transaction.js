@@ -27,8 +27,11 @@ export class transactionOnCommit {
             };
             ModelAPIRequest.obj(DatabaseSchema, TableSchema).trigger(args, SubscriptionName, async () => {
                 subscribe = true;
+                console.log({ SubscriptionName });
                 taskHolder.updateFunction(SubscriptionName, 'callback', () => {
+                    console.log("run call back");
                     for (const [requestId, callback] of Object.entries(this.stores[databaseName][table])) {
+                        console.log("run");
                         callback();
                     }
                 });

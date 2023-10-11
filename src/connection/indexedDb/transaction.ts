@@ -47,6 +47,7 @@ export class transaction {
     objectStore = (currentStore) => {
         return {
             add:({value}) =>  {
+
                 const request = new transactionRequest()
                 request.type = 'add'
                 request.value = value

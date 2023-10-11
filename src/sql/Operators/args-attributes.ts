@@ -64,18 +64,23 @@ export class argsAttributes {
 
                 const element = field.split('__')
                 
+                console.log({element})
+                
                 if(element.length == 1) {
                     element.push('eq')
                 }
 
                 let  operation: any = element[element.length - 1]
 
-            
+                
                 if(OperatorsKeysArray.includes(operation)) {
-                    operation = element.pop()
+                  operation = element.pop()
                 } else {
-                    operation = 'eq'
+                  console.log("not found", operation)
+                  operation = 'eq'
                 }
+
+                console.log({operation, element})
                 
                 fieldName = element[0]
                 fieldPath = element.join('.')

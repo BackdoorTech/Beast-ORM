@@ -1,6 +1,6 @@
 import { taskHolder } from "../connection/taskHolder.js";
 import { ModelAPIRequest } from "../models/model-manager.js"
-import { Model } from "../models/model.js";
+import { Model as ModelType } from "../models/model.js";
 import { uniqueGenerator } from "../utils.js";
 
 export  class transactionOnCommit {
@@ -8,7 +8,7 @@ export  class transactionOnCommit {
     static stores: {[dbName: string]: {[store: string]: {[requestId: string]:  Function } }} = {}
     static subscription : {[SubscriptionName: string]: boolean} = {}
 
-    static prepare(model: typeof Model) {
+    static prepare(model: typeof ModelType) {
         const TableSchema = model.getTableSchema()
         const DatabaseSchema = model.getDBSchema()
         const databaseName = DatabaseSchema.databaseName
@@ -17,7 +17,7 @@ export  class transactionOnCommit {
         this.stores[databaseName][table] = {}
     }
 
-    static subscribe(model: typeof Model, callback) {
+    static subscribe(model: typeof ModelType, callback) {
         const TableSchema = model.getTableSchema()
         const DatabaseSchema = model.getDBSchema()
         const databaseName = DatabaseSchema.databaseName
@@ -28,22 +28,28 @@ export  class transactionOnCommit {
         this.stores[databaseName][table][queryId]  = callback
         
         if(!this.subscription[SubscriptionName]) {
-            //
-            const args = {
-                type: 'transactionOnCommit',
-                subscribe: true
-            }
+          //
+          const args = {
+            type: 'transactionOnCommit',
+            subscribe: true
+          }
 
-            ModelAPIRequest.obj(DatabaseSchema, TableSchema).trigger(args, SubscriptionName, async () => {
-                subscribe = true
+     
 
-                taskHolder.updateFunction(SubscriptionName, 'callback', () => {
-                    for(const [requestId, callback] of Object.entries(this.stores[databaseName][table])) {
-                        callback()
-                    }
-                })
+          ModelAPIRequest.obj(DatabaseSchema, TableSchema).trigger(args, SubscriptionName, async () => {
+            subscribe = true
+
+            console.log({SubscriptionName})
+
+            taskHolder.updateFunction(SubscriptionName, 'callback', () => {
+              console.log("run call back")
+
+              for(const [requestId, callback] of Object.entries(this.stores[databaseName][table])) {
+                console.log("run")
+                callback()
+              }
             })
-
+          })
         }
 
         return {

@@ -15,7 +15,7 @@ describe("argsAttributes", () => {
      
   
 	it('basic', async () => {
-        await page.waitForFunction(() => 'models' in window);
+        await  page.waitForFunction(() => 'models' in window);
 
 		await page.evaluate(async() => {
 
@@ -48,14 +48,14 @@ describe("argsAttributes", () => {
 		})
 
 		debugger
-		await page.waitForFunction(() => '[{"name":{"fieldName":"name","fieldPath":"name","operation":"eq","operationArg":"Peter"},"age":{"fieldName":"age","fieldPath":"age","operation":"eq","operationArg":18}}]');
+		const text = ('result: [{"name":{"fieldName":"name","fieldPath":"name","operation":"eq","operationArg":"Peter","fieldClassName":"CharField"},"age":{"fieldName":"age","fieldPath":"age","operation":"eq","operationArg":18,"fieldClassName":"IntegerField"}}]');
 
-		expect('time not exceeded').toBe('time not exceeded')
+		expect(text).toBe(await page.$eval('body', el => (el as any).innerText))
 	}, 20000)
 
 
-    it('basic 1', async () => {
-        await page.waitForFunction(() => 'models' in window);
+  it('basic 1', async () => {
+    await  page.waitForFunction(() => 'models' in window);
 
 		await page.evaluate(async() => {
 
@@ -85,9 +85,9 @@ describe("argsAttributes", () => {
 		})
 
 		debugger
-		await page.waitForFunction(() => '[{"name":{"fieldName":"name","fieldPath":"name","operation":"eq","operationArg":"Peter"},"age":{"fieldName":"age","fieldPath":"age","operation":"eq","operationArg":18}}]');
+		const text = ('result: [{"name":{"fieldName":"name","fieldPath":"name","operation":"eq","operationArg":"Peter","fieldClassName":"CharField"},"age":{"fieldName":"age","fieldPath":"age","operation":"eq","operationArg":18,"fieldClassName":"IntegerField"}}]');
 
-		expect('time not exceeded').toBe('time not exceeded')
+		expect(text).toBe(await page.$eval('body', el => (el as any).innerText))
 	}, 20000)
   
   

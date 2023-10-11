@@ -8,6 +8,7 @@ import { taskHolder } from '../connection/taskHolder.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
 import { ReactiveList } from '../reactive/DynamicList.js';
 import { signalExecutor, rewrite } from './signal.js';
+import { ModelReader } from './model.reader.js';
 let methods = {} = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model {
@@ -190,16 +191,32 @@ export class Model {
     static async getEmptyFields() {
         const TableSchema = this.getTableSchema();
         const emptyFields = {};
-        const fieldsName = TableSchema.fields.map((field) => field.name);
+        let fieldsName;
+        if (TableSchema.fields) {
+            fieldsName = TableSchema.fields.map((field) => field.name);
+        }
+        else {
+            fieldsName = ModelReader.read(this).fieldNames;
+        }
         for (let fieldName of fieldsName) {
             emptyFields[fieldName] = null;
         }
+
+        console.log
         return emptyFields;
     }
     static getFields(arg) {
-        const TableSchema = this.getTableSchema();
+        let TableSchema = this.getTableSchema();
+        let fieldsName;
+        if (TableSchema) {
+            fieldsName = TableSchema.fields.map((field) => field.name);
+            fieldsName.push(TableSchema.id.keyPath);
+        }
+        else {
+            const data = ModelReader.read(this);
+            fieldsName = data.fieldNames.concat(data.id);
+        }
         const filteredArgs = {};
-        const fieldsName = TableSchema.fields.map((field) => field.name);
         for (let fieldName of fieldsName) {
             if (arg.hasOwnProperty(fieldName)) {
                 filteredArgs[fieldName] = arg[fieldName];
@@ -261,7 +278,7 @@ export class Model {
         delete newInstance[TableSchema.id.keyPath];
         if (TableSchema.fieldTypes.ManyToManyField) {
             for (let field of TableSchema.fieldTypes.ManyToManyField) {
-                newInstance[field] = null;
+                delete newInstance[field];
             }
         }
         Object.assign(newInstance, dataToMerge);
@@ -288,35 +305,37 @@ export class Model {
             created = true;
             instance = await this.create(Object.assign(getArg, defaultCreate));
         }
-        return [instance, created];
+        return { instance, created };
     }
     static async updateOrCreate(...args) {
         if (args.length == 1) {
             if (Array.isArray(args)) {
                 const TableSchema = this.getTableSchema();
-                let created = [];
-                let updated = [];
-                const list = args;
-                const uniqueFields = TableSchema.attributes["unique"].concat(TableSchema.id.keyPath);
-                for (const object of list) {
-                    const uniqueFieldName = uniqueFields.find((fieldName) => {
-                        if (object[fieldName]) {
-                            return true;
-                        }
-                        return false;
-                    });
+                const list = args[0];
+                const uniqueFields = TableSchema.attributes["unique"][0];
+                const uniqueFieldName = uniqueFields;
+                const created = await this.create(list);
+                const updated = [];
+                const same = [];
+                const toUpdate = list.filter((e) => {
+                    return !created.find(b => b[uniqueFieldName] == e[uniqueFieldName]);
+                });
+                for (const object of toUpdate) {
                     const params = {};
                     params[uniqueFieldName] = object[uniqueFieldName];
-                    try {
-                        const instanceModel = await this.get(params);
+                    let instanceModel = await this.get(params);
+                    object[TableSchema.id.keyPath] = instanceModel[TableSchema.id.keyPath];
+                    if (JSON.stringify(this.getFields(object)) == JSON.stringify(this.getFields(instanceModel))) {
+                        same.push(instanceModel);
+                    }
+                    else {
+                        delete object[TableSchema.id.keyPath];
+                        Object.assign(instanceModel, object);
+                        await instanceModel.save();
                         updated.push(instanceModel);
                     }
-                    catch (error) {
-                        const instanceModel = await this.create(params);
-                        created.push(instanceModel);
-                    }
                 }
-                return { created, updated };
+                return { created, updated, same };
             }
             else {
                 const TableSchema = this.getTableSchema();
@@ -346,13 +365,13 @@ export class Model {
         else {
             let argToFind = args[0];
             let argsToUpdate = args[1];
-            let [instance, created] = await this.createOrFind(argToFind, argsToUpdate);
+            let { instance, created } = await this.createOrFind(argToFind, argsToUpdate);
             if (!created) {
                 const params = Object.assign(argToFind, argsToUpdate);
                 instance = Object.assign(instance, params);
                 await instance.save();
             }
-            return instance;
+            return { instance, created };
         }
     }
     static async update(arg) {

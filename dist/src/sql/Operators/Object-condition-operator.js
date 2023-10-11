@@ -11,6 +11,7 @@ export class ObjectConditionOperator {
                 return true;
             }
         }
+        return false;
     }
     execute(objOperator) {
         for (let objOperatorFieldName in objOperator) {
@@ -23,7 +24,9 @@ export class ObjectConditionOperator {
             const operator = field.operator;
             const customData = field.customData({ row: this.row, fieldPath });
             const arg = operationArg;
+            console.log({ fieldName, fieldPath, operationArg, operator });
             let operationResult = operator({ fieldName, arg, row: this.row, TableSchema: this.TableSchema, element: fieldName, fieldPath, customData });
+            console.log({ operationResult });
             if (!operationResult) {
                 return false;
             }

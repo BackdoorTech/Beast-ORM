@@ -1,4 +1,3 @@
-import { Model } from "../models/model.js";
 import { transactionOnCommit } from "../triggers/transaction.js";
 let values = {};
 export class ReactiveList {
@@ -6,13 +5,14 @@ export class ReactiveList {
         let transactionOnCommitSubscription;
         let value;
         let updateUi;
+        transactionOnCommit.prepare(model);
         transactionOnCommitSubscription = transactionOnCommit.subscribe(model, async () => {
-            value = await callback(Model);
+            value = await callback(model);
             if (updateUi) {
                 updateUi();
             }
         });
-        callback(Model).then(result => {
+        callback(model).then(result => {
             value = result;
             if (updateUi) {
                 updateUi();

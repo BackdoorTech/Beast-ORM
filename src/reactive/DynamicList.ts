@@ -1,4 +1,4 @@
-import { Model } from "../models/model.js";
+import { Model as ModelType } from "../models/model.js";
 import { transactionOnCommit } from "../triggers/transaction.js";
 import { uniqueGenerator } from "../utils.js";
 
@@ -6,25 +6,26 @@ let  values: {[key: string]: any}  = {}
 
 export  class ReactiveList {
 
-    static subscribe(model: typeof Model, callback) {
+    static subscribe(model: typeof ModelType, callback) {
         let transactionOnCommitSubscription;
         let value;
         let updateUi;
-        
+
+        transactionOnCommit.prepare(model)
         transactionOnCommitSubscription = transactionOnCommit.subscribe(model, async () => {
-            value = await  callback(Model)
+            value = await  callback(model)
             if(updateUi) {
                 updateUi()
             }
         })
 
-        callback(Model).then(result => {
+        callback(model).then(result => {
             value = result
             if(updateUi) {
                 updateUi()
             }
         });
-        
+
         return {
             get value () {
                 return value

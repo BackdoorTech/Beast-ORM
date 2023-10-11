@@ -14,7 +14,7 @@ describe("multiple Request", () => {
 
   it('Multiple transactions at onces', async () => {
   
-    await page.waitForFunction(() => 'models' in window);
+    await  page.waitForFunction(() => 'models' in window);
 
     await page.evaluate(async() => {
 
@@ -50,9 +50,21 @@ describe("multiple Request", () => {
     })
     debugger
     // Check to see if text exists on the page
-    await page.waitForFunction('[{"username":"kobe1","email":"kobe.bryant@lakers.com","age":null,"userId":1},{"username":"kobe2","email":"kobe.bryant@lakers.com","age":null,"userId":2},{"username":"kobe3","email":"kobe.bryant@lakers.com","age":null,"userId":3},{"username":"kobe4","email":"kobe.bryant@lakers.com","age":null,"userId":4},{"username":"kobe5","email":"kobe.bryant@lakers.com","age":null,"userId":5}]')
+    const text =  ('[{"username":"kobe1","email":"kobe.bryant@lakers.com","userId":1},{"username":"kobe2","email":"kobe.bryant@lakers.com","userId":2},{"username":"kobe3","email":"kobe.bryant@lakers.com","userId":3},{"username":"kobe4","email":"kobe.bryant@lakers.com","userId":4},{"username":"kobe5","email":"kobe.bryant@lakers.com","userId":5}]')
 
-    expect('time not exceeded').toBe('time not exceeded')
+    try {
+
+      await page.waitForFunction(
+        text => document!.querySelector('body')!.innerText.includes(text),
+        {timeout: 100},
+        text
+      );
+      expect(text).toBe(text)
+
+    } catch(e) {
+      expect(text).toBe(await page.$eval('body', el => (el as any).innerText))
+    }
+
     
   }, 20000)
 

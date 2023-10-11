@@ -10,6 +10,7 @@ export class ObjectStore {
         this.txInstanceMode = {};
         this.storeCache = {};
         this.transactionOnCommit = {};
+        this.haveWriteSomeThing = false;
         this.name = '';
         this.transactionFinish = (TableName) => { };
         this.name = store.name;
@@ -20,21 +21,34 @@ export class ObjectStore {
         if (this.txInstanceMode['readwrite']) {
             try {
                 (_b = (_a = this.txInstance.IDBTransaction) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
-                this.transactionsToCommit = [];
                 (async () => {
-                    for (let [queryId, value] of Object.entries(this.transactionOnCommit)) {
-                        PostMessage({
-                            run: 'callback',
-                            queryId: queryId,
-                            value: true
-                        });
+                    if (this.haveWriteSomeThing) {
+                        for (let [queryId, value] of Object.entries(this.transactionOnCommit)) {
+                            this.cleanTransaction();
+                            PostMessage({
+                                run: 'callback',
+                                queryId: queryId,
+                                value: true
+                            });
+                        }
                     }
                 })();
             }
             catch (error) {
-                // no commit need 
+                // no commit need
+                // console.log('not need to commit')
             }
         }
+        else {
+            // console.log("mode ", JSON.stringify(this.txInstanceMode))
+        }
+        this.txInstanceMode['readwrite'] = {};
+        this.transactionsToCommit = [];
+        this.haveWriteSomeThing = false;
+        this.cleanTransaction();
+    }
+    cleanTransaction() {
+        this.txInstanceMode = {};
     }
     executeTransaction() {
         const { mode, callback } = this.transactions[0];
@@ -42,27 +56,25 @@ export class ObjectStore {
         const done = async () => {
             const transaction = this.transactions.shift();
             this.transactionsToCommit.push(transaction);
+            if (mode == 'readwrite') {
+                this.haveWriteSomeThing = true;
+            }
             if (this.transactions.length == 0) {
                 this.executingTransaction = false;
                 this.transactionTrigger();
                 delete this.txInstance;
-                this.txInstanceMode[mode] = false;
                 this.transactionFinish(this.name);
+                // console.log("finish")
             }
             else {
                 this.executeTransaction();
             }
         };
         const doneButFailed = async () => {
-            var _a, _b;
             this.transactions.shift();
             this.txInstance.active = false;
             if (this.transactionsToCommit.length >= 1) {
-                try {
-                    (_b = (_a = this.txInstance.IDBTransaction) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.call(_a);
-                    this.transactionsToCommit = [];
-                }
-                catch (error) { }
+                this.transactionTrigger();
             }
             if (this.transactions.length >= 1) {
                 const tx = this.createTransaction(this.dbInstance, "readwrite", (onerror) => { }, (oncomplete) => { }, (onabort) => { });
@@ -72,9 +84,6 @@ export class ObjectStore {
                     IDBTransactionMode: "readwrite"
                 };
                 this.executeTransaction();
-            }
-            else {
-                this.transactionTrigger();
             }
         };
         this.validateBeforeTransaction(this.dbInstance, (data) => {

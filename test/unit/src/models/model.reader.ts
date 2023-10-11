@@ -10,7 +10,7 @@
   
 //   it('read attribute', async () => {
 
-//     await page.waitForFunction(() => 'models' in window);
+//     await  page.waitForFunction(() => 'models' in window);
 
 //     await page.evaluate(() => {
 
@@ -32,7 +32,7 @@
 
 //     await page.waitForFunction(() => '{"name":{"maxLength":0}}');
 
-//     expect('time not exceeded').toBe('time not exceeded')
+//     expect(text).toBe(await page.$eval('body', el => (el as any).innerText))
 
 //   }, 20000)
 

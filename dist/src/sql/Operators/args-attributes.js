@@ -28,6 +28,7 @@ export class argsAttributes {
                 let fieldPath;
                 let arg;
                 const element = field.split('__');
+                console.log({ element });
                 if (element.length == 1) {
                     element.push('eq');
                 }
@@ -36,8 +37,10 @@ export class argsAttributes {
                     operation = element.pop();
                 }
                 else {
+                    console.log("not found", operation);
                     operation = 'eq';
                 }
+                console.log({ operation, element });
                 fieldName = element[0];
                 fieldPath = element.join('.');
                 if (OperatorsKeysArray.includes(operation)) {

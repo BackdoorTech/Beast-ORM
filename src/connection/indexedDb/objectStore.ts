@@ -25,9 +25,9 @@ export class ObjectStore {
     mode: string
   }[] = []
 
-   dbInstance: IDBDatabase 
+   dbInstance: IDBDatabase
 
-   txInstance: { 
+   txInstance: {
     IDBTransaction: IDBTransaction,
     IDBTransactionMode: IDBTransactionMode,
     active: boolean
@@ -39,6 +39,8 @@ export class ObjectStore {
 
   storeCache: {[store: string]: object[] } = {}
   transactionOnCommit: {[queryId: string]: Object} = {}
+  haveWriteSomeThing = false
+
   name = ''
 
   transactionFinish = (TableName) => {}
@@ -57,26 +59,40 @@ export class ObjectStore {
     if(this.txInstanceMode['readwrite']) {
       try {
         (this.txInstance.IDBTransaction as any)?.commit?.();
-        this.transactionsToCommit = [];
 
         (async () => {
-          for (let [queryId , value] of Object.entries(this.transactionOnCommit) ) {
-            PostMessage({
-              run: 'callback',
-              queryId: queryId,
-              value: true
-            })
+          if(this.haveWriteSomeThing) {
+            for (let [queryId, value] of Object.entries(this.transactionOnCommit)) {
+              this.cleanTransaction();
+              PostMessage({
+                  run: 'callback',
+                  queryId: queryId,
+                  value: true
+              });
+            }
           }
         })();
 
       } catch (error) {
-        // no commit need 
+        // no commit need
+        // console.log('not need to commit')
       }
+    } else {
+      // console.log("mode ", JSON.stringify(this.txInstanceMode))
     }
+
+    this.txInstanceMode['readwrite'] = {}
+    this.transactionsToCommit = [];
+    this.haveWriteSomeThing = false
+    this.cleanTransaction();
+  }
+
+  cleanTransaction() {
+    this.txInstanceMode = {}
   }
 
    executeTransaction() {
-    
+
     const {mode, callback} = this.transactions[0]
     this.txInstanceMode[mode] = true
 
@@ -84,17 +100,22 @@ export class ObjectStore {
       const transaction = this.transactions.shift();
       this.transactionsToCommit.push(transaction)
 
+
+      if(mode == 'readwrite') {
+        this.haveWriteSomeThing = true
+      }
+
       if(this.transactions.length == 0) {
         this.executingTransaction = false;
 
 
         this.transactionTrigger()
         delete this.txInstance
-        this.txInstanceMode[mode] = false
-        
-        
+
+
         this.transactionFinish(this.name)
-                
+        // console.log("finish")
+
       } else {
         this.executeTransaction()
       }
@@ -106,14 +127,11 @@ export class ObjectStore {
       this.txInstance.active = false;
 
       if(this.transactionsToCommit.length >= 1) {
-        try {
-          (this.txInstance.IDBTransaction as any)?.commit?.();
-          this.transactionsToCommit = [];
-        } catch (error) {}
-      } 
+        this.transactionTrigger();
+      }
 
       if(this.transactions.length >= 1) {
-        
+
         const tx = this.createTransaction(
           this.dbInstance,
           "readwrite",
@@ -129,24 +147,22 @@ export class ObjectStore {
         }
 
         this.executeTransaction()
-      } else {
-        this.transactionTrigger()
       }
     }
 
     this.validateBeforeTransaction(this.dbInstance, (data) => {
-      
+
     })
 
     const transactionInstance = new transaction({
-      store: this.name, 
-      done, 
+      store: this.name,
+      done,
       doneButFailed,
       db: this.dbInstance,
       tx: this.txInstance.IDBTransaction
     })
     callback(transactionInstance)
-    
+
   }
 
 
@@ -182,7 +198,7 @@ export class ObjectStore {
     })
     callback(transactionInstance)
   }
-  
+
    getOrCreateTransaction({queryId, Database}, mode: IDBTransactionMode, callback:  (transaction:transaction) => void) {
 
     //if(mode == 'readonly' && !this.txInstance) {
@@ -204,7 +220,7 @@ export class ObjectStore {
         )
 
         this.dbInstance = Database
-        
+
         if(!this.txInstance) {
           this.txInstance = {
             IDBTransaction: tx,
@@ -212,7 +228,7 @@ export class ObjectStore {
             IDBTransactionMode: "readwrite"
           }
         }
-        
+
         this.txInstance.IDBTransaction = tx
         this.txInstance.active = true
 
@@ -221,7 +237,7 @@ export class ObjectStore {
 
     } else {
       if(mode == 'readonly') {
-        
+
       }
     }
   }
@@ -251,8 +267,7 @@ export class ObjectStore {
   }
 
 
-
-   transactionOnCommitSubscribe(TableName: string , DatabaseName:string, SubscriptionName) {
+  transactionOnCommitSubscribe(TableName: string , DatabaseName:string, SubscriptionName) {
     this.transactionOnCommit[SubscriptionName] = {}
     return {
       run: 'callback',

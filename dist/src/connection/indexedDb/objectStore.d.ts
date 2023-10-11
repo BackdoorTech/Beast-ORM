@@ -31,6 +31,7 @@ export declare class ObjectStore {
     transactionOnCommit: {
         [queryId: string]: Object;
     };
+    haveWriteSomeThing: boolean;
     name: string;
     transactionFinish: (TableName: any) => void;
     config: TableSchema;
@@ -38,6 +39,7 @@ export declare class ObjectStore {
         store: TableSchema;
     });
     transactionTrigger(): Promise<void>;
+    cleanTransaction(): void;
     executeTransaction(): void;
     parallelExecuteTransaction(): void;
     getOrCreateTransaction({ queryId, Database }: {

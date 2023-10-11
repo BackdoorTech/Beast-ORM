@@ -9,6 +9,7 @@ import { taskHolder } from '../connection/taskHolder.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
 import { ReactiveList } from '../reactive/DynamicList.js';
 import { signalExecutor, rewrite } from './signal.js';
+import { ModelReader } from './model.reader.js';
 
 let methods : Methods = {} = {}
 
@@ -265,8 +266,14 @@ export class Model {
   private static async getEmptyFields () {
     const TableSchema = this.getTableSchema()
     const emptyFields = {}
+    let fieldsName
 
-    const fieldsName = TableSchema.fields.map((field)=>field.name)
+    if(TableSchema.fields) {
+      fieldsName = TableSchema.fields.map((field)=>field.name)
+    } else {
+      fieldsName = ModelReader.read(this).fieldNames
+    }
+
 
     for(let fieldName of fieldsName) {
       emptyFields[fieldName] = null
@@ -277,10 +284,18 @@ export class Model {
 
   private static getFields(arg) {
 
-    const TableSchema = this.getTableSchema()
-    const filteredArgs = {}
+    let TableSchema = this.getTableSchema()
+    let fieldsName
 
-    const fieldsName = TableSchema.fields.map((field)=>field.name)
+    if(TableSchema) {
+      fieldsName = TableSchema.fields.map((field)=>field.name)
+      fieldsName.push(TableSchema.id.keyPath)
+    } else {
+      const data = ModelReader.read(this)
+      fieldsName = data.fieldNames.concat(data.id)
+    }
+
+    const filteredArgs = {}
 
     for(let fieldName of fieldsName) {
       if(arg.hasOwnProperty(fieldName)) {
@@ -367,7 +382,7 @@ export class Model {
 
     if(TableSchema.fieldTypes.ManyToManyField) {
       for (let field of TableSchema.fieldTypes.ManyToManyField) {
-        newInstance[field] = null
+        delete newInstance[field]
       }
     }
 
@@ -386,7 +401,7 @@ export class Model {
   }
 
 
-  static async createOrFind(getArg, defaultCreate): Promise<[any, any]> {
+  static async createOrFind(getArg, defaultCreate): Promise<any> {
 
     const result: any[] = await this.filter(getArg).execute()
     const TableSchema = this.getTableSchema()
@@ -403,41 +418,49 @@ export class Model {
       instance = await this.create(Object.assign(getArg, defaultCreate))
     }
 
-    return [instance, created] as  [any, any]
+    return {instance, created}
   }
 
   static async updateOrCreate(...args) {
 
+
     if(args.length == 1) {
       if(Array.isArray(args)) {
-        const TableSchema = this.getTableSchema()
-        let created = []
-        let updated = []
-        const list = args
-        const uniqueFields = TableSchema.attributes["unique"].concat(TableSchema.id.keyPath)
+        const TableSchema = this.getTableSchema();
 
-        for (const object of list) {
+        const list = args[0];
+        const uniqueFields = TableSchema.attributes["unique"][0]
+        const uniqueFieldName = uniqueFields
 
-          const uniqueFieldName = uniqueFields.find((fieldName)=> {
-            if(object[fieldName]) {
-              return true
-            }
-            return false
-          })
 
-          const params = {}
-          params[uniqueFieldName] = object[uniqueFieldName]
+        const created = await this.create(list)
+        const updated = []
+        const same = []
 
-          try {
-            const instanceModel = await this.get(params)
+        const toUpdate = list.filter((e)=> {
+          return !created.find(b => b[uniqueFieldName] == e[uniqueFieldName])
+        })
+
+        for (const object of toUpdate) {
+          const params = {};
+          params[uniqueFieldName] = object[uniqueFieldName];
+
+          let instanceModel = await this.get(params);
+
+          object[TableSchema.id.keyPath] = instanceModel[TableSchema.id.keyPath]
+
+          if(JSON.stringify(this.getFields(object)) == JSON.stringify(this.getFields(instanceModel))) {
+            same.push(instanceModel)
+          } else {
+
+            delete object[TableSchema.id.keyPath]
+            Object.assign(instanceModel, object)
+            await instanceModel.save()
             updated.push(instanceModel)
-          } catch (error) {
-            const instanceModel = await this.create(params)
-            created.push(instanceModel)
           }
-        }
 
-        return { created, updated }
+        }
+        return { created, updated, same };
       } else {
         const TableSchema = this.getTableSchema()
         let instance;
@@ -469,7 +492,7 @@ export class Model {
       let argToFind = args[0]
       let argsToUpdate = args[1]
 
-      let [instance , created]: any = await this.createOrFind(argToFind, argsToUpdate)
+      let {instance , created}: any = await this.createOrFind(argToFind, argsToUpdate)
 
       if(!created) {
         const params = Object.assign(argToFind, argsToUpdate)
@@ -477,7 +500,7 @@ export class Model {
 
         await instance.save()
       }
-      return instance
+      return {instance, created}
     }
 
   }
@@ -504,7 +527,7 @@ export class Model {
   }
 
   static ReactiveList (callback : (Model: Model) => void) {
-    return ReactiveList.subscribe(this as typeof Model, callback)
+    return ReactiveList.subscribe(this as any, callback)
   }
 
   static object = ({queryId, DBconfig, TableSchema,  some = null}) => {

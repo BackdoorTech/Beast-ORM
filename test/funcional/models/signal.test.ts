@@ -13,7 +13,7 @@ describe("Signal", () => {
 
   it('signal', async () => {
   
-    await page.waitForFunction(() => 'models' in window);
+    await  page.waitForFunction(() => 'models' in window);
 
     await page.evaluate(async() => {
 
@@ -69,9 +69,9 @@ describe("Signal", () => {
 
     
     // Check to see if text exists on the page
-    await page.waitForFunction('[["username","peter"],["age",55],["$age",55]]')
+    const text = ('[["username","peter"],["age",55],["$age",55],["getTableSchema",null],["getDBSchema",null]]')
     
-    expect('time not exceeded').toBe('time not exceeded')
+    expect(text).toBe(await page.$eval('body', el => (el as any).innerText))
     
   }, 605000)
 

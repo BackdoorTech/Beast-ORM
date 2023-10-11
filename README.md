@@ -615,13 +615,13 @@ Create a Restaurant. Pass the “parent” object as this object’s primary key
 
 A Restaurant can access its place:
 ```javascript
-  const r = await p1.Restaurant()
+  const r = await p1.Restaurant.get()
 
 ```
 
 A Place can access its restaurant, if available:
 ```javascript
-  const p = await await r.Place()
+  const p = await await r.Place().get()
 ```
 
 ## many-to-one relationships
@@ -666,11 +666,6 @@ Create an Article:
 
 ```
 
-Article objects have access to their related Reporter objects:
-```javascript
-  const r1 = await a.Reporter()
-
-```
 
 Reporter objects have access to their related Article objects:
 ```javascript
@@ -680,7 +675,7 @@ Reporter objects have access to their related Article objects:
 
 Add the same article to a different article set
 ```javascript
-  const a = await await r1.article_setAdd({headline:"This is a test", pubDate:''})
+  const createdArticle = await r1.article_setAdd({headline:"This is a test", pubDate:''})
 
 ```
 ## Reactive List 

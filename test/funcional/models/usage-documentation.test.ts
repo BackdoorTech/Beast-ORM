@@ -14,7 +14,7 @@ describe("initial test for model", () => {
 
   it('documentation first example', async () => {
   
-    await page.waitForFunction(() => 'models' in window);
+    await  page.waitForFunction(() => 'models' in window);
 
     await page.evaluate(async() => {
 
@@ -42,9 +42,9 @@ describe("initial test for model", () => {
     })
     debugger
     // Check to see if text exists on the page
-    await page.waitForFunction('{"userId":1,"username":"","email":"","age":""}')
+    const text =  ('{"username":"kobe","email":"kobe.bryant@lakers.com","userId":1}')
 
-    expect('time not exceeded').toBe('time not exceeded')
+    expect(text).toBe(await page.$eval('body', el => (el as any).innerText))
     
   }, 20000)
 

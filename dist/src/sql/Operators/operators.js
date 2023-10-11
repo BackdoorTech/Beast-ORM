@@ -47,6 +47,7 @@ export class gte {
 export class lt {
     static validate({ fieldName, arg, row, fieldPath, customData }) {
         let _rowFieldValue;
+        console.log(_rowFieldValue, arg);
         try {
             _rowFieldValue = getDeep(row, fieldPath);
             if (_rowFieldValue === undefined) {
@@ -64,14 +65,12 @@ export class lte {
         let _rowFieldValue;
         try {
             _rowFieldValue = getDeep(row, fieldPath);
-            if (_rowFieldValue === undefined) {
-                return false;
-            }
+            console.log(_rowFieldValue, arg);
+            return _rowFieldValue <= arg;
         }
         catch (error) {
             return false;
         }
-        return _rowFieldValue <= arg;
     }
 }
 export class not {
@@ -516,16 +515,16 @@ export class ArrayFieldContains_by {
             return false;
         }
         try {
-            for (const keys of arg) {
-                if (rowValue.includes(keys)) {
-                    return true;
+            for (const keys of rowValue) {
+                if (!arg.includes(keys)) {
+                    return false;
                 }
             }
         }
         catch (error) {
             return false;
         }
-        return false;
+        return true;
     }
 }
 export class ArrayFieldContains_overlap {

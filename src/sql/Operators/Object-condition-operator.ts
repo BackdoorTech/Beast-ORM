@@ -22,6 +22,7 @@ export class ObjectConditionOperator {
 			}
 		}
 
+    return false
 	}
 
 	private execute(objOperator ): boolean {
@@ -41,8 +42,12 @@ export class ObjectConditionOperator {
 
 			const arg = operationArg;
 			
+      console.log({fieldName, fieldPath, operationArg, operator})
+      
 			let operationResult: boolean = operator({fieldName, arg, row:this.row, TableSchema:this.TableSchema, element:fieldName, fieldPath, customData})
 			
+      console.log({operationResult})
+      
 			if(!operationResult) {
 				
 				return false

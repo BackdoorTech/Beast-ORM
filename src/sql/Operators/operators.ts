@@ -56,7 +56,7 @@ export class lt {
 	static validate({fieldName, arg,  row, fieldPath, customData}):boolean{
 
 		let _rowFieldValue
-
+    console.log(_rowFieldValue, arg)
 		try {
 			_rowFieldValue = getDeep(row, fieldPath)
 			if (_rowFieldValue === undefined) {
@@ -79,14 +79,13 @@ export class lte {
 
 		try {
 			_rowFieldValue = getDeep(row, fieldPath)
-			if (_rowFieldValue === undefined) {
-				return false 
-			}
+      console.log(_rowFieldValue, arg)
+			return  _rowFieldValue <= arg
 		} catch (error) {
 			return false
 		}
 
-		return  _rowFieldValue <= arg
+		
 	}
 }
 
@@ -108,6 +107,7 @@ export class not {
 		}
 
 		return _rowFieldValue != arg
+		
 	}
 }
 
@@ -631,9 +631,9 @@ export class ArrayFieldContains_by {
 		}
 
 		try {
-			for (const keys of arg) {
-				if(rowValue.includes(keys)) {
-					return true
+      for (const keys of rowValue) {
+				if(!arg.includes(keys)) {
+					return false
 				}
 				
 			}
@@ -642,7 +642,7 @@ export class ArrayFieldContains_by {
 		}
 		
 
-		return false 
+		return true 
 	}
 }
 export class ArrayFieldContains_overlap {

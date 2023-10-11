@@ -366,20 +366,33 @@ export class ModelEditor {
                 }
             }
         };
-        console.log({ FieldName });
-        currentModel['prototype'][FieldName] = function () {
-            const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel();
-            let _model = this;
-            return {
-                async all() {
-                    let params = {};
-                    params[`iD${_model.getModelName()}`] = _model.getPrimaryKeyValue();
-                    const middleTableResult = await middleTable['filter'](params).execute();
-                    foreignKeyField.model;
-                    return middleTableResult;
-                }
-            };
-        };
+        // console.log({FieldName, currentModel}, FieldName)
+        // let object3 = undefined
+        // Object.defineProperty(currentModel['prototype'], FieldName.toUpperCase(), {
+        //   get() {
+        //     return {
+        //       get() {
+        //         {
+        //           const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel()
+        //           let _model = this
+        //           return  {
+        //             async all () {
+        //               let params = {}
+        //               params[`iD${_model.getModelName()}`] = _model.getPrimaryKeyValue()
+        //               const middleTableResult = await middleTable['filter'](params).execute()
+        //               object3 = middleTableResult
+        //               foreignKeyField.model
+        //               return middleTableResult
+        //             }
+        //           }
+        //         }
+        //       },
+        //       get object() {
+        //         return object3
+        //       }
+        //     }
+        //   }
+        // })
         currentModel['prototype'][FieldName + '_all'] = async function () {
             const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel();
             let _model = this;

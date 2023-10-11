@@ -206,7 +206,7 @@ class indexedDBInterface {
                         else {
                             this.getActions(TableSchema.name, db, queryId).update({ value: args, key: idValue });
                         }
-                        db.getOrCreateTransaction({ TableName: TableName, queryId }, 'readwrite', (transaction) => {
+                        db.getOrCreateTransaction({ TableName: TableName, queryId }, 'readonly', (transaction) => {
                             PostMessage({
                                 run: 'callback',
                                 queryId: queryId,
@@ -225,7 +225,7 @@ class indexedDBInterface {
                                 const updateRow = Object.assign(row, argsToUpdate);
                                 this.getActions(TableSchema.name, db, queryId).update({ value: updateRow });
                             }
-                            db.getOrCreateTransaction({ TableName: TableName, queryId }, 'readwrite', (transaction) => {
+                            db.getOrCreateTransaction({ TableName: TableName, queryId }, 'readonly', (transaction) => {
                                 PostMessage({
                                     run: 'callback',
                                     queryId: queryId,
@@ -246,7 +246,7 @@ class indexedDBInterface {
                         else {
                             this.getActions(TableSchema.name, db, queryId).update({ value: argsToUpdate, key: idValue });
                         }
-                        db.getOrCreateTransaction({ TableName: TableSchema.name, queryId }, 'readwrite', (transaction) => {
+                        db.getOrCreateTransaction({ TableName: TableSchema.name, queryId }, 'readonly', (transaction) => {
                             PostMessage({
                                 run: 'callback',
                                 queryId: queryId,
@@ -268,7 +268,7 @@ class indexedDBInterface {
                                 const id = row[TableSchema.id.keyPath];
                                 this.getActions(TableSchema.name, db, queryId).deleteByID(id);
                             }
-                            db.getOrCreateTransaction({ TableName: TableName, queryId }, 'readwrite', (transaction) => {
+                            db.getOrCreateTransaction({ TableName: TableName, queryId }, 'readonly', (transaction) => {
                                 PostMessage({
                                     run: 'callback',
                                     queryId: queryId,
@@ -310,7 +310,7 @@ class indexedDBInterface {
                         const insert = rows[i];
                         this.getActions(TableName, db, queryId).add({ value: insert, key: null, index: i, add });
                     }
-                    db.getOrCreateTransaction({ TableName: TableName, queryId }, 'readwrite', (transaction) => {
+                    db.getOrCreateTransaction({ TableName: TableName, queryId }, 'readonly', (transaction) => {
                         PostMessage({
                             run: 'done',
                             queryId: queryId,

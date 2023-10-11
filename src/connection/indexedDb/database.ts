@@ -33,12 +33,12 @@ export class Database {
         return this.dbInstance 
     }
 
-    async getOrCreateTransaction({TableName, queryId}, mode, callback) {
+    async getOrCreateTransaction({TableName, queryId}, mode: IDBTransactionMode, callback) {
 
         const Database = await this.getDatabaseConnection()
 
         this.storeUsingDbInstance[TableName] = true
-        this.objectStore[TableName].getOrCreateTransaction({Database, queryId}, "readonly", callback)
+        this.objectStore[TableName].getOrCreateTransaction({Database, queryId}, mode, callback)
      
     }
 

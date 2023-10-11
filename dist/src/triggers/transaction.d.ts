@@ -1,4 +1,4 @@
-import { Model } from "../models/model.js";
+import { Model as ModelType } from "../models/model.js";
 export declare class transactionOnCommit {
     static stores: {
         [dbName: string]: {
@@ -10,8 +10,8 @@ export declare class transactionOnCommit {
     static subscription: {
         [SubscriptionName: string]: boolean;
     };
-    static prepare(model: typeof Model): void;
-    static subscribe(model: typeof Model, callback: any): {
+    static prepare(model: typeof ModelType): void;
+    static subscribe(model: typeof ModelType, callback: any): {
         queryId: string;
         subscribe: boolean;
         unsubscribe: () => Promise<unknown>;

@@ -7,7 +7,7 @@ import { Database } from "./database.js";
 
 // inspire by https://github.com/hc-oss/use-indexeddb
 class indexedDBInterface {
-  
+
 
   getActions = (TableName: string, Database: Database, queryId: string) => {
     const DatabaseName = Database.name
@@ -58,7 +58,7 @@ class indexedDBInterface {
           Database.getOrCreateTransaction({TableName, queryId}, 'readonly', (transaction) => {
             let objectStore = transaction.objectStore(TableName)
             let request = objectStore.getAll();
-            
+
             request.onsuccess = async (e: any) => {
               resolve(e.target.result as any[]);
             };
@@ -76,7 +76,7 @@ class indexedDBInterface {
               add(id, index)
               resolve(true)
             };
-  
+
             request.onerror = (e: any) => {
               let data = {
                 error: e.target['error']
@@ -122,7 +122,7 @@ class indexedDBInterface {
       },
       deleteAll:() => {
         return new Promise<any>((resolve, reject) => {
-          
+
           Database.getOrCreateTransaction({TableName, queryId }, 'readwrite', (transaction) => {
             let objectStore = transaction.objectStore(TableName)
             let request = objectStore.clear();
@@ -139,7 +139,8 @@ class indexedDBInterface {
   requestHandler = (TableName:string, DatabaseName:string, queryId, PostMessage = PostMessageWorker) => {
 
     const db = DatabaseManager.getDb(DatabaseName)
-    
+
+
     return {
       select: async (methods: Method[]) => {
         const TableSchema = db.objectStore[TableName].config
@@ -155,7 +156,7 @@ class indexedDBInterface {
         }
         else if(methods[0].methodName == 'get') {
           const args = methods[0].arguments
-          
+
 
           if(Object.keys(args).length == 1) {
             const key = Object.keys(args)[0]
@@ -175,7 +176,7 @@ class indexedDBInterface {
                 queryId: queryId,
                 value: await this.getActions(TableName, db, queryId).getOneByIndex(key, value)
               })
-              
+
             }
           } else if (methods[0].arguments[TableSchema.id.keyPath]) {
             PostMessage ({
@@ -185,25 +186,25 @@ class indexedDBInterface {
             })
           }
         } else if (methods[methods.length - 1].methodName == 'execute') {
-          
+
           const sqlObject =  new SqlObject(TableSchema, methods)
           //await this.getActions(TableSchema.name, config, queryId).openCursor(async(event: any) => {
             //var cursor = event.target.result;
             //if(cursor) {
               const rows = await this.getActions(TableName, db, queryId).getAll()
 
-              
+
               for (const row of rows) {
                 //const row = cursor.value
                 await sqlObject.runFirstMethod(row)
                 //cursor.continue();
               }
-              
+
             //} else {
               sqlObject.doneRunFirstMethod()
               sqlObject.run()
 
-              
+
               PostMessage({
                 run: 'callback',
                 queryId: queryId,
@@ -223,11 +224,12 @@ class indexedDBInterface {
 
       },
       update: async (methods: Method[]) => {
+
         const TableSchema = db.objectStore[TableName].config
-        
+
 
         if(methods[0].methodName == 'save') {
-          
+
           const args = methods[0].arguments
           const idFieldName = TableSchema.id.keyPath
           const idValue = args[idFieldName]
@@ -238,7 +240,7 @@ class indexedDBInterface {
             this.getActions(TableSchema.name, db, queryId).update({value:args, key:idValue})
           }
 
-          db.getOrCreateTransaction({TableName: TableName, queryId }, 'readwrite', (transaction) => {
+          db.getOrCreateTransaction({TableName: TableName, queryId }, 'readonly', (transaction) => {
             PostMessage({
               run: 'callback',
               queryId: queryId,
@@ -246,7 +248,7 @@ class indexedDBInterface {
             })
             transaction.done()
           });
-      
+
         } else if(methods[0].methodName != 'update' && methods[methods.length - 1].methodName == 'update' ) {
 
 
@@ -262,8 +264,8 @@ class indexedDBInterface {
               const updateRow = Object.assign(row, argsToUpdate)
               this.getActions(TableSchema.name, db, queryId).update({value:updateRow})
             }
-            
-            db.getOrCreateTransaction({TableName: TableName, queryId}, 'readwrite', (transaction) => {
+
+            db.getOrCreateTransaction({TableName: TableName, queryId}, 'readonly', (transaction) => {
               PostMessage({
                 run: 'callback',
                 queryId: queryId,
@@ -277,10 +279,11 @@ class indexedDBInterface {
 
         } else if (methods[0].methodName == 'update') {
           const argsToUpdate = methods[0].arguments
-          
+
           const idFieldName = TableSchema.id.keyPath
           //await this.getActions(TableSchema.name, config).update(argsToUpdate)
           const idValue = argsToUpdate[idFieldName]
+
 
           if(idValue) {
             this.getActions(TableSchema.name, db, queryId).update({value: argsToUpdate})
@@ -288,7 +291,7 @@ class indexedDBInterface {
             this.getActions(TableSchema.name, db, queryId).update({value:argsToUpdate, key:idValue})
           }
 
-          db.getOrCreateTransaction({TableName: TableSchema.name, queryId}, 'readwrite', (transaction) => {
+          db.getOrCreateTransaction({TableName: TableSchema.name, queryId}, 'readonly', (transaction) => {
             PostMessage({
               run: 'callback',
               queryId: queryId,
@@ -296,14 +299,14 @@ class indexedDBInterface {
             })
             transaction.done()
           });
-          
+
         }
       },
       delete: async (methods: Method[]) => {
         const TableSchema = db.objectStore[TableName].config
-        
 
-        if(methods[methods.length - 1].methodName == 'delete' && 
+
+        if(methods[methods.length - 1].methodName == 'delete' &&
         methods[methods.length - 1].arguments == null) {
 
           const customMethods: Method[] = Object.create(methods)
@@ -316,8 +319,8 @@ class indexedDBInterface {
               const id = row[TableSchema.id.keyPath]
               this.getActions(TableSchema.name, db, queryId).deleteByID(id)
             }
-  
-            db.getOrCreateTransaction({TableName: TableName, queryId}, 'readwrite', (transaction) => {
+
+            db.getOrCreateTransaction({TableName: TableName, queryId}, 'readonly', (transaction) => {
               PostMessage({
                 run: 'callback',
                 queryId: queryId,
@@ -328,7 +331,7 @@ class indexedDBInterface {
           }).select(customMethods) as any
 
 
-        } else if ( methods[methods.length - 1].methodName == 'delete' && 
+        } else if ( methods[methods.length - 1].methodName == 'delete' &&
         typeof methods[methods.length - 1].arguments == 'object') {
 
           const IdInObject = methods[methods.length - 1].arguments
@@ -339,7 +342,7 @@ class indexedDBInterface {
             queryId: queryId,
             value: await this.getActions(TableName, db, queryId).deleteByID(idValue)
           })
-        } else if (methods[methods.length - 1].methodName == 'delete' && 
+        } else if (methods[methods.length - 1].methodName == 'delete' &&
         methods[methods.length - 1].arguments == '*') {
           PostMessage({
             run: 'callback',
@@ -350,7 +353,7 @@ class indexedDBInterface {
       },
       insert: async (methods: Method[]) => {
         const rows = methods[0].arguments
-        
+
         const add = (id, index) => {
           PostMessage({
             run: 'callback',
@@ -364,7 +367,7 @@ class indexedDBInterface {
           this.getActions(TableName, db, queryId).add({value: insert, key: null, index:i, add})
         }
 
-        db.getOrCreateTransaction({TableName: TableName, queryId}, 'readwrite', (transaction) => {
+        db.getOrCreateTransaction({TableName: TableName, queryId}, 'readonly', (transaction) => {
           PostMessage({
             run: 'done',
             queryId: queryId,
@@ -382,7 +385,7 @@ class indexedDBInterface {
           queryId: queryId,
           value: true
         })
-      }, 
+      },
       trigger: async({type, subscribe}) => {
 
         const objectStore = db.getObjectStore(TableName)
@@ -391,7 +394,7 @@ class indexedDBInterface {
           if(subscribe) {
             PostMessage(
               objectStore.transactionOnCommitSubscribe(TableName, DatabaseName, queryId)
-            ) 
+            )
           } else {
             PostMessage(
               objectStore.transactionOnCommitUnSubscribe(TableName, DatabaseName, queryId)
