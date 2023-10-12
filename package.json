@@ -7,11 +7,14 @@
     "watch": "rimraf dist/src && tsc  --watch",
     "test": "jest",
     "speed-test": "ts-node-dev ./test/funcional/speed/speed.ts",
+    "test:cypress": "npx cypress run --spec ./feature",
+    "cypress:open": "npx cypress open",
     "start": "live-server --ignore='node_modules'",
     "package:info": "npm publish --dry-run"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",
+    "cypress": "^13.3.1",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "jest": "^27.5.1",

@@ -9,6 +9,7 @@ node_modules
 .gitignore
 .vscode/
 test
+_test
 index.html
 dist/src/tsconfig.tsbuildinfo
 dist/src/connection/***.d.ts
