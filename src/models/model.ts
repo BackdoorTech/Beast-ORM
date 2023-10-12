@@ -266,14 +266,7 @@ export class Model {
   private static async getEmptyFields () {
     const TableSchema = this.getTableSchema()
     const emptyFields = {}
-    let fieldsName
-
-    if(TableSchema.fields) {
-      fieldsName = TableSchema.fields.map((field)=>field.name)
-    } else {
-      fieldsName = ModelReader.read(this).fieldNames
-    }
-
+    let fieldsName = TableSchema.fields.map((field)=>field.name)
 
     for(let fieldName of fieldsName) {
       emptyFields[fieldName] = null
@@ -285,15 +278,8 @@ export class Model {
   private static getFields(arg) {
 
     let TableSchema = this.getTableSchema()
-    let fieldsName
-
-    if(TableSchema) {
-      fieldsName = TableSchema.fields.map((field)=>field.name)
-      fieldsName.push(TableSchema.id.keyPath)
-    } else {
-      const data = ModelReader.read(this)
-      fieldsName = data.fieldNames.concat(data.id)
-    }
+    let fieldsName = TableSchema.fields.map((field)=>field.name)
+    fieldsName.push(TableSchema.id.keyPath)
 
     const filteredArgs = {}
 

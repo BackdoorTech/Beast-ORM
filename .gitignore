@@ -5,3 +5,4 @@ test/config/test.json
 plugin_packages
 src/DBMS
 .vscode
+_src

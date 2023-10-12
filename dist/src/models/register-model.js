@@ -10,6 +10,11 @@ import { DatabaseManagerSchema } from './schema/databae-manager-schema.js';
 const models = {};
 export const objModels = {};
 const modelsLocalStorage = {};
+/**
+ * @function migrate
+ * @description Migrates models based on the registration type (indexedDB or localStorage).
+ * @param {register} register - The registration configuration.
+ */
 export function migrate(register) {
     if (register.type == 'indexedDB') {
         registerModel.register(register);
@@ -18,9 +23,13 @@ export function migrate(register) {
         registerLocalStorage.register(register);
     }
 }
+/**
+ * @class registerModel
+ * @description Manages the registration of models for indexedDB storage.
+ */
 export class registerModel {
     static ModalName() { }
-    static async register(entries) {
+    static register(entries) {
         var _a, _b, _c, _d;
         const databaseSchema = {
             databaseName: entries.databaseName || uniqueGenerator(),
@@ -69,13 +78,13 @@ export class registerModel {
                     });
                 }
                 if (Field instanceof OneToOneField) {
-                    await ModelEditor.addMethodOneToOneField(Field, fieldName, ModelName, databaseSchema);
+                    ModelEditor.addMethodOneToOneField(Field, fieldName, ModelName, databaseSchema);
                 }
                 else if (Field instanceof ForeignKey) {
-                    await ModelEditor.addMethodForeignKey(Field, fieldName, ModelName, databaseSchema);
+                    ModelEditor.addMethodForeignKey(Field, fieldName, ModelName, databaseSchema);
                 }
                 else if (Field instanceof ManyToManyField) {
-                    await ModelEditor.addMethodManyToManyField(Field, fieldName, ModelName, databaseSchema);
+                    ModelEditor.addMethodManyToManyField(Field, fieldName, ModelName, databaseSchema);
                 }
             }
             models[ModelName] = modelClassRepresentations;
@@ -93,10 +102,16 @@ export class registerModel {
             transactionOnCommit.prepare(model);
             objModels[DbName + stores.name] = model;
         }
+        let requestMigrations;
         if (databaseSchema.type == 'indexedDB') {
-            await ModelAPIRequest.obj(databaseSchema).migrate();
+            requestMigrations = ModelAPIRequest.obj(databaseSchema).migrate();
             ModelMigrations.migrationsState(databaseSchema.databaseName, true);
         }
+        return {
+            wait() {
+                return requestMigrations;
+            }
+        };
     }
     static manyToManyRelationShip(foreignKeyField, FieldName, modelName, databaseSchema) {
         const foreignKeyFieldModel = foreignKeyField.model;
@@ -156,7 +171,16 @@ async function cachedValue(Model) {
         return getModelName;
     };
 }
+/**
+ * @class registerLocalStorage
+ * @description Manages the registration of models for localStorage.
+ */
 export class registerLocalStorage {
+    /**
+     * @function register
+     * @description Registers models for localStorage storage.
+     * @param {register} entries - The registration configuration.
+     */
     static async register(entries) {
         const databaseSchema = {
             databaseName: entries.databaseName,

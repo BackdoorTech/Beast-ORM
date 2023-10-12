@@ -8,6 +8,17 @@ import { ModelMigrations } from './mode-migrations.js'
 import { ModelAPIRequest } from './model-manager.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
 import { DatabaseManagerSchema } from './schema/databae-manager-schema.js';
+
+/**
+ * @interface register
+ * @description Represents the configuration options for registering models.
+ * @property {string} databaseName - The name of the database.
+ * @property {number} version - The version of the database schema.
+ * @property {'indexedDB' | 'localStorage'} type - The type of storage ('indexedDB' or 'localStorage').
+ * @property {typeof Model[] | typeof LocalStorage[]} models - An array of model classes to be registered.
+ * @property {boolean} [restore] - Whether to restore values from localStorage for LocalStorage Models.
+ * @property {string[]} [ignoreFieldsStartWidth] - An array of field names to ignore.
+ */
 interface register {
   databaseName: string,
   version: number,
@@ -21,13 +32,15 @@ interface register {
 }
 
 const models = {}
-
 export const objModels = {}
-
 const modelsLocalStorage = {}
 
 
-
+/**
+ * @function migrate
+ * @description Migrates models based on the registration type (indexedDB or localStorage).
+ * @param {register} register - The registration configuration.
+ */
 export function migrate(register: register) {
   if(register.type == 'indexedDB') {
     registerModel.register(register)
@@ -35,12 +48,17 @@ export function migrate(register: register) {
     registerLocalStorage.register(register)
   }
 }
+
+/**
+ * @class registerModel
+ * @description Manages the registration of models for indexedDB storage.
+ */
 export class registerModel {
 
 
   static ModalName() {}
 
-  static async register(entries: register) {
+  static register(entries: register) {
 
     const databaseSchema : DatabaseSchema  = {
       databaseName: entries.databaseName || uniqueGenerator(),
@@ -105,11 +123,11 @@ export class registerModel {
         }
 
         if(Field instanceof OneToOneField) {
-          await ModelEditor.addMethodOneToOneField(Field, fieldName, ModelName, databaseSchema)
+          ModelEditor.addMethodOneToOneField(Field, fieldName, ModelName, databaseSchema)
         } else if (Field instanceof ForeignKey) {
-          await ModelEditor.addMethodForeignKey(Field, fieldName, ModelName, databaseSchema)
+          ModelEditor.addMethodForeignKey(Field, fieldName, ModelName, databaseSchema)
         } else if (Field instanceof ManyToManyField) {
-          await ModelEditor.addMethodManyToManyField(Field, fieldName, ModelName, databaseSchema)
+          ModelEditor.addMethodManyToManyField(Field, fieldName, ModelName, databaseSchema)
         }
       }
 
@@ -137,9 +155,17 @@ export class registerModel {
       objModels[DbName+stores.name] = model
     }
 
+    let requestMigrations: Promise<any>
+
     if(databaseSchema.type == 'indexedDB') {
-      await ModelAPIRequest.obj(databaseSchema).migrate()
+      requestMigrations = ModelAPIRequest.obj(databaseSchema).migrate()
       ModelMigrations.migrationsState(databaseSchema.databaseName, true);
+    }
+
+    return {
+      wait(): Promise<any> {
+        return requestMigrations
+      }
     }
 
   }
@@ -213,7 +239,17 @@ async function  cachedValue(Model) {
     return getModelName
   }
 }
+
+/**
+ * @class registerLocalStorage
+ * @description Manages the registration of models for localStorage.
+ */
 export class registerLocalStorage {
+  /**
+   * @function register
+   * @description Registers models for localStorage storage.
+   * @param {register} entries - The registration configuration.
+   */
   static async register(entries: register) {
 
 
@@ -506,19 +542,19 @@ export class ModelEditor {
     //       get() {
     //         {
     //           const middleTable = DatabaseManagerSchema.getDb(databaseSchema.databaseName).getTable(_middleTable.getModelName()).getModel()
-        
+
     //           let _model = this
-        
+
     //           return  {
     //             async all () {
     //               let params = {}
     //               params[`iD${_model.getModelName()}`] = _model.getPrimaryKeyValue()
-        
+
     //               const middleTableResult = await middleTable['filter'](params).execute()
     //               object3 = middleTableResult
-        
+
     //               foreignKeyField.model
-        
+
     //               return middleTableResult
     //             }
     //           }

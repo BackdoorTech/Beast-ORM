@@ -8,7 +8,6 @@ import { taskHolder } from '../connection/taskHolder.js';
 import { transactionOnCommit } from '../triggers/transaction.js';
 import { ReactiveList } from '../reactive/DynamicList.js';
 import { signalExecutor, rewrite } from './signal.js';
-import { ModelReader } from './model.reader.js';
 let methods = {} = {};
 // inspire by https://github.com/brianschardt/browser-orm
 export class Model {
@@ -191,31 +190,16 @@ export class Model {
     static async getEmptyFields() {
         const TableSchema = this.getTableSchema();
         const emptyFields = {};
-        let fieldsName;
-        if (TableSchema.fields) {
-            fieldsName = TableSchema.fields.map((field) => field.name);
-        }
-        else {
-            fieldsName = ModelReader.read(this).fieldNames;
-        }
+        let fieldsName = TableSchema.fields.map((field) => field.name);
         for (let fieldName of fieldsName) {
             emptyFields[fieldName] = null;
         }
-
-        console.log
         return emptyFields;
     }
     static getFields(arg) {
         let TableSchema = this.getTableSchema();
-        let fieldsName;
-        if (TableSchema) {
-            fieldsName = TableSchema.fields.map((field) => field.name);
-            fieldsName.push(TableSchema.id.keyPath);
-        }
-        else {
-            const data = ModelReader.read(this);
-            fieldsName = data.fieldNames.concat(data.id);
-        }
+        let fieldsName = TableSchema.fields.map((field) => field.name);
+        fieldsName.push(TableSchema.id.keyPath);
         const filteredArgs = {};
         for (let fieldName of fieldsName) {
             if (arg.hasOwnProperty(fieldName)) {
