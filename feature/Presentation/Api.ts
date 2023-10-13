@@ -10,11 +10,9 @@ export class Model {
    * Save the current model's data to the database.
    * @returns A promise that resolves when the save operation is complete.
    */
-  save() {
+  save(...args) {
     const queryBuilder = new QueryBuilder();
-    queryBuilder
-      .createQuery({operation:"save", model: this})
-      .save()
+    queryBuilder.insertInto(this).insert(args)
   }
 
   /**
@@ -25,8 +23,8 @@ export class Model {
   get(params) {
     const queryBuilder = new QueryBuilder();
     queryBuilder
-      .createQuery({operation:"select", model: this})
-      .filter({params})
+      .select(this)
+      .where(this)
       .limit(1)
   }
 
@@ -36,7 +34,7 @@ export class Model {
    */
   all() {
     const queryBuilder = new QueryBuilder();
-    queryBuilder.createQuery({operation:"select", model: this})
+    queryBuilder.select(this)
   }
 
   /**
@@ -46,25 +44,20 @@ export class Model {
    */
   getOrCreate(...params) {
     const queryBuilder = new QueryBuilder();
-    const object = queryBuilder
-    .createQuery({operation:"select", model: this})
-    .filter({params})
-    .limit(1)
+    const object: any = queryBuilder.select(this)
+      .where(params)
+      .limit(1)
 
     if(object) {
       return object
     }
 
-    return queryBuilder
-    .createQuery({operation:"insert", model: this})
-    .save()
+    return new QueryBuilder().insert(params)
   }
   create(...params) {
     const queryBuilder = new QueryBuilder();
 
-    return queryBuilder
-    .createQuery({operation:"insert", model: this})
-    .insert(params)
+    return queryBuilder.insert(this).insert(params)
   }
 
 
@@ -75,7 +68,7 @@ export class Model {
    */
   async delete(params: any) {
     const queryBuilder = new QueryBuilder();
-    return queryBuilder.createQuery({operation:"delete", model: this}).filter(params).limit(1);
+    return queryBuilder.deleteFrom(this).where(params).limit(1);
   }
 
   updateOrCreate(...args) {
