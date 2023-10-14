@@ -8,6 +8,6 @@ export default defineConfig({
 
       // implement node event listeners here
     },
-    specPattern: 'feature/**/*.cy.{ts,tsx}',
+    specPattern: 'dist/src/**/*.cy.{ts,js,tsx}',
   },
 });

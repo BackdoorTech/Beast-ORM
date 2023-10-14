@@ -1,8 +1,8 @@
 import fs from 'fs'
-import * as _Fields from '../../../../../src/models/field/fields'
-import { models, models as  modelsType } from '../../../../../src/index'
-import { ObjectConditionOperator as ObjectConditionOperatorType } from './../../../../../src/sql/Operators/Object-condition-operator'
-import { argsAttributes as argsAttributesType } from './../../../../../src/sql/Operators/args-attributes'
+import * as _Fields js'
+import { models, models as  modelsType } js'
+import { ObjectConditionOperator as ObjectConditionOperatorType } js'
+import { argsAttributes as argsAttributesType } js'
 
 const { Port } = JSON.parse(fs.readFileSync('./test/config/test.json', 'utf8'));
 
@@ -10,7 +10,7 @@ describe("comparisonOperator", () => {
   beforeEach(async () => {
     await page.goto(`http://127.0.0.1:${Port}/test/index.html`)
   })
- 
+
 	it('comparisonOperator = eq', async () => {
 
 		await page.evaluate(async() => {
@@ -21,7 +21,7 @@ describe("comparisonOperator", () => {
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
 				age = models.IntegerField()
-			} 
+			}
 
 			models.register({
 				databaseName:'',
@@ -29,8 +29,8 @@ describe("comparisonOperator", () => {
 				version: 1,
 				models: [Person]
 			})
-			
-	  		
+
+
 			const tableSchema = Person.getTableSchema()
 			const row = {name:'peter', age: 22}
 			const filterParams = [{age: 22}]
@@ -39,7 +39,7 @@ describe("comparisonOperator", () => {
 
 			const operator = new ObjectOperator(tableSchema, args)
 			const result: Boolean = await operator.run(row)
-			
+
 			document.body.innerHTML = 'result: '+result
 		})
 
@@ -63,7 +63,7 @@ describe("comparisonOperator", () => {
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
 				age = models.IntegerField()
-			} 
+			}
 
 			models.register({
         databaseName:'',
@@ -71,7 +71,7 @@ describe("comparisonOperator", () => {
         version: 1,
         models: [Person]
       })
-			
+
 			const tableSchema = Person.getTableSchema()
 			const row = {name:'peter', age: 22}
 			const filterParams = [{age: 23}]
@@ -80,7 +80,7 @@ describe("comparisonOperator", () => {
 
 			const operator = new ObjectOperator(tableSchema, args)
 			const result: Boolean = await operator.run(row)
-			
+
 			document.body.innerHTML = 'result: '+result
 		})
 
@@ -103,7 +103,7 @@ describe("comparisonOperator", () => {
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
 				age = models.IntegerField()
-			} 
+			}
 
 			models.register({
         databaseName:'',
@@ -112,7 +112,7 @@ describe("comparisonOperator", () => {
         models: [Person]
       })
 
-			
+
 			const tableSchema = Person.getTableSchema()
 			const row = {username:'peter', age: 10}
 			const filterParams = [{age__lte: 22}]
@@ -121,7 +121,7 @@ describe("comparisonOperator", () => {
 
 			const operator = new ObjectOperator(tableSchema, args)
 			const result = await operator.run(row)
-			
+
 			document.body.innerHTML = 'result: '+result
     })
 
@@ -144,7 +144,7 @@ describe("comparisonOperator", () => {
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
 				age = models.IntegerField()
-			} 
+			}
 
 			models.register({
         databaseName:'',
@@ -153,7 +153,7 @@ describe("comparisonOperator", () => {
         models: [Person]
       })
 
-			
+
 			const tableSchema = Person.getTableSchema()
 			const row = {name:'peter', age: 23}
 			const filterParams = [{age__lte: 22}]
@@ -162,7 +162,7 @@ describe("comparisonOperator", () => {
 
 			const operator = new ObjectOperator(tableSchema, args)
 			const result: Boolean = await operator.run(row)
-			
+
 			document.body.innerHTML = 'result: '+result
     })
 
@@ -185,7 +185,7 @@ describe("comparisonOperator", () => {
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
 				age = models.IntegerField()
-			} 
+			}
 
 			models.register({
         databaseName:'',
@@ -194,7 +194,7 @@ describe("comparisonOperator", () => {
         models: [Person]
       })
 
-			
+
 			const tableSchema = Person.getTableSchema()
 			const row = {username:'jame', age: 10}
 			const filterParams = [{username__not: 'peter',age__lte: 20}]
@@ -203,7 +203,7 @@ describe("comparisonOperator", () => {
 
 			const operator = new ObjectOperator(tableSchema, args)
 			const result = await operator.run(row)
-			
+
 			document.body.innerHTML = 'result: '+result
     })
 
@@ -228,7 +228,7 @@ describe("comparisonOperator", () => {
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
 				age = models.IntegerField()
-			} 
+			}
 
 			models.register({
         databaseName:'',
@@ -245,8 +245,8 @@ describe("comparisonOperator", () => {
 
 			const operator = new ObjectOperator(tableSchema, args)
 			const result: Boolean = await operator.run(row)
-			
-			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
+
+			document.body.innerHTML = 'result: '+ JSON.stringify(result)
     })
 
     debugger
@@ -270,7 +270,7 @@ describe("comparisonOperator", () => {
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
 				age = models.IntegerField()
-			} 
+			}
 
 			models.register({
         databaseName:'',
@@ -287,8 +287,8 @@ describe("comparisonOperator", () => {
 
 			const operator = new ObjectOperator(tableSchema, args)
 			const result: Boolean = await operator.run(row)
-			
-			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
+
+			document.body.innerHTML = 'result: '+ JSON.stringify(result)
     })
 
     debugger
@@ -312,7 +312,7 @@ describe("comparisonOperator", () => {
 			class Person extends models.Model {
 				username =  models.CharField({maxLength:0})
 				age = models.IntegerField()
-			} 
+			}
 
 			models.register({
         databaseName:'',
@@ -329,8 +329,8 @@ describe("comparisonOperator", () => {
 
 			const operator = new ObjectOperator(tableSchema, args)
 			const result: Boolean = await operator.run(row)
-			
-			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
+
+			document.body.innerHTML = 'result: '+ JSON.stringify(result)
     })
 
     debugger
@@ -350,7 +350,7 @@ describe("comparisonOperator", () => {
 			const models: typeof modelsType = window['models']
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
 			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
-			
+
 			const { ArrayField, JsonField} = models.indexedDB.fields
 
 			class Person extends models.Model {
@@ -373,8 +373,8 @@ describe("comparisonOperator", () => {
 
 			const operator = new ObjectOperator(tableSchema, args)
 			const result: Boolean = await operator.run(row)
-			
-			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
+
+			document.body.innerHTML = 'result: '+ JSON.stringify(result)
     })
 
     debugger
@@ -395,7 +395,7 @@ describe("comparisonOperator", () => {
 			const models: typeof modelsType = window['models']
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
 			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
-			
+
 			const { ArrayField, JsonField} = models.indexedDB.fields
 
 			class Person extends models.Model {
@@ -418,8 +418,8 @@ describe("comparisonOperator", () => {
 
 			const operator = new ObjectOperator(tableSchema, args)
 			const result: Boolean = await operator.run(row)
-			
-			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
+
+			document.body.innerHTML = 'result: '+ JSON.stringify(result)
     })
 
     debugger
@@ -438,7 +438,7 @@ describe("comparisonOperator", () => {
 			const models: typeof modelsType = window['models']
 			const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
 			const argsAttributes: typeof argsAttributesType = window['argsAttributes']
-			
+
 			const { ArrayField, JsonField} = models.indexedDB.fields
 
 			class Person extends models.Model {
@@ -455,7 +455,7 @@ describe("comparisonOperator", () => {
 
 			const tableSchema = Person.getTableSchema()
 			const row = {
-				username:'jame', 
+				username:'jame',
 				data: {
 					'name': 'Bob',
 					'other_pets': [{
@@ -469,8 +469,8 @@ describe("comparisonOperator", () => {
 
 			const operator = new ObjectOperator(tableSchema, args)
 			const result: Boolean = await operator.run(row )
-			
-			document.body.innerHTML = 'result: '+ JSON.stringify(result) 
+
+			document.body.innerHTML = 'result: '+ JSON.stringify(result)
     	})
 
     	 debugger
@@ -491,7 +491,7 @@ describe("comparisonOperator", () => {
 				const models: typeof modelsType = window['models']
 				const ObjectOperator: typeof ObjectConditionOperatorType = window['ObjectConditionOperator']
 				const argsAttributes: typeof argsAttributesType = window['argsAttributes']
-				
+
 				const { ArrayField, JsonField} = models.indexedDB.fields
 
 				class Person extends models.Model {
@@ -508,7 +508,7 @@ describe("comparisonOperator", () => {
 
 				const tableSchema = Person.getTableSchema()
 				const row = {
-					username:'jame', 
+					username:'jame',
 					data: {
 						'name': 'Bob',
 						'other_pets': [{
@@ -523,8 +523,8 @@ describe("comparisonOperator", () => {
 
 				const operator = new ObjectOperator(tableSchema, args)
 				const result: Boolean = await operator.run(row)
-				
-				document.body.innerHTML = 'result: '+ JSON.stringify(result) 
+
+				document.body.innerHTML = 'result: '+ JSON.stringify(result)
 		})
 
     debugger
