@@ -1,6 +1,6 @@
 import { Model } from "../Presentation/Api"
 
-export interface register {
+export interface IRegister {
   databaseName: string,
   version: number,
   type: 'indexedDB' | 'localStorage'
