@@ -1,4 +1,4 @@
-import * as Fields from './allFields.js'
+import * as Fields from './allFields'
 import { AutoFieldParams, BigIntegerFieldParams, BooleanFieldParams, CharFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams, TextFieldParams } from './allFields.type.js'
 
 export function CharField(data?: CharFieldParams): string {

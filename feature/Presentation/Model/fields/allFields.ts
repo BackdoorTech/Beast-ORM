@@ -1,4 +1,4 @@
-import { FieldKeys, TextFieldParams, BigIntegerFieldParams, CharFieldParams, AutoFieldParams, BooleanFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams, FieldType, field } from './allFields.type.js'
+import { FieldKeys, TextFieldParams, BigIntegerFieldParams, CharFieldParams, AutoFieldParams, BooleanFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams, FieldType, field } from './allFields.type'
 
 
 
