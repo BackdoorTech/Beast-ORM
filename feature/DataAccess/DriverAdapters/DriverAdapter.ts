@@ -1,4 +1,5 @@
 import { IDatabaseStrategy } from "./DriverAdapter.type";
+import { IndexedDBStrategy } from '../DataSource/indexeDB/DriverAdapters/DriverAdapterIndexeDB'
 
  // Context that uses the strategy pattern
 export class DriverAdapter implements IDatabaseStrategy{
@@ -17,4 +18,9 @@ export class DriverAdapter implements IDatabaseStrategy{
   async select(table, key) {
     return this.strategy.select(table, key);
   }
+}
+
+export function AdapterFactory () {
+
+  return new IndexedDBStrategy()
 }

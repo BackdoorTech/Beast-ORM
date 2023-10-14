@@ -1,13 +1,12 @@
 import { IDatabaseStrategy } from "../../../DriverAdapters/DriverAdapter.type";
 import { IndexedDB } from '../indexeDB/indexeDB'
 // IndexedDB strategy
-class IndexedDBStrategy extends IDatabaseStrategy {
+export class IndexedDBStrategy extends IDatabaseStrategy {
 
   databaseName
 
-  constructor(databaseName) {
+  constructor() {
     super();
-    this.databaseName = databaseName;
   }
 
   async openDatabase() {
