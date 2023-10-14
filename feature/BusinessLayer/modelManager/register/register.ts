@@ -1,9 +1,18 @@
 
 import {} from '../schemaGenerator/ModelReader'
-import { Database } from './database.js'
+import { Database } from './database'
+import { DatabaseSchema } from '../../modelManager/schemaGenerator/schemaGenerator.type'
 
-export class ModelRegistration {
+class ModelRegistration {
   databases: {[key: string]: Database} = {}
 
-  static register() {}
+  register(DatabaseSchema: DatabaseSchema) {
+
+    const database = new Database(DatabaseSchema)
+    const databaseName = DatabaseSchema.databaseName
+    this.databases[databaseName] = database
+  }
 }
+
+
+export const modelRegistration = new ModelRegistration()
