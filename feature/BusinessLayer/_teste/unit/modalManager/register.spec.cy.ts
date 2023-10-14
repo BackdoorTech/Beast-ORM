@@ -42,7 +42,12 @@ describe('Register', () => {
               }
             ],
             "databaseName": "test",
-            "version": 1
+            "version": 1,
+            "DBConnectionManager": {
+              "driverAdapter": {
+                "strategy": {}
+              }
+            }
           }
         }
       }));
@@ -88,7 +93,12 @@ describe('Register', () => {
               }
             ],
             "databaseName": "test",
-            "version": 1
+            "version": 1,
+            "DBConnectionManager": {
+              "driverAdapter": {
+                "strategy": {}
+              }
+            }
           }
         }
       }));
