@@ -6,8 +6,8 @@ export class DriverAdapter implements IDatabaseStrategy{
   constructor(strategy) {
     this.strategy = strategy;
   }
-  openDatabase(): Promise<void> {
-    throw new Error("Method not implemented.");
+  async migrate() {
+    this.strategy.migrate()
   }
 
   async insert(table, data) {
