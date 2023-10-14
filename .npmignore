@@ -23,3 +23,6 @@ jest.config.js
 jest-puppeteer.config.js
 dist/test.js
 plugin_packages
+*.cy.js
+*.cy.ts
+dist/tsconfig.tsbuildinfo

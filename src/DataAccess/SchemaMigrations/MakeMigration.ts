@@ -1,7 +1,9 @@
 import { Model } from "../../Presentation/Api.js";
-import { CharField, indexedDB } from '../../Presentation/Model/definitions.js'
+import { fields } from '../../Presentation/Model/definitions.js'
 import { IDatabaseStrategy } from "../DriverAdapters/DriverAdapter.type.js";
 import { IMigrations } from "./MakeMigration.type.js";
+
+const { CharField, indexedDB }  = fields
 class Migrations extends Model<Migrations> {
   databaseName =  CharField()
   migrations = indexedDB.fields.ArrayField({})

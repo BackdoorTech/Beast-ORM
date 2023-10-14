@@ -1,5 +1,6 @@
 import { Model } from "../../Presentation/Api.js";
-import { CharField, indexedDB } from '../../Presentation/Model/definitions.js';
+import { fields } from '../../Presentation/Model/definitions.js';
+const { CharField, indexedDB } = fields;
 class Migrations extends Model {
     constructor() {
         super(...arguments);
