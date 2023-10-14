@@ -21,7 +21,7 @@ export interface TableSchema {
 	middle?: boolean
 }
 
-export interface DatabaseSchema {
+export interface IConfig {
 	databaseName: string;
 	type: 'indexedDB' | 'localStorage'
 	version: number;

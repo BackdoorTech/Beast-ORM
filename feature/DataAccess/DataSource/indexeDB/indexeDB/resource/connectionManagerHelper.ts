@@ -1,4 +1,4 @@
-import { DatabaseSchema, FieldSchema } from "./type";
+import { IConfig, FieldSchema } from "./type";
 
 class ConnectionManagerHelper {
 
