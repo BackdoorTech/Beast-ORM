@@ -3,7 +3,7 @@ import { schemaGenerator } from '../../../modelManager/schemaGenerator/schemaGen
 describe('SchemaGenerator', () => {
   // Test the read method
   describe('generate', () => {
-    it('should return model information when provided with a model class', () => {
+    it('should return database schema', () => {
 
       class MockModel extends Model {
         // Define your mock model here
@@ -37,6 +37,38 @@ describe('SchemaGenerator', () => {
               "fieldTypes":{}
             }
           ]
+      }));
+    });
+
+    it('should attach generated TableSchema into Model instance ', () => {
+
+      class MockModel extends Model {
+        // Define your mock model here
+      }
+
+      const register = {
+        databaseName: 'test',
+        type: 'indexedDB',
+        version: 1,
+        models: [MockModel]
+      }
+
+      const schema = schemaGenerator.generate(register as any);
+
+      schemaGenerator.attachGeneratedTableSchemaToModel(schema, register);
+
+      // Assert the expected output based on your mock model
+      expect(JSON.stringify(MockModel.getTableSchema())).to.equal(JSON.stringify({
+        "databaseName": "test",
+        "name": "MockModel",
+        "id": {
+          "keyPath": "id",
+          "autoIncrement": true,
+          "type": 1
+        },
+        "attributes": {},
+        "fields": [],
+        "fieldTypes": {}
       }));
     });
   });

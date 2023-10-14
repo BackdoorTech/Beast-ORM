@@ -26,5 +26,5 @@ export interface DatabaseSchema {
 	type: 'indexedDB' | 'localStorage'
 	version: number;
 	webWorker?:boolean,
-	table?: TableSchema[]
+	table: TableSchema[]
 }

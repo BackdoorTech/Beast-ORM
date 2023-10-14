@@ -4,7 +4,7 @@ import { register } from '../../beastOrm.type'
 import { FieldType } from './ModalReader.type'
 import { DatabaseSchema } from './schemaGenerator.type'
 class SchemaGenerator {
-  generate(entries: register) {
+  generate(entries: register): DatabaseSchema {
 
 
     const databaseSchema: DatabaseSchema = {
@@ -54,7 +54,32 @@ class SchemaGenerator {
     }
   }
 
-  attacheGeneratedTableSchemaToModel() {}
+  /**
+   * Attaches generated table schema to model classes.
+   * @param {DatabaseSchema} databaseSchema - The database schema to extract table information from.
+   * @param {Object} entries - An object containing model classes.
+   */
+  attachGeneratedTableSchemaToModel(databaseSchema:DatabaseSchema, entries: register) {
+    for (let index = 0; index < entries.models.length; index++) {
+
+      // Get the table schema class for the current model.
+      const tableSchemaClass = databaseSchema.table[index];
+
+      // Add a prototype method to the model for accessing the table schema.
+      entries.models[index].prototype.getTableSchema = () => {
+          return tableSchemaClass;
+      }
+
+      // Add a static method to the model for accessing the table schema.
+      entries.models[index].getTableSchema = () => {
+          return tableSchemaClass;
+      }
+    }
+  }
+
+
+
+
 }
 
 

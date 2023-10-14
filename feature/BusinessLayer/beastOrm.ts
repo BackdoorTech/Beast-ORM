@@ -1,12 +1,16 @@
-import { SchemaGenerator } from './modelManager/schemaGenerator/schemaGenerator'
+import { schemaGenerator } from './modelManager/schemaGenerator/schemaGenerator'
 import { register } from './beastOrm.type'
 class BeastORM {
 
   private generateSchema(register:register) {}
   private migrate() {}
   register(register:register) {
+
     // generate schema
-    // attacheGeneratedTableSchemaToModel
+    const schema = schemaGenerator.generate(register)
+    schemaGenerator.attachGeneratedTableSchemaToModel(schema, register);
+
+
     // make migrations
     // detect migration change
     // migrate
