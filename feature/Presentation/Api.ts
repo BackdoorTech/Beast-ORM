@@ -1,47 +1,37 @@
+import { IModel } from "./Api.type";
 import { QueryBuilder } from "./queryBuilder/queryBuilder" // Represents a query object that helps build and execute database queries.
 import { returnSelf } from "./returnSelf/returnSelf" // Represents a return object for query-related methods
 
 /**
  * Represents a model for database operations.
  */
-export class Model {
+export class Model<Model>  implements IModel<Model>{
 
-  /**
-   * Save the current model's data to the database.
-   * @returns A promise that resolves when the save operation is complete.
-   */
-  save(...args) {
+  static getTableSchema: () => import("c:/Users/peter.maquiran/Documents/project/beast-ORM-v0/feature/BusinessLayer/modelManager/schemaGenerator/schemaGenerator.type").TableSchema;
+
+  async save(...args) {
     const queryBuilder = new QueryBuilder();
     queryBuilder.insertInto(this).insert(args)
   }
 
-  /**
-   * Retrieve data from the database with specified filter parameters.
-   * @param params - The filter parameters for the query.
-   * @returns A promise that resolves with the query results.
-   */
-  get(params) {
+  async get() {
     const queryBuilder = new QueryBuilder();
     queryBuilder
       .select(this)
       .where(this)
       .limit(1)
+
+    return {} as any
   }
 
-  /**
-   * Retrieve all data of the current model from the database.
-   * @returns A promise that resolves with all query results.
-   */
-  all() {
+  async all() {
     const queryBuilder = new QueryBuilder();
     queryBuilder.select(this)
+
+    return {} as any
   }
 
-  /**
-   * Retrieve data from the database with specified filter parameters and create if it doesn't exist.
-   * @param params - The filter parameters for the query.
-   * @returns A promise that resolves with the query results.
-   */
+
   getOrCreate(...params) {
     const queryBuilder = new QueryBuilder();
     const object: any = queryBuilder.select(this)
@@ -54,36 +44,28 @@ export class Model {
 
     return new QueryBuilder().insert(params)
   }
-  create(...params) {
+  async create(...params) {
     const queryBuilder = new QueryBuilder();
 
-    return queryBuilder.insert(this).insert(params)
+    return queryBuilder.insert(this).insert(params)  as any
   }
 
-
-  /**
-   * Delete data from the database with specified filter parameters.
-   * @param params - The filter parameters for the delete.
-   * @returns A promise that resolves when the delete operation is complete.
-   */
   async delete(params: any) {
     const queryBuilder = new QueryBuilder();
     return queryBuilder.deleteFrom(this).where(params).limit(1);
   }
 
-  updateOrCreate(...args) {
+  async updateOrCreate(...args) {
     this.getOrCreate(args)
+    return {} as any
   }
 
-  /**
-   * Update data in the database with specified filter parameters.
-   * @param params - The filter parameters for the update.
-   * @returns A promise that resolves when the update operation is complete.
-   */
-  update() {}
+
+  async update() {}
 
   filter() {
 
     // return returnSelf.object()
   }
 }
+
