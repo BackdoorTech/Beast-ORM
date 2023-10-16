@@ -1,16 +1,29 @@
-import { Model } from "../../Presentation/Api.js";
-import { fields } from '../../Presentation/Model/definitions.js';
-const { CharField, indexedDB } = fields;
-class Migrations extends Model {
-    constructor() {
-        super(...arguments);
-        this.databaseName = CharField();
-        this.migrations = indexedDB.fields.ArrayField({});
-    }
-}
+import { migrationsStorageManager } from "./storage/MigrationsStorageManager.js";
 export class MakeMigrations {
     constructor() {
         this.needToMigrate = false;
     }
-    make(Migrations, Function) { }
+    async migrationIsUpToDate(Migrations) {
+        const databaseName = Migrations.databaseName;
+        const migrations = await migrationsStorageManager.getMigrations(databaseName);
+        return migrations.databaseVersion == Migrations.version;
+    }
+    async make(Migrations) {
+        const databaseName = Migrations.databaseName;
+        const hasMigration = await migrationsStorageManager.hasMigration(databaseName);
+        console.log("hasMigration");
+        if (hasMigration) {
+            console.log("createMigrationUpdate");
+            if (!await this.migrationIsUpToDate(Migrations)) {
+                this.needToMigrate = true;
+                await migrationsStorageManager.createMigrationUpdate(Migrations);
+            }
+        }
+        else {
+            this.needToMigrate = true;
+            console.log("createMigrationFirstTime");
+            await migrationsStorageManager.createMigrationFirstTime(Migrations);
+        }
+        console.log("realizes");
+    }
 }

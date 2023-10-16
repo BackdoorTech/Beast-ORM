@@ -1,7 +1,5 @@
 // @ts-nocheck
-
-import { QueryBuilder } from '../queryBuilder/queryBuilder.js'
-describe('QueryBuilder', () => {
+describe('Model', () => {
   it('passes', () => {
 
     cy.visit('./index.html')
@@ -9,11 +7,11 @@ describe('QueryBuilder', () => {
 
     cy.window().then((wind ) => {
 
-      class Person extends wind.models.LocalStorage {
+      class Person extends wind.models.Model {
         static username = "";
       }
 
-      wind.models.migrate({
+      wind.models.register({
         databaseName: "jest-test123",
         type: "localStorage",
         version: 1,

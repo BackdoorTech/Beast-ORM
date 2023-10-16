@@ -22,7 +22,31 @@ describe('beastOrm', () => {
                     displayName: 'setSS',
                     message: `123`
                 });
+                const requestDb = indexedDB.open("Migrations", 2);
+                // on Open database
+                requestDb.onsuccess = () => {
+                    const db = requestDb.result;
+                    // create transaction
+                    const txInstance = db.transaction(["database"], "readwrite");
+                    // create object store
+                    const objectStore = txInstance.objectStore("database");
+                    const request = objectStore.getAll();
+                    request.onsuccess = () => {
+                        // cy.log('Logged Result', request.result); // Capture the value
+                        cy.get("h1").then(($resultElement) => {
+                            $resultElement.text(JSON.stringify(request.result));
+                        });
+                    };
+                    request.onerror = (error) => {
+                        console.log(error);
+                    };
+                };
             });
+            // Add assertions on the logged value
+            // cy.get('.command-log .message')
+            // .should('contain', 'Logged Result')
+            // .invoke('text')
+            // .should('contain', 'YOUR_EXPECTED_RESULT'); // Replace with your expected result
         });
     });
 });

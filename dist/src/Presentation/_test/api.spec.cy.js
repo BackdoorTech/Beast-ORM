@@ -1,13 +1,13 @@
 // @ts-nocheck
-describe('QueryBuilder', () => {
+describe('Model', () => {
     it('passes', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then((wind) => {
-            class Person extends wind.models.LocalStorage {
+            class Person extends wind.models.Model {
             }
             Person.username = "";
-            wind.models.migrate({
+            wind.models.register({
                 databaseName: "jest-test123",
                 type: "localStorage",
                 version: 1,
@@ -18,4 +18,3 @@ describe('QueryBuilder', () => {
         expect(0).to.equal(0); // test fails
     });
 });
-export {};

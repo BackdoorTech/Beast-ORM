@@ -1,8 +1,9 @@
 class indexedDBFIFO {
-    constructor() {
+    constructor(dbName) {
         this.transactionQueue = [];
         this.isTransactionInProgress = false;
         this.pending = 0;
+        this.dbName = dbName;
     }
     async openDatabase() {
         return new Promise((resolve, reject) => {
@@ -10,35 +11,29 @@ class indexedDBFIFO {
                 resolve(this.db);
             }
             else {
-                console.log("else");
-                let request = indexedDB.open("Migrations", 2);
+                let request = indexedDB.open(this.dbName, 2);
                 request.onsuccess = () => {
-                    console.log("onsuccess");
                     this.db = request.result;
                     this.txInstance = this.db.transaction(["database"], "readwrite");
                     resolve(this.db);
                 };
                 request.onupgradeneeded = (event) => {
-                    console.log("onupgradeneeded");
                     let db = event.target.result;
                     db.createObjectStore("database", { keyPath: "MyID", autoIncrement: true });
                     db.close();
                     resolve(this.openDatabase());
                 };
                 request.onerror = (error) => {
-                    console.log("onerror");
                     reject(error);
                 };
             }
         });
     }
     async processTransactionQueue() {
-        console.log('processTransactionQueue');
         if (this.isTransactionInProgress) {
             return;
         }
         this.db = await this.openDatabase();
-        console.log("enter");
         let loop = () => {
             var _a;
             if (this.transactionQueue.length > 0) {
@@ -48,15 +43,6 @@ class indexedDBFIFO {
                 this.executeTransaction(nextTransaction)
                     .then(() => { })
                     .catch((error) => { }).finally(() => {
-                    console.log("done");
-                    this.pending--;
-                    loop();
-                });
-                this.pending++;
-                this.executeTransaction(nextTransaction)
-                    .then(() => { })
-                    .catch((error) => { }).finally(() => {
-                    console.log("done");
                     this.pending--;
                     loop();
                 });
@@ -65,7 +51,6 @@ class indexedDBFIFO {
                 this.isTransactionInProgress = false;
                 if (this.db) {
                     if (this.pending == 0) {
-                        console.log('close');
                         (_a = (this.txInstance)) === null || _a === void 0 ? void 0 : _a.commit();
                         this.db.close();
                         this.db = null;
@@ -84,8 +69,6 @@ class indexedDBFIFO {
             let request = this.txInstance.objectStore("database")[operation](transaction.data);
             request.onsuccess = () => {
                 resolve(request.result);
-                console.log(request.result);
-                console.log(transaction);
                 transaction.callback(request.result);
             };
             request.onerror = (error) => {
@@ -94,18 +77,11 @@ class indexedDBFIFO {
         });
     }
     async enqueueTransaction({ storeName, mode, operation, data, callback }) {
-        return new Promise((resolve, reject) => {
-            let transaction = { storeName, mode, operation, data, callback };
-            this.transactionQueue.push(transaction);
-            if (!this.isTransactionInProgress) {
-                console.log("add");
-                this.processTransactionQueue();
-                this.isTransactionInProgress = true;
-            }
-            else {
-                console.log("transactionQueue");
-            }
-        });
+        let transaction = { storeName, mode, operation, data, callback };
+        this.transactionQueue.push(transaction);
+        if (!this.isTransactionInProgress) {
+            this.processTransactionQueue();
+        }
     }
     async insert(storeName, data, callback) {
         return this.enqueueTransaction({ storeName, mode: 'readwrite', operation: 'add', data: data, callback });
@@ -117,8 +93,40 @@ class indexedDBFIFO {
         return this.enqueueTransaction({ storeName, mode: 'readonly', operation: 'getAll', callback, data: null });
     }
 }
-let db = new indexedDBFIFO();
-db.getAll("objectStore", (data) => {
-    console.log({ data });
-});
-export {};
+const db = new indexedDBFIFO("Migrations");
+export class MigrationsModel {
+    constructor(data = {}) {
+        this.migrations = [];
+        Object.assign(this, data);
+    }
+    DB() { return MigrationsModel.DB(); }
+    static DB() { return db; }
+    static async insert(data) {
+        return new Promise((resolve) => {
+            this.DB().insert("objectStore", data, (data) => {
+                resolve(data);
+            });
+        });
+    }
+    async save() {
+        return new Promise((resolve) => {
+            this.DB().insert("objectStore", this, (data) => {
+                resolve(data);
+            });
+        });
+    }
+    static async get(key) {
+        return new Promise((resolve) => {
+            this.DB().get("objectStore", key, (data) => {
+                resolve(data);
+            });
+        });
+    }
+    static getAll() {
+        return new Promise((resolve) => {
+            this.DB().getAll("objectStore", (data) => {
+                resolve(data);
+            });
+        });
+    }
+}

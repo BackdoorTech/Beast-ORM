@@ -17,13 +17,22 @@ export class CallbackScheduler {
   }
 
   /**
-   * Adds a callback function to the queue without immediately executing it.
+   * Adds a callback function to the queue or run immediately depending on `this.running` state
    * @param callback - The callback function to be added to the queue.
    * @returns A function to remove the callback from the queue.
    */
-  triggerToEnqueueCallback(callback: () => void): Function {
-    const add = () => { this.callbackQueue.push(callback); };
-    return add;
+  function<T>(callback: (...args: any) => any): (...args: any) => Promise<T> {
+    return async (...args: any): Promise<T> => {
+      return new Promise(async (resolve) => {
+        if (this.running) {
+          resolve(await callback(...args));
+        } else {
+          this.callbackQueue.push(async () => {
+            resolve(await callback(...args));
+          });
+        }
+      });
+    };
   }
 
   /**
@@ -61,8 +70,6 @@ export class CallbackScheduler {
       const callback = this.callbackQueue.shift();
       callback();
       this.executeNextCallback(); // Execute the next callback
-    } else {
-      this.running = false;
     }
   }
 }
