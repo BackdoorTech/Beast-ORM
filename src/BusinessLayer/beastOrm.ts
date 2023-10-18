@@ -7,9 +7,8 @@ import { IDatabaseStrategy } from '../DataAccess/DriverAdapters/DriverAdapter.ty
 import { DatabaseSchema } from './modelManager/schemaGenerator/schemaGenerator.type.js';
 class BeastORM {
 
-  private migrate() {}
-  register(register:IRegister) {
 
+  register(register:IRegister) {
 
     // generate schema
     const schema = schemaGenerator.generate(register)
@@ -23,9 +22,6 @@ class BeastORM {
       .driverAdapter
       .strategy
 
-      DatabaseStrategy.prepare(schema)
-
-
     this.prepareMigrations(schema, DatabaseStrategy)
   }
 
@@ -35,7 +31,8 @@ class BeastORM {
 
     if(makeMigrations.needToMigrate) {
       console.log("Migrate")
-      migrateMigrations.migrate(schema, DatabaseStrategy)
+      await migrateMigrations.prepareMigrate(schema, DatabaseStrategy)
+      await migrateMigrations.migrate(schema, DatabaseStrategy)
     } else {
       console.log('no need to migrate')
     }

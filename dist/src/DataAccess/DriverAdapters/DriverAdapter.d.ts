@@ -5,7 +5,7 @@ export declare class DriverAdapter implements IDatabaseStrategy {
     constructor(strategy: any);
     prepare(migrate: IMigrations): Promise<any>;
     migrate(migration: IMigrations): Promise<void>;
-    insert(table: any, data: any): Promise<void>;
-    select(table: any, key: any): Promise<void>;
+    insert(table: any, data: any): Promise<(returnObject: import("./DriverAdapter.type.js").IReturnObject) => void>;
+    select(table: any, key: any): Promise<(returnObject: import("./DriverAdapter.type.js").IReturnObject) => void>;
 }
 export declare function AdapterFactory(): IndexedDBStrategy;

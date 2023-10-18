@@ -1,11 +1,19 @@
 import { TableSchema } from "../../BusinessLayer/modelManager/schemaGenerator/schemaGenerator.type.js";
 
-export class IDatabaseStrategy {
+export interface IReturnObject {
+  onsuccess?: Function
+  onerror?: Function
+  done?: Function
+}
 
-  async migrate(migrate: IMigrations) {}
-  async insert(table, data) {}
-  async select(table, key) {}
-  async prepare(migrate: IMigrations): Promise<any> {}
+type returnFunction = (returnObject: IReturnObject) => void
+
+export interface IDatabaseStrategy {
+
+  migrate(migrate: IMigrations): returnFunction
+  insert(table, data): returnFunction
+  select(table, key) : returnFunction
+  prepare(migrate: IMigrations): returnFunction
 }
 export interface IMigrations {
 	databaseName: string;

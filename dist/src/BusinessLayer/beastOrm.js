@@ -3,7 +3,6 @@ import { modelRegistration } from './modelManager/register/register.js';
 import { MakeMigrations } from '../DataAccess/SchemaMigrations/MakeMigration.js';
 import { migrateMigrations } from '../DataAccess/SchemaMigrations/MigrateMigrations.js';
 class BeastORM {
-    migrate() { }
     register(register) {
         // generate schema
         const schema = schemaGenerator.generate(register);
@@ -14,7 +13,6 @@ class BeastORM {
             .DBConnectionManager
             .driverAdapter
             .strategy;
-        DatabaseStrategy.prepare(schema);
         this.prepareMigrations(schema, DatabaseStrategy);
     }
     async prepareMigrations(schema, DatabaseStrategy) {
@@ -22,7 +20,8 @@ class BeastORM {
         await makeMigrations.make(schema);
         if (makeMigrations.needToMigrate) {
             console.log("Migrate");
-            migrateMigrations.migrate(schema, DatabaseStrategy);
+            await migrateMigrations.prepareMigrate(schema, DatabaseStrategy);
+            await migrateMigrations.migrate(schema, DatabaseStrategy);
         }
         else {
             console.log('no need to migrate');

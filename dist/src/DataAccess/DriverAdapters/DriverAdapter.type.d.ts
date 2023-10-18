@@ -1,9 +1,15 @@
 import { TableSchema } from "../../BusinessLayer/modelManager/schemaGenerator/schemaGenerator.type.js";
-export declare class IDatabaseStrategy {
-    migrate(migrate: IMigrations): Promise<void>;
-    insert(table: any, data: any): Promise<void>;
-    select(table: any, key: any): Promise<void>;
-    prepare(migrate: IMigrations): Promise<any>;
+export interface IReturnObject {
+    onsuccess?: Function;
+    onerror?: Function;
+    done?: Function;
+}
+type returnFunction = (returnObject: IReturnObject) => void;
+export interface IDatabaseStrategy {
+    migrate(migrate: IMigrations): returnFunction;
+    insert(table: any, data: any): returnFunction;
+    select(table: any, key: any): returnFunction;
+    prepare(migrate: IMigrations): returnFunction;
 }
 export interface IMigrations {
     databaseName: string;
@@ -12,3 +18,4 @@ export interface IMigrations {
     webWorker?: boolean;
     table: TableSchema[];
 }
+export {};
