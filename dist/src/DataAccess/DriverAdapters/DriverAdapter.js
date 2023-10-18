@@ -4,8 +4,11 @@ export class DriverAdapter {
     constructor(strategy) {
         this.strategy = strategy;
     }
-    async migrate() {
-        this.strategy.migrate();
+    async prepare(migrate) {
+        await this.strategy.prepare(migrate);
+    }
+    async migrate(migration) {
+        this.strategy.migrate(migration);
     }
     async insert(table, data) {
         return this.strategy.insert(table, data);

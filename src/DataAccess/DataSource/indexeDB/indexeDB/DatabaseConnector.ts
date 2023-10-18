@@ -1,20 +1,14 @@
-import { connectionManagerHelper } from "./connectionManagerHelper.js";
-import { FieldSchema, IConfig } from "./type.js";
+import { IDatabaseSchema } from "./DatabaseService.type.js";
+import { connectionManagerHelper } from "./resource/connectionManagerHelper.js";
 
-class IndexedDBManager {
+export class DatabaseConnector {
 
-  config: IConfig
-
-  constructor(config) {
-    this.config = config;
-  }
-
-  openDatabase(): Promise<IDBDatabase> {
+  openDatabase(config: IDatabaseSchema): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
       const idbInstance = indexedDB || self.indexedDB || (self as any).mozIndexedDB || (self as any).webkitIndexedDB || (self as any).msIndexedDB;
 
       if (idbInstance) {
-        const request: IDBOpenDBRequest = idbInstance.open(this.config.databaseName, this.config.version);
+        const request: IDBOpenDBRequest = idbInstance.open(config.databaseName, config.version);
 
         request.onsuccess = () => {
           resolve(request.result);
@@ -25,7 +19,7 @@ class IndexedDBManager {
         };
 
         request.onupgradeneeded = async (e: any) => {
-          await this.migrate(this.config)
+          await this.migrate(config)
         };
 
         request.onblocked = async (e: any) => {
@@ -37,7 +31,7 @@ class IndexedDBManager {
     });
   }
 
-  migrate(config: IConfig): Promise<boolean> {
+  migrate(config: IDatabaseSchema): Promise<boolean> {
     return  new Promise<boolean>((resolve, reject) => {
       const idbInstance = indexedDB || self.indexedDB || (self as any).mozIndexedDB || (self as any).webkitIndexedDB || (self as any).msIndexedDB;
 
@@ -66,7 +60,7 @@ class IndexedDBManager {
     });
   }
 
-  private async runMigrations(db:IDBDatabase, config: IConfig) {
+  private async runMigrations(db:IDBDatabase, config: IDatabaseSchema) {
     for (const storeSchema of config.table) {
       if (!connectionManagerHelper.storeExist(db, storeSchema.name) ) {
         const ObjectStore = connectionManagerHelper.createObjectStore(db, storeSchema.id, storeSchema.name);
@@ -81,5 +75,4 @@ class IndexedDBManager {
   closeDatabase(db) {
     db.close();
   }
-
 }

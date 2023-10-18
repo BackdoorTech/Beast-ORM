@@ -1,13 +1,10 @@
-import { connectionManagerHelper } from "./connectionManagerHelper.js";
-export class IndexedDBManager {
-    constructor(config) {
-        this.config = config;
-    }
-    openDatabase() {
+import { connectionManagerHelper } from "./resource/connectionManagerHelper.js";
+export class DatabaseConnector {
+    openDatabase(config) {
         return new Promise((resolve, reject) => {
             const idbInstance = indexedDB || self.indexedDB || self.mozIndexedDB || self.webkitIndexedDB || self.msIndexedDB;
             if (idbInstance) {
-                const request = idbInstance.open(this.config.databaseName, this.config.version);
+                const request = idbInstance.open(config.databaseName, config.version);
                 request.onsuccess = () => {
                     resolve(request.result);
                 };
@@ -15,7 +12,7 @@ export class IndexedDBManager {
                     reject(e.target.error.name);
                 };
                 request.onupgradeneeded = async (e) => {
-                    await this.migrate(this.config);
+                    await this.migrate(config);
                 };
                 request.onblocked = async (e) => {
                     reject(e.target.error.name);
@@ -63,4 +60,3 @@ export class IndexedDBManager {
         db.close();
     }
 }
-const indexedDBManager = new IndexedDBManager();

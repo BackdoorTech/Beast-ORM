@@ -1,4 +1,5 @@
 import { IDatabaseStrategy } from "../../../DriverAdapters/DriverAdapter.type.js";
+import { databaseManager } from "../indexeDB/DatabaseManager.js";
 // IndexedDB strategy
 export class IndexedDBStrategy extends IDatabaseStrategy {
     constructor() {
@@ -14,5 +15,13 @@ export class IndexedDBStrategy extends IDatabaseStrategy {
     async select(table, key) {
         const db = await this.openDatabase();
         // Implement IndexedDB select here
+    }
+    async migrate(migrate) {
+        return await databaseManager
+            .getDb(migrate.databaseName)
+            .migrate();
+    }
+    async prepare(migrate) {
+        return await databaseManager.prepare(migrate);
     }
 }

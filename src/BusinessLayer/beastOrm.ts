@@ -18,22 +18,24 @@ class BeastORM {
 
     const database = modelRegistration.getDatabase(schema.databaseName)
 
-    const strategy = database
+    const DatabaseStrategy = database
       .DBConnectionManager
       .driverAdapter
       .strategy
 
+      DatabaseStrategy.prepare(schema)
 
-    this.prepareMigrations(schema, strategy)
+
+    this.prepareMigrations(schema, DatabaseStrategy)
   }
 
-  private async prepareMigrations (schema: DatabaseSchema, Function: IDatabaseStrategy) {
+  private async prepareMigrations (schema: DatabaseSchema, DatabaseStrategy: IDatabaseStrategy) {
     const makeMigrations = new MakeMigrations();
     await makeMigrations.make(schema)
 
     if(makeMigrations.needToMigrate) {
       console.log("Migrate")
-      // migrateMigrations.migrate(schema, {})
+      migrateMigrations.migrate(schema, DatabaseStrategy)
     } else {
       console.log('no need to migrate')
     }

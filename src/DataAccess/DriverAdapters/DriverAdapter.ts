@@ -1,4 +1,4 @@
-import { IDatabaseStrategy } from "./DriverAdapter.type.js";
+import { IDatabaseStrategy, IMigrations } from "./DriverAdapter.type.js";
 import { IndexedDBStrategy } from '../DataSource/indexeDB/DriverAdapters/DriverAdapterIndexeDB.js'
 
  // Context that uses the strategy pattern
@@ -7,8 +7,11 @@ export class DriverAdapter implements IDatabaseStrategy{
   constructor(strategy) {
     this.strategy = strategy;
   }
-  async migrate() {
-    this.strategy.migrate()
+  async prepare(migrate: IMigrations): Promise<any> {
+    await this.strategy.prepare(migrate)
+  }
+  async migrate(migration: IMigrations) {
+    this.strategy.migrate(migration)
   }
 
   async insert(table, data) {
