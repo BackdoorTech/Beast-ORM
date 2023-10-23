@@ -39,7 +39,7 @@ class BeastORM {
             .DBConnectionManager
             .driverAdapter
             .strategy;
-        await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder);
+        return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder);
     }
     executeQueries() { }
 }

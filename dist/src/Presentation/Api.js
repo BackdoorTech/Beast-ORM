@@ -36,10 +36,12 @@ export class Model {
         }
         return new QueryBuilder().insert(params);
     }
-    static async create(...params) {
+    static async create(params) {
+        const isParamsArray = Array.isArray(params) ? true : false;
         const queryBuilder = new QueryBuilder();
         queryBuilder.insertInto(this).insert(params);
-        return await ORM.executeQuery(queryBuilder, this);
+        const result = await ORM.executeQuery(queryBuilder, this);
+        return isParamsArray ? result : result[0];
     }
     async delete(params) {
         const queryBuilder = new QueryBuilder();

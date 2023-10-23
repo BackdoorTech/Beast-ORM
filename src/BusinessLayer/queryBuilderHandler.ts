@@ -6,13 +6,15 @@ class QueryBuilderHandler {
     const dataToInsert = QueryBuilder.query.values
     const result = []
     const tableName = QueryBuilder.query.table
+    const idFieldName = QueryBuilder.model["getTableSchema"]().id.keyPath;
 
     return await new Promise((resolve, reject) => {
       DatabaseStrategy.insert(tableName, dataToInsert)({
         onsuccess:(data) => {
-          const savedData = data.data;
+          const id = data.data;
           const index = data.index
-          result[index] = savedData
+          dataToInsert[index][idFieldName] =  id
+          result.push(dataToInsert[index])
         },
         done:() => {
           resolve(result)

@@ -21,6 +21,7 @@ export class QueryBuilder {
      * @returns {QueryBuilder} The QueryBuilder instance.
      */
     insertInto(table) {
+        this.model = table;
         this.query.type = 'INSERT';
         this.query.table = table["getTableSchema"]().name;
         return this;
@@ -31,6 +32,7 @@ export class QueryBuilder {
      * @returns {QueryBuilder} The QueryBuilder instance.
      */
     select(table) {
+        this.model = table;
         this.query.type = 'SELECT';
         this.query.table = table;
         return this;
@@ -41,6 +43,7 @@ export class QueryBuilder {
      * @returns {QueryBuilder} The QueryBuilder instance.
      */
     update(table) {
+        this.model = table;
         this.query.type = 'UPDATE';
         this.query.table = table;
         return this;
@@ -51,6 +54,7 @@ export class QueryBuilder {
      * @returns {QueryBuilder} The QueryBuilder instance.
      */
     deleteFrom(table) {
+        this.model = table;
         this.query.type = 'DELETE';
         this.query.table = table;
         return this;

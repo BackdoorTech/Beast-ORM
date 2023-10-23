@@ -49,12 +49,17 @@ export class Model<Model>  implements IModel<Model>{
 
     return new QueryBuilder().insert(params)
   }
-  static async create(...params) {
+  static async create(params) {
+
+    const isParamsArray = Array.isArray(params)? true : false
+
     const queryBuilder = new QueryBuilder();
 
     queryBuilder.insertInto(this as any).insert(params)  as any
 
-    return await ORM.executeQuery(queryBuilder, this as any)
+    const result = await ORM.executeQuery(queryBuilder, this as any)
+
+    return isParamsArray? result: result[0]
   }
 
   async delete(params: any) {

@@ -14,7 +14,7 @@ export declare class Model<Model> implements IModel<Model> {
     get(): Promise<any>;
     all(): Promise<any>;
     getOrCreate(...params: any[]): any;
-    static create(...params: any[]): Promise<void>;
+    static create(params: any): Promise<any>;
     delete(params: any): any;
     updateOrCreate(...args: any[]): Promise<any>;
     update(): Promise<void>;

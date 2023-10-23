@@ -15,6 +15,7 @@ export class QueryBuilder {
     updateValues: {},
     where: [],
   }
+  model: Model<any>
 
   constructor() {}
 
@@ -24,6 +25,7 @@ export class QueryBuilder {
    * @returns {QueryBuilder} The QueryBuilder instance.
    */
   insertInto(table: IModel<any>) {
+    this.model = table
     this.query.type = 'INSERT';
     this.query.table = table["getTableSchema"]().name;
     return this;
@@ -35,6 +37,7 @@ export class QueryBuilder {
    * @returns {QueryBuilder} The QueryBuilder instance.
    */
   select(table:IModel<any>) {
+    this.model = table
     this.query.type = 'SELECT';
     this.query.table = table;
     return this;
@@ -46,6 +49,7 @@ export class QueryBuilder {
    * @returns {QueryBuilder} The QueryBuilder instance.
    */
   update(table:IModel<any>) {
+    this.model = table
     this.query.type = 'UPDATE';
     this.query.table = table;
     return this;
@@ -57,6 +61,7 @@ export class QueryBuilder {
    * @returns {QueryBuilder} The QueryBuilder instance.
    */
   deleteFrom(table:IModel<any>) {
+    this.model = table
     this.query.type = 'DELETE';
     this.query.table = table;
     return this;

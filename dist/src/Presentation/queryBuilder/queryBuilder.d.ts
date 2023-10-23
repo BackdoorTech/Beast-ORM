@@ -1,3 +1,4 @@
+import { Model } from '../Api.js';
 import { IModel } from '../Api.type.js';
 /**
  * Represents a query builder for creating Query instances.
@@ -14,6 +15,7 @@ export declare class QueryBuilder {
         updateValues: {};
         where: any[];
     };
+    model: Model<any>;
     constructor();
     /**
      * Start building an INSERT query.

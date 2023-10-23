@@ -5,10 +5,15 @@ export class ObjectStore {
         this.schema = tableSchema;
     }
     async enqueueTransaction(transaction) {
-        this.transactionQueue.push(transaction);
-        if (!this.isTransactionInProgress) {
-            this.processTransactionQueue();
-        }
+        return new Promise((resolve, reject) => {
+            transaction.finishRequest = () => {
+                resolve(true);
+            };
+            this.transactionQueue.push(transaction);
+            if (!this.isTransactionInProgress) {
+                this.processTransactionQueue();
+            }
+        });
     }
     async processTransactionQueue() {
         if (this.isTransactionInProgress) {
@@ -34,20 +39,23 @@ export class ObjectStore {
         this.commitTransaction();
     }
     async executeTransaction(transaction) {
-        const { operation, data, onsuccess, onerror } = transaction;
+        const { operation, data, onsuccess, onerror, index, finishRequest } = transaction;
         this.txInstance.IDBTransaction = this.db.transaction(this.schema.name, "readwrite");
         const objectStore = this.txInstance.IDBTransaction.objectStore(this.schema.name);
         const request = objectStore[operation](data);
-        return new Promise((resolve, reject) => {
-            request.onsuccess = () => {
-                resolve(request.result);
-                onsuccess(request.result);
+        return new Promise(async (resolve, reject) => {
+            request.onsuccess = async () => {
+                const data = { data: request.result, index };
+                resolve(data);
+                onsuccess(data);
+                finishRequest();
             };
             request.onerror = (error) => {
                 this.commitTransaction();
                 this.createTransaction();
                 reject(error);
                 onerror();
+                finishRequest();
             };
         });
     }

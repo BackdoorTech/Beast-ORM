@@ -20,15 +20,16 @@ export class IndexedDBStrategy {
         };
     }
     insert(table, data) {
-        console.log("insert", table, data, this.databaseName);
         // Implement IndexedDB insert here
         return async (callbacks) => {
             const ObjectStore = await databaseManager.getDb(this.databaseName)
                 .executeOnObjectStore(table);
-            console.log("realeasewsdfsfsdf");
+            let index = 0;
             for (const item of data) {
-                ObjectStore.enqueueTransaction(Object.assign({ operation: "add", data: item }, callbacks));
+                await ObjectStore.enqueueTransaction(Object.assign({ operation: "add", index, data: item }, callbacks));
+                index++;
             }
+            callbacks.done();
         };
     }
     select(table, data) {

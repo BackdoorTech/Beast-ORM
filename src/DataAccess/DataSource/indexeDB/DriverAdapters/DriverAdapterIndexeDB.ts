@@ -33,19 +33,18 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
 
   insert(table, data: any[]) {
 
-    console.log("insert",table, data, this.databaseName)
-
     // Implement IndexedDB insert here
     return async (callbacks: IReturnObject) => {
       const ObjectStore = await databaseManager.getDb(this.databaseName)
       .executeOnObjectStore(table)
 
-      console.log("realeasewsdfsfsdf")
-
+      let index = 0
       for (const item of data) {
-        ObjectStore.enqueueTransaction({operation:"add", data:item, ...callbacks})
+        await ObjectStore.enqueueTransaction({operation:"add",index, data:item, ...callbacks})
+        index++
       }
 
+      callbacks.done()
     }
   }
 
