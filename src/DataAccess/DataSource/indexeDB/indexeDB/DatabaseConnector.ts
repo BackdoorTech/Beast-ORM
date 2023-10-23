@@ -19,7 +19,11 @@ export class DatabaseConnector {
         };
 
         request.onupgradeneeded = async (e: any) => {
-          await this.migrate(config)
+          const db:IDBDatabase = e.target.result;
+          await this.runMigrations(db, config);
+          db.onclose = async () => {
+            resolve(await this.openDatabase(config))
+          }
         };
 
         request.onblocked = async (e: any) => {

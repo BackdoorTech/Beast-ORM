@@ -1,10 +1,10 @@
+import { IDatabaseSchema } from '../../_interface/interface.js';
 import { Database } from './database.js';
-import { DatabaseSchema } from '../../modelManager/schemaGenerator/schemaGenerator.type.js';
 declare class ModelRegistration {
     databases: {
         [key: string]: Database;
     };
-    register(DatabaseSchema: DatabaseSchema): void;
+    register(DatabaseSchema: IDatabaseSchema): void;
     getDatabase(databaseName: any): Database;
 }
 export declare const modelRegistration: ModelRegistration;

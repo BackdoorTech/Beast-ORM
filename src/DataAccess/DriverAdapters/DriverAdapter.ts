@@ -7,23 +7,23 @@ export class DriverAdapter implements IDatabaseStrategy{
   constructor(strategy) {
     this.strategy = strategy;
   }
-  async prepare(migrate: IMigrations): Promise<any> {
-    await this.strategy.prepare(migrate)
+  prepare(migrate: IMigrations) {
+    return this.strategy.prepare(migrate)
   }
-  async migrate(migration: IMigrations) {
-    this.strategy.migrate(migration)
+  migrate(migration: IMigrations) {
+    return this.strategy.migrate(migration)
   }
 
-  async insert(table, data) {
+  insert(table, data) {
     return this.strategy.insert(table, data);
   }
 
-  async select(table, key) {
-    return this.strategy.select(table, key);
+  select(table, data) {
+    return this.strategy.select(table, data);
   }
 }
 
-export function AdapterFactory () {
+export function AdapterFactory (databaseName: string) {
 
-  return new IndexedDBStrategy()
+  return new IndexedDBStrategy(databaseName)
 }

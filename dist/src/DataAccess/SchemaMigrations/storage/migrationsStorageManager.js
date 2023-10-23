@@ -21,7 +21,6 @@ export class MigrationsStorageManager {
     }
     async getRegisteredMigrations() {
         this.allMigrations = await this.MigrationsModel.getAll();
-        console.log("allMigrations");
         this.waitMigrationsList.start();
     }
     async createMigrationFirstTime(Migrations) {
@@ -30,7 +29,6 @@ export class MigrationsStorageManager {
             databaseVersion: Migrations.version,
             migrations: Migrations.table
         };
-        console.log({ data });
         await this.MigrationsModel.insert(data);
     }
     async createMigrationUpdate(Migrations) {

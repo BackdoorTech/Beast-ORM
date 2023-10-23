@@ -22,7 +22,7 @@ export class QueryBuilder {
      */
     insertInto(table) {
         this.query.type = 'INSERT';
-        this.query.table = table;
+        this.query.table = table["getTableSchema"]().name;
         return this;
     }
     /**

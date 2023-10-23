@@ -1,12 +1,11 @@
 
-import {} from '../schemaGenerator/ModelReader.js'
+import { IDatabaseSchema } from '../../_interface/interface.js'
 import { Database } from './database.js'
-import { DatabaseSchema } from '../../modelManager/schemaGenerator/schemaGenerator.type.js'
 
 class ModelRegistration {
   databases: {[key: string]: Database} = {}
 
-  register(DatabaseSchema: DatabaseSchema) {
+  register(DatabaseSchema: IDatabaseSchema) {
 
     const database = new Database(DatabaseSchema)
     const databaseName = DatabaseSchema.databaseName

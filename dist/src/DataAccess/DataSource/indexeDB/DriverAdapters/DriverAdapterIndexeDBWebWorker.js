@@ -1,34 +1,67 @@
-import { databaseManager } from "../indexeDB/DatabaseManager.js";
 // IndexedDB strategy
-export class IndexedDBStrategy {
+export class IndexedDBWorkerStrategy {
+    constructor() {
+        this.myWorker = new Worker(new URL('./worker/worker.js', import.meta.url), { type: "module" });
+        this.myWorker.onmessage = (oEvent) => {
+            const data = oEvent.data;
+            this.Queue[data.UUID][data.method](data.data);
+        };
+        this.myWorker.onerror = (error) => {
+            console.log('myWorker', error);
+        };
+    }
     openDatabase() {
+        const UUID = '';
         return async (callbacks) => {
-            // return indexedDB.open(this.databaseName);
+            const { done } = callbacks;
+            callbacks.done = (...arg) => {
+                done(...arg);
+            };
+            this.myWorker.postMessage(Object.assign({ method: 'openDatabase', UUID }, callbacks));
         };
     }
     insert(table, data) {
-        // Implement IndexedDB insert here
+        const UUID = '';
         return async (callbacks) => {
-            const db = await this.openDatabase();
+            const { done } = callbacks;
+            callbacks.done = (...arg) => {
+                done(...arg);
+            };
+            this.Queue[UUID] = Object.assign({}, callbacks);
+            this.myWorker.postMessage(Object.assign({ method: 'openDatabase', UUID }, callbacks));
         };
     }
     select(table, key) {
-        // Implement IndexedDB select here
+        const UUID = '';
         return async (callbacks) => {
-            const db = await this.openDatabase();
+            const { done } = callbacks;
+            callbacks.done = (...arg) => {
+                done(...arg);
+            };
+            this.Queue[UUID] = Object.assign({}, callbacks);
+            this.myWorker.postMessage(Object.assign({ method: 'openDatabase', UUID }, callbacks));
         };
     }
     migrate(migrate) {
-        return async ({ onerror, onsuccess }) => {
-            databaseManager
-                .getDb(migrate.databaseName)
-                .migrate();
+        const UUID = '';
+        return async (callbacks) => {
+            const { done } = callbacks;
+            callbacks.done = (...arg) => {
+                done(...arg);
+            };
+            this.Queue[UUID] = Object.assign({}, callbacks);
+            this.myWorker.postMessage(Object.assign({ method: 'openDatabase', UUID }, callbacks));
         };
     }
     prepare(migrate) {
-        return async ({ onerror, onsuccess, done }) => {
-            return await databaseManager.prepare(migrate);
-            done();
+        const UUID = '';
+        return async (callbacks) => {
+            const { done } = callbacks;
+            callbacks.done = (...arg) => {
+                done(...arg);
+            };
+            this.Queue[UUID] = Object.assign({}, callbacks);
+            this.myWorker.postMessage(Object.assign({ method: 'openDatabase', UUID }, callbacks));
         };
     }
 }

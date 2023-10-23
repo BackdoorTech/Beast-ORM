@@ -36,7 +36,6 @@ export class MakeMigrations {
       await migrationsStorageManager.createMigrationFirstTime(Migrations)
     }
 
-    console.log("realizes")
   }
 
 }

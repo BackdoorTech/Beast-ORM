@@ -1,4 +1,4 @@
-import { TableSchema } from "../BusinessLayer/modelManager/schemaGenerator/schemaGenerator.type.js";
+import { TableSchema } from "../../_src/models/register-modal.interface.js";
 import { QueryBuilder } from "./queryBuilder/queryBuilder.js";
 
 export declare class IModel<T> {
@@ -20,7 +20,7 @@ export declare class IModel<T> {
    * @returns A promise that resolves with the query results.
    */
   getOrCreate(...params: any[]): Promise<T>;
-  create(...params: any[]): Promise<void>;
+  static create(...params: any[]): Promise<void>;
   /**
    * Delete data from the database with specified filter parameters.
    * @param params - The filter parameters for the delete.

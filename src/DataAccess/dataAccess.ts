@@ -1,8 +1,9 @@
+import { IDatabaseSchema } from "./_interface/interface.js";
 import { DBConnectionManager } from "./DBconnectionManager/DBConnectionManager.js";
 
 export class DataAccess {
-  createDBconnectionManager(args) {
-    return new DBConnectionManager()
+  createDBconnectionManager(args: IDatabaseSchema) {
+    return new DBConnectionManager(args)
   }
 }
 

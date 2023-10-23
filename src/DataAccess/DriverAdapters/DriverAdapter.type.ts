@@ -1,4 +1,4 @@
-import { TableSchema } from "../../BusinessLayer/modelManager/schemaGenerator/schemaGenerator.type.js";
+import { ITableSchema } from "../_interface/interface"
 
 export interface IReturnObject {
   onsuccess?: Function
@@ -11,8 +11,8 @@ type returnFunction = (returnObject: IReturnObject) => void
 export interface IDatabaseStrategy {
 
   migrate(migrate: IMigrations): returnFunction
-  insert(table, data): returnFunction
-  select(table, key) : returnFunction
+  insert(table,data): returnFunction
+  select(table,data) : returnFunction
   prepare(migrate: IMigrations): returnFunction
 }
 export interface IMigrations {
@@ -20,5 +20,5 @@ export interface IMigrations {
 	type: 'indexedDB' | 'localStorage'
 	version: number;
 	webWorker?:boolean,
-	table: TableSchema[]
+	table: ITableSchema[]
 }

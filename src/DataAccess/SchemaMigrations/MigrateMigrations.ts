@@ -4,7 +4,7 @@ import { IDatabaseStrategy } from '../../DataAccess/DriverAdapters/DriverAdapter
 export class MigrateMigrations{
   async prepareMigrate(Migrations: IMigrations, DatabaseStrategy: IDatabaseStrategy) {
     return new Promise((resolve, reject)=> {
-      DatabaseStrategy.prepare(Migrations)({
+      const request = DatabaseStrategy.prepare(Migrations)({
         done:() => {
           resolve(true)
         }

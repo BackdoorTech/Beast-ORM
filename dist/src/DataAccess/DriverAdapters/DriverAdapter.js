@@ -4,19 +4,19 @@ export class DriverAdapter {
     constructor(strategy) {
         this.strategy = strategy;
     }
-    async prepare(migrate) {
-        await this.strategy.prepare(migrate);
+    prepare(migrate) {
+        return this.strategy.prepare(migrate);
     }
-    async migrate(migration) {
-        this.strategy.migrate(migration);
+    migrate(migration) {
+        return this.strategy.migrate(migration);
     }
-    async insert(table, data) {
+    insert(table, data) {
         return this.strategy.insert(table, data);
     }
-    async select(table, key) {
-        return this.strategy.select(table, key);
+    select(table, data) {
+        return this.strategy.select(table, data);
     }
 }
-export function AdapterFactory() {
-    return new IndexedDBStrategy();
+export function AdapterFactory(databaseName) {
+    return new IndexedDBStrategy(databaseName);
 }

@@ -1,7 +1,7 @@
 import { IRegister } from '../../beastOrm.type.js';
-import { DatabaseSchema } from './schemaGenerator.type.js';
+import { IDatabaseSchema } from '../../_interface/interface.js';
 declare class SchemaGenerator {
-    generate(entries: IRegister): DatabaseSchema;
+    generate(entries: IRegister): IDatabaseSchema;
     private getModalName;
     private makePrimary;
     /**
@@ -9,7 +9,7 @@ declare class SchemaGenerator {
      * @param {DatabaseSchema} databaseSchema - The database schema to extract table information from.
      * @param {Object} entries - An object containing model classes.
      */
-    attachGeneratedTableSchemaToModel(databaseSchema: DatabaseSchema, entries: IRegister): void;
+    attachGeneratedTableSchemaToModel(databaseSchema: IDatabaseSchema, entries: IRegister): void;
 }
 export declare const schemaGenerator: SchemaGenerator;
 export {};

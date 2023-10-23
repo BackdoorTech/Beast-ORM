@@ -1,7 +1,7 @@
 export class MigrateMigrations {
     async prepareMigrate(Migrations, DatabaseStrategy) {
         return new Promise((resolve, reject) => {
-            DatabaseStrategy.prepare(Migrations)({
+            const request = DatabaseStrategy.prepare(Migrations)({
                 done: () => {
                     resolve(true);
                 }

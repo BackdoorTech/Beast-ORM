@@ -1,5 +1,5 @@
-import { IConfig } from "./table.type.js";
+import { ITableSchema } from "../../_interface/interface";
 export declare class Table {
-    config: IConfig;
-    constructor(Config: IConfig);
+    config: ITableSchema;
+    constructor(Config: ITableSchema);
 }

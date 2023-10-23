@@ -1,5 +1,6 @@
+import { IDatabaseSchema } from "./_interface/interface.js";
 import { DBConnectionManager } from "./DBconnectionManager/DBConnectionManager.js";
 export declare class DataAccess {
-    createDBconnectionManager(args: any): DBConnectionManager;
+    createDBconnectionManager(args: IDatabaseSchema): DBConnectionManager;
 }
 export declare const dataAccess: DataAccess;

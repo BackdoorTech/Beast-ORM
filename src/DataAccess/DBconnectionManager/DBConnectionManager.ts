@@ -1,11 +1,11 @@
 import { DriverAdapter, AdapterFactory } from "../DriverAdapters/DriverAdapter.js";
-
+import { IDatabaseSchema } from "../_interface/interface.js"
 export class DBConnectionManager {
 
   driverAdapter!:DriverAdapter
-  constructor() {
+  constructor(DatabaseSchema: IDatabaseSchema) {
 
-    const strategy = AdapterFactory()
+    const strategy = AdapterFactory(DatabaseSchema.databaseName)
     this.driverAdapter = new DriverAdapter(strategy)
   }
 }

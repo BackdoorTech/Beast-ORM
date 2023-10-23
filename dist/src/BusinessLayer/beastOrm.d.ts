@@ -1,8 +1,10 @@
 import { IRegister } from './beastOrm.type.js';
+import { QueryBuilder } from '../Presentation/queryBuilder/queryBuilder.js';
+import { Model } from '../Presentation/Api';
 declare class BeastORM {
-    register(register: IRegister): void;
+    register: (register: IRegister) => void;
     private prepareMigrations;
-    executeQuery(): void;
+    executeQuery(QueryBuilder: QueryBuilder, Model: Model<any>): Promise<void>;
     executeQueries(): void;
 }
 export declare const ORM: BeastORM;

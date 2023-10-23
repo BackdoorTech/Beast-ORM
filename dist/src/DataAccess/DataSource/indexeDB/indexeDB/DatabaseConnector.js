@@ -12,7 +12,11 @@ export class DatabaseConnector {
                     reject(e.target.error.name);
                 };
                 request.onupgradeneeded = async (e) => {
-                    await this.migrate(config);
+                    const db = e.target.result;
+                    await this.runMigrations(db, config);
+                    db.onclose = async () => {
+                        resolve(await this.openDatabase(config));
+                    };
                 };
                 request.onblocked = async (e) => {
                     reject(e.target.error.name);

@@ -1,9 +1,10 @@
 import { IModel } from "./Api.type.js";
+import { TableSchema } from "../../_src/models/register-modal.interface.js";
 /**
  * Represents a model for database operations.
  */
 export declare class Model<Model> implements IModel<Model> {
-    static getTableSchema: () => import("c:/Users/peter.maquiran/Documents/project/beast-ORM-v0/src/BusinessLayer/modelManager/schemaGenerator/schemaGenerator.type.js").TableSchema;
+    static getTableSchema: () => TableSchema;
     /**
      * Retrieve data from the database with specified filter parameters.
      * @param params - The filter parameters for the query.
@@ -13,7 +14,7 @@ export declare class Model<Model> implements IModel<Model> {
     get(): Promise<any>;
     all(): Promise<any>;
     getOrCreate(...params: any[]): any;
-    create(...params: any[]): Promise<any>;
+    static create(...params: any[]): Promise<void>;
     delete(params: any): any;
     updateOrCreate(...args: any[]): Promise<any>;
     update(): Promise<void>;

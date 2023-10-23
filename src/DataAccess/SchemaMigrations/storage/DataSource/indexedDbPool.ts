@@ -1,4 +1,3 @@
-import { FieldSchema } from "../../../../BusinessLayer/modelManager/schemaGenerator/schemaGenerator.type.js";
 
 class indexedDBFIFO {
   dbName

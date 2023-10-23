@@ -1,4 +1,5 @@
 import { QueryBuilder } from "./queryBuilder/queryBuilder.js"; // Represents a query object that helps build and execute database queries.
+import { ORM } from "../BusinessLayer/beastOrm.js";
 /**
  * Represents a model for database operations.
  */
@@ -35,9 +36,10 @@ export class Model {
         }
         return new QueryBuilder().insert(params);
     }
-    async create(...params) {
+    static async create(...params) {
         const queryBuilder = new QueryBuilder();
-        return queryBuilder.insert(this).insert(params);
+        queryBuilder.insertInto(this).insert(params);
+        return await ORM.executeQuery(queryBuilder, this);
     }
     async delete(params) {
         const queryBuilder = new QueryBuilder();

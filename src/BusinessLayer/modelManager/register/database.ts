@@ -1,8 +1,8 @@
 import { Table } from './table.js'
 import { DatabaseType } from './../../../Utility/globalInterface.js'
-import { IConfig } from './database.type.js'
 import { DBConnectionManager } from '../../../DataAccess/DBconnectionManager/DBConnectionManager.js'
 import { DataAccess, dataAccess } from '../../../DataAccess/dataAccess.js'
+import { IDatabaseSchema } from '../../_interface/interface.js'
 export class Database {
 
   databaseName: string
@@ -11,7 +11,7 @@ export class Database {
   tables: Table[] = []
   DBConnectionManager!: DBConnectionManager
 
-  constructor(DatabaseSchema: IConfig) {
+  constructor(DatabaseSchema: IDatabaseSchema) {
     this.databaseName = DatabaseSchema.databaseName
     this.version = DatabaseSchema.version
 
@@ -23,7 +23,7 @@ export class Database {
     this.establishConnection(DatabaseSchema)
   }
 
-  private establishConnection(DatabaseSchema: IConfig) {
+  private establishConnection(DatabaseSchema: IDatabaseSchema) {
     this.DBConnectionManager = dataAccess.createDBconnectionManager(DatabaseSchema)
   }
 }

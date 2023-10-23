@@ -1,13 +1,14 @@
 import { IModel } from "./Api.type.js";
 import { QueryBuilder } from "./queryBuilder/queryBuilder.js" // Represents a query object that helps build and execute database queries.
 import { returnSelf } from "./returnSelf/returnSelf.js" // Represents a return object for query-related methods
-
+import { ORM } from "../BusinessLayer/beastOrm.js"
+import { TableSchema } from "../../_src/models/register-modal.interface.js";
 /**
  * Represents a model for database operations.
  */
 export class Model<Model>  implements IModel<Model>{
+  static getTableSchema: () => TableSchema;
 
-  static getTableSchema: () => import("c:/Users/peter.maquiran/Documents/project/beast-ORM-v0/src/BusinessLayer/modelManager/schemaGenerator/schemaGenerator.type.js").TableSchema;
   /**
    * Retrieve data from the database with specified filter parameters.
    * @param params - The filter parameters for the query.
@@ -48,10 +49,12 @@ export class Model<Model>  implements IModel<Model>{
 
     return new QueryBuilder().insert(params)
   }
-  async create(...params) {
+  static async create(...params) {
     const queryBuilder = new QueryBuilder();
 
-    return queryBuilder.insert(this).insert(params)  as any
+    queryBuilder.insertInto(this as any).insert(params)  as any
+
+    return await ORM.executeQuery(queryBuilder, this as any)
   }
 
   async delete(params: any) {

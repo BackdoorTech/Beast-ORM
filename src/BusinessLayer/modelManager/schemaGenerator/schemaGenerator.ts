@@ -1,12 +1,12 @@
 import { ModelReader } from './ModelReader.js'
 import { IRegister } from '../../beastOrm.type.js'
 import { FieldType } from './ModalReader.type.js'
-import { DatabaseSchema } from './schemaGenerator.type.js'
+import { IDatabaseSchema } from '../../_interface/interface.js'
 class SchemaGenerator {
-  generate(entries: IRegister): DatabaseSchema {
+  generate(entries: IRegister): IDatabaseSchema {
 
 
-    const databaseSchema: DatabaseSchema = {
+    const databaseSchema: IDatabaseSchema = {
       databaseName: entries.databaseName,
       type: entries.type,
       version: entries.version,
@@ -58,7 +58,7 @@ class SchemaGenerator {
    * @param {DatabaseSchema} databaseSchema - The database schema to extract table information from.
    * @param {Object} entries - An object containing model classes.
    */
-  attachGeneratedTableSchemaToModel(databaseSchema:DatabaseSchema, entries: IRegister) {
+  attachGeneratedTableSchemaToModel(databaseSchema:IDatabaseSchema, entries: IRegister) {
     for (let index = 0; index < entries.models.length; index++) {
 
       // Get the table schema class for the current model.
@@ -67,8 +67,12 @@ class SchemaGenerator {
 
       // Add a static method to the model for accessing the table schema.
       entries.models[index].getTableSchema = () => {
-          return tableSchemaClass;
+        return tableSchemaClass;
       }
+
+      Object.defineProperty(entries.models[index].prototype, "getTableSchema", () => {
+        return tableSchemaClass;
+      })
     }
   }
 

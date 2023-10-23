@@ -4,6 +4,7 @@ declare class DatabaseManager {
     databases: {
         [databaseName: string]: DatabaseService;
     };
+    migrate(config: IDatabaseSchema): Promise<void>;
     prepare(config: IDatabaseSchema): Promise<void>;
     getDb(databaseName: any): DatabaseService;
 }

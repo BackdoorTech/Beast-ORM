@@ -1,6 +1,6 @@
 import { AttributesMap, FieldAttributesKeys, FieldKeys, FieldType, FieldsMap, PossibleFieldAttributes } from "../../../Presentation/Model/fields/allFields.type.js"
 
-export interface FieldSchema {
+export interface IFieldSchema {
 	name: string,
 	keyPath: string,
 	className?: FieldKeys,
@@ -11,7 +11,7 @@ export interface FieldSchema {
 	}
 }
 
-export interface TableSchema {
+export interface ITableSchema {
 	databaseName: string
 	name: string,
 	id: { keyPath: string , autoIncrement?: boolean , type:  FieldType},
@@ -21,7 +21,7 @@ export interface TableSchema {
 	middle?: boolean
 }
 
-export interface DatabaseSchema {
+export interface IDatabaseSchema {
 	databaseName: string;
 	type: 'indexedDB' | 'localStorage'
 	version: number;

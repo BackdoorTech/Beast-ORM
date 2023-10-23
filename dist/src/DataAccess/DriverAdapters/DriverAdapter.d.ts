@@ -3,9 +3,9 @@ import { IndexedDBStrategy } from '../DataSource/indexeDB/DriverAdapters/DriverA
 export declare class DriverAdapter implements IDatabaseStrategy {
     strategy: IDatabaseStrategy;
     constructor(strategy: any);
-    prepare(migrate: IMigrations): Promise<any>;
-    migrate(migration: IMigrations): Promise<void>;
-    insert(table: any, data: any): Promise<(returnObject: import("./DriverAdapter.type.js").IReturnObject) => void>;
-    select(table: any, key: any): Promise<(returnObject: import("./DriverAdapter.type.js").IReturnObject) => void>;
+    prepare(migrate: IMigrations): (returnObject: import("./DriverAdapter.type.js").IReturnObject) => void;
+    migrate(migration: IMigrations): (returnObject: import("./DriverAdapter.type.js").IReturnObject) => void;
+    insert(table: any, data: any): (returnObject: import("./DriverAdapter.type.js").IReturnObject) => void;
+    select(table: any, data: any): (returnObject: import("./DriverAdapter.type.js").IReturnObject) => void;
 }
-export declare function AdapterFactory(): IndexedDBStrategy;
+export declare function AdapterFactory(databaseName: string): IndexedDBStrategy;

@@ -1,9 +1,10 @@
-import { IConfig } from "./table.type.js";
+import { ITableSchema } from "../../_interface/interface"
+
 
 export class Table {
-  config: IConfig
+  config: ITableSchema
 
-  constructor(Config: IConfig) {
+  constructor(Config: ITableSchema) {
     this.config = Config
   }
 }

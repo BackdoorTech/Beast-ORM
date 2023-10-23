@@ -50,6 +50,9 @@ class SchemaGenerator {
             entries.models[index].getTableSchema = () => {
                 return tableSchemaClass;
             };
+            Object.defineProperty(entries.models[index].prototype, "getTableSchema", () => {
+                return tableSchemaClass;
+            });
         }
     }
 }

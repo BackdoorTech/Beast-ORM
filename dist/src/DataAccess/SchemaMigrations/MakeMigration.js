@@ -24,6 +24,5 @@ export class MakeMigrations {
             console.log("createMigrationFirstTime");
             await migrationsStorageManager.createMigrationFirstTime(Migrations);
         }
-        console.log("realizes");
     }
 }
