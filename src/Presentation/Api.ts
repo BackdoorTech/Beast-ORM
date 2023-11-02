@@ -2,12 +2,12 @@ import { IModel } from "./Api.type.js";
 import { QueryBuilder } from "./queryBuilder/queryBuilder.js" // Represents a query object that helps build and execute database queries.
 import { returnSelf } from "./returnSelf/returnSelf.js" // Represents a return object for query-related methods
 import { ORM } from "../BusinessLayer/beastOrm.js"
-import { TableSchema } from "../../_src/models/register-modal.interface.js";
+import { ITableSchema } from "../BusinessLayer/_interface/interface.js";
 /**
  * Represents a model for database operations.
  */
 export class Model<Model>  implements IModel<Model>{
-  static getTableSchema: () => TableSchema;
+  static getTableSchema: () => ITableSchema;
 
   /**
    * Retrieve data from the database with specified filter parameters.

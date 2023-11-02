@@ -5,7 +5,7 @@ export declare class field {
     minLength?: number | undefined;
     choices?: any[] | undefined;
     type: number;
-    blank?: boolean;
+    blank: boolean;
     default?: any;
     unique?: boolean;
     foreignKey?: boolean;

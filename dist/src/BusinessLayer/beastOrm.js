@@ -3,6 +3,7 @@ import { modelRegistration } from './modelManager/register/register.js';
 import { MakeMigrations } from '../DataAccess/SchemaMigrations/MakeMigration.js';
 import { migrateMigrations } from '../DataAccess/SchemaMigrations/MigrateMigrations.js';
 import { queryBuilderHandler } from './queryBuilderHandler.js';
+import { customMethod } from '../Configuration/CustomMethod.js';
 class BeastORM {
     constructor() {
         this.register = (register) => {
@@ -18,6 +19,17 @@ class BeastORM {
             DatabaseStrategy.prepare(schema)({ done: () => { } });
             this.prepareMigrations(schema, DatabaseStrategy);
         };
+    }
+    addMethods(Model) {
+        const schema = Model.getTableSchema();
+        const object = {};
+        for (const fieldName of schema.fieldNames) {
+            object[fieldName] = null;
+        }
+        delete object[schema.id.keyPath];
+        customMethod.addStaticMethod(Model, 'emptyFields', function () {
+            return object;
+        });
     }
     async prepareMigrations(schema, DatabaseStrategy) {
         const makeMigrations = new MakeMigrations();

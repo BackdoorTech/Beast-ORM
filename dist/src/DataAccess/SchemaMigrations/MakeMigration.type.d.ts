@@ -1,4 +1,4 @@
-import { ITableSchema } from "../_interface/interface";
+import { ITableSchema } from "../_interface/interface.type";
 export interface IMigrations {
     databaseName: string;
     type: 'indexedDB' | 'localStorage';

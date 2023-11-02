@@ -6,10 +6,10 @@ class SchemaGenerator {
             databaseName: entries.databaseName,
             type: entries.type,
             version: entries.version,
-            table: []
+            table: [],
         };
         for (const modelClassRepresentations of entries.models) {
-            const { fields, attributes, fieldTypes, modelName } = ModelReader.read(modelClassRepresentations);
+            const { fields, attributes, fieldTypes, modelName, fieldNames } = ModelReader.read(modelClassRepresentations);
             const otherTablesName = databaseSchema.table.map(e => e.name);
             const tableName = this.getModalName(databaseSchema.databaseName, otherTablesName, modelName);
             const id = this.makePrimary(fields, attributes);
@@ -19,8 +19,21 @@ class SchemaGenerator {
                 id: id,
                 attributes: attributes,
                 fields: [],
-                fieldTypes
+                fieldTypes,
+                fieldNames
             };
+            for (const [fieldName, Field] of Object.entries(fields)) {
+                tablesSchema.fields.push({
+                    name: fieldName,
+                    keyPath: fieldName,
+                    options: {
+                        unique: false,
+                        type: null
+                    },
+                    className: Field === null || Field === void 0 ? void 0 : Field['fieldName'],
+                    fieldAttributes: Object.assign({}, Field)
+                });
+            }
             databaseSchema.table.push(tablesSchema);
         }
         return databaseSchema;

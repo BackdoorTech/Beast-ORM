@@ -5,6 +5,7 @@ export interface IFieldSchema {
 	keyPath: string,
 	className?: FieldKeys,
 	fieldAttributes?: PossibleFieldAttributes,
+  blank: boolean
 	options?: {
 		unique?: boolean,
 		type:  FieldType
@@ -15,10 +16,11 @@ export interface ITableSchema {
 	databaseName: string
 	name: string,
 	id: { keyPath: string , autoIncrement?: boolean , type:  FieldType},
-	fields: FieldSchema[]
+	fields: IFieldSchema[]
 	attributes: AttributesMap<FieldAttributesKeys, string[]>
 	fieldTypes: FieldsMap<FieldKeys, string[]>
-	middle?: boolean
+	middle?: boolean,
+  fieldNames: string[],
 }
 
 export interface IDatabaseSchema {
@@ -26,5 +28,5 @@ export interface IDatabaseSchema {
 	type: 'indexedDB' | 'localStorage'
 	version: number;
 	webWorker?:boolean,
-	table: TableSchema[]
+	table: ITableSchema[]
 }

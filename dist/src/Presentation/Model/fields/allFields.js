@@ -20,6 +20,7 @@ export class BigIntegerField extends field {
         super();
         this.fieldName = 'BigIntegerField';
         this.type = FieldType.BIGINT;
+        this.blank = false;
         Object.assign(this, data);
     }
 }
@@ -30,6 +31,7 @@ export class BooleanField extends field {
     constructor(data) {
         super();
         this.fieldName = 'BooleanField';
+        this.blank = false;
         Object.assign(this, data);
     }
 }
@@ -41,6 +43,7 @@ export class CharField extends field {
         super();
         this.fieldName = 'CharField';
         this.type = FieldType.DATE;
+        this.blank = false;
         Object.assign(this, data);
     }
 }
@@ -49,6 +52,7 @@ export class DateField extends field {
         super();
         this.fieldName = 'DateField';
         this.type = FieldType.DATE;
+        this.blank = false;
         Object.assign(this, data);
     }
 }
@@ -74,6 +78,7 @@ export class indexedDBArrayField extends field {
         super();
         this.fieldName = 'indexedDBArrayField';
         this.type = FieldType.ARRAY;
+        this.blank = false;
         Object.assign(this, data);
     }
 }
@@ -85,6 +90,7 @@ export class indexedDBJsonField extends field {
         super();
         this.fieldName = 'indexedDBJsonField';
         this.type = FieldType.JSON;
+        this.blank = false;
         Object.assign(this, data);
     }
 }
@@ -95,6 +101,7 @@ export class TextField extends field {
     constructor(data) {
         super();
         this.fieldName = 'TextField';
+        this.blank = false;
         Object.assign(this, data);
     }
 }
@@ -106,6 +113,7 @@ export class IntegerField extends field {
         super();
         this.fieldName = 'IntegerField';
         this.type = FieldType.INT;
+        this.blank = false;
         Object.assign(this, data);
     }
 }
@@ -114,6 +122,7 @@ export class ForeignKey extends field {
         super();
         this.fieldName = 'ForeignKey';
         this.foreignKey = true;
+        this.blank = false;
         Object.assign(this, data);
     }
 }
@@ -122,6 +131,7 @@ export class OneToOneField extends field {
         super();
         this.fieldName = 'OneToOneField';
         this.foreignKey = true;
+        this.blank = false;
         Object.assign(this, data);
     }
 }
@@ -130,6 +140,7 @@ export class ManyToManyField extends field {
         super();
         this.fieldName = 'ManyToManyField';
         this.foreignKey = true;
+        this.blank = false;
         Object.assign(this, data);
     }
 }

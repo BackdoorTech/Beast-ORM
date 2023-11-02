@@ -8,7 +8,11 @@ import { IDatabaseSchema } from './_interface/interface.js';
 import { QueryBuilder } from '../Presentation/queryBuilder/queryBuilder.js'
 import { Model } from '../Presentation/Api';
 import { queryBuilderHandler } from './queryBuilderHandler.js';
+import { customMethod } from '../Configuration/CustomMethod.js';
+import { Model as ModelType } from '../Presentation/Api';
 class BeastORM {
+
+
 
   register = (register:IRegister) => {
 
@@ -28,6 +32,23 @@ class BeastORM {
     DatabaseStrategy.prepare(schema)({done: () => {}})
 
     this.prepareMigrations(schema, DatabaseStrategy)
+  }
+
+  addMethods(Model:typeof ModelType<any>) {
+
+    const schema =  Model.getTableSchema()
+    const object = {}
+
+    for( const fieldName of  schema.fieldNames) {
+      object[fieldName] = null
+    }
+
+    delete object[schema.id.keyPath]
+
+    customMethod.addStaticMethod(Model, 'emptyFields', function() {
+      return object
+    })
+
   }
 
   private async prepareMigrations (schema: IDatabaseSchema, DatabaseStrategy: IDatabaseStrategy) {

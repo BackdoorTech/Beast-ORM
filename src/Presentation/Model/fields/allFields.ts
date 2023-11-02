@@ -26,6 +26,7 @@ export class BigIntegerField extends field implements AutoFieldParams{
 
 	fieldName: FieldKeys = 'BigIntegerField'
 	type = FieldType.BIGINT
+  blank = false
 
 	constructor(data?:BigIntegerFieldParams) {
 		super()
@@ -39,6 +40,7 @@ export class BigIntegerField extends field implements AutoFieldParams{
 export class BooleanField extends field implements BooleanFieldParams{
 
 	fieldName: FieldKeys = 'BooleanField'
+  blank = false
 
 	constructor(data?: BooleanFieldParams) {
 		super()
@@ -54,6 +56,7 @@ export class CharField extends field implements CharFieldParams{
 
 	fieldName: FieldKeys = 'CharField'
 	type = FieldType.DATE
+  blank = false
 
 	constructor(data?:CharFieldParams) {
 		super()
@@ -68,6 +71,7 @@ export class DateField extends field implements DateFieldParams{
 
 	fieldName: FieldKeys = 'DateField'
 	type = FieldType.DATE
+  blank = false
 
 	constructor(data?:DateFieldParams) {
 		super()
@@ -94,6 +98,7 @@ export class indexedDBArrayField extends field implements IndexedDBArrayFieldPar
 
 	fieldName: FieldKeys = 'indexedDBArrayField'
 	type = FieldType.ARRAY
+  blank = false
 	private _field?: any
 
 	public get field() {
@@ -116,6 +121,7 @@ export class indexedDBJsonField extends field implements IndexedDBJsonFieldParam
 
 	fieldName: FieldKeys = 'indexedDBJsonField'
 	type = FieldType.JSON
+  blank = false
 
 	constructor(data?:IndexedDBJsonFieldParams) {
 		super()
@@ -132,6 +138,7 @@ export class TextField  extends field implements TextFieldParams{
 
 	fieldName: FieldKeys = 'TextField'
 	type: FieldType.TEXT
+  blank = false
 
 	constructor(data?:TextFieldParams) {
 		super()
@@ -148,6 +155,7 @@ export class IntegerField extends field implements IntegerFieldParams{
 
 	fieldName: FieldKeys = 'IntegerField'
 	type = FieldType.INT
+  blank = false
 
 	constructor(data?:IntegerFieldParams) {
 		super()
@@ -162,6 +170,7 @@ export class ForeignKey extends field implements ForeignKeyParams{
 	fieldName: FieldKeys = 'ForeignKey'
   model
 	foreignKey = true
+  blank = false
 
 	constructor(data?: ForeignKeyParams) {
 		super()
@@ -175,6 +184,7 @@ export class OneToOneField extends field implements OneToOneFieldParams{
 
 	fieldName: FieldKeys = 'OneToOneField'
 	foreignKey = true
+  blank = false
 	model
 
 	constructor(data?: OneToOneFieldParams) {
@@ -191,6 +201,7 @@ export class ManyToManyField extends field implements ManyToManyFieldParams{
 	fieldName: FieldKeys = 'ManyToManyField'
 	model
 	foreignKey = true
+  blank = false
 
 	constructor(data?:ManyToManyFieldParams) {
 		super()

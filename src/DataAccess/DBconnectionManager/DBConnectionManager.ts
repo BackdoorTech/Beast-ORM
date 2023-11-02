@@ -1,5 +1,5 @@
 import { DriverAdapter, AdapterFactory } from "../DriverAdapters/DriverAdapter.js";
-import { IDatabaseSchema } from "../_interface/interface.js"
+import { IDatabaseSchema } from "../_interface/interface.type.js"
 export class DBConnectionManager {
 
   driverAdapter!:DriverAdapter

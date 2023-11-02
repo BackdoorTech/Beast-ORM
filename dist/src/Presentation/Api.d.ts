@@ -1,10 +1,10 @@
 import { IModel } from "./Api.type.js";
-import { TableSchema } from "../../_src/models/register-modal.interface.js";
+import { ITableSchema } from "../BusinessLayer/_interface/interface.js";
 /**
  * Represents a model for database operations.
  */
 export declare class Model<Model> implements IModel<Model> {
-    static getTableSchema: () => TableSchema;
+    static getTableSchema: () => ITableSchema;
     /**
      * Retrieve data from the database with specified filter parameters.
      * @param params - The filter parameters for the query.
