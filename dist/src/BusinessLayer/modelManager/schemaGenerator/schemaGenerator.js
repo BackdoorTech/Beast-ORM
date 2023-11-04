@@ -1,5 +1,6 @@
 import { ModelReader } from './ModelReader.js';
 import { FieldType } from './ModalReader.type.js';
+import { RuntimeMethods as RM } from '../runtimeMethods/runTimeMethods.js';
 class SchemaGenerator {
     generate(entries) {
         const databaseSchema = {
@@ -63,7 +64,7 @@ class SchemaGenerator {
             entries.models[index].getTableSchema = () => {
                 return tableSchemaClass;
             };
-            Object.defineProperty(entries.models[index].prototype, "getTableSchema", () => {
+            Object.defineProperty(entries.models[index].prototype, RM.getTableSchema, () => {
                 return tableSchemaClass;
             });
         }

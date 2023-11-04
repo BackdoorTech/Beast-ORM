@@ -27,7 +27,7 @@ export class ObjectStore {
                     await this.executeTransaction(nextTransaction);
                 }
                 catch (error) {
-                    console.error('Transaction failed:', error);
+                    // console.error('Transaction failed:', error);
                 }
                 finally {
                     await loop();

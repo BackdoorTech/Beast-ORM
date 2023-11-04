@@ -3,7 +3,7 @@
  * This query builder service allows you to create INSERT, UPDATE, and DELETE queries
  */
 export class QueryBuilder {
-    constructor() {
+    constructor({ isParamsArray }) {
         /**
          * Create a new QueryBuilder instance.
          */
@@ -14,6 +14,7 @@ export class QueryBuilder {
             updateValues: {},
             where: [],
         };
+        this.isParamsArray = isParamsArray;
     }
     /**
      * Start building an INSERT query.
@@ -91,4 +92,38 @@ export class QueryBuilder {
         return this;
     }
     limit(num) { }
+    /**
+     * Build and return the SQL query string.
+     * @returns {string} The SQL query string.
+     */
+    // build() {
+    //   let query = '';
+    //   switch (this.query.type) {
+    //     case 'INSERT':
+    //       if (this.query.values.length > 0) {
+    //         const columns = Object.keys(this.query.values[0]);
+    //         const valueSets = this.query.values.map(obj => `(${columns.map(col => `'${obj[col]}'`).join(', ')})`);
+    //         query = `INSERT INTO ${this.query.table} (${columns.join(', ')}) VALUES ${valueSets.join(', ')}`;
+    //       }
+    //       break;
+    //     case 'UPDATE':
+    //       query = `UPDATE ${this.query.table} SET ${Object.entries(this.query.updateValues).map(([key, value]) => `${key} = '${value}'`).join(', ')}`;
+    //       if (this.query.where.length > 0) {
+    //         query += ` WHERE ${this.query.where.join(' AND ')}`;
+    //       }
+    //       break;
+    //     case 'DELETE':
+    //       query = `DELETE FROM ${this.query.table}`;
+    //       if (this.query.where.length > 0) {
+    //         query += ` WHERE ${this.query.where.join(' AND ')}`;
+    //       }
+    //       break;
+    //     default:
+    //       throw new Error('Invalid query type');
+    //   }
+    //   return query;
+    // }
+    setCleanData(processedData) {
+        this.query.values = processedData;
+    }
 }

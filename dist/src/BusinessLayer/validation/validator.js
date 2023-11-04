@@ -1,12 +1,14 @@
-class validator {
+import { error, ok } from '../../Utility/Either/index.js';
+import { ValidationError } from './error/ValidationError.js';
+class Validator {
     validateFromSchema(tableSchema, data) {
         const requiredFieldNames = this.requiredFields(tableSchema);
         for (const fieldName of requiredFieldNames) {
-            if (!data.hasOwnProperty(fieldName)) {
-                return false;
+            if (data.hasOwnProperty(fieldName) == false) {
+                return error(new ValidationError());
             }
         }
-        return true;
+        return ok(true);
     }
     requiredFields(tableSchema) {
         const fieldNames = [];
@@ -17,5 +19,19 @@ class validator {
         }
         return fieldNames;
     }
+    ModelValidator(Model, tableSchema) {
+        const data = new Model();
+        return (Object) => {
+            for (const fieldName of tableSchema.fieldNames) {
+                const validator = data[fieldName];
+                const value = Object[fieldName];
+                const result = validator.valid(value);
+                if (result.isError) {
+                    return result;
+                }
+            }
+            return ok(true);
+        };
+    }
 }
-export {};
+export const validator = new Validator();

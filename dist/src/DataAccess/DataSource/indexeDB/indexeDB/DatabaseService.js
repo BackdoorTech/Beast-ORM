@@ -37,9 +37,9 @@ export class DatabaseService {
         if (!objectStore.hasActiveTransaction()) {
             objectStore.db = this.db;
             objectStore.createTransaction();
-            console.log("create transaction");
+            // console.log("create transaction")
         }
-        console.log("objectStore", objectStore);
+        // console.log("objectStore", objectStore)
         this.executingTransaction[objectStoreName] = true;
         return objectStore;
     }

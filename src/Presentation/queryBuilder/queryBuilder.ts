@@ -15,16 +15,19 @@ export class QueryBuilder {
     updateValues: {},
     where: [],
   }
-  model: Model<any>
+  model: typeof Model
+  isParamsArray: boolean
 
-  constructor() {}
+  constructor({isParamsArray}) {
+    this.isParamsArray = isParamsArray
+  }
 
   /**
    * Start building an INSERT query.
    * @param {string} table - The name of the table to insert data into.
    * @returns {QueryBuilder} The QueryBuilder instance.
    */
-  insertInto(table: IModel<any>) {
+  insertInto(table: typeof Model) {
     this.model = table
     this.query.type = 'INSERT';
     this.query.table = table["getTableSchema"]().name;
@@ -36,7 +39,7 @@ export class QueryBuilder {
    * @param {string} table - The name of the table to insert data into.
    * @returns {QueryBuilder} The QueryBuilder instance.
    */
-  select(table:IModel<any>) {
+  select(table:typeof Model) {
     this.model = table
     this.query.type = 'SELECT';
     this.query.table = table;
@@ -48,7 +51,7 @@ export class QueryBuilder {
    * @param {string} table - The name of the table to update data in.
    * @returns {QueryBuilder} The QueryBuilder instance.
    */
-  update(table:IModel<any>) {
+  update(table:typeof Model) {
     this.model = table
     this.query.type = 'UPDATE';
     this.query.table = table;
@@ -60,7 +63,7 @@ export class QueryBuilder {
    * @param {string} table - The name of the table to delete data from.
    * @returns {QueryBuilder} The QueryBuilder instance.
    */
-  deleteFrom(table:IModel<any>) {
+  deleteFrom(table:typeof Model) {
     this.model = table
     this.query.type = 'DELETE';
     this.query.table = table;
@@ -72,7 +75,7 @@ export class QueryBuilder {
    * @param {Array} values - An array of objects to insert into the table.
    * @returns {QueryBuilder} The QueryBuilder instance.
    */
-  insert(values) {
+  insert(values: Object | Array<Object>) {
     if (this.query.type === 'INSERT') {
       this.query.values = this.query.values.concat(values);
     }
@@ -134,5 +137,9 @@ export class QueryBuilder {
   //   }
   //   return query;
   // }
+
+  setCleanData(processedData: any) {
+    this.query.values = processedData
+  }
 }
 

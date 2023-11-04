@@ -1,4 +1,5 @@
-import { AttributesMap, FieldAttributesKeys, FieldKeys, FieldType, FieldsMap, PossibleFieldAttributes } from "../../Presentation/Model/fields/allFields.type.js";
+import { AttributesMap, FieldAttributesKeys, FieldKeys, FieldType, FieldsMap } from "../../BusinessLayer/fields/fields.type";
+import { PossibleFieldAttributes } from "../../BusinessLayer/fields/fieldsParameters.type";
 export interface IFieldSchema {
     name: string;
     keyPath: string;

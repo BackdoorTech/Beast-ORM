@@ -20,10 +20,10 @@ export class MakeMigrations {
     const databaseName = Migrations.databaseName
     const hasMigration = await migrationsStorageManager.hasMigration(databaseName)
 
-    console.log("hasMigration")
+    // console.log("hasMigration")
 
     if(hasMigration) {
-      console.log("createMigrationUpdate")
+      // console.log("createMigrationUpdate")
       if(!await this.migrationIsUpToDate(Migrations)) {
         this.needToMigrate = true
         await migrationsStorageManager.createMigrationUpdate(Migrations)

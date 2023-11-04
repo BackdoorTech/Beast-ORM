@@ -1,7 +1,8 @@
 import { QueryBuilder } from '../Presentation/queryBuilder/queryBuilder.js';
 import { IDatabaseStrategy } from "../DataAccess/DriverAdapters/DriverAdapter.type.js";
+import { Either } from '../Utility/Either/index.js';
 declare class QueryBuilderHandler {
-    INSERT(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder): Promise<unknown>;
+    INSERT<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder): Promise<Either<T, any>>;
 }
 export declare const queryBuilderHandler: QueryBuilderHandler;
 export {};

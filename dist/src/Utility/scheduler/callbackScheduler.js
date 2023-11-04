@@ -25,11 +25,9 @@ export class CallbackScheduler {
         return async (...args) => {
             return new Promise(async (resolve) => {
                 if (this.running) {
-                    console.log("running");
                     resolve(await callback(...args));
                 }
                 else {
-                    console.log("callbackQueue");
                     this.callbackQueue.push(async () => {
                         resolve(await callback(...args));
                     });

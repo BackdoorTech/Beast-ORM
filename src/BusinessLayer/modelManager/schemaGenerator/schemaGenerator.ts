@@ -2,6 +2,8 @@ import { ModelReader } from './ModelReader.js'
 import { IRegister } from '../../beastOrm.type.js'
 import { FieldType } from './ModalReader.type.js'
 import { IDatabaseSchema } from '../../_interface/interface.js'
+import { RuntimeMethods as RM } from '../runtimeMethods/runTimeMethods.js'
+
 class SchemaGenerator {
   generate(entries: IRegister): IDatabaseSchema {
 
@@ -84,7 +86,7 @@ class SchemaGenerator {
         return tableSchemaClass;
       }
 
-      Object.defineProperty(entries.models[index].prototype, "getTableSchema", () => {
+      Object.defineProperty(entries.models[index].prototype, RM.getTableSchema, () => {
         return tableSchemaClass;
       })
     }

@@ -6,12 +6,12 @@ class DatabaseManager {
   databases: {[databaseName: string]: DatabaseService }  = {}
 
   async migrate(config:IDatabaseSchema) {
-    console.log("migrate db")
+    //console.log("migrate db")
     await this.databases[config.databaseName].migrate()
   }
 
   async prepare(config:IDatabaseSchema) {
-    console.log("create db connection")
+    //console.log("create db connection")
     this.databases[config.databaseName] = new DatabaseService(config)
   }
 

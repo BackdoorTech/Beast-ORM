@@ -11,12 +11,12 @@ export declare class Model<Model> implements IModel<Model> {
      * @returns A promise that resolves with the query results.
      */
     save(...args: any[]): Promise<void>;
-    get(): Promise<any>;
-    all(): Promise<any>;
-    getOrCreate(...params: any[]): any;
-    static create(params: any): Promise<any>;
-    delete(params: any): any;
-    updateOrCreate(...args: any[]): Promise<any>;
+    static get(): Promise<any>;
+    static all(): Promise<any>;
+    static getOrCreate(...params: any[]): any;
+    static create<T>(params: any): Promise<import("../Utility/Either/index.js").Either<T, import("../BusinessLayer/validation/fields/allFields.type.js").FormValidationError>>;
+    delete(): Promise<import("../Utility/Either/index.js").Either<true, import("../BusinessLayer/validation/fields/allFields.type.js").FormValidationError>>;
+    static updateOrCreate(...args: any[]): Promise<any>;
     update(): Promise<void>;
-    filter(): void;
+    static filter(): void;
 }

@@ -1,5 +1,4 @@
 import { Model } from '../Api.js';
-import { IModel } from '../Api.type.js';
 /**
  * Represents a query builder for creating Query instances.
  * This query builder service allows you to create INSERT, UPDATE, and DELETE queries
@@ -15,38 +14,41 @@ export declare class QueryBuilder {
         updateValues: {};
         where: any[];
     };
-    model: Model<any>;
-    constructor();
+    model: typeof Model;
+    isParamsArray: boolean;
+    constructor({ isParamsArray }: {
+        isParamsArray: any;
+    });
     /**
      * Start building an INSERT query.
      * @param {string} table - The name of the table to insert data into.
      * @returns {QueryBuilder} The QueryBuilder instance.
      */
-    insertInto(table: IModel<any>): this;
+    insertInto(table: typeof Model): this;
     /**
      * Start building an INSERT query.
      * @param {string} table - The name of the table to insert data into.
      * @returns {QueryBuilder} The QueryBuilder instance.
      */
-    select(table: IModel<any>): this;
+    select(table: typeof Model): this;
     /**
      * Start building an UPDATE query.
      * @param {string} table - The name of the table to update data in.
      * @returns {QueryBuilder} The QueryBuilder instance.
      */
-    update(table: IModel<any>): this;
+    update(table: typeof Model): this;
     /**
      * Start building a DELETE query.
      * @param {string} table - The name of the table to delete data from.
      * @returns {QueryBuilder} The QueryBuilder instance.
      */
-    deleteFrom(table: IModel<any>): this;
+    deleteFrom(table: typeof Model): this;
     /**
      * Insert data into the specified table.
      * @param {Array} values - An array of objects to insert into the table.
      * @returns {QueryBuilder} The QueryBuilder instance.
      */
-    insert(values: any): this;
+    insert(values: Object | Array<Object>): this;
     /**
      * Set values for an UPDATE query.
      * @param {Object} values - An object representing key-value pairs to update in the table.
@@ -60,4 +62,9 @@ export declare class QueryBuilder {
      */
     where(condition: Object): this;
     limit(num: number): void;
+    /**
+     * Build and return the SQL query string.
+     * @returns {string} The SQL query string.
+     */
+    setCleanData(processedData: any): void;
 }

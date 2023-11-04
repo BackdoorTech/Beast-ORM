@@ -4,15 +4,18 @@ import { modelRegistration } from './modelManager/register/register.js';
 import { MakeMigrations } from '../DataAccess/SchemaMigrations/MakeMigration.js';
 import { migrateMigrations } from '../DataAccess/SchemaMigrations/MigrateMigrations.js';
 import { IDatabaseStrategy } from '../DataAccess/DriverAdapters/DriverAdapter.type.js';
-import { IDatabaseSchema } from './_interface/interface.js';
+import { IDatabaseSchema, ITableSchema } from './_interface/interface.js';
 import { QueryBuilder } from '../Presentation/queryBuilder/queryBuilder.js'
-import { Model } from '../Presentation/Api';
 import { queryBuilderHandler } from './queryBuilderHandler.js';
 import { customMethod } from '../Configuration/CustomMethod.js';
-import { Model as ModelType } from '../Presentation/Api';
+import { Model, Model as ModelType } from '../Presentation/Api';
+import { validator } from './validation/validator.js'
+import { Either } from '../Utility/Either/index.js'
+import { dataParameters } from "./modelManager/dataParameters.js"
+import { RuntimeMethods as RM } from './modelManager/runtimeMethods/runTimeMethods.js';
+import { EitherFormValidationError, FormValidationError } from './validation/fields/allFields.type.js';
+
 class BeastORM {
-
-
 
   register = (register:IRegister) => {
 
@@ -32,22 +35,26 @@ class BeastORM {
     DatabaseStrategy.prepare(schema)({done: () => {}})
 
     this.prepareMigrations(schema, DatabaseStrategy)
+
+    for (const model of register.models) {
+      this.addMethods(model, RM.getModel,  model)
+
+      const generateValidator = validator.ModelValidator(model, model[RM.getTableSchema]())
+      this.addStaticMethodNowrap(model, RM.validator,  generateValidator)
+    }
   }
 
-  addMethods(Model:typeof ModelType<any>) {
+  addMethods(Model:typeof ModelType<any>, functionName , value) {
 
-    const schema =  Model.getTableSchema()
-    const object = {}
-
-    for( const fieldName of  schema.fieldNames) {
-      object[fieldName] = null
-    }
-
-    delete object[schema.id.keyPath]
-
-    customMethod.addStaticMethod(Model, 'emptyFields', function() {
-      return object
+    customMethod.add(Model, functionName, function() {
+      return value
     })
+
+  }
+
+  addStaticMethodNowrap(Model:typeof ModelType<any>, functionName , value:Function) {
+
+    customMethod.addStaticMethod(Model, functionName, value)
 
   }
 
@@ -64,9 +71,59 @@ class BeastORM {
     }
   }
 
-  async executeQuery(QueryBuilder: QueryBuilder, Model:Model<any>) {
-    const data = Model["getTableSchema"]()
-    const databaseName = data.databaseName
+  async executeInsertionQuery<PModel>(QueryBuilder: QueryBuilder, Model:PModel):Promise<Either<PModel, FormValidationError>>   {
+    const tableSchema: ITableSchema = Model[RM.getTableSchema]()
+    const databaseName = tableSchema.databaseName
+
+    const database = modelRegistration.getDatabase(databaseName)
+
+    const DatabaseStrategy = database
+      .DBConnectionManager
+      .driverAdapter
+      .strategy
+
+      const arrayOfData = QueryBuilder.query.values
+
+      const validator: (value: Object) => EitherFormValidationError  = Model[RM.validator]
+
+      for( const object in arrayOfData) {
+        arrayOfData[object] = dataParameters.getFilteredData(tableSchema, arrayOfData[object])
+        const validationResult = validator(arrayOfData[object])
+
+        if(validationResult.isError) {
+          return validationResult as any
+        }
+
+      }
+      QueryBuilder.setCleanData(arrayOfData)
+
+    return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder)
+  }
+
+  async deleteQuery<PModel>(QueryBuilder: QueryBuilder, Model:PModel):Promise<Either<PModel, FormValidationError>> {
+    const tableSchema: ITableSchema = Model[RM.getTableSchema]()
+    const databaseName = tableSchema.databaseName
+
+    const database = modelRegistration.getDatabase(databaseName)
+
+    const DatabaseStrategy = database
+      .DBConnectionManager
+      .driverAdapter
+      .strategy
+
+      const arrayOfData = QueryBuilder.query.values
+
+      for( const object in arrayOfData) {
+        arrayOfData[object] = dataParameters.getFilteredDataOverlay(tableSchema, arrayOfData[object])
+      }
+      QueryBuilder.setCleanData(arrayOfData)
+
+    return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder)
+  }
+
+  async deleteQueryNoFormValidation(QueryBuilder: QueryBuilder, model: typeof Model):Promise<Either<true, FormValidationError>> {
+    const tableSchema: ITableSchema = model[RM.getTableSchema]()
+    const databaseName = tableSchema.databaseName
 
     const database = modelRegistration.getDatabase(databaseName)
 
@@ -77,6 +134,7 @@ class BeastORM {
 
     return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder)
   }
+
   executeQueries() {}
 }
 

@@ -1,8 +1,10 @@
-import { FieldType, field } from './allFields.type.js';
+import { FieldType } from '../../../BusinessLayer/fields/fields.type.js';
+import { AutoFieldBL, BigIntegerFieldBL, BooleanFieldBL, CharFieldBL, DateFieldBL, DateTimeFieldBL, ForeignKeyBL, IntegerFieldBL, TextFieldBL, indexedDBArrayFieldBL, indexedDBJsonFieldBL } from '../../../BusinessLayer/validation/fields/allFields.js';
+import { field } from '../../../BusinessLayer/validation/fields/allFields.type.js';
 /**
  * Represents an AutoField, an automatically incrementing field for primary keys.
  */
-export class AutoField extends field {
+export class AutoField extends AutoFieldBL {
     constructor(data) {
         super();
         this.fieldName = 'AutoField';
@@ -15,7 +17,7 @@ export class AutoField extends field {
 /**
  * Represents a BigIntegerField, a field for storing large integer values.
  */
-export class BigIntegerField extends field {
+export class BigIntegerField extends BigIntegerFieldBL {
     constructor(data) {
         super();
         this.fieldName = 'BigIntegerField';
@@ -27,7 +29,7 @@ export class BigIntegerField extends field {
 /**
  * Represents a BooleanField, a field for storing boolean values.
  */
-export class BooleanField extends field {
+export class BooleanField extends BooleanFieldBL {
     constructor(data) {
         super();
         this.fieldName = 'BooleanField';
@@ -38,7 +40,7 @@ export class BooleanField extends field {
 /**
  * Represents a CharField, a field for storing text with a specified length.
  */
-export class CharField extends field {
+export class CharField extends CharFieldBL {
     constructor(data) {
         super();
         this.fieldName = 'CharField';
@@ -47,7 +49,7 @@ export class CharField extends field {
         Object.assign(this, data);
     }
 }
-export class DateField extends field {
+export class DateField extends DateFieldBL {
     constructor(data) {
         super();
         this.fieldName = 'DateField';
@@ -56,7 +58,7 @@ export class DateField extends field {
         Object.assign(this, data);
     }
 }
-export class DateTimeField extends field {
+export class DateTimeField extends DateTimeFieldBL {
     constructor(data) {
         super();
         this.fieldName = 'DateTimeField';
@@ -67,13 +69,7 @@ export class DateTimeField extends field {
 /**
  * Represents a CharField, a field for storing array.
  */
-export class indexedDBArrayField extends field {
-    get field() {
-        return this._field;
-    }
-    set field(value) {
-        this._field = value;
-    }
+export class indexedDBArrayField extends indexedDBArrayFieldBL {
     constructor(data) {
         super();
         this.fieldName = 'indexedDBArrayField';
@@ -85,7 +81,7 @@ export class indexedDBArrayField extends field {
 /**
  * Represents a CharField, a field for storing json.
  */
-export class indexedDBJsonField extends field {
+export class indexedDBJsonField extends indexedDBJsonFieldBL {
     constructor(data) {
         super();
         this.fieldName = 'indexedDBJsonField';
@@ -97,7 +93,7 @@ export class indexedDBJsonField extends field {
 /**
  * Represents a CharField, a field for storing large text
  */
-export class TextField extends field {
+export class TextField extends TextFieldBL {
     constructor(data) {
         super();
         this.fieldName = 'TextField';
@@ -108,7 +104,7 @@ export class TextField extends field {
 /**
  * Represents a CharField, a field for storing integer
  */
-export class IntegerField extends field {
+export class IntegerField extends IntegerFieldBL {
     constructor(data) {
         super();
         this.fieldName = 'IntegerField';
@@ -117,7 +113,7 @@ export class IntegerField extends field {
         Object.assign(this, data);
     }
 }
-export class ForeignKey extends field {
+export class ForeignKey extends ForeignKeyBL {
     constructor(data) {
         super();
         this.fieldName = 'ForeignKey';

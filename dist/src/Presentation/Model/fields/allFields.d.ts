@@ -1,8 +1,11 @@
-import { FieldKeys, TextFieldParams, BigIntegerFieldParams, CharFieldParams, AutoFieldParams, BooleanFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams, FieldType, field } from './allFields.type.js';
+import { FieldKeys, FieldType } from '../../../BusinessLayer/fields/fields.type.js';
+import { AutoFieldBL, BigIntegerFieldBL, BooleanFieldBL, CharFieldBL, DateFieldBL, DateTimeFieldBL, ForeignKeyBL, IntegerFieldBL, TextFieldBL, indexedDBArrayFieldBL, indexedDBJsonFieldBL } from '../../../BusinessLayer/validation/fields/allFields.js';
+import { AutoFieldParams, BigIntegerFieldParams, BooleanFieldParams, CharFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams, TextFieldParams } from '../../../BusinessLayer/fields/fieldsParameters.type.js';
+import { field } from '../../../BusinessLayer/validation/fields/allFields.type.js';
 /**
  * Represents an AutoField, an automatically incrementing field for primary keys.
  */
-export declare class AutoField extends field implements AutoFieldParams {
+export declare class AutoField extends AutoFieldBL {
     fieldName: FieldKeys;
     unique: boolean;
     autoIncrement: boolean;
@@ -12,7 +15,7 @@ export declare class AutoField extends field implements AutoFieldParams {
 /**
  * Represents a BigIntegerField, a field for storing large integer values.
  */
-export declare class BigIntegerField extends field implements AutoFieldParams {
+export declare class BigIntegerField extends BigIntegerFieldBL {
     fieldName: FieldKeys;
     type: FieldType;
     blank: boolean;
@@ -21,7 +24,7 @@ export declare class BigIntegerField extends field implements AutoFieldParams {
 /**
  * Represents a BooleanField, a field for storing boolean values.
  */
-export declare class BooleanField extends field implements BooleanFieldParams {
+export declare class BooleanField extends BooleanFieldBL {
     fieldName: FieldKeys;
     blank: boolean;
     constructor(data?: BooleanFieldParams);
@@ -29,19 +32,19 @@ export declare class BooleanField extends field implements BooleanFieldParams {
 /**
  * Represents a CharField, a field for storing text with a specified length.
  */
-export declare class CharField extends field implements CharFieldParams {
+export declare class CharField extends CharFieldBL {
     fieldName: FieldKeys;
     type: FieldType;
     blank: boolean;
     constructor(data?: CharFieldParams);
 }
-export declare class DateField extends field implements DateFieldParams {
+export declare class DateField extends DateFieldBL {
     fieldName: FieldKeys;
     type: FieldType;
     blank: boolean;
     constructor(data?: DateFieldParams);
 }
-export declare class DateTimeField extends field implements DateTimeFieldParams {
+export declare class DateTimeField extends DateTimeFieldBL {
     fieldName: FieldKeys;
     type: FieldType;
     constructor(data?: DateTimeFieldParams);
@@ -49,19 +52,16 @@ export declare class DateTimeField extends field implements DateTimeFieldParams 
 /**
  * Represents a CharField, a field for storing array.
  */
-export declare class indexedDBArrayField extends field implements IndexedDBArrayFieldParams {
+export declare class indexedDBArrayField extends indexedDBArrayFieldBL {
     fieldName: FieldKeys;
     type: FieldType;
     blank: boolean;
-    private _field?;
-    get field(): any;
-    set field(value: any);
     constructor(data?: IndexedDBArrayFieldParams);
 }
 /**
  * Represents a CharField, a field for storing json.
  */
-export declare class indexedDBJsonField extends field implements IndexedDBJsonFieldParams {
+export declare class indexedDBJsonField extends indexedDBJsonFieldBL {
     fieldName: FieldKeys;
     type: FieldType;
     blank: boolean;
@@ -70,7 +70,7 @@ export declare class indexedDBJsonField extends field implements IndexedDBJsonFi
 /**
  * Represents a CharField, a field for storing large text
  */
-export declare class TextField extends field implements TextFieldParams {
+export declare class TextField extends TextFieldBL {
     fieldName: FieldKeys;
     type: FieldType.TEXT;
     blank: boolean;
@@ -79,13 +79,13 @@ export declare class TextField extends field implements TextFieldParams {
 /**
  * Represents a CharField, a field for storing integer
  */
-export declare class IntegerField extends field implements IntegerFieldParams {
+export declare class IntegerField extends IntegerFieldBL {
     fieldName: FieldKeys;
     type: FieldType;
     blank: boolean;
     constructor(data?: IntegerFieldParams);
 }
-export declare class ForeignKey extends field implements ForeignKeyParams {
+export declare class ForeignKey extends ForeignKeyBL {
     fieldName: FieldKeys;
     model: any;
     foreignKey: boolean;
