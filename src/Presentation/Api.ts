@@ -21,16 +21,23 @@ export class Model<Model>  implements IModel<Model>{
     return {cars:'d'} as any
   }
 
-  static async get() {
+  static async get(value:Object) {
     const queryBuilder = new QueryBuilder({isParamsArray:false});
     const model = this.getModel()
 
     queryBuilder
       .select(model)
-      .where(model)
+      .where(value)
       .limit(1)
+      .hasIndex(true)
 
-    return {} as any
+      const result = await ORM.executeSelectQuery(queryBuilder, this as any)
+
+      if(result.isError) {
+        throw(result.error)
+      } else {
+        return result.value
+      }
   }
 
   static async all() {

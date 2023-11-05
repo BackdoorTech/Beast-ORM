@@ -1,3 +1,4 @@
+import { ok, error as err } from "../../../../Utility/Either/index.js";
 export class ObjectStore {
     constructor(tableSchema) {
         this.transactionQueue = [];
@@ -48,14 +49,14 @@ export class ObjectStore {
                 const data = { data: request.result, index };
                 resolve(data);
                 onsuccess(data);
-                finishRequest(true);
+                finishRequest(ok(data));
             };
             request.onerror = (error) => {
                 this.commitTransaction();
                 this.createTransaction();
                 reject(error);
                 onerror();
-                finishRequest(false);
+                finishRequest(err(false));
             };
         });
     }

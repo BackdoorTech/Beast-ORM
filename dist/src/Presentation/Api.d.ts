@@ -7,7 +7,7 @@ export declare class Model<Model> implements IModel<Model> {
     static getTableSchema(): ITableSchema;
     static getModel(): typeof Model;
     getModel(): typeof Model;
-    static get(): Promise<any>;
+    static get(value: Object): Promise<any>;
     static all(): Promise<any>;
     static deleteAll(): Promise<true>;
     static create<T>(params: any): Promise<T>;

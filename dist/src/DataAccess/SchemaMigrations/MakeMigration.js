@@ -21,7 +21,7 @@ export class MakeMigrations {
         }
         else {
             this.needToMigrate = true;
-            console.log("createMigrationFirstTime");
+            // console.log("createMigrationFirstTime")
             await migrationsStorageManager.createMigrationFirstTime(Migrations);
         }
     }

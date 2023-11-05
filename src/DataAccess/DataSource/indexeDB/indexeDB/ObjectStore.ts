@@ -1,8 +1,10 @@
-import { TableSchema } from "./resource/type";
+import { ITableSchema } from "../../../../BusinessLayer/_interface/interface";
+import { Either, ok, error as err } from "../../../../Utility/Either/index.js";
+import { ObjectStoreRequestResult } from "./ObjectStore.type";
 
 export class ObjectStore {
 
-  schema: TableSchema
+  schema: ITableSchema
   transactionQueue = [];
   isTransactionInProgress = false;
   db:  IDBDatabase;
@@ -13,13 +15,13 @@ export class ObjectStore {
     active?: boolean
    };
 
-  constructor(tableSchema: TableSchema) {
+  constructor(tableSchema: ITableSchema) {
     this.schema = tableSchema
   }
 
-  async enqueueTransaction(transaction): Promise<Boolean> {
+  async enqueueTransaction(transaction): Promise<Either<ObjectStoreRequestResult, false>> {
     return new Promise((resolve, reject) => {
-      transaction.finishRequest = (result: Boolean) => {
+      transaction.finishRequest = (result: Either<any, false>) => {
         resolve(result)
       }
 
@@ -69,10 +71,10 @@ export class ObjectStore {
 
     return new Promise(async (resolve, reject) => {
       request.onsuccess = async () => {
-        const data = {data:request.result, index}
+        const data: ObjectStoreRequestResult = {data:request.result, index}
         resolve(data);
         onsuccess(data);
-        finishRequest(true)
+        finishRequest(ok(data))
       };
 
       request.onerror = (error) => {
@@ -80,7 +82,7 @@ export class ObjectStore {
         this.createTransaction()
         reject(error);
         onerror()
-        finishRequest(false)
+        finishRequest(err(false))
       };
     });
   }

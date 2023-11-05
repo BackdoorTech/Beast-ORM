@@ -1,8 +1,2 @@
-import { ITableSchema } from "../_interface/interface.type";
-export interface IMigrations {
-    databaseName: string;
-    type: 'indexedDB' | 'localStorage';
-    version: number;
-    webWorker?: boolean;
-    table: ITableSchema[];
-}
+import { IDatabaseSchema } from "../../BusinessLayer/_interface/interface";
+export type IMigrations = IDatabaseSchema;

@@ -135,4 +135,7 @@ export class QueryBuilder {
     setCleanData(processedData) {
         this.query.values = processedData;
     }
+    get hasNoCondition() {
+        return this.query.where.length == 0;
+    }
 }

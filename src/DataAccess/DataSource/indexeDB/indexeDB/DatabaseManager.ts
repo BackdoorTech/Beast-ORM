@@ -1,5 +1,5 @@
+import { IDatabaseSchema } from "../../../../BusinessLayer/_interface/interface.js"
 import { DatabaseService } from "./DatabaseService.js"
-import { IDatabaseSchema } from "./DatabaseService.type.js"
 
 class DatabaseManager {
 
@@ -17,6 +17,10 @@ class DatabaseManager {
 
   getDb(databaseName) {
     return this.databases[databaseName]
+  }
+
+  getTableSchema(databaseName, tableName) {
+    return this.databases[databaseName].objectStore[tableName].schema
   }
 
 }

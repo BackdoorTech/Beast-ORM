@@ -14,5 +14,8 @@ class DatabaseManager {
     getDb(databaseName) {
         return this.databases[databaseName];
     }
+    getTableSchema(databaseName, tableName) {
+        return this.databases[databaseName].objectStore[tableName].schema;
+    }
 }
 export const databaseManager = new DatabaseManager();

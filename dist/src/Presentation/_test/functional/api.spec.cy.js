@@ -163,4 +163,29 @@ describe('API', () => {
             expect(Object.assign({}, createdPerson)).to.deep.equal({ username: 'kobe', email: 'kobe.bryant@lakers.com', age: null, userId: createdPerson.userId });
         });
     });
+    it('passes get()', () => {
+        cy.visit('./index.html');
+        cy.window().should("have.property", "models");
+        cy.window().then(async (wind) => {
+            class Person extends wind.models.Model {
+                constructor() {
+                    super(...arguments);
+                    this.userId = wind.models.AutoField({ primaryKey: true });
+                    this.username = wind.models.CharField({ maxLength: 100 });
+                    this.email = wind.models.CharField({ blank: true, maxLength: 100 });
+                    this.age = wind.models.IntegerField({ blank: true });
+                }
+            }
+            wind.models.register({
+                databaseName: "jest-7",
+                type: "localStorage",
+                version: 1,
+                models: [Person],
+            });
+            await Person.deleteAll();
+            const createdPerson = await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
+            const person = await Person.get({ userId: createdPerson.userId });
+            expect(Object.assign({}, person)).to.deep.equal(Object.assign({}, createdPerson));
+        });
+    });
 });

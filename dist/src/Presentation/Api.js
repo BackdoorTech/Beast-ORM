@@ -14,14 +14,21 @@ export class Model {
     getModel() {
         return { cars: 'd' };
     }
-    static async get() {
+    static async get(value) {
         const queryBuilder = new QueryBuilder({ isParamsArray: false });
         const model = this.getModel();
         queryBuilder
             .select(model)
-            .where(model)
-            .limit(1);
-        return {};
+            .where(value)
+            .limit(1)
+            .hasIndex(true);
+        const result = await ORM.executeSelectQuery(queryBuilder, this);
+        if (result.isError) {
+            throw (result.error);
+        }
+        else {
+            return result.value;
+        }
     }
     static async all() {
         const model = this.getModel();

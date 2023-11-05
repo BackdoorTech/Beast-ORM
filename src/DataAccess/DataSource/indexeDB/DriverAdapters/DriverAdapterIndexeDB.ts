@@ -1,7 +1,18 @@
 import { IDatabaseStrategy, IMigrations, IReturnObject } from "../../../DriverAdapters/DriverAdapter.type.js";
 import { databaseManager } from "../indexeDB/DatabaseManager.js";
 import { IQuery } from "../../../../BusinessLayer/_interface/Apresentation/queryBuilder.js"
+import { CreateQueryReaderSelect } from "../../../QueryReader/queryReader.js";
+import { SqlObject } from "../../../filter/sqlObject/sqlObject.js";
 // IndexedDB strategy
+
+
+
+const emptyCallBacks = {
+  onsuccess: () => {},
+  onerror: () => {},
+  done: () => {}
+}
+
 export class IndexedDBStrategy implements IDatabaseStrategy {
 
   databaseName: string
@@ -80,11 +91,30 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
 
     // Implement IndexedDB select here
     return async ( callbacks: IReturnObject) => {
+      const queryReader = CreateQueryReaderSelect(Query)
       const ObjectStore = await databaseManager.getDb(this.databaseName)
       .executeOnObjectStore(table)
 
-      if(Query.where.length == 0) {
+      const TableSchema = databaseManager.getTableSchema(this.databaseName, table)
+
+      if(queryReader.hasNoCondition) {
         await ObjectStore.enqueueTransaction({operation:"getAll", item: null, ...callbacks})
+      } else {
+
+        const result = await ObjectStore.enqueueTransaction({operation:"getAll", item: null, ...emptyCallBacks})
+
+        if(result.isOk) {
+          const rows = result.value.data
+          // console.log(rows)
+          // console.log(queryReader)
+
+          const sqlObject =  new SqlObject(TableSchema, queryReader)
+
+          const filteredRow = await sqlObject.run(rows)
+          callbacks.done(filteredRow)
+          return
+
+        }
       }
 
       callbacks.done()

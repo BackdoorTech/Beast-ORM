@@ -62,4 +62,5 @@ export declare class QueryBuilder {
      * @returns {string} The SQL query string.
      */
     setCleanData(processedData: any): void;
+    get hasNoCondition(): boolean;
 }

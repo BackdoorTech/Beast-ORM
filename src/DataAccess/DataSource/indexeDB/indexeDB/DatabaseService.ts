@@ -1,5 +1,5 @@
+import { IDatabaseSchema } from "../../../../BusinessLayer/_interface/interface.js";
 import { DatabaseConnector } from "./DatabaseConnector.js";
-import { IDatabaseSchema } from './DatabaseService.type.js'
 import { ObjectStore } from './ObjectStore.js'
 export class DatabaseService {
   db:  IDBDatabase | null = null;

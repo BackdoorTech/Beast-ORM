@@ -26,7 +26,7 @@ class QueryBuilderHandler {
           result.push(newInstanceOfModel)
         },
         onerror:() => {
-          if(QueryBuilder.query.isParamsArray) {
+          if(!QueryBuilder.query.isParamsArray) {
             resolve(error(false))
           }
         },
@@ -48,19 +48,19 @@ class QueryBuilderHandler {
       DatabaseStrategy.select(tableName, QueryBuilder.query)({
         onsuccess:(data:any) => {
           if(Array.isArray(data.data)) {
-            result = data.data
-          } else {
-            result.push(data)
+            result = data.data // get all with no condition `Model.all()`
           }
         },
         onerror:() => {
-          if(QueryBuilder.query.isParamsArray) {
+          if(!QueryBuilder.query.isParamsArray) {
             resolve(error(false))
           }
         },
-        done:() => {
-          if(QueryBuilder.query.where.length == 0) {
-            resolve(ok(result as any))
+        done:(data) => {
+          if(QueryBuilder.hasNoCondition) {
+            resolve(ok(result as any)) // get all with no condition `Model.all()`
+          } else { // get with condition `Model.get()`
+            resolve(ok(QueryBuilder.query.isParamsArray? data: data[0] as any))
           }
         }
       })

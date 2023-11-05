@@ -214,4 +214,39 @@ describe('API', () => {
     });
 
   })
+
+
+
+  it('passes get()', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+
+      class Person extends wind.models.Model {
+        userId = wind.models.AutoField({primaryKey:true})
+        username = wind.models.CharField({maxLength: 100})
+        email = wind.models.CharField({blank: true, maxLength: 100})
+        age = wind.models.IntegerField({blank: true})
+      }
+
+      wind.models.register({
+        databaseName: "jest-7",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
+      });
+
+      await Person.deleteAll()
+
+      const createdPerson = await Person.create({username:'kobe', email:'kobe.bryant@lakers.com'})
+
+      const person = await Person.get({userId: createdPerson.userId})
+
+      expect(Object.assign({}, person)).to.deep.equal(Object.assign({}, createdPerson))
+
+    });
+
+  })
 })
