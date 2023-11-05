@@ -1,5 +1,5 @@
+import { IQuery } from '../../BusinessLayer/_interface/Apresentation/queryBuilder.js';
 import { Model } from '../Api.js';
-import { IModel } from '../Api.type.js'
 /**
  * Represents a query builder for creating Query instances.
  * This query builder service allows you to create INSERT, UPDATE, and DELETE queries
@@ -8,18 +8,20 @@ export class QueryBuilder {
   /**
    * Create a new QueryBuilder instance.
    */
-  query = {
+  query: IQuery = {
     type: '',
-    table: {},
+    table: "",
     values: [],
     updateValues: {},
     where: [],
+    limit: null,
+    hasIndex: false,
+    isParamsArray: false
   }
   model: typeof Model
-  isParamsArray: boolean
 
   constructor({isParamsArray}) {
-    this.isParamsArray = isParamsArray
+    this.query.isParamsArray = isParamsArray
   }
 
   /**
@@ -30,7 +32,7 @@ export class QueryBuilder {
   insertInto(table: typeof Model) {
     this.model = table
     this.query.type = 'INSERT';
-    this.query.table = table["getTableSchema"]().name;
+    this.query.table = this.model.getTableSchema().name;
     return this;
   }
 
@@ -42,7 +44,7 @@ export class QueryBuilder {
   select(table:typeof Model) {
     this.model = table
     this.query.type = 'SELECT';
-    this.query.table = table;
+    this.query.table = this.model.getTableSchema().name;
     return this;
   }
 
@@ -54,7 +56,7 @@ export class QueryBuilder {
   update(table:typeof Model) {
     this.model = table
     this.query.type = 'UPDATE';
-    this.query.table = table;
+    this.query.table = this.model.getTableSchema().name;
     return this;
   }
 
@@ -66,7 +68,7 @@ export class QueryBuilder {
   deleteFrom(table:typeof Model) {
     this.model = table
     this.query.type = 'DELETE';
-    this.query.table = table;
+    this.query.table = this.model.getTableSchema().name;
     return this;
   }
 
@@ -104,7 +106,14 @@ export class QueryBuilder {
     return this;
   }
 
-  limit(num: number) {}
+  limit(num: number) {
+    this.query.limit = num
+    return this;
+  }
+
+  hasIndex(boolean: Boolean) {
+    this.query.hasIndex = boolean
+  }
 
   /**
    * Build and return the SQL query string.

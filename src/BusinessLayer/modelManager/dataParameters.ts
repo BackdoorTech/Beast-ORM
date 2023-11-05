@@ -11,6 +11,18 @@ export class DataParameters {
     return filteredData
   }
 
+  getFilteredDataWithId(tableSchema: ITableSchema, data: Object) {
+
+    const filteredData = {}
+    tableSchema.fieldNames.push(tableSchema.id.keyPath)
+
+    for(const field of tableSchema.fieldNames) {
+      filteredData[field]= data[field]
+    }
+
+    return filteredData
+  }
+
   getFilteredDataOverlay(tableSchema: ITableSchema, data: Object) {
 
     const filteredData = {}

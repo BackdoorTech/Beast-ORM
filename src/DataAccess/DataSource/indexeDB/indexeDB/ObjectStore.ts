@@ -17,10 +17,10 @@ export class ObjectStore {
     this.schema = tableSchema
   }
 
-  async enqueueTransaction(transaction) {
+  async enqueueTransaction(transaction): Promise<Boolean> {
     return new Promise((resolve, reject) => {
-      transaction.finishRequest = () => {
-        resolve(true)
+      transaction.finishRequest = (result: Boolean) => {
+        resolve(result)
       }
 
       this.transactionQueue.push(transaction);
@@ -57,6 +57,7 @@ export class ObjectStore {
 
     this.isTransactionInProgress = false;
     this.commitTransaction()
+
   }
 
   async executeTransaction(transaction) {
@@ -71,7 +72,7 @@ export class ObjectStore {
         const data = {data:request.result, index}
         resolve(data);
         onsuccess(data);
-        finishRequest()
+        finishRequest(true)
       };
 
       request.onerror = (error) => {
@@ -79,7 +80,7 @@ export class ObjectStore {
         this.createTransaction()
         reject(error);
         onerror()
-        finishRequest()
+        finishRequest(false)
       };
     });
   }

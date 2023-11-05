@@ -9,12 +9,15 @@ export class QueryBuilder {
          */
         this.query = {
             type: '',
-            table: {},
+            table: "",
             values: [],
             updateValues: {},
             where: [],
+            limit: null,
+            hasIndex: false,
+            isParamsArray: false
         };
-        this.isParamsArray = isParamsArray;
+        this.query.isParamsArray = isParamsArray;
     }
     /**
      * Start building an INSERT query.
@@ -24,7 +27,7 @@ export class QueryBuilder {
     insertInto(table) {
         this.model = table;
         this.query.type = 'INSERT';
-        this.query.table = table["getTableSchema"]().name;
+        this.query.table = this.model.getTableSchema().name;
         return this;
     }
     /**
@@ -35,7 +38,7 @@ export class QueryBuilder {
     select(table) {
         this.model = table;
         this.query.type = 'SELECT';
-        this.query.table = table;
+        this.query.table = this.model.getTableSchema().name;
         return this;
     }
     /**
@@ -46,7 +49,7 @@ export class QueryBuilder {
     update(table) {
         this.model = table;
         this.query.type = 'UPDATE';
-        this.query.table = table;
+        this.query.table = this.model.getTableSchema().name;
         return this;
     }
     /**
@@ -57,7 +60,7 @@ export class QueryBuilder {
     deleteFrom(table) {
         this.model = table;
         this.query.type = 'DELETE';
-        this.query.table = table;
+        this.query.table = this.model.getTableSchema().name;
         return this;
     }
     /**
@@ -91,7 +94,13 @@ export class QueryBuilder {
         this.query.where.push(condition);
         return this;
     }
-    limit(num) { }
+    limit(num) {
+        this.query.limit = num;
+        return this;
+    }
+    hasIndex(boolean) {
+        this.query.hasIndex = boolean;
+    }
     /**
      * Build and return the SQL query string.
      * @returns {string} The SQL query string.

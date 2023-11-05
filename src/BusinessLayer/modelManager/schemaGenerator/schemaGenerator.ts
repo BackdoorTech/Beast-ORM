@@ -4,6 +4,8 @@ import { FieldType } from './ModalReader.type.js'
 import { IDatabaseSchema } from '../../_interface/interface.js'
 import { RuntimeMethods as RM } from '../runtimeMethods/runTimeMethods.js'
 
+
+
 class SchemaGenerator {
   generate(entries: IRegister): IDatabaseSchema {
 
@@ -80,15 +82,14 @@ class SchemaGenerator {
       // Get the table schema class for the current model.
       const tableSchemaClass = databaseSchema.table[index];
 
-
       // Add a static method to the model for accessing the table schema.
-      entries.models[index].getTableSchema = () => {
+      entries.models[index][RM.getTableSchema] = () => {
         return tableSchemaClass;
       }
 
-      Object.defineProperty(entries.models[index].prototype, RM.getTableSchema, () => {
+      entries.models[index].prototype[RM.getTableSchema] = () => {
         return tableSchemaClass;
-      })
+      }
     }
   }
 

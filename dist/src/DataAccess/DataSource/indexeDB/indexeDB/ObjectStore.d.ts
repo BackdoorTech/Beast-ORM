@@ -10,7 +10,7 @@ export declare class ObjectStore {
         active?: boolean;
     };
     constructor(tableSchema: TableSchema);
-    enqueueTransaction(transaction: any): Promise<unknown>;
+    enqueueTransaction(transaction: any): Promise<Boolean>;
     processTransactionQueue(): Promise<void>;
     executeTransaction(transaction: any): Promise<unknown>;
     commitTransaction(): boolean;

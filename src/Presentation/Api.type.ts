@@ -33,7 +33,7 @@ export declare class IModel<T> {
    * @param params - The filter parameters for the update.
    * @returns A promise that resolves when the update operation is complete.
    */
-  update(): Promise<void>;
+  // update(): Promise<void>;
   static filter(): void;
 
   static getTableSchema(): TableSchema;

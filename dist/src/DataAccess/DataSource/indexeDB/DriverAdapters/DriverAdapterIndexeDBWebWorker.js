@@ -10,6 +10,12 @@ export class IndexedDBWorkerStrategy {
             console.log('myWorker', error);
         };
     }
+    update(table, data) {
+        throw new Error("Method not implemented.");
+    }
+    delete(table, data) {
+        throw new Error("Method not implemented.");
+    }
     openDatabase() {
         const UUID = '';
         return async (callbacks) => {

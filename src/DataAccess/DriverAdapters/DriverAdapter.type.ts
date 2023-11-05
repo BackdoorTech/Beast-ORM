@@ -1,3 +1,4 @@
+import { IQuery } from "../../BusinessLayer/_interface/Apresentation/queryBuilder"
 import { ITableSchema } from "../_interface/interface.type"
 
 export interface IReturnObject {
@@ -11,8 +12,10 @@ type returnFunction = (returnObject: IReturnObject) => void
 export interface IDatabaseStrategy {
 
   migrate(migrate: IMigrations): returnFunction
+  update(table,data:IQuery): returnFunction
   insert(table,data): returnFunction
-  select(table,data) : returnFunction
+  delete(table,data:IQuery): returnFunction
+  select(table,data:IQuery) : returnFunction
   prepare(migrate: IMigrations): returnFunction
 }
 export interface IMigrations {

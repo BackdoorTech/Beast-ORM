@@ -4,6 +4,12 @@ export class DriverAdapter {
     constructor(strategy) {
         this.strategy = strategy;
     }
+    update(table, data) {
+        throw new Error("Method not implemented.");
+    }
+    delete(table, data) {
+        throw new Error("Method not implemented.");
+    }
     prepare(migrate) {
         return this.strategy.prepare(migrate);
     }

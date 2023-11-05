@@ -6,8 +6,8 @@ export class ObjectStore {
     }
     async enqueueTransaction(transaction) {
         return new Promise((resolve, reject) => {
-            transaction.finishRequest = () => {
-                resolve(true);
+            transaction.finishRequest = (result) => {
+                resolve(result);
             };
             this.transactionQueue.push(transaction);
             if (!this.isTransactionInProgress) {
@@ -48,14 +48,14 @@ export class ObjectStore {
                 const data = { data: request.result, index };
                 resolve(data);
                 onsuccess(data);
-                finishRequest();
+                finishRequest(true);
             };
             request.onerror = (error) => {
                 this.commitTransaction();
                 this.createTransaction();
                 reject(error);
                 onerror();
-                finishRequest();
+                finishRequest(false);
             };
         });
     }

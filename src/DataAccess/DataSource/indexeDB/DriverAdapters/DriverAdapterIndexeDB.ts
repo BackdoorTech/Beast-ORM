@@ -1,5 +1,6 @@
 import { IDatabaseStrategy, IMigrations, IReturnObject } from "../../../DriverAdapters/DriverAdapter.type.js";
 import { databaseManager } from "../indexeDB/DatabaseManager.js";
+import { IQuery } from "../../../../BusinessLayer/_interface/Apresentation/queryBuilder.js"
 // IndexedDB strategy
 export class IndexedDBStrategy implements IDatabaseStrategy {
 
@@ -16,18 +17,24 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
     }
   }
 
-
-  delete(table, data: any[]) {
-
+  delete(table, Query: IQuery) {
     // Implement IndexedDB insert here
     return async (callbacks: IReturnObject) => {
       const ObjectStore = await databaseManager.getDb(this.databaseName)
-      .executeOnObjectStore(this.tableName)
+      .executeOnObjectStore(table)
 
-      for (const item of data) {
-        ObjectStore.enqueueTransaction({operation:"delete", item, ...callbacks})
+      const condition = Query.where.shift()
+      const limit = Query.limit
+      const hasIndex = Query.hasIndex
+
+      if(hasIndex) {
+        if(limit == 1) {
+          const idIndex = Object.values(condition)[0]
+          const result = await ObjectStore.enqueueTransaction({operation:"delete", data:idIndex, ...callbacks})
+        }
+      } else {
       }
-
+      callbacks.done()
     }
   }
 
@@ -48,21 +55,38 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
     }
   }
 
-  select(table, data) {
+  update(table, Query: IQuery) {
+
+    // Implement IndexedDB insert here
+    return async (callbacks: IReturnObject) => {
+      const ObjectStore = await databaseManager.getDb(this.databaseName)
+      .executeOnObjectStore(table)
+
+      if(Query.hasIndex) {
+        if(Query.isParamsArray == false) {
+
+          const updateValues = Query.updateValues
+
+          await ObjectStore.enqueueTransaction({operation:"put",updateValues, data:updateValues, ...callbacks})
+        }
+      }
+
+      callbacks.done()
+    }
+  }
+
+  select(table, Query: IQuery) {
 
     // Implement IndexedDB select here
     return async ( callbacks: IReturnObject) => {
       const ObjectStore = await databaseManager.getDb(this.databaseName)
-      .executeOnObjectStore(this.tableName)
+      .executeOnObjectStore(table)
 
-      const _callbacks = {
-        onsuccess: (completeList: any[]) => {
-
-        },
-        onerror:  () => {}
+      if(Query.where.length == 0) {
+        await ObjectStore.enqueueTransaction({operation:"getAll", item: null, ...callbacks})
       }
 
-      ObjectStore.enqueueTransaction({operation:"all", item: null, callbacks:_callbacks})
+      callbacks.done()
 
     }
   }

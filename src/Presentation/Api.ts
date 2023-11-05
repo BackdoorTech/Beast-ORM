@@ -3,113 +3,116 @@ import { QueryBuilder } from "./queryBuilder/queryBuilder.js" // Represents a qu
 import { returnSelf } from "./returnSelf/returnSelf.js" // Represents a return object for query-related methods
 import { ORM } from "../BusinessLayer/beastOrm.js"
 import { ITableSchema } from "../BusinessLayer/_interface/interface.js";
-import { RuntimeMethods as RM } from "../BusinessLayer/modelManager/runtimeMethods/runTimeMethods.js";
+import { dataParameters } from "../BusinessLayer/modelManager/dataParameters.js";
 /**
  * Represents a model for database operations.
  */
 export class Model<Model>  implements IModel<Model>{
-  static getTableSchema: () => ITableSchema;
 
-  /**
-   * Retrieve data from the database with specified filter parameters.
-   * @param params - The filter parameters for the query.
-   * @returns A promise that resolves with the query results.
-   */
-  async save(...args) {
+  static getTableSchema(): ITableSchema {
+    return {} as ITableSchema
+  }
 
-    const queryBuilder = new QueryBuilder({isParamsArray:false});
-    queryBuilder.insertInto(this[RM.getModel]()).insert(args)
+  static getModel(): typeof Model {
+    return { cars:'d'} as any
+  }
+
+  getModel(): typeof Model {
+    return {cars:'d'} as any
   }
 
   static async get() {
-
     const queryBuilder = new QueryBuilder({isParamsArray:false});
+    const model = this.getModel()
+
     queryBuilder
-      .select(this)
-      .where(this)
+      .select(model)
+      .where(model)
       .limit(1)
 
     return {} as any
   }
 
   static async all() {
-
+    const model = this.getModel()
     const queryBuilder = new QueryBuilder({isParamsArray: false});
-    queryBuilder.select(this)
+    queryBuilder.select(model)
 
-    return {} as any
-  }
+    const result = await ORM.executeSelectQuery(queryBuilder, this as any)
 
-
-  static getOrCreate(...params) {
-    const isParamsArray = Array.isArray(params)? true : false
-    const queryBuilder = new QueryBuilder({isParamsArray});
-    const object: any = queryBuilder.select(this)
-      .where(params)
-      .limit(1)
-
-    if(object) {
-      return object
+    if(result.isError) {
+      throw(result.error)
+    } else {
+      return result.value
     }
-
-    return new QueryBuilder({isParamsArray}).insert(params)
   }
+
   static async create<T>(params) {
 
     const isParamsArray = Array.isArray(params)? true : false
 
+    const model = this.getModel()
     const queryBuilder = new QueryBuilder({isParamsArray});
 
-    queryBuilder.insertInto(this).insert(params)  as any
+    queryBuilder.insertInto(model).insert(params)  as any
 
-    return await ORM.executeInsertionQuery<T>(queryBuilder, this as any)
+    const result = await ORM.executeInsertionQuery<T>(queryBuilder, this as any)
+
+    if(result.isError) {
+      throw(result.error)
+    } else {
+      return result.value
+    }
   }
 
+
+  async save(params: any = false) {
+    const queryBuilder = new QueryBuilder({isParamsArray:false});
+    const model = this.getModel()
+    const tableSchema: ITableSchema = model.getTableSchema()
+
+    if(params) {
+      const tableSchema = model.getTableSchema()
+      const data = dataParameters.getFilteredData(tableSchema, params)
+      Object.assign(this, data)
+    }
+
+    const filter = {}
+    const idFieldName = tableSchema.id.keyPath
+    filter[idFieldName] = this[idFieldName]
+
+    queryBuilder.update(model).set(this).where(filter).limit(1).hasIndex(true)
+
+    const result = await ORM.executeUpdateQuery(queryBuilder, model as any)
+
+    if(result.isError) {
+      throw(result.error)
+    } else {
+      return result.value
+    }
+  }
+
+
+  // delete one
   async delete() {
-    const isParamsArray = false
-    const queryBuilder = new QueryBuilder({isParamsArray});
-    const model: typeof Model<any> = this[RM.getModel]()
-    const tableSchema: ITableSchema = Model[RM.getTableSchema]()
+
+    const queryBuilder = new QueryBuilder({isParamsArray: false});
+    const model = this.getModel()
+    const tableSchema: ITableSchema = model.getTableSchema()
 
     const filter = {}
     const idFieldName = tableSchema.id.keyPath
 
     filter[idFieldName] = this[idFieldName]
-    queryBuilder.deleteFrom(model).where(filter).limit(1);
+    queryBuilder.deleteFrom(model).where(filter).limit(1).hasIndex(true)
 
-    return await ORM.deleteQueryNoFormValidation(queryBuilder, model)
+    const result = await ORM.deleteQueryNoFormValidation(queryBuilder, model)
+
+    if(result.isError) {
+      throw(result.error)
+    } else {
+      return result.value
+    }
   }
-
-  static async updateOrCreate(...args) {
-    this.getOrCreate(args)
-    return {} as any
-  }
-
-
-  async update() {}
-
-  static filter() {
-
-    // return returnSelf.object()
-  }
-}
-
-
-class peter extends Model<peter> {
-
-
-  nice() {
-
-  }
-
-  static cars() {}
 
 }
-
-(async () => {
-  const { value } = await peter.create<peter>({})
-
-  value.delete()
-})
-
-

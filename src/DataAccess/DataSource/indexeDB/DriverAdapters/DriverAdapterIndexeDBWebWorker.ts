@@ -1,3 +1,4 @@
+import { IQuery } from "../../../../BusinessLayer/_interface/Apresentation/queryBuilder.js";
 import { IDatabaseStrategy, IMigrations, IReturnObject } from "../../../DriverAdapters/DriverAdapter.type.js";
 // IndexedDB strategy
 export class IndexedDBWorkerStrategy implements IDatabaseStrategy {
@@ -17,6 +18,12 @@ export class IndexedDBWorkerStrategy implements IDatabaseStrategy {
       console.log('myWorker', error);
     };
 	}
+  update(table: any, data: IQuery): (returnObject: IReturnObject) => void {
+    throw new Error("Method not implemented.");
+  }
+  delete(table: any, data: any): (returnObject: IReturnObject) => void {
+    throw new Error("Method not implemented.");
+  }
 
   openDatabase() {
     const UUID = ''

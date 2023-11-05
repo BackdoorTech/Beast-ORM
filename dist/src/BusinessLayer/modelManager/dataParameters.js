@@ -6,6 +6,14 @@ export class DataParameters {
         }
         return filteredData;
     }
+    getFilteredDataWithId(tableSchema, data) {
+        const filteredData = {};
+        tableSchema.fieldNames.push(tableSchema.id.keyPath);
+        for (const field of tableSchema.fieldNames) {
+            filteredData[field] = data[field];
+        }
+        return filteredData;
+    }
     getFilteredDataOverlay(tableSchema, data) {
         const filteredData = {};
         for (const [key, value] of Object.entries(data)) {

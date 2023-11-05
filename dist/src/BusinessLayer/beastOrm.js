@@ -22,6 +22,7 @@ class BeastORM {
             DatabaseStrategy.prepare(schema)({ done: () => { } });
             this.prepareMigrations(schema, DatabaseStrategy);
             for (const model of register.models) {
+                // const tableSchema = model[RM.getTableSchema]()
                 this.addMethods(model, RM.getModel, model);
                 const generateValidator = validator.ModelValidator(model, model[RM.getTableSchema]());
                 this.addStaticMethodNowrap(model, RM.validator, generateValidator);
@@ -29,12 +30,10 @@ class BeastORM {
         };
     }
     addMethods(Model, functionName, value) {
-        customMethod.add(Model, functionName, function () {
-            return value;
-        });
+        customMethod.add(Model, functionName, value);
     }
     addStaticMethodNowrap(Model, functionName, value) {
-        customMethod.addStaticMethod(Model, functionName, value);
+        customMethod.addStaticMethodNowrap(Model, functionName, value);
     }
     async prepareMigrations(schema, DatabaseStrategy) {
         const makeMigrations = new MakeMigrations();
@@ -66,6 +65,26 @@ class BeastORM {
             }
         }
         QueryBuilder.setCleanData(arrayOfData);
+        return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder);
+    }
+    async executeSelectQuery(QueryBuilder, Model) {
+        const tableSchema = Model[RM.getTableSchema]();
+        const databaseName = tableSchema.databaseName;
+        const database = modelRegistration.getDatabase(databaseName);
+        const DatabaseStrategy = database
+            .DBConnectionManager
+            .driverAdapter
+            .strategy;
+        return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder);
+    }
+    async executeUpdateQuery(QueryBuilder, Model) {
+        const tableSchema = Model[RM.getTableSchema]();
+        const databaseName = tableSchema.databaseName;
+        const database = modelRegistration.getDatabase(databaseName);
+        const DatabaseStrategy = database
+            .DBConnectionManager
+            .driverAdapter
+            .strategy;
         return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder);
     }
     async deleteQuery(QueryBuilder, Model) {

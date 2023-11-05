@@ -1,3 +1,4 @@
+import { IQuery } from '../../BusinessLayer/_interface/Apresentation/queryBuilder.js';
 import { Model } from '../Api.js';
 /**
  * Represents a query builder for creating Query instances.
@@ -7,15 +8,8 @@ export declare class QueryBuilder {
     /**
      * Create a new QueryBuilder instance.
      */
-    query: {
-        type: string;
-        table: {};
-        values: any[];
-        updateValues: {};
-        where: any[];
-    };
+    query: IQuery;
     model: typeof Model;
-    isParamsArray: boolean;
     constructor({ isParamsArray }: {
         isParamsArray: any;
     });
@@ -61,7 +55,8 @@ export declare class QueryBuilder {
      * @returns {QueryBuilder} The QueryBuilder instance.
      */
     where(condition: Object): this;
-    limit(num: number): void;
+    limit(num: number): this;
+    hasIndex(boolean: Boolean): void;
     /**
      * Build and return the SQL query string.
      * @returns {string} The SQL query string.

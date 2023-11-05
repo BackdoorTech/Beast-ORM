@@ -1,13 +1,17 @@
 class CustomMethod {
-    add(Model, methodName, f) {
+    add(Model, methodName, value) {
         // Add a static method to the model for accessing the table schema.
-        Model[methodName] = f;
-        Object.defineProperty(Model.prototype, methodName, f);
+        Model[methodName] = function () {
+            return value;
+        };
+        Model.prototype[methodName] = function () {
+            return value;
+        };
     }
-    addStaticMethod(Model, methodName, f) {
+    addStaticMethodNowrap(Model, methodName, func) {
         // Add a static method to the model for accessing the table schema.
-        Model[methodName] = f;
-        // Object.defineProperty(Model.prototype, methodName, f)
+        Model[methodName] = func;
+        Model.prototype[methodName] = func;
     }
 }
 export const customMethod = new CustomMethod();

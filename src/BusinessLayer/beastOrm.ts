@@ -31,30 +31,31 @@ class BeastORM {
       .driverAdapter
       .strategy
 
-
     DatabaseStrategy.prepare(schema)({done: () => {}})
 
     this.prepareMigrations(schema, DatabaseStrategy)
 
-    for (const model of register.models) {
-      this.addMethods(model, RM.getModel,  model)
+    for(const model of register.models) {
 
+      // const tableSchema = model[RM.getTableSchema]()
+
+      this.addMethods(model, RM.getModel,  model)
       const generateValidator = validator.ModelValidator(model, model[RM.getTableSchema]())
       this.addStaticMethodNowrap(model, RM.validator,  generateValidator)
+
     }
+
   }
 
   addMethods(Model:typeof ModelType<any>, functionName , value) {
 
-    customMethod.add(Model, functionName, function() {
-      return value
-    })
+    customMethod.add(Model, functionName, value)
 
   }
 
   addStaticMethodNowrap(Model:typeof ModelType<any>, functionName , value:Function) {
 
-    customMethod.addStaticMethod(Model, functionName, value)
+    customMethod.addStaticMethodNowrap(Model, functionName, value)
 
   }
 
@@ -99,6 +100,36 @@ class BeastORM {
 
     return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder)
   }
+
+  async executeSelectQuery<PModel>(QueryBuilder: QueryBuilder, Model:PModel):Promise<Either<PModel, FormValidationError>>   {
+    const tableSchema: ITableSchema = Model[RM.getTableSchema]()
+    const databaseName = tableSchema.databaseName
+
+    const database = modelRegistration.getDatabase(databaseName)
+
+    const DatabaseStrategy = database
+      .DBConnectionManager
+      .driverAdapter
+      .strategy
+
+    return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder)
+  }
+
+
+  async executeUpdateQuery<PModel>(QueryBuilder: QueryBuilder, Model:PModel):Promise<Either<PModel, FormValidationError>>   {
+    const tableSchema: ITableSchema = Model[RM.getTableSchema]()
+    const databaseName = tableSchema.databaseName
+
+    const database = modelRegistration.getDatabase(databaseName)
+
+    const DatabaseStrategy = database
+      .DBConnectionManager
+      .driverAdapter
+      .strategy
+
+    return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder)
+  }
+
 
   async deleteQuery<PModel>(QueryBuilder: QueryBuilder, Model:PModel):Promise<Either<PModel, FormValidationError>> {
     const tableSchema: ITableSchema = Model[RM.getTableSchema]()

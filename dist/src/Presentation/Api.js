@@ -1,75 +1,89 @@
 import { QueryBuilder } from "./queryBuilder/queryBuilder.js"; // Represents a query object that helps build and execute database queries.
 import { ORM } from "../BusinessLayer/beastOrm.js";
-import { RuntimeMethods as RM } from "../BusinessLayer/modelManager/runtimeMethods/runTimeMethods.js";
+import { dataParameters } from "../BusinessLayer/modelManager/dataParameters.js";
 /**
  * Represents a model for database operations.
  */
 export class Model {
-    /**
-     * Retrieve data from the database with specified filter parameters.
-     * @param params - The filter parameters for the query.
-     * @returns A promise that resolves with the query results.
-     */
-    async save(...args) {
-        const queryBuilder = new QueryBuilder({ isParamsArray: false });
-        queryBuilder.insertInto(this[RM.getModel]()).insert(args);
+    static getTableSchema() {
+        return {};
+    }
+    static getModel() {
+        return { cars: 'd' };
+    }
+    getModel() {
+        return { cars: 'd' };
     }
     static async get() {
         const queryBuilder = new QueryBuilder({ isParamsArray: false });
+        const model = this.getModel();
         queryBuilder
-            .select(this)
-            .where(this)
+            .select(model)
+            .where(model)
             .limit(1);
         return {};
     }
     static async all() {
+        const model = this.getModel();
         const queryBuilder = new QueryBuilder({ isParamsArray: false });
-        queryBuilder.select(this);
-        return {};
-    }
-    static getOrCreate(...params) {
-        const isParamsArray = Array.isArray(params) ? true : false;
-        const queryBuilder = new QueryBuilder({ isParamsArray });
-        const object = queryBuilder.select(this)
-            .where(params)
-            .limit(1);
-        if (object) {
-            return object;
+        queryBuilder.select(model);
+        const result = await ORM.executeSelectQuery(queryBuilder, this);
+        if (result.isError) {
+            throw (result.error);
         }
-        return new QueryBuilder({ isParamsArray }).insert(params);
+        else {
+            return result.value;
+        }
     }
     static async create(params) {
         const isParamsArray = Array.isArray(params) ? true : false;
+        const model = this.getModel();
         const queryBuilder = new QueryBuilder({ isParamsArray });
-        queryBuilder.insertInto(this).insert(params);
-        return await ORM.executeInsertionQuery(queryBuilder, this);
+        queryBuilder.insertInto(model).insert(params);
+        const result = await ORM.executeInsertionQuery(queryBuilder, this);
+        if (result.isError) {
+            throw (result.error);
+        }
+        else {
+            return result.value;
+        }
     }
-    async delete() {
-        const isParamsArray = false;
-        const queryBuilder = new QueryBuilder({ isParamsArray });
-        const model = this[RM.getModel]();
-        const tableSchema = Model[RM.getTableSchema]();
+    async save(params = false) {
+        const queryBuilder = new QueryBuilder({ isParamsArray: false });
+        const model = this.getModel();
+        const tableSchema = model.getTableSchema();
+        if (params) {
+            const tableSchema = model.getTableSchema();
+            const data = dataParameters.getFilteredData(tableSchema, params);
+            Object.assign(this, data);
+        }
         const filter = {};
         const idFieldName = tableSchema.id.keyPath;
         filter[idFieldName] = this[idFieldName];
-        queryBuilder.deleteFrom(model).where(filter).limit(1);
-        return await ORM.deleteQueryNoFormValidation(queryBuilder, model);
+        queryBuilder.update(model).set(this).where(filter).limit(1).hasIndex(true);
+        const result = await ORM.executeUpdateQuery(queryBuilder, model);
+        if (result.isError) {
+            throw (result.error);
+        }
+        else {
+            return result.value;
+        }
     }
-    static async updateOrCreate(...args) {
-        this.getOrCreate(args);
-        return {};
-    }
-    async update() { }
-    static filter() {
-        // return returnSelf.object()
+    // delete one
+    async delete() {
+        const queryBuilder = new QueryBuilder({ isParamsArray: false });
+        const model = this.getModel();
+        const tableSchema = model.getTableSchema();
+        const filter = {};
+        const idFieldName = tableSchema.id.keyPath;
+        filter[idFieldName] = this[idFieldName];
+        queryBuilder.deleteFrom(model).where(filter).limit(1).hasIndex(true);
+        const result = await ORM.deleteQueryNoFormValidation(queryBuilder, model);
+        if (result.isError) {
+            throw (result.error);
+        }
+        else {
+            return result.value;
+        }
     }
 }
-class peter extends Model {
-    nice() {
-    }
-    static cars() { }
-}
-(async () => {
-    const { value } = await peter.create({});
-    value.delete();
-});

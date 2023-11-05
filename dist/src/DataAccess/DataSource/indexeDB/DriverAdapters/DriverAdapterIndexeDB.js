@@ -9,14 +9,23 @@ export class IndexedDBStrategy {
             // return indexedDB.open(this.databaseName);
         };
     }
-    delete(table, data) {
+    delete(table, Query) {
         // Implement IndexedDB insert here
         return async (callbacks) => {
             const ObjectStore = await databaseManager.getDb(this.databaseName)
-                .executeOnObjectStore(this.tableName);
-            for (const item of data) {
-                ObjectStore.enqueueTransaction(Object.assign({ operation: "delete", item }, callbacks));
+                .executeOnObjectStore(table);
+            const condition = Query.where.shift();
+            const limit = Query.limit;
+            const hasIndex = Query.hasIndex;
+            if (hasIndex) {
+                if (limit == 1) {
+                    const idIndex = Object.values(condition)[0];
+                    const result = await ObjectStore.enqueueTransaction(Object.assign({ operation: "delete", data: idIndex }, callbacks));
+                }
             }
+            else {
+            }
+            callbacks.done();
         };
     }
     insert(table, data) {
@@ -32,17 +41,29 @@ export class IndexedDBStrategy {
             callbacks.done();
         };
     }
-    select(table, data) {
+    update(table, Query) {
+        // Implement IndexedDB insert here
+        return async (callbacks) => {
+            const ObjectStore = await databaseManager.getDb(this.databaseName)
+                .executeOnObjectStore(table);
+            if (Query.hasIndex) {
+                if (Query.isParamsArray == false) {
+                    const updateValues = Query.updateValues;
+                    await ObjectStore.enqueueTransaction(Object.assign({ operation: "put", updateValues, data: updateValues }, callbacks));
+                }
+            }
+            callbacks.done();
+        };
+    }
+    select(table, Query) {
         // Implement IndexedDB select here
         return async (callbacks) => {
             const ObjectStore = await databaseManager.getDb(this.databaseName)
-                .executeOnObjectStore(this.tableName);
-            const _callbacks = {
-                onsuccess: (completeList) => {
-                },
-                onerror: () => { }
-            };
-            ObjectStore.enqueueTransaction({ operation: "all", item: null, callbacks: _callbacks });
+                .executeOnObjectStore(table);
+            if (Query.where.length == 0) {
+                await ObjectStore.enqueueTransaction(Object.assign({ operation: "getAll", item: null }, callbacks));
+            }
+            callbacks.done();
         };
     }
     migrate(migrate) {
