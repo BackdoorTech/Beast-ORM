@@ -43,6 +43,7 @@ describe('Model', () => {
         models: [Person],
       });
 
+      await Person.deleteAll()
       const result = await Person.create({username: 'Peter'})
 
 
@@ -78,6 +79,8 @@ describe('Model', () => {
         version: 1,
         models: [Person],
       });
+
+      await Person.deleteAll()
 
       const value  = await Person.create({username: 'Peter'})
 
@@ -118,6 +121,8 @@ describe('Model', () => {
         models: [Person],
       });
 
+      await Person.deleteAll()
+
       await Person.create({username: 'Peter'})
 
       const value = await Person.all()
@@ -152,6 +157,7 @@ describe('Model', () => {
         models: [Person],
       });
 
+      await Person.deleteAll()
       let peter = await Person.create({username: 'Peter'})
 
       peter.username = "123"

@@ -47,6 +47,21 @@ export class Model<Model>  implements IModel<Model>{
     }
   }
 
+  static async deleteAll() {
+    const queryBuilder = new QueryBuilder({isParamsArray: false});
+    const model = this.getModel()
+
+    queryBuilder.deleteFrom(model).where({}).limit(1)
+
+    const result = await ORM.deleteQueryNoFormValidation(queryBuilder, model)
+
+    if(result.isError) {
+      throw(result.error)
+    } else {
+      return result.value
+    }
+  }
+
   static async create<T>(params) {
 
     const isParamsArray = Array.isArray(params)? true : false

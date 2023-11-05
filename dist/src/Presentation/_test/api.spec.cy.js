@@ -36,6 +36,7 @@ describe('Model', () => {
                 version: 1,
                 models: [Person],
             });
+            await Person.deleteAll();
             const result = await Person.create({ username: 'Peter' });
             Cypress.log({
                 name: 'setSessionStorage',
@@ -63,6 +64,7 @@ describe('Model', () => {
                 version: 1,
                 models: [Person],
             });
+            await Person.deleteAll();
             const value = await Person.create({ username: 'Peter' });
             const deleteResult = await value.delete();
             Cypress.log({
@@ -91,6 +93,7 @@ describe('Model', () => {
                 version: 1,
                 models: [Person],
             });
+            await Person.deleteAll();
             await Person.create({ username: 'Peter' });
             const value = await Person.all();
             Cypress.log({
@@ -118,6 +121,7 @@ describe('Model', () => {
                 version: 1,
                 models: [Person],
             });
+            await Person.deleteAll();
             let peter = await Person.create({ username: 'Peter' });
             peter.username = "123";
             const result = await peter.save();

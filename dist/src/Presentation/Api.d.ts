@@ -9,6 +9,7 @@ export declare class Model<Model> implements IModel<Model> {
     getModel(): typeof Model;
     static get(): Promise<any>;
     static all(): Promise<any>;
+    static deleteAll(): Promise<true>;
     static create<T>(params: any): Promise<T>;
     save(params?: any): Promise<any>;
     delete(): Promise<true>;

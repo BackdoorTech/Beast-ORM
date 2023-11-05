@@ -24,16 +24,16 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
       .executeOnObjectStore(table)
 
       const condition = Query.where.shift()
-      const limit = Query.limit
       const hasIndex = Query.hasIndex
 
-      if(hasIndex) {
-        if(limit == 1) {
-          const idIndex = Object.values(condition)[0]
-          const result = await ObjectStore.enqueueTransaction({operation:"delete", data:idIndex, ...callbacks})
-        }
-      } else {
+      if(hasIndex && !Query.isParamsArray) {
+        const idIndex = Object.values(condition)[0]
+        await ObjectStore.enqueueTransaction({operation:"delete", data:idIndex, ...callbacks})
+
+      } else if (Query.where.length == 0) {
+        await ObjectStore.enqueueTransaction({operation:"clear", ...callbacks})
       }
+
       callbacks.done()
     }
   }

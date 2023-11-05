@@ -15,15 +15,13 @@ export class IndexedDBStrategy {
             const ObjectStore = await databaseManager.getDb(this.databaseName)
                 .executeOnObjectStore(table);
             const condition = Query.where.shift();
-            const limit = Query.limit;
             const hasIndex = Query.hasIndex;
-            if (hasIndex) {
-                if (limit == 1) {
-                    const idIndex = Object.values(condition)[0];
-                    const result = await ObjectStore.enqueueTransaction(Object.assign({ operation: "delete", data: idIndex }, callbacks));
-                }
+            if (hasIndex && !Query.isParamsArray) {
+                const idIndex = Object.values(condition)[0];
+                await ObjectStore.enqueueTransaction(Object.assign({ operation: "delete", data: idIndex }, callbacks));
             }
-            else {
+            else if (Query.where.length == 0) {
+                await ObjectStore.enqueueTransaction(Object.assign({ operation: "clear" }, callbacks));
             }
             callbacks.done();
         };
