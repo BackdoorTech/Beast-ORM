@@ -1,16 +1,16 @@
 import { error, ok } from '../../../Utility/Either/index.js';
 import { InvalidType, InvalidValue } from '../../error/class/validation.js';
 import { field, sizeError } from './allFields.type.js';
-function isString(value) {
+function isString(field, value) {
     if (typeof value != 'string') {
-        if (this.blank && value != null)
+        if (field.blank && value != null)
             return error(new InvalidValue());
     }
     return ok(true);
 }
-function isNumber(value) {
+function isNumber(field, value) {
     if (!(typeof value == 'bigint' || typeof value == 'number')) {
-        if (this.blank && value != null)
+        if (field.blank && value != null)
             return error(new InvalidValue());
     }
     return ok(true);
@@ -21,7 +21,7 @@ function isNumber(value) {
 export class AutoFieldBL extends field {
     constructor() { super(); }
     valid(value) {
-        const result = isNumber(value);
+        const result = isNumber(this, value);
         if (result.isError) {
             return result;
         }
@@ -34,7 +34,7 @@ export class AutoFieldBL extends field {
 export class BigIntegerFieldBL extends field {
     constructor() { super(); }
     valid(value) {
-        const result = isNumber(value);
+        const result = isNumber(this, value);
         if (result.isError) {
             return result;
         }
@@ -61,7 +61,7 @@ export class BooleanFieldBL extends field {
 export class CharFieldBL extends field {
     constructor() { super(); }
     valid(value) {
-        const result = isString(value);
+        const result = isString(this, value);
         if (result.isError) {
             return result;
         }
@@ -74,7 +74,7 @@ export class CharFieldBL extends field {
 export class DateFieldBL extends field {
     constructor() { super(); }
     valid(value) {
-        const result = isString(value);
+        const result = isString(this, value);
         if (result.isError) {
             return result;
         }
@@ -87,7 +87,7 @@ export class DateFieldBL extends field {
 export class DateTimeFieldBL extends field {
     constructor() { super(); }
     valid(value) {
-        const result = isString(value);
+        const result = isString(this, value);
         if (result.isError) {
             return result;
         }
@@ -139,7 +139,7 @@ export class indexedDBJsonFieldBL extends field {
 export class TextFieldBL extends field {
     constructor() { super(); }
     valid(value) {
-        const result = isString(value);
+        const result = isString(this, value);
         if (result.isError) {
             return result;
         }
@@ -155,7 +155,7 @@ export class TextFieldBL extends field {
 export class IntegerFieldBL extends field {
     constructor() { super(); }
     valid(value) {
-        const result = isNumber(value);
+        const result = isNumber(this, value);
         if (result.isError) {
             return result;
         }

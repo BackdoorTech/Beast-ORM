@@ -33,6 +33,7 @@ export class IndexedDBStrategy {
                 .executeOnObjectStore(table);
             let index = 0;
             for (const item of data) {
+                delete item.userId;
                 await ObjectStore.enqueueTransaction(Object.assign({ operation: "add", index, data: item }, callbacks));
                 index++;
             }

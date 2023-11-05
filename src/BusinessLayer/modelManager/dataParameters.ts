@@ -5,7 +5,8 @@ export class DataParameters {
 
     const filteredData = {}
     for(const field of tableSchema.fieldNames) {
-      filteredData[field]= data[field]
+      filteredData[field]= data[field] || null
+      delete filteredData[tableSchema.id.keyPath]
     }
 
     return filteredData
@@ -17,7 +18,7 @@ export class DataParameters {
     tableSchema.fieldNames.push(tableSchema.id.keyPath)
 
     for(const field of tableSchema.fieldNames) {
-      filteredData[field]= data[field]
+      filteredData[field]= data[field] || null
     }
 
     return filteredData

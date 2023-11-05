@@ -47,6 +47,7 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
 
       let index = 0
       for (const item of data) {
+        delete item.userId
         await ObjectStore.enqueueTransaction({operation:"add",index, data:item, ...callbacks})
         index++
       }

@@ -88,7 +88,9 @@ class BeastORM {
       const validator: (value: Object) => EitherFormValidationError  = Model[RM.validator]
 
       for( const object in arrayOfData) {
+
         arrayOfData[object] = dataParameters.getFilteredData(tableSchema, arrayOfData[object])
+
         const validationResult = validator(arrayOfData[object])
 
         if(validationResult.isError) {

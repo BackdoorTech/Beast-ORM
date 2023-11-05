@@ -137,4 +137,30 @@ describe('API', () => {
             expect(0).to.deep.equal(all.length); // test fails
         });
     });
+    it('passes costume id field increment', () => {
+        cy.visit('./index.html');
+        cy.window().should("have.property", "models");
+        cy.window().then(async (wind) => {
+            class Person extends wind.models.Model {
+                constructor() {
+                    super(...arguments);
+                    this.userId = wind.models.AutoField({ primaryKey: true });
+                    this.username = wind.models.CharField({ maxLength: 100 });
+                    this.email = wind.models.CharField({ blank: true, maxLength: 100 });
+                    this.age = wind.models.IntegerField({ blank: true });
+                }
+            }
+            wind.models.register({
+                databaseName: "jest-6",
+                type: "localStorage",
+                version: 1,
+                models: [Person],
+            });
+            await Person.deleteAll();
+            const createdPerson = await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
+            const all = await Person.all();
+            expect(Object.assign({}, all[0])).to.deep.equal({ username: 'kobe', email: 'kobe.bryant@lakers.com', age: null, userId: createdPerson.userId });
+            expect(Object.assign({}, createdPerson)).to.deep.equal({ username: 'kobe', email: 'kobe.bryant@lakers.com', age: null, userId: createdPerson.userId });
+        });
+    });
 });
