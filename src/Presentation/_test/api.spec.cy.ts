@@ -46,20 +46,10 @@ describe('Model', () => {
       await Person.deleteAll()
       const result = await Person.create({username: 'Peter'})
 
+      expect(Object.assign({},result)).to.deep.equal({username: 'Peter', id: result.id}) // test fails
 
-      Cypress.log({
-        name: 'setSessionStorage',
-        // shorter name for the Command Log
-        displayName: 'data',
-        message: result
-      })
     });
 
-
-    cy.get("h1").should('have.text',"Example")
-
-
-    expect(0).to.equal(0) // test fails
   })
 
   it('passes insert and delete', () => {
@@ -82,26 +72,15 @@ describe('Model', () => {
 
       await Person.deleteAll()
 
-      const value  = await Person.create({username: 'Peter'})
+      const createdPerson  = await Person.create({username: 'Peter'})
+      const deleteResult = await createdPerson.delete()
+      const all = await Person.all()
 
-
-      const deleteResult = await value.delete()
-
-      Cypress.log({
-        name: 'setSessionStorage',
-        // shorter name for the Command Log
-        displayName: 'data',
-        message: value
-      })
-
-      expect(deleteResult).to.equal(true) // test fails
+      expect(all.length).to.equal(0) // test fails
     });
 
 
-    cy.get("h1").should('have.text',"Example")
-
   })
-
 
   it('passes get all and delete', () => {
 
@@ -124,17 +103,12 @@ describe('Model', () => {
       await Person.deleteAll()
 
       await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
 
-      const value = await Person.all()
+      const all = await Person.all()
 
-      Cypress.log({
-        name: 'setSessionStorage',
-        // shorter name for the Command Log
-        displayName: 'data',
-        message: value
-      })
-
-      expect(1).to.equal(1) // test fails
+      expect(all.length).to.equal(3) // test fails
     });
 
   })
@@ -158,16 +132,51 @@ describe('Model', () => {
       });
 
       await Person.deleteAll()
-      let peter = await Person.create({username: 'Peter'})
+      let createdPerson = await Person.create({username: 'Peter'})
 
-      peter.username = "123"
-      const result = await peter.save()
+      createdPerson.username = "123"
+      const result = await createdPerson.save()
+      const all = await Person.all()
 
       expect(result).to.equal(true) // test fails
+      expect(all).to.deep.equal([{ username: '123', id: all[0].id }]) // test fails
 
 
     });
 
   })
 
+
+  it('passes delete all', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+
+      class Person extends wind.models.Model {
+        username = wind.models.CharField({});
+      }
+
+      wind.models.register({
+        databaseName: "jest-5",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
+      });
+
+
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+
+      await Person.deleteAll()
+
+      const all = await Person.all()
+
+      expect(0).to.deep.equal(all.length) // test fails
+
+    });
+
+  })
 })
