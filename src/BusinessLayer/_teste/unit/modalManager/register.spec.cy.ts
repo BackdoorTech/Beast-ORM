@@ -22,7 +22,7 @@ describe('Register', () => {
       modelRegistration.register(schema)
 
       // Assert the expected output based on your mock model
-      expect(JSON.stringify(modelRegistration)).to.equal(JSON.stringify({
+      expect(JSON.stringify(modelRegistration)).to.deep.equal(JSON.stringify({
         "databases": {
           "test": {
             "type": "indexedDB",
@@ -38,7 +38,8 @@ describe('Register', () => {
                   },
                   "attributes": {},
                   "fields": [],
-                  "fieldTypes": {}
+                  "fieldTypes": {},
+                  "fieldNames": []
                 }
               }
             ],
@@ -46,7 +47,9 @@ describe('Register', () => {
             "version": 1,
             "DBConnectionManager": {
               "driverAdapter": {
-                "strategy": {}
+                "strategy": {
+                  "databaseName": "test"
+                }
               }
             }
           }
@@ -89,7 +92,8 @@ describe('Register', () => {
                   },
                   "attributes": {},
                   "fields": [],
-                  "fieldTypes": {}
+                  "fieldTypes": {},
+                  "fieldNames": []
                 }
               }
             ],
@@ -97,7 +101,9 @@ describe('Register', () => {
             "version": 1,
             "DBConnectionManager": {
               "driverAdapter": {
-                "strategy": {}
+                "strategy": {
+                  "databaseName": "test"
+                }
               }
             }
           }

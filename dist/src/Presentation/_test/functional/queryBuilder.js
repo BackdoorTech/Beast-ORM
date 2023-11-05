@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { QueryBuilder } from '../queryBuilder/queryBuilder.js';
-import { ModelNoFields as UserModel } from '../../Utility/test/models.js';
+import { QueryBuilder } from '../../queryBuilder/queryBuilder.js';
+import { ModelNoFields as UserModel } from '../../../Utility/test/models.js';
 /**
  * @description
  * - `QueryBuilder` is a components for constructing database queries. This includes SELECT, INSERT, UPDATE, and DELETE queries in an object-oriented way.

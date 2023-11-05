@@ -20,24 +20,24 @@ describe('SchemaGenerator', () => {
 
       // Assert the expected output based on your mock model
       expect(JSON.stringify(schema)).to.equal(JSON.stringify({
-        "databaseName":"test",
-        "type":"indexedDB",
-        "version":1,
-        "table":[
+        "databaseName": "test",
+        "type": "indexedDB",
+        "version": 1,
+        "table": [
           {
-            "databaseName":"test",
-            "name":"MockModel",
-            "id":
-              {
-                "keyPath":"id",
-                "autoIncrement":true,
-                "type":1
-              },
-              "attributes":{},
-              "fields":[],
-              "fieldTypes":{}
-            }
-          ]
+            "databaseName": "test",
+            "name": "MockModel",
+            "id": {
+              "keyPath": "id",
+              "autoIncrement": true,
+              "type": 1
+            },
+            "attributes": {},
+            "fields": [],
+            "fieldTypes": {},
+            "fieldNames": []
+          }
+        ]
       }));
     });
 
@@ -69,7 +69,8 @@ describe('SchemaGenerator', () => {
         },
         "attributes": {},
         "fields": [],
-        "fieldTypes": {}
+        "fieldTypes": {},
+        "fieldNames": []
       }));
     });
   });

@@ -9,7 +9,7 @@
     "watch:feature": "tsc ./feature/index.ts  --watch",
     "test": "jest",
     "speed-test": "ts-node-dev ./test/funcional/speed/speed.ts",
-    "test:cypress": "npx cypress run --spec ./feature",
+    "test:cypress": "npx cypress run --spec ./dist",
     "cypress:open": "npx cypress open",
     "start": "live-server --ignore='node_modules'",
     "package:info": "npm publish --dry-run"

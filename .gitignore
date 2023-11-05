@@ -6,6 +6,4 @@ plugin_packages
 src/DBMS
 .vscode
 _src
-**.cy.js
-**.cy.ts
 dist/tsconfig.tsbuildinfo

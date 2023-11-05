@@ -29,7 +29,8 @@ describe('SchemaGenerator', () => {
                         },
                         "attributes": {},
                         "fields": [],
-                        "fieldTypes": {}
+                        "fieldTypes": {},
+                        "fieldNames": []
                     }
                 ]
             }));
@@ -56,7 +57,8 @@ describe('SchemaGenerator', () => {
                 },
                 "attributes": {},
                 "fields": [],
-                "fieldTypes": {}
+                "fieldTypes": {},
+                "fieldNames": []
             }));
         });
     });

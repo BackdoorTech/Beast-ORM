@@ -1,5 +1,5 @@
 // @ts-nocheck
-describe('Model', () => {
+describe('API', () => {
   it('passes', () => {
 
     cy.visit('./index.html')
