@@ -16,6 +16,8 @@ dist/src/connection/***.d.ts
 dist/src/sql/***.d.ts
 dist/src/connection/**/**.d.ts
 dist/src/sql/**/**.d.ts
+dist/test
+dist/cypress
 yarn.lock
 tslint.json
 package-lock.json
@@ -26,3 +28,5 @@ plugin_packages
 *.cy.js
 *.cy.ts
 dist/tsconfig.tsbuildinfo
+uploads
+public

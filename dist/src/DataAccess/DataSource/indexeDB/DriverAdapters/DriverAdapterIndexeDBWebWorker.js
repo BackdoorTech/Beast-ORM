@@ -10,6 +10,18 @@ export class IndexedDBWorkerStrategy {
             console.log('myWorker', error);
         };
     }
+    updateMany(table, data) {
+        throw new Error("Method not implemented.");
+    }
+    insertMany(table, data) {
+        throw new Error("Method not implemented.");
+    }
+    deleteMany(table, data) {
+        throw new Error("Method not implemented.");
+    }
+    selectMany(table, data) {
+        throw new Error("Method not implemented.");
+    }
     update(table, data) {
         throw new Error("Method not implemented.");
     }

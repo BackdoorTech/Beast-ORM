@@ -7,3 +7,9 @@ src/DBMS
 .vscode
 _src
 dist/tsconfig.tsbuildinfo
+uploads
+public
+index.js
+index.1.js
+uploads
+public

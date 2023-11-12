@@ -249,4 +249,84 @@ describe('API', () => {
     });
 
   })
+
+
+  it('passes filter.update should update all', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+
+      class Person extends wind.models.Model {
+        username = wind.models.CharField({});
+      }
+
+      wind.models.register({
+        databaseName: "jest-8",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
+      });
+
+      await Person.deleteAll()
+
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+
+      await Person.filter({username:"Peter"}).update({username:"michael jackson"})
+
+      const jackson = await Person.filter({username:"michael jackson"}).execute()
+      
+      expect(jackson.length).to.equal(9) // test fails
+    });
+
+  })
+
+
+  it('passes filter.delete ', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+
+      class Person extends wind.models.Model {
+        username = wind.models.CharField({});
+      }
+
+      wind.models.register({
+        databaseName: "jest-9",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
+      });
+
+      await Person.deleteAll()
+
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+
+      await Person.filter({username:"Peter"}).delete()
+
+      const all = await Person.all()
+      
+      expect(all.length).to.equal(0) // test fails
+    });
+
+  })
 })

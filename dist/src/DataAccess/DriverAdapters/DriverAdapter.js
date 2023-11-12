@@ -4,11 +4,23 @@ export class DriverAdapter {
     constructor(strategy) {
         this.strategy = strategy;
     }
+    insertMany(table, data) {
+        return this.strategy.insertMany(table, data);
+    }
+    deleteMany(table, data) {
+        return this.strategy.deleteMany(table, data);
+    }
+    selectMany(table, data) {
+        return this.strategy.selectMany(table, data);
+    }
+    updateMany(table, data) {
+        return this.strategy.updateMany(table, data);
+    }
     update(table, data) {
-        throw new Error("Method not implemented.");
+        return this.strategy.update(table, data);
     }
     delete(table, data) {
-        throw new Error("Method not implemented.");
+        return this.strategy.delete(table, data);
     }
     prepare(migrate) {
         return this.strategy.prepare(migrate);

@@ -14,13 +14,15 @@ export class SqlObject {
 	constructor(private TableSchema: ITableSchema, QueryReaderSelect: QueryReaderSelect) {
 
 		const condition = QueryReaderSelect.where
+
 		const methodName: any = "filter"
 		this.QueryReaderSelect = QueryReaderSelect
     this.argsAttributes = new argsAttributes(condition, TableSchema )
+
 		this.firstMethod = new methods[methodName](this.argsAttributes, this.TableSchema)
 	}
 
-	async run (rows: any[]) {
+	async run (rows: any[]): Promise<any[]>{
 
     if(this.QueryReaderSelect.hasLimit) {
       return this.firstMethod.cursorWithLimit(rows, this.QueryReaderSelect.limit)

@@ -1,5 +1,7 @@
-import { IQuery } from '../../BusinessLayer/_interface/Apresentation/queryBuilder.js';
+import { IDeleteQuery, IQuery, ISelectQuery, IUpdateQuery } from '../../BusinessLayer/_interface/Apresentation/queryBuilder.js';
 import { Model } from '../Api.js';
+import { IDeleteQueryStrategy, IInsertQueryStrategy, ISelectQueryStrategy, IUpdateQueryStrategy } from './queryBuilder.type.js';
+
 /**
  * Represents a query builder for creating Query instances.
  * This query builder service allows you to create INSERT, UPDATE, and DELETE queries
@@ -155,4 +157,3 @@ export class QueryBuilder {
     return this.query.where.length == 0
   }
 }
-

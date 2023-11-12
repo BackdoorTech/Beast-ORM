@@ -10,9 +10,9 @@ declare class BeastORM {
     private prepareMigrations;
     executeInsertionQuery<PModel>(QueryBuilder: QueryBuilder, Model: PModel): Promise<Either<PModel, FormValidationError>>;
     executeSelectQuery<PModel>(QueryBuilder: QueryBuilder, Model: PModel): Promise<Either<PModel, FormValidationError>>;
-    executeUpdateQuery<PModel>(QueryBuilder: QueryBuilder, Model: PModel): Promise<Either<PModel, FormValidationError>>;
-    deleteQuery<PModel>(QueryBuilder: QueryBuilder, Model: PModel): Promise<Either<PModel, FormValidationError>>;
-    deleteQueryNoFormValidation(QueryBuilder: QueryBuilder, model: typeof Model): Promise<Either<true, FormValidationError>>;
+    executeUpdateQuery<PModel>(QueryBuilder: QueryBuilder, Model: PModel): Promise<Either<true | number, FormValidationError>>;
+    deleteQuery<PModel>(QueryBuilder: QueryBuilder, Model: PModel): Promise<Either<true | number, FormValidationError>>;
+    deleteQueryNoFormValidation(QueryBuilder: QueryBuilder, model: typeof Model): Promise<Either<true | number, FormValidationError>>;
     executeQueries(): void;
 }
 export declare const ORM: BeastORM;

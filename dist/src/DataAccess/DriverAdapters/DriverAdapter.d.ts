@@ -4,6 +4,10 @@ import { IQuery } from "../../BusinessLayer/_interface/Apresentation/queryBuilde
 export declare class DriverAdapter implements IDatabaseStrategy {
     strategy: IDatabaseStrategy;
     constructor(strategy: any);
+    insertMany(table: any, data: any): (returnObject: IReturnObject) => void;
+    deleteMany(table: any, data: IQuery): (returnObject: IReturnObject) => void;
+    selectMany(table: any, data: IQuery): (returnObject: IReturnObject) => void;
+    updateMany(table: any, data: IQuery): (returnObject: IReturnObject) => void;
     update(table: any, data: IQuery): (returnObject: IReturnObject) => void;
     delete(table: any, data: IQuery): (returnObject: IReturnObject) => void;
     prepare(migrate: IMigrations): (returnObject: IReturnObject) => void;

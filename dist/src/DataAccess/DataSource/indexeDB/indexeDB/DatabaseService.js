@@ -7,10 +7,23 @@ export class DatabaseService {
         this.isTransactionInProgress = false;
         this.objectStore = {};
         this.executingTransaction = {};
+        this.connect = async () => {
+            this.db = await this.connector.openDatabase(this.schema);
+            if (this.isSchemaHeathy() == false) {
+                this.db.close();
+                this.db.onclose = async () => {
+                    let currentVersion = this.db.version;
+                    currentVersion++;
+                    const newSchemaVersion = this.schema;
+                    newSchemaVersion.version = currentVersion;
+                    this.db = await this.connector.openDatabase(newSchemaVersion);
+                };
+            }
+        };
         this.transactionFinish = (TableName) => {
             delete this.executingTransaction[TableName];
             if (Object.keys(this.executingTransaction).length == 0) {
-                this.db.close();
+                // this.db.close()
                 delete this.db;
             }
         };
@@ -18,10 +31,18 @@ export class DatabaseService {
         this.connector = new DatabaseConnector();
         for (let tableSchema of schema.table) {
             this.objectStore[tableSchema.name] = new ObjectStore(tableSchema);
+            this.objectStore[tableSchema.name].connect = this.connect;
+            this.objectStore[tableSchema.name].transactionFinish = this.transactionFinish;
         }
     }
-    async connect() {
-        this.db = await this.connector.openDatabase(this.schema);
+    isSchemaHeathy() {
+        for (const table of this.schema.table) {
+            const found = this.db.objectStoreNames.contains(table.name);
+            if (!found) {
+                return false;
+            }
+        }
+        return true;
     }
     async migrate() {
         await this.connector.migrate(this.schema);
@@ -37,9 +58,7 @@ export class DatabaseService {
         if (!objectStore.hasActiveTransaction()) {
             objectStore.db = this.db;
             objectStore.createTransaction();
-            // console.log("create transaction")
         }
-        // console.log("objectStore", objectStore)
         this.executingTransaction[objectStoreName] = true;
         return objectStore;
     }

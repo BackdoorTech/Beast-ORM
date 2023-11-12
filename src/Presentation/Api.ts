@@ -4,10 +4,11 @@ import { returnSelf } from "./returnSelf/returnSelf.js" // Represents a return o
 import { ORM } from "../BusinessLayer/beastOrm.js"
 import { ITableSchema } from "../BusinessLayer/_interface/interface.js";
 import { dataParameters } from "../BusinessLayer/modelManager/dataParameters.js";
+
 /**
  * Represents a model for database operations.
  */
-export class Model<Model>  implements IModel<Model>{
+export class Model<Model> implements IModel<Model>{
 
   static getTableSchema(): ITableSchema {
     return {} as ITableSchema
@@ -42,7 +43,7 @@ export class Model<Model>  implements IModel<Model>{
 
   static async all() {
     const model = this.getModel()
-    const queryBuilder = new QueryBuilder({isParamsArray: false});
+    const queryBuilder = new QueryBuilder({isParamsArray: true});
     queryBuilder.select(model)
 
     const result = await ORM.executeSelectQuery(queryBuilder, this as any)
@@ -55,10 +56,10 @@ export class Model<Model>  implements IModel<Model>{
   }
 
   static async deleteAll() {
-    const queryBuilder = new QueryBuilder({isParamsArray: false});
+    const queryBuilder = new QueryBuilder({isParamsArray: true});
     const model = this.getModel()
 
-    queryBuilder.deleteFrom(model).where({}).limit(1)
+    queryBuilder.deleteFrom(model)
 
     const result = await ORM.deleteQueryNoFormValidation(queryBuilder, model)
 
@@ -87,6 +88,15 @@ export class Model<Model>  implements IModel<Model>{
     }
   }
 
+  static filter<T>(value:Object) {
+    const queryBuilder = new QueryBuilder({isParamsArray:true});
+    const model = this.getModel()
+
+    queryBuilder.where(value)
+
+    return returnSelf.object<T>(queryBuilder, model)
+  }
+
 
   async save(params: any = false) {
     const queryBuilder = new QueryBuilder({isParamsArray:false});
@@ -110,7 +120,7 @@ export class Model<Model>  implements IModel<Model>{
     if(result.isError) {
       throw(result.error)
     } else {
-      return result.value
+      return true
     }
   }
 

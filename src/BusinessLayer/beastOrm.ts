@@ -6,7 +6,6 @@ import { migrateMigrations } from '../DataAccess/SchemaMigrations/MigrateMigrati
 import { IDatabaseStrategy } from '../DataAccess/DriverAdapters/DriverAdapter.type.js';
 import { IDatabaseSchema, ITableSchema } from './_interface/interface.js';
 import { QueryBuilder } from '../Presentation/queryBuilder/queryBuilder.js'
-import { queryBuilderHandler } from './queryBuilderHandler.js';
 import { customMethod } from '../Configuration/CustomMethod.js';
 import { Model, Model as ModelType } from '../Presentation/Api';
 import { validator } from './validation/validator.js'
@@ -14,6 +13,11 @@ import { Either } from '../Utility/Either/index.js'
 import { dataParameters } from "./modelManager/dataParameters.js"
 import { RuntimeMethods as RM } from './modelManager/runtimeMethods/runTimeMethods.js';
 import { EitherFormValidationError, FormValidationError } from './validation/fields/allFields.type.js';
+import { queryBuilderInsertHandler } from "./queryBuilderHandler/queryBuilderInsertHandler.js"
+import { queryBuilderDeleteHandler } from "./queryBuilderHandler/queryBuilderDeletehandler.js"
+import { queryBuilderUpdateHandler } from "./queryBuilderHandler/queryBuilderUpdateHandler.js"
+import { queryBuilderSelectHandler } from "./queryBuilderHandler/queryBuilderSelectHandler.js"
+
 
 class BeastORM {
 
@@ -98,9 +102,14 @@ class BeastORM {
         }
 
       }
-      QueryBuilder.setCleanData(arrayOfData)
+    QueryBuilder.setCleanData(arrayOfData)
 
-    return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder)
+    if(QueryBuilder.query.isParamsArray) {
+      return await queryBuilderInsertHandler.INSERTMany(DatabaseStrategy, QueryBuilder)
+    } else {
+      return await  queryBuilderInsertHandler.INSERTOne(DatabaseStrategy, QueryBuilder)
+
+    }
   }
 
   async executeSelectQuery<PModel>(QueryBuilder: QueryBuilder, Model:PModel):Promise<Either<PModel, FormValidationError>>   {
@@ -114,11 +123,15 @@ class BeastORM {
       .driverAdapter
       .strategy
 
-    return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder)
+      if(QueryBuilder.query.isParamsArray) {
+        return await queryBuilderSelectHandler.SELECTMany(DatabaseStrategy, QueryBuilder)
+      } else {
+        return await queryBuilderSelectHandler.SELECTOne(DatabaseStrategy, QueryBuilder)
+      }
   }
 
 
-  async executeUpdateQuery<PModel>(QueryBuilder: QueryBuilder, Model:PModel):Promise<Either<PModel, FormValidationError>>   {
+  async executeUpdateQuery<PModel>(QueryBuilder: QueryBuilder, Model:PModel):Promise<Either<true  | number, FormValidationError>>   {
     const tableSchema: ITableSchema = Model[RM.getTableSchema]()
     const databaseName = tableSchema.databaseName
 
@@ -128,12 +141,15 @@ class BeastORM {
       .DBConnectionManager
       .driverAdapter
       .strategy
-
-    return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder)
+      if(QueryBuilder.query.isParamsArray) {
+        return await queryBuilderUpdateHandler.UPDATEMany(DatabaseStrategy, QueryBuilder)
+      } else {
+        return await queryBuilderUpdateHandler.UPDATEOne(DatabaseStrategy, QueryBuilder)
+      }
   }
 
 
-  async deleteQuery<PModel>(QueryBuilder: QueryBuilder, Model:PModel):Promise<Either<PModel, FormValidationError>> {
+  async deleteQuery<PModel>(QueryBuilder: QueryBuilder, Model:PModel):Promise<Either<true  | number, FormValidationError>> {
     const tableSchema: ITableSchema = Model[RM.getTableSchema]()
     const databaseName = tableSchema.databaseName
 
@@ -151,10 +167,14 @@ class BeastORM {
       }
       QueryBuilder.setCleanData(arrayOfData)
 
-    return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder)
+      if(QueryBuilder.query.isParamsArray) {
+        return await queryBuilderDeleteHandler.DELETEMany(DatabaseStrategy, QueryBuilder)
+      } else {
+        return await queryBuilderDeleteHandler.DELETEOne(DatabaseStrategy, QueryBuilder)
+      }
   }
 
-  async deleteQueryNoFormValidation(QueryBuilder: QueryBuilder, model: typeof Model):Promise<Either<true, FormValidationError>> {
+async deleteQueryNoFormValidation(QueryBuilder: QueryBuilder, model: typeof Model):Promise<Either<true  | number, FormValidationError>> {
     const tableSchema: ITableSchema = model[RM.getTableSchema]()
     const databaseName = tableSchema.databaseName
 
@@ -165,7 +185,11 @@ class BeastORM {
       .driverAdapter
       .strategy
 
-    return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder)
+      if(QueryBuilder.query.isParamsArray) {
+        return await queryBuilderDeleteHandler.DELETEMany(DatabaseStrategy, QueryBuilder)
+      } else {
+        return await queryBuilderDeleteHandler.DELETEOne(DatabaseStrategy, QueryBuilder)
+      }
   }
 
   executeQueries() {}

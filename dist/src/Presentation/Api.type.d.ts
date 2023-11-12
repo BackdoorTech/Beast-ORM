@@ -5,7 +5,7 @@ export declare class IModel<T> {
      * @param params - The filter parameters for the query.
      * @returns A promise that resolves with the query results.
      */
-    save(...args: any[]): Promise<void>;
+    save(...args: any[]): Promise<Boolean>;
     static get<T>(): Promise<T | null>;
     /**
      * Retrieve all data of the current model from the database.

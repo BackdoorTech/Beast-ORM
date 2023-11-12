@@ -1,3 +1,4 @@
+import { Model } from "../Api";
 /**
  * @description Represents a return object for query-related methods
  */
@@ -7,15 +8,9 @@ export declare class returnSelf {
      * @param param0 - An object with query-related configuration.
      * @returns An object with query-related methods.
      */
-    static object: ({ queryBuilder, DBconfig, TableSchema }: {
-        queryBuilder: any;
-        DBconfig: any;
-        TableSchema: any;
-    }) => {
-        filter: (...args: any[]) => void;
-        execute: () => Promise<void>;
-        update: (args: any) => Promise<void>;
-        delete: () => Promise<void>;
-        all: () => Promise<void>;
+    static object: <T>(queryBuilder: any, model: typeof Model) => {
+        execute: () => Promise<T>;
+        update: (params: any) => Promise<number | true>;
+        delete: () => Promise<number | true>;
     };
 }

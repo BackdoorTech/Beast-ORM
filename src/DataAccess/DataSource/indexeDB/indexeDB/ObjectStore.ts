@@ -1,6 +1,6 @@
-import { ITableSchema } from "../../../../BusinessLayer/_interface/interface";
+import { ITableSchema } from "../../../../BusinessLayer/_interface/interface.js";
 import { Either, ok, error as err } from "../../../../Utility/Either/index.js";
-import { ObjectStoreRequestResult } from "./ObjectStore.type";
+import { ObjectStoreRequestResult } from "./ObjectStore.type.js";
 
 export class ObjectStore {
 
@@ -8,6 +8,9 @@ export class ObjectStore {
   transactionQueue = [];
   isTransactionInProgress = false;
   db:  IDBDatabase;
+
+  connect = () => {}
+  transactionFinish = (a: any) => {}
 
   txInstance: {
     IDBTransaction?: IDBTransaction,
@@ -59,15 +62,37 @@ export class ObjectStore {
 
     this.isTransactionInProgress = false;
     this.commitTransaction()
+    this.closeTransaction()
+    this.transactionFinish(this.schema.name)
 
   }
 
   async executeTransaction(transaction) {
-    const { operation, data, onsuccess, onerror, index, finishRequest } = transaction;
+    const { operation, data, onsuccess, onerror, index, finishRequest, retry } = transaction;
     this.txInstance.IDBTransaction = this.db.transaction(this.schema.name, "readwrite");
     const objectStore = this.txInstance.IDBTransaction.objectStore(this.schema.name);
 
-    const request = objectStore[operation](data);
+    let request;
+
+    try {
+      request = objectStore[operation](data);
+    } catch(error) {
+
+      if(onerror) {
+        onerror()
+      }
+      return new Promise(async (resolve, reject) => {
+
+        reject(error);
+        if(onerror) {
+          onerror()
+        }
+        finishRequest(err(false))
+        console.error({operation, data})
+        console.error(error)
+        console.error("ObjectStore not found", this.db, this.schema.name)
+      });
+    }
 
     return new Promise(async (resolve, reject) => {
       request.onsuccess = async () => {
@@ -81,7 +106,9 @@ export class ObjectStore {
         this.commitTransaction()
         this.createTransaction()
         reject(error);
-        onerror()
+        if(onerror) {
+          onerror()
+        }
         finishRequest(err(false))
       };
     });
@@ -92,6 +119,7 @@ export class ObjectStore {
       this.txInstance.IDBTransaction.commit();
       return true
     } catch (error) {
+      console.error(error)
       return false
     }
   }

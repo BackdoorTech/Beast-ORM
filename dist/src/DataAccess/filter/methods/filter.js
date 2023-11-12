@@ -13,9 +13,9 @@ export class filter {
                 this.rows.push(row);
             }
         }
+        return this.rows;
     }
     async cursorWithLimit(rows, limit) {
-        // console.log("cursorWithLimit");
         for (const row of rows) {
             const operationsResult = await this.operator.run(row);
             if (operationsResult == true) {
@@ -33,6 +33,8 @@ export class filter {
             const operationsResult = await this.operator.run(row);
             if (operationsResult == true) {
                 newRows.push(row);
+            }
+            else {
             }
         }
         return newRows;

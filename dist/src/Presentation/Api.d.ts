@@ -9,8 +9,13 @@ export declare class Model<Model> implements IModel<Model> {
     getModel(): typeof Model;
     static get(value: Object): Promise<any>;
     static all(): Promise<any>;
-    static deleteAll(): Promise<true>;
+    static deleteAll(): Promise<number | true>;
     static create<T>(params: any): Promise<T>;
-    save(params?: any): Promise<any>;
-    delete(): Promise<true>;
+    static filter<T>(value: Object): {
+        execute: () => Promise<T>;
+        update: (params: any) => Promise<number | true>;
+        delete: () => Promise<number | true>;
+    };
+    save(params?: any): Promise<boolean>;
+    delete(): Promise<number | true>;
 }

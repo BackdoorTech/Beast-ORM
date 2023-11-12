@@ -14,7 +14,8 @@ export declare class DatabaseService {
         [key: string]: boolean;
     };
     constructor(schema: IDatabaseSchema);
-    connect(): Promise<void>;
+    connect: () => Promise<void>;
+    isSchemaHeathy(): boolean;
     migrate(): Promise<void>;
     hasConnectionToDatabase(): IDBDatabase;
     executeOnObjectStore(objectStoreName: string): Promise<ObjectStore>;

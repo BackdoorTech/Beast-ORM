@@ -2,11 +2,14 @@ import { schemaGenerator } from './modelManager/schemaGenerator/schemaGenerator.
 import { modelRegistration } from './modelManager/register/register.js';
 import { MakeMigrations } from '../DataAccess/SchemaMigrations/MakeMigration.js';
 import { migrateMigrations } from '../DataAccess/SchemaMigrations/MigrateMigrations.js';
-import { queryBuilderHandler } from './queryBuilderHandler.js';
 import { customMethod } from '../Configuration/CustomMethod.js';
 import { validator } from './validation/validator.js';
 import { dataParameters } from "./modelManager/dataParameters.js";
 import { RuntimeMethods as RM } from './modelManager/runtimeMethods/runTimeMethods.js';
+import { queryBuilderInsertHandler } from "./queryBuilderHandler/queryBuilderInsertHandler.js";
+import { queryBuilderDeleteHandler } from "./queryBuilderHandler/queryBuilderDeletehandler.js";
+import { queryBuilderUpdateHandler } from "./queryBuilderHandler/queryBuilderUpdateHandler.js";
+import { queryBuilderSelectHandler } from "./queryBuilderHandler/queryBuilderSelectHandler.js";
 class BeastORM {
     constructor() {
         this.register = (register) => {
@@ -65,7 +68,12 @@ class BeastORM {
             }
         }
         QueryBuilder.setCleanData(arrayOfData);
-        return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder);
+        if (QueryBuilder.query.isParamsArray) {
+            return await queryBuilderInsertHandler.INSERTMany(DatabaseStrategy, QueryBuilder);
+        }
+        else {
+            return await queryBuilderInsertHandler.INSERTOne(DatabaseStrategy, QueryBuilder);
+        }
     }
     async executeSelectQuery(QueryBuilder, Model) {
         const tableSchema = Model[RM.getTableSchema]();
@@ -75,7 +83,12 @@ class BeastORM {
             .DBConnectionManager
             .driverAdapter
             .strategy;
-        return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder);
+        if (QueryBuilder.query.isParamsArray) {
+            return await queryBuilderSelectHandler.SELECTMany(DatabaseStrategy, QueryBuilder);
+        }
+        else {
+            return await queryBuilderSelectHandler.SELECTOne(DatabaseStrategy, QueryBuilder);
+        }
     }
     async executeUpdateQuery(QueryBuilder, Model) {
         const tableSchema = Model[RM.getTableSchema]();
@@ -85,7 +98,12 @@ class BeastORM {
             .DBConnectionManager
             .driverAdapter
             .strategy;
-        return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder);
+        if (QueryBuilder.query.isParamsArray) {
+            return await queryBuilderUpdateHandler.UPDATEMany(DatabaseStrategy, QueryBuilder);
+        }
+        else {
+            return await queryBuilderUpdateHandler.UPDATEOne(DatabaseStrategy, QueryBuilder);
+        }
     }
     async deleteQuery(QueryBuilder, Model) {
         const tableSchema = Model[RM.getTableSchema]();
@@ -100,7 +118,12 @@ class BeastORM {
             arrayOfData[object] = dataParameters.getFilteredDataOverlay(tableSchema, arrayOfData[object]);
         }
         QueryBuilder.setCleanData(arrayOfData);
-        return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder);
+        if (QueryBuilder.query.isParamsArray) {
+            return await queryBuilderDeleteHandler.DELETEMany(DatabaseStrategy, QueryBuilder);
+        }
+        else {
+            return await queryBuilderDeleteHandler.DELETEOne(DatabaseStrategy, QueryBuilder);
+        }
     }
     async deleteQueryNoFormValidation(QueryBuilder, model) {
         const tableSchema = model[RM.getTableSchema]();
@@ -110,7 +133,12 @@ class BeastORM {
             .DBConnectionManager
             .driverAdapter
             .strategy;
-        return await queryBuilderHandler[QueryBuilder.query.type](DatabaseStrategy, QueryBuilder);
+        if (QueryBuilder.query.isParamsArray) {
+            return await queryBuilderDeleteHandler.DELETEMany(DatabaseStrategy, QueryBuilder);
+        }
+        else {
+            return await queryBuilderDeleteHandler.DELETEOne(DatabaseStrategy, QueryBuilder);
+        }
     }
     executeQueries() { }
 }

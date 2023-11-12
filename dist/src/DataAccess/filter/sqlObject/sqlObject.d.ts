@@ -11,5 +11,5 @@ export declare class SqlObject {
     argsAttributes: argsAttributes;
     QueryReaderSelect: QueryReaderSelect;
     constructor(TableSchema: ITableSchema, QueryReaderSelect: QueryReaderSelect);
-    run(rows: any[]): Promise<void>;
+    run(rows: any[]): Promise<any[]>;
 }

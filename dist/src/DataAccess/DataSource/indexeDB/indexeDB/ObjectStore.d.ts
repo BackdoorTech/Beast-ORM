@@ -1,11 +1,13 @@
-import { ITableSchema } from "../../../../BusinessLayer/_interface/interface";
+import { ITableSchema } from "../../../../BusinessLayer/_interface/interface.js";
 import { Either } from "../../../../Utility/Either/index.js";
-import { ObjectStoreRequestResult } from "./ObjectStore.type";
+import { ObjectStoreRequestResult } from "./ObjectStore.type.js";
 export declare class ObjectStore {
     schema: ITableSchema;
     transactionQueue: any[];
     isTransactionInProgress: boolean;
     db: IDBDatabase;
+    connect: () => void;
+    transactionFinish: (a: any) => void;
     txInstance: {
         IDBTransaction?: IDBTransaction;
         IDBTransactionMode?: IDBTransactionMode;

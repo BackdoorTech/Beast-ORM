@@ -17,11 +17,12 @@ export class filter {
         this.rows.push(row)
       }
     }
+
+    return this.rows
 	}
 
   async cursorWithLimit(rows: any[], limit?) {
 
-    // console.log("cursorWithLimit");
 
     for (const row of rows ) {
       const operationsResult = await this.operator.run(row)
@@ -45,7 +46,8 @@ export class filter {
 
 			if(operationsResult == true) {
 				newRows.push(row)
-			}
+			} else {
+      }
 		}
 
 		return newRows

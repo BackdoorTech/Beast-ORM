@@ -1,4 +1,5 @@
 import { QueryBuilder } from "./queryBuilder/queryBuilder.js"; // Represents a query object that helps build and execute database queries.
+import { returnSelf } from "./returnSelf/returnSelf.js"; // Represents a return object for query-related methods
 import { ORM } from "../BusinessLayer/beastOrm.js";
 import { dataParameters } from "../BusinessLayer/modelManager/dataParameters.js";
 /**
@@ -32,7 +33,7 @@ export class Model {
     }
     static async all() {
         const model = this.getModel();
-        const queryBuilder = new QueryBuilder({ isParamsArray: false });
+        const queryBuilder = new QueryBuilder({ isParamsArray: true });
         queryBuilder.select(model);
         const result = await ORM.executeSelectQuery(queryBuilder, this);
         if (result.isError) {
@@ -43,9 +44,9 @@ export class Model {
         }
     }
     static async deleteAll() {
-        const queryBuilder = new QueryBuilder({ isParamsArray: false });
+        const queryBuilder = new QueryBuilder({ isParamsArray: true });
         const model = this.getModel();
-        queryBuilder.deleteFrom(model).where({}).limit(1);
+        queryBuilder.deleteFrom(model);
         const result = await ORM.deleteQueryNoFormValidation(queryBuilder, model);
         if (result.isError) {
             throw (result.error);
@@ -67,6 +68,12 @@ export class Model {
             return result.value;
         }
     }
+    static filter(value) {
+        const queryBuilder = new QueryBuilder({ isParamsArray: true });
+        const model = this.getModel();
+        queryBuilder.where(value);
+        return returnSelf.object(queryBuilder, model);
+    }
     async save(params = false) {
         const queryBuilder = new QueryBuilder({ isParamsArray: false });
         const model = this.getModel();
@@ -85,7 +92,7 @@ export class Model {
             throw (result.error);
         }
         else {
-            return result.value;
+            return true;
         }
     }
     // delete one

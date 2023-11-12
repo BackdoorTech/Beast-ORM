@@ -6,7 +6,7 @@ export declare class filter {
     rows: any[];
     operator: ObjectConditionOperator;
     constructor(arg: argsAttributes, TableSchema: any);
-    cursor(rows: any[]): Promise<void>;
+    cursor(rows: any[]): Promise<any[]>;
     cursorWithLimit(rows: any[], limit?: any): Promise<any[]>;
     run(rows: any[]): Promise<any[]>;
 }

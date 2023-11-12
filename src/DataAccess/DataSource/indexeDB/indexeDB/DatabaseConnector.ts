@@ -5,6 +5,7 @@ export class DatabaseConnector {
 
   openDatabase(config: IDatabaseSchema): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
+
       const idbInstance = indexedDB || self.indexedDB || (self as any).mozIndexedDB || (self as any).webkitIndexedDB || (self as any).msIndexedDB;
 
       if (idbInstance) {
