@@ -1,4 +1,5 @@
-import { FieldsMap, FieldKeys, FieldKeysArray, AttributesMap, FieldAttributesKeys } from './ModalReader.type.js'
+import { GustPrototype, RealPrototype } from '../../../Presentation/Model/fields/fieldsWrappers.js';
+import { FieldKeysArray, field } from './ModalReader.type.js'
 
 export class ModelReader {
   /**
@@ -14,7 +15,9 @@ export class ModelReader {
    * }} - An object containing extracted model information.
    */
   static read(modelClassRepresentation) {
+    RealPrototype()
     const classInstance = new modelClassRepresentation();
+    GustPrototype()
     let {
       modelName,
       fields,
@@ -26,7 +29,7 @@ export class ModelReader {
     modelName = this.getModelName(modelClassRepresentation)
 
     for (const [fieldName, Field] of Object.entries(classInstance)) {
-      this.processField(classInstance, fieldName, Field, fieldTypes, attributes, fieldNames, fields);
+      this.processField(classInstance, fieldName, Field as any, fieldTypes, attributes, fieldNames, fields);
     }
 
     return {
@@ -80,18 +83,19 @@ export class ModelReader {
    * @param {string[]} fieldNames - An array of field names.
    * @param {Object} fields - An object containing field information.
    */
-  private static processField(classInstance, fieldName, Field, fieldTypes, attributes, fieldNames, fields) {
+  private static processField(classInstance, fieldName, Field: field, fieldTypes, attributes, fieldNames, fields) {
+
     const type = Field?.fieldName;
     const knownFieldType = this.isKnownFieldType(type);
 
-    fieldNames.push(fieldName);
-    fields[fieldName] = Field;
+
 
     if (knownFieldType) {
+      fieldNames.push(fieldName);
+      fields[fieldName] = Field;
       this.addFieldToType(fieldTypes, type, fieldName);
       this.processFieldAttributes(Field, attributes, fieldName);
     } else {
-      this.addFieldToType(fieldTypes, 'Unknown', fieldName);
     }
   }
 

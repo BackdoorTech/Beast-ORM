@@ -30,10 +30,9 @@
     "module": "ES2020",                                /* Specify what module code is generated. */
     "rootDir": "./",                                  /* Specify the root folder within your source files. */
     "moduleResolution": "Node",                       /* Specify how TypeScript looks up a file from a given module specifier. */
-    "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
+    // "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
     "paths": {
       "src": ["./src/"],
-      "dist": ["./dist/*"]
     },                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
     "rootDirs": [
       // "./",
@@ -113,6 +112,8 @@
     "node_modules/pretty-js/*"
   ],
   "exclude": [
+    "_src",
+    "dist",
     "node_modules",
     "other",
     "**/*.spec.ts"

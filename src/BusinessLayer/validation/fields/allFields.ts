@@ -5,14 +5,15 @@ import { FormValidationError, field, sizeError } from './allFields.type.js'
 
 function isString(field:field, value: any): Either<true, InvalidType> {
   if(typeof value != 'string') {
-    if(field.blank && value != null) return error(new InvalidValue())
+    return error(new InvalidValue())
   }
   return ok(true)
 }
 
 function isNumber (field:field, value: any): Either<true, InvalidType> {
+
   if(!(typeof value == 'bigint' || typeof value == 'number')) {
-    if(field.blank && value != null) return error(new InvalidValue())
+    return error(new InvalidValue())
   }
 
   return ok(true)
@@ -26,6 +27,11 @@ export class AutoFieldBL  extends field{
 	constructor() { super() }
 
   valid(value): Either<true, FormValidationError> {
+
+  if(this.blank && (value == null || value == undefined) ) {
+    return ok(true)
+  }
+
     const result = isNumber(this, value)
     if(result.isError) {
       return result
@@ -43,6 +49,11 @@ export class BigIntegerFieldBL extends field {
 	constructor() { super() }
 
   valid(value): Either<true, FormValidationError> {
+
+    if(this.blank && (value == null || value == undefined) ) {
+      return ok(true)
+    }
+
     const result = isNumber(this, value)
     if(result.isError) {
       return result
@@ -64,6 +75,7 @@ export class BooleanFieldBL extends field {
 
   valid(value): Either<true, FormValidationError> {
 
+
 		if( typeof value != 'boolean') return error(new InvalidType())
 
 		return ok(true)
@@ -78,6 +90,10 @@ export class CharFieldBL extends field {
 	constructor() { super() }
 
   valid(value): Either<true, FormValidationError> {
+
+    if(this.blank && (value == null || value == undefined) ) {
+      return ok(true)
+    }
 
     const result = isString(this, value)
     if(result.isError) {
@@ -100,6 +116,10 @@ export class DateFieldBL extends field{
 
   valid(value): Either<true, FormValidationError> {
 
+    if(this.blank && (value == null || value == undefined) ) {
+      return ok(true)
+    }
+
     const result = isString(this, value)
     if(result.isError) {
       return result
@@ -119,6 +139,10 @@ export class DateTimeFieldBL  extends field {
 	constructor() { super() }
 
   valid(value): Either<true, FormValidationError> {
+
+    if(this.blank && (value == null || value == undefined) ) {
+      return ok(true)
+    }
 
     const result = isString(this, value)
     if(result.isError) {
@@ -192,6 +216,10 @@ export class TextFieldBL  extends field {
 
   valid(value): Either<true, FormValidationError> {
 
+    if(this.blank && (value == null || value == undefined) ) {
+      return ok(true)
+    }
+
     const result = isString(this, value)
     if(result.isError) {
       return result
@@ -214,6 +242,11 @@ export class IntegerFieldBL extends field {
 	constructor() { super() }
 
   valid(value): Either<true, FormValidationError> {
+
+    if(this.blank && (value == null || value == undefined) ) {
+      return ok(true)
+    }
+
     const result = isNumber(this, value)
     if(result.isError) {
       return result
@@ -233,6 +266,7 @@ export class ForeignKeyBL extends field {
   valid(value): Either<true, FormValidationError> {
     const validation = this.rules(this, value)
     if (validation.isError) return validation
+    else return ok(true)
 	}
 
 }
@@ -244,6 +278,7 @@ export class OneToOneFieldBL extends field {
   valid(value): Either<true, FormValidationError> {
     const validation = this.rules(this, value)
     if (validation.isError) return validation
+    else return ok(true)
 	}
 
 }
@@ -255,5 +290,6 @@ export class ManyToManyFieldBL extends field{
   valid(value): Either<true, FormValidationError> {
     const validation = this.rules(this, value)
     if (validation.isError) return validation
+    else return ok(true)
 	}
 }

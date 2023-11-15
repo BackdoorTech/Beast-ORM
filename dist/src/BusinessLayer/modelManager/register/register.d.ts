@@ -1,4 +1,4 @@
-import { IDatabaseSchema } from '../../_interface/interface.js';
+import { IDatabaseSchema } from '../../_interface/interface.type.js';
 import { Database } from './database.js';
 declare class ModelRegistration {
     databases: {

@@ -2,7 +2,7 @@ import { IModel } from "./Api.type.js";
 import { QueryBuilder } from "./queryBuilder/queryBuilder.js" // Represents a query object that helps build and execute database queries.
 import { returnSelf } from "./returnSelf/returnSelf.js" // Represents a return object for query-related methods
 import { ORM } from "../BusinessLayer/beastOrm.js"
-import { ITableSchema } from "../BusinessLayer/_interface/interface.js";
+import { ITableSchema } from "../BusinessLayer/_interface/interface.type.js";
 import { dataParameters } from "../BusinessLayer/modelManager/dataParameters.js";
 
 /**
@@ -11,15 +11,45 @@ import { dataParameters } from "../BusinessLayer/modelManager/dataParameters.js"
 export class Model<Model> implements IModel<Model>{
 
   static getTableSchema(): ITableSchema {
-    return {} as ITableSchema
+    throw("Register your Model before using the API") as any
   }
 
   static getModel(): typeof Model {
-    return { cars:'d'} as any
+    throw("Register your Model before using the API") as any
   }
 
   getModel(): typeof Model {
-    return {cars:'d'} as any
+    throw("Register your Model before using the API") as any
+  }
+
+  static getModelSchema(): any {
+    throw("Register your Model before using the API") as any
+  }
+
+  async get() {
+    const queryBuilder = new QueryBuilder({isParamsArray:false});
+    const model = this.getModel()
+    const tableSchema: ITableSchema = model.getTableSchema()
+
+    const filter = {}
+    const idFieldName = tableSchema.id.keyPath
+    filter[idFieldName] = this[idFieldName]
+
+    queryBuilder
+      .select(model)
+      .where(filter)
+      .limit(1)
+      .hasIndex(true)
+
+    // console.log({queryBuilder})
+    const result = await ORM.executeSelectQuery(queryBuilder, this as any)
+
+    if(result.isError) {
+      throw(result.error)
+    } else {
+      Object.assign(this, result.value)
+      return true
+    }
   }
 
   static async get(value:Object) {
@@ -32,16 +62,16 @@ export class Model<Model> implements IModel<Model>{
       .limit(1)
       .hasIndex(true)
 
-      const result = await ORM.executeSelectQuery(queryBuilder, this as any)
+    const result = await ORM.executeSelectQuery(queryBuilder, this as any)
 
-      if(result.isError) {
-        throw(result.error)
-      } else {
-        return result.value
-      }
+    if(result.isError) {
+      throw(result.error)
+    } else {
+      return result.value
+    }
   }
 
-  static async all() {
+  static async all<T>() {
     const model = this.getModel()
     const queryBuilder = new QueryBuilder({isParamsArray: true});
     queryBuilder.select(model)
@@ -51,7 +81,7 @@ export class Model<Model> implements IModel<Model>{
     if(result.isError) {
       throw(result.error)
     } else {
-      return result.value
+      return result.value as T[]
     }
   }
 
@@ -77,6 +107,7 @@ export class Model<Model> implements IModel<Model>{
     const model = this.getModel()
     const queryBuilder = new QueryBuilder({isParamsArray});
 
+    // console.log({params})
     queryBuilder.insertInto(model).insert(params)  as any
 
     const result = await ORM.executeInsertionQuery<T>(queryBuilder, this as any)
@@ -124,6 +155,23 @@ export class Model<Model> implements IModel<Model>{
     }
   }
 
+  getPrimaryKeyValue(): number | string {
+    const model = this.getModel()
+    const tableSchema: ITableSchema = model.getTableSchema()
+
+    const idFieldName = tableSchema.id.keyPath
+
+    return this[idFieldName]
+  }
+
+  setPrimaryKey(key: number | string) {
+    const model = this.getModel()
+    const tableSchema: ITableSchema = model.getTableSchema()
+
+    const primaryKeyFieldName = tableSchema.id.keyPath
+
+    this[primaryKeyFieldName] = key
+  }
 
   // delete one
   async delete() {

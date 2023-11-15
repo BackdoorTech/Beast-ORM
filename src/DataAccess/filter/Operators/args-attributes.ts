@@ -1,5 +1,5 @@
 import { FieldSchema } from "../../../../_src/models/register-modal.interface.js";
-import { ITableSchema } from "../../../BusinessLayer/_interface/interface.js";
+import { ITableSchema } from "../../../BusinessLayer/_interface/interface.type.js";
 import { AttributesMap, FieldAttributesKeys, FieldKeys, FieldsMap } from "../../../BusinessLayer/fields/fields.type.js";
 import { OperatorKeys, OperatorsKeysArray, operator, ObjOperatorOverwrite, ArrOperatorOverwrite } from "./object-operator.js";
 import { info } from "./operators.js";
@@ -65,7 +65,6 @@ export class argsAttributes {
 
                 const element = field.split('__')
 
-                // console.log({element})
 
                 if(element.length == 1) {
                     element.push('eq')
@@ -77,11 +76,10 @@ export class argsAttributes {
                 if(OperatorsKeysArray.includes(operation)) {
                   operation = element.pop()
                 } else {
-                  // console.log("not found", operation)
                   operation = 'eq'
                 }
 
-                // console.log({operation, element})
+
 
                 fieldName = element[0]
                 fieldPath = element.join('.')

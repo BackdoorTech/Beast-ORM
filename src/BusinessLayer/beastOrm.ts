@@ -4,7 +4,7 @@ import { modelRegistration } from './modelManager/register/register.js';
 import { MakeMigrations } from '../DataAccess/SchemaMigrations/MakeMigration.js';
 import { migrateMigrations } from '../DataAccess/SchemaMigrations/MigrateMigrations.js';
 import { IDatabaseStrategy } from '../DataAccess/DriverAdapters/DriverAdapter.type.js';
-import { IDatabaseSchema, ITableSchema } from './_interface/interface.js';
+import { IDatabaseSchema, ITableSchema } from './_interface/interface.type.js';
 import { QueryBuilder } from '../Presentation/queryBuilder/queryBuilder.js'
 import { customMethod } from '../Configuration/CustomMethod.js';
 import { Model, Model as ModelType } from '../Presentation/Api';
@@ -17,6 +17,8 @@ import { queryBuilderInsertHandler } from "./queryBuilderHandler/queryBuilderIns
 import { queryBuilderDeleteHandler } from "./queryBuilderHandler/queryBuilderDeletehandler.js"
 import { queryBuilderUpdateHandler } from "./queryBuilderHandler/queryBuilderUpdateHandler.js"
 import { queryBuilderSelectHandler } from "./queryBuilderHandler/queryBuilderSelectHandler.js"
+import { relationShip } from './modelManager/relationships/relationShip.js';
+import { modelGeneration } from './modelManager/modelGenerator.js';
 
 
 class BeastORM {
@@ -25,8 +27,16 @@ class BeastORM {
 
     // generate schema
     const schema = schemaGenerator.generate(register)
+    // const middleTablesModels = modelGeneration.forMiddleTables(schema)
+
+    //schemaGenerator.attachMiddleTablesModel(schema, register, middleTablesModels);
+
+
     schemaGenerator.attachGeneratedTableSchemaToModel(schema, register);
+
     modelRegistration.register(schema)
+
+    // relationShip.add(register)
 
     const database = modelRegistration.getDatabase(schema.databaseName)
 
@@ -35,9 +45,30 @@ class BeastORM {
       .driverAdapter
       .strategy
 
-    DatabaseStrategy.prepare(schema)({done: () => {}})
 
-    this.prepareMigrations(schema, DatabaseStrategy)
+    const modelsHolder: {[key:string]: typeof Model<any>} = {}
+
+    let a: {
+      fieldName: string,
+      model: typeof Model<any>
+    }[] = []
+
+    let count = 0
+    for( const tableSchema of schema.table) {
+      if(tableSchema.attributes.foreignKey) {
+        for(const fieldName of tableSchema.attributes.foreignKey) {
+          register.models[count]
+          modelsHolder[fieldName] = register.models[count]
+
+          a.push({
+            fieldName: fieldName,
+            model: register.models[count]
+          })
+        }
+      }
+
+      count++
+    }
 
     for(const model of register.models) {
 
@@ -49,6 +80,9 @@ class BeastORM {
 
     }
 
+    // console.log({schema})
+    DatabaseStrategy.prepare(schema)({done: () => {}})
+    this.prepareMigrations(schema, DatabaseStrategy)
   }
 
   addMethods(Model:typeof ModelType<any>, functionName , value) {
@@ -65,7 +99,9 @@ class BeastORM {
 
   private async prepareMigrations (schema: IDatabaseSchema, DatabaseStrategy: IDatabaseStrategy) {
     const makeMigrations = new MakeMigrations();
+    // console.log("===================================5")
     await makeMigrations.make(schema)
+    // console.log("===================================6")
 
     if(makeMigrations.needToMigrate) {
       // console.log("Migrate")
@@ -88,6 +124,8 @@ class BeastORM {
       .strategy
 
       const arrayOfData = QueryBuilder.query.values
+      const arrayOfDataBackup = [...QueryBuilder.query.values]
+
 
       const validator: (value: Object) => EitherFormValidationError  = Model[RM.validator]
 
@@ -105,9 +143,9 @@ class BeastORM {
     QueryBuilder.setCleanData(arrayOfData)
 
     if(QueryBuilder.query.isParamsArray) {
-      return await queryBuilderInsertHandler.INSERTMany(DatabaseStrategy, QueryBuilder)
+      return await queryBuilderInsertHandler.INSERTMany(DatabaseStrategy, QueryBuilder, arrayOfDataBackup)
     } else {
-      return await  queryBuilderInsertHandler.INSERTOne(DatabaseStrategy, QueryBuilder)
+      return await  queryBuilderInsertHandler.INSERTOne(DatabaseStrategy, QueryBuilder, arrayOfDataBackup)
 
     }
   }
@@ -123,11 +161,11 @@ class BeastORM {
       .driverAdapter
       .strategy
 
-      if(QueryBuilder.query.isParamsArray) {
-        return await queryBuilderSelectHandler.SELECTMany(DatabaseStrategy, QueryBuilder)
-      } else {
-        return await queryBuilderSelectHandler.SELECTOne(DatabaseStrategy, QueryBuilder)
-      }
+    if(QueryBuilder.query.isParamsArray) {
+      return await queryBuilderSelectHandler.SELECTMany(DatabaseStrategy, QueryBuilder)
+    } else {
+      return await queryBuilderSelectHandler.SELECTOne(DatabaseStrategy, QueryBuilder)
+    }
   }
 
 

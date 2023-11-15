@@ -7,20 +7,22 @@ class QueryBuilderSelectHandler {
   async SELECTOne<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder): Promise<Either<T,any>> {
 
     const tableName = QueryBuilder.query.table
-    let result = []
+    const model = QueryBuilder.model
 
     return await new Promise((resolve, reject) => {
+
       DatabaseStrategy.select(tableName, QueryBuilder.query)({
         onsuccess:(data:any) => {},
         onerror:() => {
           resolve(error(false))
         },
         done:(data) => {
-          if(QueryBuilder.hasNoCondition) {
-            resolve(ok(result as any)) // get all with no condition `Model.all()`
-          } else { // get with condition `Model.get()`
-            resolve(ok(data[0] as any))
-          }
+
+          const newInstanceOfModel = new model()
+
+          Object.assign(newInstanceOfModel, data[0])
+
+          resolve(ok(newInstanceOfModel as any))
         }
       })
     })
@@ -29,24 +31,18 @@ class QueryBuilderSelectHandler {
   async SELECTMany<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder): Promise<Either<T,any>> {
 
     const tableName = QueryBuilder.query.table
-    let result = []
+    const model = QueryBuilder.model
 
     return await new Promise((resolve, reject) => {
       DatabaseStrategy.selectMany(tableName, QueryBuilder.query)({
-        onsuccess:(data:any) => {
-          result = data.data // get all with no condition `Model.all()`
-        },
+        onsuccess:(data:any) => {},
         onerror:() => {
-          if(!QueryBuilder.query.isParamsArray) {
-            resolve(error(false))
-          }
+          resolve(error(false))
         },
-        done:(data) => {
-          if(QueryBuilder.hasNoCondition) {
-            resolve(ok(result as any)) // get all with no condition `Model.all()`
-          } else { // get with condition `Model.get()`
-            resolve(ok(data as any))
-          }
+        done:(data: any[]) => {
+
+          data = data.map( e => Object.assign(new model(),e))
+          resolve(ok(data as any))
         }
       })
     })

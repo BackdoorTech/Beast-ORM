@@ -1,3 +1,4 @@
+import { Model } from "../../../Presentation/Api.js";
 import { Either } from "../../../Utility/Either/index.js";
 import { InvalidType, InvalidValue } from "../../error/class/validation.js";
 import { FieldKeys } from "../../fields/fields.type";
@@ -18,7 +19,7 @@ export declare class field {
     default?: any;
     unique?: boolean;
     foreignKey?: boolean;
-    model?: field;
+    model?: typeof Model<any>;
     isNull(value: any): boolean;
     rules(field: field, value: any): EitherResultRule;
     valid(e: any): Either<true, FormValidationError>;

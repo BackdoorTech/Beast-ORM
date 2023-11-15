@@ -1,4 +1,4 @@
-import { ITableSchema } from '../_interface/interface';
+import { ITableSchema } from '../_interface/interface.type';
 import { Either } from '../../Utility/Either/index.js';
 import { ValidationError } from './error/ValidationError.js';
 import { Model as ModelType } from '../../Presentation/Api';

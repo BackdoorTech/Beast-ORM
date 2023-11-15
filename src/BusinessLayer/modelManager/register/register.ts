@@ -1,6 +1,6 @@
 
 import { Model } from '../../../Presentation/Api.js'
-import { IDatabaseSchema, ITableSchema } from '../../_interface/interface.js'
+import { IDatabaseSchema, ITableSchema } from '../../_interface/interface.type.js'
 import { Database } from './database.js'
 
 class ModelRegistration {

@@ -1,3 +1,4 @@
+import { Model } from "../../Presentation/Api"
 import { field } from "../validation/fields/allFields.type"
 
 export interface CharFieldParams {
@@ -87,22 +88,55 @@ export interface ForeignKeyParams {
 	primaryKey?:boolean
 }
 
-export interface OneToOneFieldParams {
-	model: any
-	unique?: boolean
-	blank?: boolean
-	default?: any
-	onDelete?: any
+export interface ForeignKeyParamsResult<T> {
+  object: T;
 }
+
+// export interface ForeignKeyGetterParams<T> {
+//   add(args: T ): Promise<T>;
+//   All(): Promise<boolean>;
+//   readonly list: T[];
+// }
+
+
+export type ForeignKeyGetterParams<T>  = () => {
+  add(args: Object): Promise<T>;
+  All(): Promise<boolean>;
+  readonly list: T[];
+}
+
+
+export interface OneToOneFieldParams<T>  {
+  model: new () => T;
+  unique?: boolean;
+  blank?: boolean;
+  default?: any;
+  onDelete?: any;
+}
+export interface OneToOneFieldResult<T> {
+  object: T;
+}
+interface OneToOneFieldFunction {
+  <T>(data: OneToOneFieldParams<T>): OneToOneFieldResult<T>;
+}
+
+
 
 export interface ManyToManyFieldParams {
 	model: any
+  I: Model<any>
 	unique?: boolean
 	blank?: boolean
 	default?: any
 	onDelete?: any
 }
 
+export interface ManyToManyFieldParamsResult<T> {
+  addMany(args: T[]): Promise<T[]>;
+  add(args: T ): Promise<T>;
+  All(): Promise<T[]>;
+  readonly list: T[];
+}
 
 export interface PossibleFieldAttributes {
 	model?: any

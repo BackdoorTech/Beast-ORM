@@ -1,4 +1,4 @@
-import { ITableSchema } from '../../../BusinessLayer/_interface/interface.js';
+import { ITableSchema } from '../../../BusinessLayer/_interface/interface.type.js';
 import { argsAttributes, Field, value } from './args-attributes.js';
 
 export class ObjectConditionOperator {

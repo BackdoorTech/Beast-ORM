@@ -8,6 +8,12 @@ class CustomMethod {
             return value;
         };
     }
+    addStatic(Model, methodName, value) {
+        // Add a static method to the model for accessing the table schema.
+        Model[methodName] = function () {
+            return value;
+        };
+    }
     addStaticMethodNowrap(Model, methodName, func) {
         // Add a static method to the model for accessing the table schema.
         Model[methodName] = func;

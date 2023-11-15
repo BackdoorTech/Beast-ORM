@@ -1,8 +1,11 @@
+
+import { Model } from "../../../Presentation/Api.js"
 import { Either, error , ok } from "../../../Utility/Either/index.js"
 import { InvalidType, InvalidValue } from "../../error/class/validation.js"
 import { FieldKeys } from "../../fields/fields.type"
 
 
+class emptyError extends Error{}
 class maxLengthError extends Error{}
 class minLengthError extends Error{}
 export class sizeError extends Error{}
@@ -19,7 +22,7 @@ export class field {
 	default?: any
 	unique?: boolean
 	foreignKey?: boolean
-	model?: field
+	model?: typeof Model<any>
 
 
   isNull(value) {
@@ -36,6 +39,11 @@ export class field {
 	}
 
 	rules(field: field, value): EitherResultRule {
+
+
+    if(value == null || value == undefined) {
+      return error(new emptyError())
+    }
 
 		if(field?.maxLength) {
 			if(value.toString().length > field.maxLength) {

@@ -1,4 +1,4 @@
-import { ITableSchema } from '../../../BusinessLayer/_interface/interface.js';
+import { ITableSchema } from '../../../BusinessLayer/_interface/interface.type.js';
 import { methodFunction } from '../methods/methods.js';
 import { argsAttributes } from '../Operators/args-attributes.js';
 import { QueryReaderSelect } from "../../QueryReader/queryReader.js";

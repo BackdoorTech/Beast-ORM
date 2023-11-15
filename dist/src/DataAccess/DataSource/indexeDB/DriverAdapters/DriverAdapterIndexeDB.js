@@ -142,7 +142,7 @@ export class IndexedDBStrategy {
                 callbacks.done(filteredRow);
                 return;
             }
-            callbacks.done();
+            // callbacks.done()
         };
     }
     selectMany(table, Query) {
@@ -153,7 +153,13 @@ export class IndexedDBStrategy {
                 .executeOnObjectStore(table);
             const TableSchema = databaseManager.getTableSchema(this.databaseName, table);
             if (queryReader.hasNoCondition) {
-                await ObjectStore.enqueueTransaction(Object.assign({ operation: "getAll", item: null }, callbacks));
+                const result = await ObjectStore.enqueueTransaction(Object.assign({ operation: "getAll", item: null }, callbacks));
+                if (result.isOk) {
+                    callbacks.done(result.value.data);
+                }
+                else {
+                    callbacks.done([]);
+                }
             }
             else {
                 const result = await ObjectStore.enqueueTransaction(Object.assign({ operation: "getAll", item: null }, emptyCallBacks));
@@ -167,9 +173,9 @@ export class IndexedDBStrategy {
                 }
                 else {
                     callbacks.done(filteredRow);
+                    return;
                 }
             }
-            callbacks.done();
         };
     }
     migrate(migrate) {

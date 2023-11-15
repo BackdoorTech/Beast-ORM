@@ -1,4 +1,4 @@
-import { IDatabaseSchema } from "../../BusinessLayer/_interface/interface.js";
+import { IDatabaseSchema } from "../../BusinessLayer/_interface/interface.type.js";
 import { DriverAdapter, AdapterFactory } from "../DriverAdapters/DriverAdapter.js";
 export class DBConnectionManager {
 

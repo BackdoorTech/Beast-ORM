@@ -1,6 +1,5 @@
 import { FieldType } from '../../../BusinessLayer/fields/fields.type.js';
-import { AutoFieldBL, BigIntegerFieldBL, BooleanFieldBL, CharFieldBL, DateFieldBL, DateTimeFieldBL, ForeignKeyBL, IntegerFieldBL, TextFieldBL, indexedDBArrayFieldBL, indexedDBJsonFieldBL } from '../../../BusinessLayer/validation/fields/allFields.js';
-import { field } from '../../../BusinessLayer/validation/fields/allFields.type.js';
+import { AutoFieldBL, BigIntegerFieldBL, BooleanFieldBL, CharFieldBL, DateFieldBL, DateTimeFieldBL, ForeignKeyBL, IntegerFieldBL, ManyToManyFieldBL, OneToOneFieldBL, TextFieldBL, indexedDBArrayFieldBL, indexedDBJsonFieldBL } from '../../../BusinessLayer/validation/fields/allFields.js';
 /**
  * Represents an AutoField, an automatically incrementing field for primary keys.
  */
@@ -122,7 +121,7 @@ export class ForeignKey extends ForeignKeyBL {
         Object.assign(this, data);
     }
 }
-export class OneToOneField extends field {
+export class OneToOneField extends OneToOneFieldBL {
     constructor(data) {
         super();
         this.fieldName = 'OneToOneField';
@@ -131,7 +130,7 @@ export class OneToOneField extends field {
         Object.assign(this, data);
     }
 }
-export class ManyToManyField extends field {
+export class ManyToManyField extends ManyToManyFieldBL {
     constructor(data) {
         super();
         this.fieldName = 'ManyToManyField';

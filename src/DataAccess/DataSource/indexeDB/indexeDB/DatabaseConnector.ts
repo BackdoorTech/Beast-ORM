@@ -1,5 +1,6 @@
-import { IDatabaseSchema } from "./DatabaseService.type.js";
 import { connectionManagerHelper } from "./resource/connectionManagerHelper.js";
+import { middleTable } from '../../../../BusinessLayer/modelManager/relationships/middleTable';
+import { IDatabaseSchema } from "../../../../BusinessLayer/_interface/interface.type.js";
 
 export class DatabaseConnector {
 
@@ -66,7 +67,7 @@ export class DatabaseConnector {
   }
 
   private async runMigrations(db:IDBDatabase, config: IDatabaseSchema) {
-    for (const storeSchema of config.table) {
+    for (const storeSchema of config.table.concat(config.middleTables)) {
       if (!connectionManagerHelper.storeExist(db, storeSchema.name) ) {
         const ObjectStore = connectionManagerHelper.createObjectStore(db, storeSchema.id, storeSchema.name);
         for (const FieldSchema of storeSchema.fields) {
@@ -75,6 +76,7 @@ export class DatabaseConnector {
 
       }
     }
+
   }
 
   closeDatabase(db) {

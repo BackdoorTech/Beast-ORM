@@ -56,10 +56,10 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
         const queryReader = CreateQueryReaderSelect(Query)
 
         let filteredRow = []
-  
+
         if(result.isOk) {
           const rows = result.value.data
-  
+
           const sqlObject =  new SqlObject(TableSchema, queryReader)
           filteredRow = await sqlObject.run(rows)
 
@@ -70,10 +70,10 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
 
             ObjectStore.enqueueTransaction({operation:"delete", data:id, ...callbacks})
           }
-  
+
           callbacks.done(filteredRow)
           return
-  
+
         } else {
           callbacks.done(filteredRow)
         }
@@ -194,7 +194,7 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
         callbacks.done(filteredRow)
         return
       }
-      callbacks.done()
+      // callbacks.done()
 
     }
   }
@@ -213,26 +213,31 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
       const TableSchema = databaseManager.getTableSchema(this.databaseName, table)
 
       if(queryReader.hasNoCondition) {
-        await ObjectStore.enqueueTransaction({operation:"getAll", item: null, ...callbacks})
+        const result = await ObjectStore.enqueueTransaction({operation:"getAll", item: null, ...callbacks})
+        if(result.isOk) {
+          callbacks.done(result.value.data)
+        } else {
+          callbacks.done([])
+        }
       } else {
         const result = await ObjectStore.enqueueTransaction({operation:"getAll", item: null, ...emptyCallBacks})
 
         let filteredRow = []
-  
+
         if(result.isOk) {
           const rows = result.value.data
-  
+
           const sqlObject =  new SqlObject(TableSchema, queryReader)
           filteredRow = await sqlObject.run(rows)
 
           callbacks.done(filteredRow)
           return
-  
+
         } else {
           callbacks.done(filteredRow)
+          return
         }
       }
-      callbacks.done()
 
     }
   }

@@ -15,21 +15,41 @@ class BeastORM {
         this.register = (register) => {
             // generate schema
             const schema = schemaGenerator.generate(register);
+            // const middleTablesModels = modelGeneration.forMiddleTables(schema)
+            //schemaGenerator.attachMiddleTablesModel(schema, register, middleTablesModels);
             schemaGenerator.attachGeneratedTableSchemaToModel(schema, register);
             modelRegistration.register(schema);
+            // relationShip.add(register)
             const database = modelRegistration.getDatabase(schema.databaseName);
             const DatabaseStrategy = database
                 .DBConnectionManager
                 .driverAdapter
                 .strategy;
-            DatabaseStrategy.prepare(schema)({ done: () => { } });
-            this.prepareMigrations(schema, DatabaseStrategy);
+            const modelsHolder = {};
+            let a = [];
+            let count = 0;
+            for (const tableSchema of schema.table) {
+                if (tableSchema.attributes.foreignKey) {
+                    for (const fieldName of tableSchema.attributes.foreignKey) {
+                        register.models[count];
+                        modelsHolder[fieldName] = register.models[count];
+                        a.push({
+                            fieldName: fieldName,
+                            model: register.models[count]
+                        });
+                    }
+                }
+                count++;
+            }
             for (const model of register.models) {
                 // const tableSchema = model[RM.getTableSchema]()
                 this.addMethods(model, RM.getModel, model);
                 const generateValidator = validator.ModelValidator(model, model[RM.getTableSchema]());
                 this.addStaticMethodNowrap(model, RM.validator, generateValidator);
             }
+            // console.log({schema})
+            DatabaseStrategy.prepare(schema)({ done: () => { } });
+            this.prepareMigrations(schema, DatabaseStrategy);
         };
     }
     addMethods(Model, functionName, value) {
@@ -40,7 +60,9 @@ class BeastORM {
     }
     async prepareMigrations(schema, DatabaseStrategy) {
         const makeMigrations = new MakeMigrations();
+        // console.log("===================================5")
         await makeMigrations.make(schema);
+        // console.log("===================================6")
         if (makeMigrations.needToMigrate) {
             // console.log("Migrate")
             await migrateMigrations.prepareMigrate(schema, DatabaseStrategy);
@@ -59,6 +81,7 @@ class BeastORM {
             .driverAdapter
             .strategy;
         const arrayOfData = QueryBuilder.query.values;
+        const arrayOfDataBackup = [...QueryBuilder.query.values];
         const validator = Model[RM.validator];
         for (const object in arrayOfData) {
             arrayOfData[object] = dataParameters.getFilteredData(tableSchema, arrayOfData[object]);
@@ -69,10 +92,10 @@ class BeastORM {
         }
         QueryBuilder.setCleanData(arrayOfData);
         if (QueryBuilder.query.isParamsArray) {
-            return await queryBuilderInsertHandler.INSERTMany(DatabaseStrategy, QueryBuilder);
+            return await queryBuilderInsertHandler.INSERTMany(DatabaseStrategy, QueryBuilder, arrayOfDataBackup);
         }
         else {
-            return await queryBuilderInsertHandler.INSERTOne(DatabaseStrategy, QueryBuilder);
+            return await queryBuilderInsertHandler.INSERTOne(DatabaseStrategy, QueryBuilder, arrayOfDataBackup);
         }
     }
     async executeSelectQuery(QueryBuilder, Model) {

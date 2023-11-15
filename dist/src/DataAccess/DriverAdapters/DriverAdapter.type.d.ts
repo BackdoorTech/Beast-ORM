@@ -1,5 +1,5 @@
 import { IQuery } from "../../BusinessLayer/_interface/Apresentation/queryBuilder.js";
-import { IDatabaseSchema } from '../../BusinessLayer/_interface/interface.js';
+import { IDatabaseSchema } from '../../BusinessLayer/_interface/interface.type.js';
 export interface IReturnObject {
     onsuccess?: Function;
     onerror?: Function;

@@ -7,13 +7,38 @@ import { dataParameters } from "../BusinessLayer/modelManager/dataParameters.js"
  */
 export class Model {
     static getTableSchema() {
-        return {};
+        throw ("Register your Model before using the API");
     }
     static getModel() {
-        return { cars: 'd' };
+        throw ("Register your Model before using the API");
     }
     getModel() {
-        return { cars: 'd' };
+        throw ("Register your Model before using the API");
+    }
+    static getModelSchema() {
+        throw ("Register your Model before using the API");
+    }
+    async get() {
+        const queryBuilder = new QueryBuilder({ isParamsArray: false });
+        const model = this.getModel();
+        const tableSchema = model.getTableSchema();
+        const filter = {};
+        const idFieldName = tableSchema.id.keyPath;
+        filter[idFieldName] = this[idFieldName];
+        queryBuilder
+            .select(model)
+            .where(filter)
+            .limit(1)
+            .hasIndex(true);
+        // console.log({queryBuilder})
+        const result = await ORM.executeSelectQuery(queryBuilder, this);
+        if (result.isError) {
+            throw (result.error);
+        }
+        else {
+            Object.assign(this, result.value);
+            return true;
+        }
     }
     static async get(value) {
         const queryBuilder = new QueryBuilder({ isParamsArray: false });
@@ -59,6 +84,7 @@ export class Model {
         const isParamsArray = Array.isArray(params) ? true : false;
         const model = this.getModel();
         const queryBuilder = new QueryBuilder({ isParamsArray });
+        // console.log({params})
         queryBuilder.insertInto(model).insert(params);
         const result = await ORM.executeInsertionQuery(queryBuilder, this);
         if (result.isError) {
@@ -94,6 +120,18 @@ export class Model {
         else {
             return true;
         }
+    }
+    getPrimaryKeyValue() {
+        const model = this.getModel();
+        const tableSchema = model.getTableSchema();
+        const idFieldName = tableSchema.id.keyPath;
+        return this[idFieldName];
+    }
+    setPrimaryKey(key) {
+        const model = this.getModel();
+        const tableSchema = model.getTableSchema();
+        const primaryKeyFieldName = tableSchema.id.keyPath;
+        this[primaryKeyFieldName] = key;
     }
     // delete one
     async delete() {

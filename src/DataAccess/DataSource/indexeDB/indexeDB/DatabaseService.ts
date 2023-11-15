@@ -1,4 +1,4 @@
-import { IDatabaseSchema } from "../../../../BusinessLayer/_interface/interface.js";
+import { IDatabaseSchema } from "../../../../BusinessLayer/_interface/interface.type.js";
 import { DatabaseConnector } from "./DatabaseConnector.js";
 import { ObjectStore } from './ObjectStore.js'
 export class DatabaseService {
@@ -15,7 +15,7 @@ export class DatabaseService {
     this.schema = schema
     this.connector = new DatabaseConnector()
 
-    for (let tableSchema of schema.table) {
+    for (let tableSchema of schema.table.concat(schema.middleTables)) {
       this.objectStore[tableSchema.name] = new ObjectStore(tableSchema)
       this.objectStore[tableSchema.name].connect = this.connect
       this.objectStore[tableSchema.name].transactionFinish = this.transactionFinish

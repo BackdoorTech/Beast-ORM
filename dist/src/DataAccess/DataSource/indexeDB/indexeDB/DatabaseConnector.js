@@ -51,7 +51,7 @@ export class DatabaseConnector {
         });
     }
     async runMigrations(db, config) {
-        for (const storeSchema of config.table) {
+        for (const storeSchema of config.table.concat(config.middleTables)) {
             if (!connectionManagerHelper.storeExist(db, storeSchema.name)) {
                 const ObjectStore = connectionManagerHelper.createObjectStore(db, storeSchema.id, storeSchema.name);
                 for (const FieldSchema of storeSchema.fields) {

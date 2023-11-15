@@ -29,7 +29,7 @@ export class DatabaseService {
         };
         this.schema = schema;
         this.connector = new DatabaseConnector();
-        for (let tableSchema of schema.table) {
+        for (let tableSchema of schema.table.concat(schema.middleTables)) {
             this.objectStore[tableSchema.name] = new ObjectStore(tableSchema);
             this.objectStore[tableSchema.name].connect = this.connect;
             this.objectStore[tableSchema.name].transactionFinish = this.transactionFinish;

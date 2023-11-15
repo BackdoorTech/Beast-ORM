@@ -6,13 +6,13 @@ import fs from 'fs'
 const { Port } = JSON.parse(fs.readFileSync('./test/config/test.json', 'utf8'));
 
 describe("Trigger", () => {
-  
+
   beforeEach(async () => {
     await page.goto(`http://127.0.0.1:${Port}/test/index.html`)
   })
 
   it('transactionOnCommit', async () => {
-  
+
     await  page.waitForFunction(() => 'models' in window);
 
     await page.evaluate(async() => {
@@ -20,9 +20,9 @@ describe("Trigger", () => {
       const models: typeof modelsType = window['models']
 
       class Person extends models.Model {
-        username = models.CharField({})  
-      } 
-      
+        username = models.CharField({})
+      }
+
       models.migrate({
         databaseName:'',
         type: 'indexedDB',
@@ -36,13 +36,13 @@ describe("Trigger", () => {
         document.body.innerHTML = JSON.stringify(await Person.all())
       })
 
-      
+
     })
     debugger
 
-    
+
     // Check to see if text exists on the page
-    const text = ('[{"username":"peter","id":1}]')    
+    const text = ('[{"username":"peter","id":1}]')
 
     try {
 
@@ -56,13 +56,13 @@ describe("Trigger", () => {
     } catch(e) {
       expect(text).toBe(await page.$eval('body', el => (el as any).innerText))
     }
-    
-    
+
+
   }, 65000)
 
 
   it('transactionOnCommit UnSubscribe', async () => {
-  
+
     await  page.waitForFunction(() => 'models' in window);
 
     await page.evaluate(async() => {
@@ -70,9 +70,9 @@ describe("Trigger", () => {
       const models: typeof modelsType = window['models']
 
       class Person extends models.Model {
-        username = models.CharField({})  
-      } 
-      
+        username = models.CharField({})
+      }
+
       models.migrate({
         databaseName:'',
         type: 'indexedDB',
@@ -83,17 +83,16 @@ describe("Trigger", () => {
       Person.create({username: 'peter'})
 
       let subscription = Person.transactionOnCommit( async () => {
-        console.log('one')
         document.body.innerHTML = (await subscription.unsubscribe())+ '.'
       })
 
     })
     debugger
 
-    
+
     // Check to see if text exists on the page
     const text = 'true.'
-    
+
     try {
 
       await page.waitForFunction(
@@ -106,7 +105,7 @@ describe("Trigger", () => {
     } catch(e) {
       expect(text).toBe(await page.$eval('body', el => (el as any).innerText))
     }
-    
+
   }, 65000)
 
 

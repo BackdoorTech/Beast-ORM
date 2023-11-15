@@ -2,7 +2,7 @@ import { error, ok } from '../../Utility/Either/index.js';
 class QueryBuilderSelectHandler {
     async SELECTOne(DatabaseStrategy, QueryBuilder) {
         const tableName = QueryBuilder.query.table;
-        let result = [];
+        const model = QueryBuilder.model;
         return await new Promise((resolve, reject) => {
             DatabaseStrategy.select(tableName, QueryBuilder.query)({
                 onsuccess: (data) => { },
@@ -10,36 +10,25 @@ class QueryBuilderSelectHandler {
                     resolve(error(false));
                 },
                 done: (data) => {
-                    if (QueryBuilder.hasNoCondition) {
-                        resolve(ok(result)); // get all with no condition `Model.all()`
-                    }
-                    else { // get with condition `Model.get()`
-                        resolve(ok(data[0]));
-                    }
+                    const newInstanceOfModel = new model();
+                    Object.assign(newInstanceOfModel, data[0]);
+                    resolve(ok(newInstanceOfModel));
                 }
             });
         });
     }
     async SELECTMany(DatabaseStrategy, QueryBuilder) {
         const tableName = QueryBuilder.query.table;
-        let result = [];
+        const model = QueryBuilder.model;
         return await new Promise((resolve, reject) => {
             DatabaseStrategy.selectMany(tableName, QueryBuilder.query)({
-                onsuccess: (data) => {
-                    result = data.data; // get all with no condition `Model.all()`
-                },
+                onsuccess: (data) => { },
                 onerror: () => {
-                    if (!QueryBuilder.query.isParamsArray) {
-                        resolve(error(false));
-                    }
+                    resolve(error(false));
                 },
                 done: (data) => {
-                    if (QueryBuilder.hasNoCondition) {
-                        resolve(ok(result)); // get all with no condition `Model.all()`
-                    }
-                    else { // get with condition `Model.get()`
-                        resolve(ok(data));
-                    }
+                    data = data.map(e => Object.assign(new model(), e));
+                    resolve(ok(data));
                 }
             });
         });

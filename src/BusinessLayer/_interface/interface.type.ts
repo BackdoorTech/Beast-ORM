@@ -1,4 +1,5 @@
-import { AttributesMap, FieldAttributesKeys, FieldKeys, FieldType, FieldsMap, PossibleFieldAttributes } from "../../../Presentation/Model/fields/allFields.type.js"
+import { AttributesMap, FieldAttributesKeys, FieldKeys, FieldType, FieldsMap } from "../fields/fields.type"
+import { PossibleFieldAttributes } from "../fields/fieldsParameters.type"
 
 export interface IFieldSchema {
 	name: string,
@@ -19,6 +20,7 @@ export interface ITableSchema {
 	fields: IFieldSchema[]
 	attributes: AttributesMap<FieldAttributesKeys, string[]>
 	fieldTypes: FieldsMap<FieldKeys, string[]>
+  foreignKey: {[fieldName: string]: { tableName: string}}
 	middle?: boolean,
   fieldNames: string[],
 }
@@ -28,5 +30,6 @@ export interface IDatabaseSchema {
 	type: 'indexedDB' | 'localStorage'
 	version: number;
 	webWorker?:boolean,
-	table: ITableSchema[]
+	table: ITableSchema[],
+  middleTables: ITableSchema[],
 }

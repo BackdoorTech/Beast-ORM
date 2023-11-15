@@ -1,4 +1,6 @@
 import { error, ok } from "../../../Utility/Either/index.js";
+class emptyError extends Error {
+}
 class maxLengthError extends Error {
 }
 class minLengthError extends Error {
@@ -19,6 +21,9 @@ export class field {
         return false;
     }
     rules(field, value) {
+        if (value == null || value == undefined) {
+            return error(new emptyError());
+        }
         if (field === null || field === void 0 ? void 0 : field.maxLength) {
             if (value.toString().length > field.maxLength) {
                 return error(new maxLengthError());

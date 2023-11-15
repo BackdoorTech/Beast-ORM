@@ -4,11 +4,9 @@ class DatabaseManager {
         this.databases = {};
     }
     async migrate(config) {
-        //console.log("migrate db")
         await this.databases[config.databaseName].migrate();
     }
     async prepare(config) {
-        //console.log("create db connection")
         this.databases[config.databaseName] = new DatabaseService(config);
     }
     getDb(databaseName) {

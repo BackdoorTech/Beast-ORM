@@ -55,16 +55,21 @@ class indexedDBFIFO {
       if (this.transactionQueue.length > 0) {
         this.isTransactionInProgress = true;
         let nextTransaction = this.transactionQueue.shift();
+        // console.log({nextTransaction})
         this.pending++
         this.executeTransaction(nextTransaction)
           .then(() => {})
-          .catch((error) => {}).finally(()=> {
+          .catch((error) => {
+            console.log(error)
+          }).finally(()=> {
             this.pending--
             loop()
           })
 
       } else {
         this.isTransactionInProgress = false;
+        // console.log("end processTransactionQueue")
+       // console.log({transactionQueue: this.transactionQueue})
 
         if(this.db) {
           if(this.pending == 0) {
@@ -90,9 +95,12 @@ class indexedDBFIFO {
 
       let request = this.txInstance.objectStore("database")[operation](transaction.data);
 
+      // console.log({operation, transaction:transaction.data})
+
       request.onsuccess = () => {
         resolve(request.result);
         transaction.callback(request.result)
+        // console.log({request: request.result})
       };
 
       request.onerror = (error) => {
@@ -108,10 +116,12 @@ class indexedDBFIFO {
 
     if (!this.isTransactionInProgress) {
       this.processTransactionQueue();
+      // console.log("start processTransactionQueue", data)
     }
   }
 
   async insert(storeName, data, callback) {
+    // console.log("this.enqueueTransaction")
     return this.enqueueTransaction({storeName, mode:'readwrite', operation:'add', data:data, callback});
   }
 
@@ -141,6 +151,7 @@ export class MigrationsModel {
 
   static async insert(data) {
     return new Promise((resolve)=> {
+      // console.log(" this.DB().insert")
       this.DB().insert("objectStore", data, (data)=> {
         resolve(data)
       })

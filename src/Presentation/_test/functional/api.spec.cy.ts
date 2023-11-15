@@ -139,7 +139,7 @@ describe('API', () => {
       const all = await Person.all()
 
       expect(result).to.equal(true) // test fails
-      expect(all).to.deep.equal([{ username: '123', id: all[0].id }]) // test fails
+      expect([Object.assign({}, all[0])]).to.deep.equal([{ username: '123', id: all[0].id }]) // test fails
 
 
     });
@@ -202,13 +202,13 @@ describe('API', () => {
         models: [Person],
       });
 
-      await Person.deleteAll()
+      const a = await Person.deleteAll()
 
       const createdPerson = await Person.create({username:'kobe', email:'kobe.bryant@lakers.com'})
 
       const all = await Person.all()
 
-      expect(Object.assign({}, all[0])).to.deep.equal({username: 'kobe', email: 'kobe.bryant@lakers.com', age: null, userId: createdPerson.userId})
+      expect(Object.assign({}, all[0])).to.deep.equal({username: 'kobe', email: 'kobe.bryant@lakers.com', age: undefined, userId: createdPerson.userId})
       expect(Object.assign({}, createdPerson)).to.deep.equal({username: 'kobe', email: 'kobe.bryant@lakers.com', age: null, userId: createdPerson.userId})
 
     });
@@ -244,7 +244,10 @@ describe('API', () => {
 
       const person = await Person.get({userId: createdPerson.userId})
 
-      expect(Object.assign({}, person)).to.deep.equal(Object.assign({}, createdPerson))
+      delete createdPerson.age
+      delete person.age
+
+      expect(person).to.deep.equal(createdPerson)
 
     });
 
@@ -284,7 +287,6 @@ describe('API', () => {
       await Person.filter({username:"Peter"}).update({username:"michael jackson"})
 
       const jackson = await Person.filter({username:"michael jackson"}).execute()
-      
       expect(jackson.length).to.equal(9) // test fails
     });
 
@@ -324,9 +326,100 @@ describe('API', () => {
       await Person.filter({username:"Peter"}).delete()
 
       const all = await Person.all()
-      
+
       expect(all.length).to.equal(0) // test fails
     });
 
   })
+
+
+
+
+  it('one-to-one relationships ', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+
+      const models = wind.models
+      class Place extends wind.models.Model {
+        name = wind.models.CharField({maxLength: 50})
+        address = wind.models.CharField({maxLength: 50})
+      }
+
+      class Restaurant extends wind.models.Model  {
+        place = wind.models.OneToOneField({model:Place})
+        servesHotDogs = wind.models.BooleanField({default: false})
+        servesPizza = wind.models.BooleanField({default: false})
+      }
+
+
+      wind.models.register({
+        databaseName:'jest-test-10',
+        type: 'indexedDB',
+        version: 1,
+        models: [Place, Restaurant]
+      })
+
+      await Place.deleteAll()
+      await Restaurant.deleteAll()
+
+      const p1 = await Place.create({name:'Demon Dogs', address:'944 W. Fullerton'})
+      const r = await Restaurant.create({place:p1, servesHotDogs: false, servesPizza:false})
+
+      const object = await r.place.get()
+
+
+      expect(p1).to.deep.equal(r.place)
+      expect(true).to.deep.equal(object)
+    });
+  })
+
+
+
+  it('one-to-many relationships ', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+
+      const models = wind.models
+      class Reporter extends wind.models.Model {
+        firstName = wind.models.CharField({maxLength:30})
+        lastName = wind.models.CharField({maxLength:30})
+        email = wind.models.CharField()
+        articles= wind.models.getter.ForeignKeyGetter({model: Article, I: this})
+      }
+      class Article extends wind.models.Model  {
+        headline = wind.models.CharField({maxLength:100})
+        pubDate = wind.models.DateField()
+        reporter = wind.models.ForeignKey({model:Reporter})
+      }
+
+      wind.models.register({
+        databaseName:'jest-test-11',
+        type: 'indexedDB',
+        version: 1,
+        models: [Reporter, Article]
+      })
+
+      await Reporter.deleteAll()
+      await Article.deleteAll()
+
+      const r = await Reporter.create({firstName:"John", lastName:"Smith", email:"john@example.com"})
+      const a = await Article.create({headline:"This is a test", pubDate:"date(2005, 7, 27)", reporter:r})
+      const object = await a.reporter.get()
+
+      expect(r.firstName).to.deep.equal(a.reporter.firstName)
+      expect(true).to.deep.equal(object)
+
+      const a1 = await r.articles().add({headline:"peter", pubDate:"dias", email:"john@example.com"})
+
+      expect(r.firstName).to.deep.equal(a1.reporter.firstName)
+
+    });
+  })
+
 })

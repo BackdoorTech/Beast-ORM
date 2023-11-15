@@ -1,4 +1,4 @@
-import { ITableSchema } from "../../../../BusinessLayer/_interface/interface.js";
+import { ITableSchema } from "../../../../BusinessLayer/_interface/interface.type.js";
 import { Either, ok, error as err } from "../../../../Utility/Either/index.js";
 import { ObjectStoreRequestResult } from "./ObjectStore.type.js";
 

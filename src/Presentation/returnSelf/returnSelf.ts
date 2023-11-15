@@ -1,7 +1,7 @@
 import { ORM } from "../../BusinessLayer/beastOrm.js"
 import { Model } from "../Api"
 import { dataParameters } from "../../BusinessLayer/modelManager/dataParameters.js";
-import { ITableSchema } from "../../BusinessLayer/_interface/interface.js";
+import { ITableSchema } from "../../BusinessLayer/_interface/interface.type.js";
 
 /**
  * @description Represents a return object for query-related methods

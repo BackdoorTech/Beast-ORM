@@ -1,5 +1,6 @@
 import { error, ok } from '../../Utility/Either/index.js';
 import { ValidationError } from './error/ValidationError.js';
+import { RuntimeMethods as RM } from '../modelManager/runtimeMethods/runTimeMethods.js';
 class Validator {
     validateFromSchema(tableSchema, data) {
         const requiredFieldNames = this.requiredFields(tableSchema);
@@ -20,9 +21,11 @@ class Validator {
         return fieldNames;
     }
     ModelValidator(Model, tableSchema) {
-        const data = new Model();
+        const data = Model[RM.getModelSchema]();
+        const relationship = tableSchema.fieldTypes["OneToOneField"] || [];
+        const fieldNames = tableSchema.fieldNames.filter(e => !relationship.find(b => b == e));
         return (Object) => {
-            for (const fieldName of tableSchema.fieldNames) {
+            for (const fieldName of fieldNames) {
                 const validator = data[fieldName];
                 const value = Object[fieldName];
                 const result = validator.valid(value);

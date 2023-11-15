@@ -38,7 +38,10 @@ export class MigrationsStorageManager {
     const data = {
       databaseName: Migrations.databaseName,
       databaseVersion: Migrations.version,
-      migrations:  Migrations.table
+      migrations:  {
+        table: Migrations.table,
+        middleTables: Migrations.middleTables,
+      }
     }
     await this.MigrationsModel.insert(data)
   }

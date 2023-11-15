@@ -3,15 +3,13 @@ import { InvalidType, InvalidValue } from '../../error/class/validation.js';
 import { field, sizeError } from './allFields.type.js';
 function isString(field, value) {
     if (typeof value != 'string') {
-        if (field.blank && value != null)
-            return error(new InvalidValue());
+        return error(new InvalidValue());
     }
     return ok(true);
 }
 function isNumber(field, value) {
     if (!(typeof value == 'bigint' || typeof value == 'number')) {
-        if (field.blank && value != null)
-            return error(new InvalidValue());
+        return error(new InvalidValue());
     }
     return ok(true);
 }
@@ -21,6 +19,9 @@ function isNumber(field, value) {
 export class AutoFieldBL extends field {
     constructor() { super(); }
     valid(value) {
+        if (this.blank && (value == null || value == undefined)) {
+            return ok(true);
+        }
         const result = isNumber(this, value);
         if (result.isError) {
             return result;
@@ -34,6 +35,9 @@ export class AutoFieldBL extends field {
 export class BigIntegerFieldBL extends field {
     constructor() { super(); }
     valid(value) {
+        if (this.blank && (value == null || value == undefined)) {
+            return ok(true);
+        }
         const result = isNumber(this, value);
         if (result.isError) {
             return result;
@@ -61,6 +65,9 @@ export class BooleanFieldBL extends field {
 export class CharFieldBL extends field {
     constructor() { super(); }
     valid(value) {
+        if (this.blank && (value == null || value == undefined)) {
+            return ok(true);
+        }
         const result = isString(this, value);
         if (result.isError) {
             return result;
@@ -74,6 +81,9 @@ export class CharFieldBL extends field {
 export class DateFieldBL extends field {
     constructor() { super(); }
     valid(value) {
+        if (this.blank && (value == null || value == undefined)) {
+            return ok(true);
+        }
         const result = isString(this, value);
         if (result.isError) {
             return result;
@@ -87,6 +97,9 @@ export class DateFieldBL extends field {
 export class DateTimeFieldBL extends field {
     constructor() { super(); }
     valid(value) {
+        if (this.blank && (value == null || value == undefined)) {
+            return ok(true);
+        }
         const result = isString(this, value);
         if (result.isError) {
             return result;
@@ -139,6 +152,9 @@ export class indexedDBJsonFieldBL extends field {
 export class TextFieldBL extends field {
     constructor() { super(); }
     valid(value) {
+        if (this.blank && (value == null || value == undefined)) {
+            return ok(true);
+        }
         const result = isString(this, value);
         if (result.isError) {
             return result;
@@ -155,6 +171,9 @@ export class TextFieldBL extends field {
 export class IntegerFieldBL extends field {
     constructor() { super(); }
     valid(value) {
+        if (this.blank && (value == null || value == undefined)) {
+            return ok(true);
+        }
         const result = isNumber(this, value);
         if (result.isError) {
             return result;
@@ -171,6 +190,8 @@ export class ForeignKeyBL extends field {
         const validation = this.rules(this, value);
         if (validation.isError)
             return validation;
+        else
+            return ok(true);
     }
 }
 export class OneToOneFieldBL extends field {
@@ -179,6 +200,8 @@ export class OneToOneFieldBL extends field {
         const validation = this.rules(this, value);
         if (validation.isError)
             return validation;
+        else
+            return ok(true);
     }
 }
 export class ManyToManyFieldBL extends field {
@@ -187,5 +210,7 @@ export class ManyToManyFieldBL extends field {
         const validation = this.rules(this, value);
         if (validation.isError)
             return validation;
+        else
+            return ok(true);
     }
 }

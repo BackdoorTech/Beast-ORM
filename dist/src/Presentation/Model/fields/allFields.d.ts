@@ -1,7 +1,7 @@
 import { FieldKeys, FieldType } from '../../../BusinessLayer/fields/fields.type.js';
-import { AutoFieldBL, BigIntegerFieldBL, BooleanFieldBL, CharFieldBL, DateFieldBL, DateTimeFieldBL, ForeignKeyBL, IntegerFieldBL, TextFieldBL, indexedDBArrayFieldBL, indexedDBJsonFieldBL } from '../../../BusinessLayer/validation/fields/allFields.js';
+import { AutoFieldBL, BigIntegerFieldBL, BooleanFieldBL, CharFieldBL, DateFieldBL, DateTimeFieldBL, ForeignKeyBL, IntegerFieldBL, ManyToManyFieldBL, OneToOneFieldBL, TextFieldBL, indexedDBArrayFieldBL, indexedDBJsonFieldBL } from '../../../BusinessLayer/validation/fields/allFields.js';
 import { AutoFieldParams, BigIntegerFieldParams, BooleanFieldParams, CharFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyParams, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, OneToOneFieldParams, TextFieldParams } from '../../../BusinessLayer/fields/fieldsParameters.type.js';
-import { field } from '../../../BusinessLayer/validation/fields/allFields.type.js';
+import { Model } from '../../Api.js';
 /**
  * Represents an AutoField, an automatically incrementing field for primary keys.
  */
@@ -87,21 +87,23 @@ export declare class IntegerField extends IntegerFieldBL {
 }
 export declare class ForeignKey extends ForeignKeyBL {
     fieldName: FieldKeys;
-    model: any;
+    model: typeof Model<any>;
     foreignKey: boolean;
     blank: boolean;
+    I: Model<any>;
     constructor(data?: ForeignKeyParams);
 }
-export declare class OneToOneField extends field implements OneToOneFieldParams {
+export declare class OneToOneField<T> extends OneToOneFieldBL implements OneToOneFieldParams<T> {
     fieldName: FieldKeys;
     foreignKey: boolean;
     blank: boolean;
     model: any;
-    constructor(data?: OneToOneFieldParams);
+    constructor(data?: OneToOneFieldParams<T>);
 }
-export declare class ManyToManyField extends field implements ManyToManyFieldParams {
+export declare class ManyToManyField extends ManyToManyFieldBL implements ManyToManyFieldParams {
     fieldName: FieldKeys;
-    model: any;
+    model: typeof Model<any>;
+    I: Model<any>;
     foreignKey: boolean;
     blank: boolean;
     constructor(data?: ManyToManyFieldParams);
