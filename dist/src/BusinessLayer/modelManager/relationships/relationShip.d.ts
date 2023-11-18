@@ -1,4 +1,6 @@
 import { Model } from "../../../Presentation/Api";
+import { IDatabaseSchema, IMethodWithModels } from "../../_interface/interface.type";
+import { IRegister } from "../../beastOrm.type.js";
 export declare class RelationShip {
     getMiddleTable(modelWithNoGetter: typeof Model<any>, modelWithGetter: typeof Model<any>): {
         new (): Model<any>;
@@ -19,5 +21,6 @@ export declare class RelationShip {
     getMiddleTableName(modelWithNoGetter: typeof Model<any>, modelWithGetter: typeof Model<any>): string;
     addToMiddleTable<T>(currentModel: Model<any>, otherModel: typeof Model<any>, toAdd: Model<any>, middleTableModel: typeof Model<any>): Promise<T>;
     getAll<T>(currentModel: Model<any>, otherModel: typeof Model<any>, middleTableModel: typeof Model<any>): Promise<any[]>;
+    generateRelationShipMethods(databaseSchema: IDatabaseSchema, entries: IRegister, _MiddleModels: typeof Model<any>[]): IMethodWithModels[];
 }
 export declare const relationShip: RelationShip;

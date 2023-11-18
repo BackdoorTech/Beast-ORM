@@ -1,9 +1,11 @@
 import { Model } from "../../../Presentation/Api"
 import { getArgIdWithT } from "../../../Utility/Model/utils.js"
 import { capitalizeFirstLetter } from "../../../Utility/utils.js"
+import { IDatabaseSchema, IMethodWithModels } from "../../_interface/interface.type"
 import { IRegister } from "../../beastOrm.type.js"
 import { modelRegistration } from "../register/register.js"
-
+import { addRunTimeMethod } from "../runtimeMethods/addRuntimeMethod.js"
+import { RuntimeMethods as RM } from "../runtimeMethods/runTimeMethods.js"
 
 export class RelationShip {
 
@@ -64,6 +66,93 @@ export class RelationShip {
     return resolvedResults;
   }
 
+
+  generateRelationShipMethods(databaseSchema:IDatabaseSchema, entries: IRegister , _MiddleModels: typeof Model<any>[]) {
+
+    const methodWithModels: IMethodWithModels[] = []
+
+
+    for (let index = 0; index < databaseSchema.table.length; index++) {
+
+      const currentModel: typeof Model<any> = entries.models[index]
+
+      const currentModelName = currentModel.getTableSchema().name
+      const middleTablePK = databaseSchema.table[index].middleTablePK
+      const foreignKeyLength = Object.keys(middleTablePK).length
+
+      if(foreignKeyLength>=1) {
+        for (const [fieldName, info] of  Object.entries(middleTablePK)) {
+
+          let index = methodWithModels.push({
+            Model: currentModel,
+            func: []
+          })
+
+
+
+          const middleTableModel = _MiddleModels.find(e => {
+            if (e.getTableSchema().name == info.tableName) {
+              return true
+            }
+          })
+
+          const otherModel:typeof Model<any> = currentModel.getModelSchema()[fieldName].model
+          const otherParameterName = otherModel.getTableSchema().name
+
+          const currentTableName = capitalizeFirstLetter(currentModelName)
+
+          const funcAdd = function(Model: Model<any>) {
+
+            const parameters = {}
+
+            parameters["iD"+otherParameterName] = getArgIdWithT(otherModel, Model)
+            parameters["iD"+currentTableName] = getArgIdWithT(currentModel, this)
+
+            // console.log({parameters,currentTableName, otherParameterName })
+
+            return middleTableModel.create(parameters)
+
+          }
+
+          methodWithModels[index - 1].func.push({
+            name: fieldName+"Add",
+            function: funcAdd
+          })
+
+          const funcGetAll = async function() {
+
+            const parameters = {}
+
+            parameters["iD"+currentTableName] = getArgIdWithT(currentModel, this)
+
+            const result: any[] =  await middleTableModel.filter(parameters).execute() as any
+
+            const asyncOperations = result.map(async (e) => {
+              await e["iD" + otherParameterName].get();
+              return e["iD" + otherParameterName];
+            });
+
+            // Use Promise.all to wait for all asynchronous operations to complete
+            const resolvedResults = await Promise.all(asyncOperations);
+
+            return resolvedResults;
+
+          }
+
+          methodWithModels[index - 1].func.push({
+            name:  fieldName+RM.All,
+            function: funcGetAll
+          })
+
+        }
+      }
+
+    }
+
+
+    return methodWithModels
+
+  }
 
 }
 

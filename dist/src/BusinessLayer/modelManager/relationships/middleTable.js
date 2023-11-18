@@ -47,7 +47,7 @@ export class MiddleTable {
         };
         middleTableSchema.foreignKey['iD' + currentModelName] = { tableName: currentModelName };
         middleTableSchema.foreignKey['iD' + foreignKeyModelName] = { tableName: foreignKeyModelName };
-        console.log({ ArgCurrentModelName, currentModelName, foreignKeyModelName, middleTableSchema });
+        // console.log({ArgCurrentModelName, currentModelName, foreignKeyModelName, middleTableSchema})
         return middleTableSchema;
     }
     generateGenericModel({ ModelName, middleTableSchema }) {

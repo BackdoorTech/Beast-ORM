@@ -1,3 +1,4 @@
+import { Model } from "../../Presentation/Api";
 import { AttributesMap, FieldAttributesKeys, FieldKeys, FieldType, FieldsMap } from "../fields/fields.type";
 import { PossibleFieldAttributes } from "../fields/fieldsParameters.type";
 export interface IFieldSchema {
@@ -48,4 +49,11 @@ export interface IDatabaseSchema {
     webWorker?: boolean;
     table: ITableSchema[];
     middleTables: ITableSchema[];
+}
+export interface IMethodWithModels {
+    Model: typeof Model<any>;
+    func: {
+        name: string;
+        function: Function;
+    }[];
 }

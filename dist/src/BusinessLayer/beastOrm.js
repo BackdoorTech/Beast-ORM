@@ -2,7 +2,6 @@ import { schemaGenerator } from './modelManager/schemaGenerator/schemaGenerator.
 import { modelRegistration } from './modelManager/register/register.js';
 import { MakeMigrations } from '../DataAccess/SchemaMigrations/MakeMigration.js';
 import { migrateMigrations } from '../DataAccess/SchemaMigrations/MigrateMigrations.js';
-import { customMethod } from '../Configuration/CustomMethod.js';
 import { validator } from './validation/validator.js';
 import { dataParameters } from "./modelManager/dataParameters.js";
 import { RuntimeMethods as RM } from './modelManager/runtimeMethods/runTimeMethods.js';
@@ -10,15 +9,19 @@ import { queryBuilderInsertHandler } from "./queryBuilderHandler/queryBuilderIns
 import { queryBuilderDeleteHandler } from "./queryBuilderHandler/queryBuilderDeletehandler.js";
 import { queryBuilderUpdateHandler } from "./queryBuilderHandler/queryBuilderUpdateHandler.js";
 import { queryBuilderSelectHandler } from "./queryBuilderHandler/queryBuilderSelectHandler.js";
+import { relationShip } from './modelManager/relationships/relationShip.js';
 import { modelGeneration } from './modelManager/modelGenerator.js';
+import { addRunTimeMethod } from './modelManager/runtimeMethods/addRuntimeMethod.js';
 class BeastORM {
     constructor() {
         this.register = (register) => {
+            addRunTimeMethod.addModelSchema(register);
             // generate schema
             const schema = schemaGenerator.generate(register);
-            schemaGenerator.attachGeneratedTableSchemaToModel(schema, register);
+            addRunTimeMethod.addGeneratedTableSchemaToModel(schema, register);
             const middleTablesModels = modelGeneration.forMiddleTables(schema, register);
-            schemaGenerator.attachMiddleTablesModel(schema, register, middleTablesModels);
+            const methodToAdd = relationShip.generateRelationShipMethods(schema, register, middleTablesModels);
+            addRunTimeMethod.attachRelationShipMethods(methodToAdd);
             const models = register.models.concat(middleTablesModels);
             modelRegistration.register(schema, models);
             const database = modelRegistration.getDatabase(schema.databaseName);
@@ -27,21 +30,14 @@ class BeastORM {
                 .driverAdapter
                 .strategy;
             for (const model of register.models) {
-                // const tableSchema = model[RM.getTableSchema]()
-                this.addMethods(model, RM.getModel, model);
+                addRunTimeMethod.addStaticFunctionFWrap(model, RM.getModel, model);
+                addRunTimeMethod.addFunctionFWrap(model, RM.getModel, model);
                 const generateValidator = validator.ModelValidator(model, model[RM.getTableSchema]());
-                this.addStaticMethodNowrap(model, RM.validator, generateValidator);
+                addRunTimeMethod.addStaticFunctionFWrap(model, RM.validator, generateValidator);
             }
-            // console.log({schema})
             DatabaseStrategy.prepare(schema)({ done: () => { } });
             this.prepareMigrations(schema, DatabaseStrategy);
         };
-    }
-    addMethods(Model, functionName, value) {
-        customMethod.add(Model, functionName, value);
-    }
-    addStaticMethodNowrap(Model, functionName, value) {
-        customMethod.addStaticMethodNowrap(Model, functionName, value);
     }
     async prepareMigrations(schema, DatabaseStrategy) {
         const makeMigrations = new MakeMigrations();
@@ -67,6 +63,7 @@ class BeastORM {
             .strategy;
         const arrayOfData = QueryBuilder.query.values;
         const arrayOfDataBackup = [...QueryBuilder.query.values];
+        // console.log("Model=============================", Model)
         const validator = Model[RM.validator];
         for (const object in arrayOfData) {
             arrayOfData[object] = dataParameters.getFilteredData(tableSchema, arrayOfData[object]);

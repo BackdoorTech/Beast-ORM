@@ -12,7 +12,7 @@ class ModelGeneration {
         return models;
     }
     generateGenericModel(ModelName, middleTableSchema, register) {
-        console.log("generateGenericModel", middleTableSchema);
+        // console.log("generateGenericModel", middleTableSchema)
         class GenericModel extends Model {
         }
         const model = GenericModel;

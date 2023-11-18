@@ -1,11 +1,8 @@
 import { ModelReader } from './ModelReader.js';
 import { FieldType } from './ModalReader.type.js';
-import { RuntimeMethods as RM } from '../runtimeMethods/runTimeMethods.js';
-import { GustPrototype, RealPrototype } from '../../../Presentation/Model/fields/fieldsWrappers.js';
 import { ManyToManyField } from '../../../Presentation/Model/fields/allFields.js';
 import { middleTable } from '../relationships/middleTable.js';
-import { getArgIdWithT } from '../../../Utility/Model/utils.js';
-import { capitalizeFirstLetter, hashCode } from '../../../Utility/utils.js';
+import { hashCode } from '../../../Utility/utils.js';
 class SchemaGenerator {
     constructor() {
         this.databases = {};
@@ -33,7 +30,6 @@ class SchemaGenerator {
             databaseSchema.table = databaseSchema.table.concat(tablesSchemas);
             databaseSchema.middleTables = databaseSchema.middleTables.concat(middleTablesSchemas);
         }
-        // console.log({databaseSchema});
         return databaseSchema;
     }
     generateTableSchema(modelClassRepresentations, databaseName) {
@@ -126,69 +122,6 @@ class SchemaGenerator {
             autoIncrement: fields[idFieldName] ? ((_b = fields[idFieldName]) === null || _b === void 0 ? void 0 : _b.primaryKey) == true : true,
             type: FieldType.INT
         };
-    }
-    /**
-     * Attaches generated table schema to model classes.
-     * @param {DatabaseSchema} databaseSchema - The database schema to extract table information from.
-     * @param {Object} entries - An object containing model classes.
-     */
-    attachGeneratedTableSchemaToModel(databaseSchema, entries) {
-        for (let index = 0; index < entries.models.length; index++) {
-            // Get the table schema class for the current model.
-            const tableSchemaClass = databaseSchema.table[index];
-            // Add a static method to the model for accessing the table schema.
-            entries.models[index][RM.getTableSchema] = () => {
-                return tableSchemaClass;
-            };
-            RealPrototype();
-            const model = new entries.models[index];
-            GustPrototype();
-            entries.models[index].getModelSchema = () => {
-                return model;
-            };
-            entries.models[index].prototype[RM.getTableSchema] = () => {
-                return tableSchemaClass;
-            };
-        }
-    }
-    attachMiddleTablesModel(databaseSchema, entries, _MiddleModels) {
-        for (let index = 0; index < databaseSchema.table.length; index++) {
-            const currentModel = entries.models[index];
-            const currentModelName = currentModel.getTableSchema().name;
-            const middleTablePK = databaseSchema.table[index].middleTablePK;
-            const foreignKeyLength = Object.keys(middleTablePK).length;
-            if (foreignKeyLength >= 1) {
-                for (const [fieldName, info] of Object.entries(middleTablePK)) {
-                    const middleTableModel = _MiddleModels.find(e => {
-                        if (e.getTableSchema().name == info.tableName) {
-                            return true;
-                        }
-                    });
-                    const otherModel = currentModel.getModelSchema()[fieldName].model;
-                    const otherParameterName = otherModel.getTableSchema().name;
-                    const currentTableName = capitalizeFirstLetter(currentModelName);
-                    currentModel.prototype[fieldName + "Add"] = function (Model) {
-                        const parameters = {};
-                        parameters["iD" + otherParameterName] = getArgIdWithT(otherModel, Model);
-                        parameters["iD" + currentTableName] = getArgIdWithT(currentModel, this);
-                        console.log({ parameters, currentTableName, otherParameterName });
-                        return middleTableModel.create(parameters);
-                    };
-                    currentModel.prototype[fieldName + RM.All] = async function () {
-                        const parameters = {};
-                        parameters["iD" + currentTableName] = getArgIdWithT(currentModel, this);
-                        const result = await middleTableModel.filter(parameters).execute();
-                        const asyncOperations = result.map(async (e) => {
-                            await e["iD" + otherParameterName].get();
-                            return e["iD" + otherParameterName];
-                        });
-                        // Use Promise.all to wait for all asynchronous operations to complete
-                        const resolvedResults = await Promise.all(asyncOperations);
-                        return resolvedResults;
-                    };
-                }
-            }
-        }
     }
 }
 export const schemaGenerator = new SchemaGenerator();

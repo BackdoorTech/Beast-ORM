@@ -19,7 +19,7 @@ class ModelGeneration {
 
   private generateGenericModel (ModelName, middleTableSchema: ITableSchema, register:IRegister) {
 
-    console.log("generateGenericModel", middleTableSchema)
+    // console.log("generateGenericModel", middleTableSchema)
     class GenericModel extends  Model<GenericModel> {}
 
     const model = GenericModel
