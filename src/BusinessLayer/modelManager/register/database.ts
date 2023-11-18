@@ -3,24 +3,35 @@ import { DatabaseType } from './../../../Utility/globalInterface.js'
 import { DBConnectionManager } from '../../../DataAccess/DBconnectionManager/DBConnectionManager.js'
 import { DataAccess, dataAccess } from '../../../DataAccess/dataAccess.js'
 import { IDatabaseSchema } from '../../_interface/interface.type.js'
+import { Model } from '../../../Presentation/Api.js'
 export class Database {
 
   databaseName: string
   version: number
   type: DatabaseType = DatabaseType.IndexedDB
-  tables: Table[] = []
+
+  tables: {[key: string]: Table} = {}
+
   DBConnectionManager!: DBConnectionManager
 
-  constructor(DatabaseSchema: IDatabaseSchema) {
+  constructor(DatabaseSchema: IDatabaseSchema, Models: typeof Model<any>[]) {
     this.databaseName = DatabaseSchema.databaseName
     this.version = DatabaseSchema.version
 
-    for(const tableSchema of DatabaseSchema.table) {
-      const table = new Table(tableSchema)
-      this.tables.push(table)
+    const tables = DatabaseSchema.table.concat(DatabaseSchema.middleTables)
+
+    for(const tableSchema of tables) {
+      const model = Models.find( (e) => e.getTableSchema().name == tableSchema.name)
+      const table = new Table(tableSchema, model)
+      this.tables[tableSchema.name]= table
     }
 
     this.establishConnection(DatabaseSchema)
+  }
+
+
+  getTable(tableName) {
+    return this.tables[tableName]
   }
 
   private establishConnection(DatabaseSchema: IDatabaseSchema) {

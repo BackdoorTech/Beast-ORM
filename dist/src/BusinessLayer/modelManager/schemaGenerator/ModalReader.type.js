@@ -13,6 +13,23 @@ export var FieldType;
     FieldType[FieldType["JSON"] = 8] = "JSON";
     FieldType[FieldType["ARRAY"] = 9] = "ARRAY";
 })(FieldType || (FieldType = {}));
+export const AllowedFieldKeysArray = [
+    'CharField',
+    'JsonField',
+    'AutoField',
+    'BigIntegerField',
+    'DateField',
+    'IntegerField',
+    'TextField',
+    'BooleanField',
+    'OneToOneField',
+    'ForeignKey',
+    'indexedDBJsonField',
+    'indexedDBArrayField',
+    'DateTimeField',
+    'DateField',
+    'Unknown'
+]; // TS3.4 syntax
 export const FieldKeysArray = [
     'CharField',
     'JsonField',

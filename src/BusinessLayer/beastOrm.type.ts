@@ -11,3 +11,20 @@ export interface IRegister {
   restore?: boolean,
   ignoreFieldsStartWidth?: string[]
 }
+
+
+
+export interface IRegisterTransform {
+  databaseName: string,
+  version: number,
+  type: 'indexedDB' | 'localStorage'
+  models: {
+    class:  typeof Model[],
+    name: string
+  }[],
+  /**
+   * @description restore values from localStorage for LocalStorage Models
+   */
+  restore?: boolean,
+  ignoreFieldsStartWidth?: string[]
+}

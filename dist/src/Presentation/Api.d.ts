@@ -1,4 +1,4 @@
-import { IModel } from "./Api.type.js";
+import { IModel, IModelStatic, self } from "./Api.type.js";
 import { ITableSchema } from "../BusinessLayer/_interface/interface.type.js";
 /**
  * Represents a model for database operations.
@@ -22,4 +22,6 @@ export declare class Model<Model> implements IModel<Model> {
     getPrimaryKeyValue(): number | string;
     setPrimaryKey(key: number | string): void;
     delete(): Promise<number | true>;
+    static magic(): import("./Api.js").Model<unknown>;
 }
+export declare const $B: <T>(model: self<T>) => IModelStatic<T>;

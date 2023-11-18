@@ -97,10 +97,15 @@ export interface ManyToManyFieldParams {
     default?: any;
     onDelete?: any;
 }
+export type ManyToManyGetterParams<T> = () => {
+    add(args: T): Promise<T>;
+    all(): Promise<boolean>;
+    readonly list: T[];
+};
 export interface ManyToManyFieldParamsResult<T> {
     addMany(args: T[]): Promise<T[]>;
     add(args: T): Promise<T>;
-    All(): Promise<T[]>;
+    all(): Promise<T[]>;
     readonly list: T[];
 }
 export interface PossibleFieldAttributes {

@@ -21,8 +21,11 @@ export interface ITableSchema {
 	attributes: AttributesMap<FieldAttributesKeys, string[]>
 	fieldTypes: FieldsMap<FieldKeys, string[]>
   foreignKey: {[fieldName: string]: { tableName: string}}
+  middleTablePK: {[fieldName: string]: { tableName: string}}
+  middleTableRelatedFields: {[middleTableName: string]: { fieldName: string}},
 	middle?: boolean,
   fieldNames: string[],
+  falseField: string[],
 }
 
 export interface IDatabaseSchema {

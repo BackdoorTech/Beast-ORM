@@ -1,10 +1,12 @@
 import { Model } from "../../../Presentation/Api.js";
+import { capitalizeFirstLetter } from "../../../Utility/utils.js";
 import { FieldType } from "../../fields/fields.type.js";
 import { RuntimeMethods as RM } from "../runtimeMethods/runTimeMethods.js";
 export class MiddleTable {
-    addMiddleTable(foreignKeyFieldName, databaseName, currentModelName) {
-        const foreignKeyModelName = foreignKeyFieldName;
-        const tableName = currentModelName + foreignKeyModelName;
+    addMiddleTable(foreignKeyFieldName, foreignKeyTableName, ArgCurrentModelName, databaseName) {
+        const foreignKeyModelName = capitalizeFirstLetter(foreignKeyTableName);
+        const currentModelName = capitalizeFirstLetter(ArgCurrentModelName);
+        const tableName = capitalizeFirstLetter(currentModelName) + foreignKeyModelName;
         const middleTableSchema = {
             databaseName: databaseName,
             name: tableName,
@@ -19,7 +21,7 @@ export class MiddleTable {
                         unique: false,
                         type: FieldType.INT
                     },
-                    className: 'IntegerField'
+                    className: 'ForeignKey'
                 },
                 {
                     name: 'iD' + currentModelName,
@@ -30,7 +32,7 @@ export class MiddleTable {
                         unique: false,
                         type: FieldType.INT
                     },
-                    className: 'IntegerField'
+                    className: 'ForeignKey'
                 }
             ],
             attributes: {},
@@ -38,8 +40,14 @@ export class MiddleTable {
             fieldTypes: {
                 IntegerField: ['iD' + foreignKeyModelName, 'iD' + currentModelName]
             },
-            fieldNames: []
+            fieldNames: ['iD' + foreignKeyModelName, 'iD' + currentModelName],
+            middleTablePK: {},
+            middleTableRelatedFields: {},
+            falseField: []
         };
+        middleTableSchema.foreignKey['iD' + currentModelName] = { tableName: currentModelName };
+        middleTableSchema.foreignKey['iD' + foreignKeyModelName] = { tableName: foreignKeyModelName };
+        console.log({ ArgCurrentModelName, currentModelName, foreignKeyModelName, middleTableSchema });
         return middleTableSchema;
     }
     generateGenericModel({ ModelName, middleTableSchema }) {

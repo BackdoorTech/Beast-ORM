@@ -1,5 +1,6 @@
 import { GustPrototype, RealPrototype } from '../../../Presentation/Model/fields/fieldsWrappers.js';
-import { FieldKeysArray, field } from './ModalReader.type.js'
+import { FieldAttributesKeys } from '../../fields/fields.type.js';
+import { AllowedFieldKeysArray, AttributesMap, FieldKeys, FieldKeysArray, FieldType, FieldsMap, field } from './ModalReader.type.js'
 
 export class ModelReader {
   /**
@@ -24,12 +25,13 @@ export class ModelReader {
       fieldTypes,
       attributes,
       fieldNames,
+      falseField
     } = this.initializeDataStructures();
 
     modelName = this.getModelName(modelClassRepresentation)
 
     for (const [fieldName, Field] of Object.entries(classInstance)) {
-      this.processField(classInstance, fieldName, Field as any, fieldTypes, attributes, fieldNames, fields);
+      this.processField(classInstance, fieldName, Field as any, fieldTypes, attributes, fieldNames, fields, falseField);
     }
 
     return {
@@ -38,6 +40,7 @@ export class ModelReader {
       fieldTypes,
       attributes,
       fieldNames,
+      falseField
     };
   }
 
@@ -69,7 +72,15 @@ export class ModelReader {
       fieldTypes: {},
       attributes: {},
       fieldNames: [],
-    };
+      falseField: []
+    } as {
+      modelName: string
+      fields: {[key: string]: field },
+      fieldTypes: FieldsMap<FieldKeys, string[]>,
+      attributes: AttributesMap<FieldAttributesKeys, string[]>,
+      fieldNames: string[],
+      falseField: string[],
+    }
   }
 
   /**
@@ -83,7 +94,7 @@ export class ModelReader {
    * @param {string[]} fieldNames - An array of field names.
    * @param {Object} fields - An object containing field information.
    */
-  private static processField(classInstance, fieldName, Field: field, fieldTypes, attributes, fieldNames, fields) {
+  private static processField(classInstance, fieldName, Field: field, fieldTypes, attributes, fieldNames, fields, falseField) {
 
     const type = Field?.fieldName;
     const knownFieldType = this.isKnownFieldType(type);
@@ -96,6 +107,7 @@ export class ModelReader {
       this.addFieldToType(fieldTypes, type, fieldName);
       this.processFieldAttributes(Field, attributes, fieldName);
     } else {
+      fields[fieldName] = Field;
     }
   }
 
@@ -106,7 +118,7 @@ export class ModelReader {
    * @returns {boolean} - True if the field type is known; false otherwise.
    */
   private static isKnownFieldType(type) {
-    return FieldKeysArray.includes(type);
+    return AllowedFieldKeysArray.includes(type);
   }
 
   /**

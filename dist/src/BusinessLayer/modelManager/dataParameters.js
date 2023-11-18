@@ -24,6 +24,13 @@ export class DataParameters {
                 filteredData[fieldName] = KeyValue;
             }
         }
+        if (tableSchema.fieldTypes.ManyToManyField) {
+            for (const fieldName of tableSchema.fieldTypes.ManyToManyField) {
+                const model = data[fieldName];
+                const KeyValue = model.getPrimaryKeyValue();
+                filteredData[fieldName] = KeyValue;
+            }
+        }
         return filteredData;
     }
     getFilteredDataWithId(tableSchema, data) {

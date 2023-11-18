@@ -23,6 +23,7 @@ export function getIdObject(TableSchema: ITableSchema, args:Object): Object {
 
 
 export function getArgIdWithT(model: typeof Model<any> |  Model<any>, args:Object): string | number {
+
   const _model = model.getModel()
   const TableSchema: ITableSchema = _model.getTableSchema()
   const idFieldName = TableSchema.id.keyPath

@@ -26,6 +26,25 @@ export enum FieldType {
 	ARRAY=9
 }
 
+export const AllowedFieldKeysArray = [
+  'CharField',
+  'JsonField',
+  'AutoField',
+  'BigIntegerField',
+  'DateField',
+  'IntegerField',
+  'TextField',
+  'BooleanField',
+  'OneToOneField',
+  'ForeignKey',
+  'indexedDBJsonField',
+  'indexedDBArrayField',
+  'DateTimeField',
+  'DateField',
+  'Unknown'
+
+] as const; // TS3.4 syntax
+
 export const FieldKeysArray = [
   'CharField',
   'JsonField',
@@ -64,6 +83,7 @@ export const AttributesArray = [
 ] as const; // TS3.4 syntax
 
 export type FieldKeys = typeof FieldKeysArray[number];
+export type FieldAllowedKeys = typeof FieldKeysArray[number];
 export type FieldsMap<K extends string | number | symbol, T> = { [P in K]?: T; };
 
 export type FieldAttributesKeys  = typeof AttributesArray[number];

@@ -1,9 +1,11 @@
 import * as Fields from './allFields.js'
-import { AutoFieldParams, BigIntegerFieldParams, BooleanFieldParams, CharFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyGetterParams, ForeignKeyParams, ForeignKeyParamsResult, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, ManyToManyFieldParamsResult, OneToOneFieldParams, OneToOneFieldResult, TextFieldParams } from '../../../BusinessLayer/fields/fieldsParameters.type.js'
+import { AutoFieldParams, BigIntegerFieldParams, BooleanFieldParams, CharFieldParams, DateFieldParams, DateTimeFieldParams, ForeignKeyGetterParams, ForeignKeyParams, ForeignKeyParamsResult, IndexedDBArrayFieldParams, IndexedDBJsonFieldParams, IntegerFieldParams, ManyToManyFieldParams, ManyToManyFieldParamsResult, ManyToManyGetterParams, OneToOneFieldParams, OneToOneFieldResult, TextFieldParams } from '../../../BusinessLayer/fields/fieldsParameters.type.js'
 import { Model } from '../../Api.js'
 import { field } from '../../../BusinessLayer/validation/fields/allFields.type.js'
 import { equalModels, getIdObjectWithT } from '../../../Utility/Model/utils.js'
-
+import { RuntimeMethods as RM } from '../../../BusinessLayer/modelManager/runtimeMethods/runTimeMethods.js'
+import { modelRegistration } from '../../../BusinessLayer/modelManager/register/register.js'
+import { relationShip } from '../../../BusinessLayer/modelManager/relationships/relationShip.js'
 
 const PrototypeGust =  {
   CharField(data?: CharFieldParams): string {return null as any },
@@ -26,26 +28,12 @@ const PrototypeGust =  {
     blank?: boolean
     default?: any
     onDelete?: any
-  }) => {
+  }): OneToOneFieldResult<T> => {
 
     const modelInstance = new (data.model as any)()
 
     return modelInstance
 
-    // return {
-    //   get object (): T {
-    //     return modelInstance as T
-    //   },
-    //   set object(value:any) {
-    //     if(typeof value == 'object') {
-    //       console.log("object")
-    //       Object.assign(modelInstance, value)
-    //     } else if(typeof value == 'number' || typeof value == 'string') {
-    //       console.log("number or string", value)
-    //       modelInstance.setPrimaryKey(value)
-    //     }
-    //   }
-    // }
   },
   ForeignKey<T>(data:{
     model:  new () => T
@@ -55,21 +43,8 @@ const PrototypeGust =  {
     default?: any
     onDelete?: any
     primaryKey?:boolean
-  }){
+  }): ForeignKeyGetterParams<T> {
     return new (data.model as any)()
-
-    // return {
-    //   get object (): T {
-    //     return modelInstance as T
-    //   },
-    //   set object(value:any) {
-    //     if(typeof value == 'object') {
-    //       Object.assign(modelInstance, value)
-    //     } else if(typeof value == 'number' || typeof value == 'string') {
-    //       modelInstance.setPrimaryKey(value)
-    //     }
-    //   }
-    // }
   },
   ManyToManyField<T>(data?:{
     model:  new () => T
@@ -80,18 +55,29 @@ const PrototypeGust =  {
     onDelete?: any
   }) {
     let modelInstance: T[]=  []
-    const _Model: typeof Model<T> = data.model as any
+    const foreignKeyModel: typeof Model<T> = data.model as any
 
     return {
-      async add(args: T[] | T) {
+      async add(args:  T) {
 
-        try {
-          _Model.create(args)
-        } catch (error) {}
+        const currentModel = data.I.getModel()
+
+        const middleTableName = relationShip.getMiddleTableName(currentModel, foreignKeyModel)
+
+        const { fieldName } = currentModel.getTableSchema().middleTableRelatedFields[middleTableName]
+
+        return data.I[fieldName+RM.Add](args)
 
       },
-      async getAll() {
-        modelInstance = await _Model.all<T>()
+      async all() {
+        const currentModel = data.I.getModel()
+
+        const middleTableName = relationShip.getMiddleTableName(currentModel, foreignKeyModel)
+
+        const { fieldName } = currentModel.getTableSchema().middleTableRelatedFields[middleTableName]
+
+        modelInstance =  await data.I[fieldName+RM.All]()
+        return true
       },
       get list(): T[] {
         return modelInstance
@@ -100,7 +86,7 @@ const PrototypeGust =  {
   },
 }
 
-const _RealPrototype =  {
+export const _RealPrototype =  {
   CharField(data?: CharFieldParams): string {
     return new Fields.CharField(data) as any
   },
@@ -258,6 +244,39 @@ export const getter = {
             return true
           }
         }
+      },
+      get list(): T[] {
+        return modelInstance
+      }
+    }
+
+    return  function () { return a }
+  },
+  ManyToManyGetter<T>(data:{
+    model:  new () => T
+    I: Model<any>
+  }):ManyToManyGetterParams<T>{
+    let modelInstance: T[]=  []
+    const foreignKeyModel: typeof Model<T> = data.model as any
+
+    const a = {
+      add(args:  T) {
+
+        const currentModel = data.I.getModel()
+
+        const middleModel = relationShip.getMiddleTable(foreignKeyModel, currentModel)
+
+        return relationShip.addToMiddleTable<T>(data.I, foreignKeyModel, args as Model<any>, middleModel)
+
+      },
+      async all(): Promise<boolean> {
+        const currentModel = data.I.getModel()
+
+        const middleModel = relationShip.getMiddleTable(foreignKeyModel, currentModel)
+
+        modelInstance =  await relationShip.getAll<T>(data.I, foreignKeyModel, middleModel)
+
+        return true
       },
       get list(): T[] {
         return modelInstance

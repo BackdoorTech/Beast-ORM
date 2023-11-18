@@ -1,4 +1,4 @@
-import { IModel } from "./Api.type.js";
+import { IModel, IModelStatic, self } from "./Api.type.js";
 import { QueryBuilder } from "./queryBuilder/queryBuilder.js" // Represents a query object that helps build and execute database queries.
 import { returnSelf } from "./returnSelf/returnSelf.js" // Represents a return object for query-related methods
 import { ORM } from "../BusinessLayer/beastOrm.js"
@@ -195,4 +195,15 @@ export class Model<Model> implements IModel<Model>{
     }
   }
 
+  static magic() {
+    return new this()
+  }
+}
+
+export const  $B = <T>(model:  self<T>): IModelStatic<T> => {
+  const _model: typeof  Model<any> = model as any
+  return {
+    create: (args) =>  _model.create<T>(args),
+    all: () =>  _model.all<T>()
+  }
 }

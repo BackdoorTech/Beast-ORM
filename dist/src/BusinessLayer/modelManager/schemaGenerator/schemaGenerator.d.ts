@@ -4,7 +4,8 @@ import { Model } from '../../../Presentation/Api.js';
 declare class SchemaGenerator {
     databases: {
         [key: string]: {
-            tablesNames: [];
+            tablesNames: string[];
+            tableHash: {};
         };
     };
     processingDatabase(DBname: string): void;
@@ -12,6 +13,10 @@ declare class SchemaGenerator {
     generate(entries: IRegister): IDatabaseSchema;
     private generateTableSchema;
     private getModalName;
+    private getModelName;
+    private registerModelName;
+    private isModelNameAvailable;
+    private hasRegisterModelName;
     private makePrimary;
     /**
      * Attaches generated table schema to model classes.

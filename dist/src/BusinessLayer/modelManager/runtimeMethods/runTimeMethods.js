@@ -4,4 +4,6 @@ export var RuntimeMethods;
     RuntimeMethods["getTableSchema"] = "getTableSchema";
     RuntimeMethods["getModelSchema"] = "getModelSchema";
     RuntimeMethods["validator"] = "validator";
+    RuntimeMethods["Add"] = "Add";
+    RuntimeMethods["All"] = "All";
 })(RuntimeMethods || (RuntimeMethods = {}));

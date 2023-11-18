@@ -23,9 +23,11 @@ export declare enum FieldType {
     JSON = 8,
     ARRAY = 9
 }
+export declare const AllowedFieldKeysArray: readonly ["CharField", "JsonField", "AutoField", "BigIntegerField", "DateField", "IntegerField", "TextField", "BooleanField", "OneToOneField", "ForeignKey", "indexedDBJsonField", "indexedDBArrayField", "DateTimeField", "DateField", "Unknown"];
 export declare const FieldKeysArray: readonly ["CharField", "JsonField", "AutoField", "BigIntegerField", "DateField", "IntegerField", "TextField", "BooleanField", "OneToOneField", "ForeignKey", "ManyToManyField", "indexedDBJsonField", "indexedDBArrayField", "DateTimeField", "DateField", "Unknown"];
 export declare const AttributesArray: readonly ["maxLength", "minLength", "choices", "primaryKey", "unique", "autoIncrement", "type", "choices", "model", "blank", "default", "onDelete", "foreignKey"];
 export type FieldKeys = typeof FieldKeysArray[number];
+export type FieldAllowedKeys = typeof FieldKeysArray[number];
 export type FieldsMap<K extends string | number | symbol, T> = {
     [P in K]?: T;
 };

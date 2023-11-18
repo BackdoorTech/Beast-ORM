@@ -3,8 +3,8 @@ class ModelRegistration {
     constructor() {
         this.databases = {};
     }
-    register(DatabaseSchema) {
-        const database = new Database(DatabaseSchema);
+    register(DatabaseSchema, Models) {
+        const database = new Database(DatabaseSchema, Models);
         const databaseName = DatabaseSchema.databaseName;
         this.databases[databaseName] = database;
     }

@@ -150,4 +150,14 @@ export class Model {
             return result.value;
         }
     }
+    static magic() {
+        return new this();
+    }
 }
+export const $B = (model) => {
+    const _model = model;
+    return {
+        create: (args) => _model.create(args),
+        all: () => _model.all()
+    };
+};

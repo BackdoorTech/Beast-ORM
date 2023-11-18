@@ -27,8 +27,19 @@ export interface ITableSchema {
             tableName: string;
         };
     };
+    middleTablePK: {
+        [fieldName: string]: {
+            tableName: string;
+        };
+    };
+    middleTableRelatedFields: {
+        [middleTableName: string]: {
+            fieldName: string;
+        };
+    };
     middle?: boolean;
     fieldNames: string[];
+    falseField: string[];
 }
 export interface IDatabaseSchema {
     databaseName: string;

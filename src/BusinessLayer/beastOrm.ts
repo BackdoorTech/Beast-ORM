@@ -19,6 +19,7 @@ import { queryBuilderUpdateHandler } from "./queryBuilderHandler/queryBuilderUpd
 import { queryBuilderSelectHandler } from "./queryBuilderHandler/queryBuilderSelectHandler.js"
 import { relationShip } from './modelManager/relationships/relationShip.js';
 import { modelGeneration } from './modelManager/modelGenerator.js';
+import { addRunTimeMethod } from './modelManager/runtimeMethods/addRuntimeMethod.js';
 
 
 class BeastORM {
@@ -27,16 +28,16 @@ class BeastORM {
 
     // generate schema
     const schema = schemaGenerator.generate(register)
-    // const middleTablesModels = modelGeneration.forMiddleTables(schema)
-
-    //schemaGenerator.attachMiddleTablesModel(schema, register, middleTablesModels);
 
 
     schemaGenerator.attachGeneratedTableSchemaToModel(schema, register);
 
-    modelRegistration.register(schema)
+    const middleTablesModels = modelGeneration.forMiddleTables(schema, register)
 
-    // relationShip.add(register)
+    schemaGenerator.attachMiddleTablesModel(schema, register, middleTablesModels);
+
+    const models = register.models.concat(middleTablesModels)
+    modelRegistration.register(schema, models)
 
     const database = modelRegistration.getDatabase(schema.databaseName)
 
@@ -212,7 +213,7 @@ class BeastORM {
       }
   }
 
-async deleteQueryNoFormValidation(QueryBuilder: QueryBuilder, model: typeof Model):Promise<Either<true  | number, FormValidationError>> {
+  async deleteQueryNoFormValidation(QueryBuilder: QueryBuilder, model: typeof Model):Promise<Either<true  | number, FormValidationError>> {
     const tableSchema: ITableSchema = model[RM.getTableSchema]()
     const databaseName = tableSchema.databaseName
 
@@ -229,8 +230,6 @@ async deleteQueryNoFormValidation(QueryBuilder: QueryBuilder, model: typeof Mode
         return await queryBuilderDeleteHandler.DELETEOne(DatabaseStrategy, QueryBuilder)
       }
   }
-
-  executeQueries() {}
 }
 
 export const ORM = new BeastORM()

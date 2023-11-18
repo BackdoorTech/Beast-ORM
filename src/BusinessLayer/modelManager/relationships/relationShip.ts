@@ -1,63 +1,70 @@
 import { Model } from "../../../Presentation/Api"
-import { ForeignKey } from "../../../Presentation/Model/fields/allFields"
-import { GustPrototype, RealPrototype } from "../../../Presentation/Model/fields/fieldsWrappers.js"
-import { IRegister } from "../../beastOrm.type"
-import { middleTable } from "./middleTable"
+import { getArgIdWithT } from "../../../Utility/Model/utils.js"
+import { capitalizeFirstLetter } from "../../../Utility/utils.js"
+import { IRegister } from "../../beastOrm.type.js"
+import { modelRegistration } from "../register/register.js"
 
 
 export class RelationShip {
 
-  add(register:IRegister) {
-    for(const model of register.models) {
+  getMiddleTable(modelWithNoGetter: typeof Model<any>, modelWithGetter : typeof Model<any>) {
+    const databaseName = modelWithNoGetter.getTableSchema().databaseName
+    const database = modelRegistration.getDatabase(databaseName)
 
-      const tableSchema = model.getTableSchema()
+    const tableName = modelWithNoGetter.getTableSchema().name + modelWithGetter.getTableSchema().name
+    const middleTable = database.getTable(tableName)
 
-      RealPrototype()
-      const ExampleInstance = new model()
-      GustPrototype()
-
-      if(tableSchema.fieldTypes["ForeignKey"]) {
-        for (const FieldName of tableSchema.fieldTypes["ForeignKey"]) {
-          const foreignKeyField: ForeignKey  = ExampleInstance[FieldName]
-          // this.addMethodForeignKey(foreignKeyField.model, FieldName, model)
-        }
-      }
-    }
+    return middleTable.model
   }
 
-  static addMethodForeignKey(foreignKeyModel:typeof Model<any>, foreignKeyFieldName:string, currentModel:typeof Model<any>) {
 
-    // const { middleTableSchema, model } = middleTable.addMiddleTable(foreignKeyModel,foreignKeyFieldName, currentModel)
+  getMiddleTableName(modelWithNoGetter: typeof Model<any>, modelWithGetter : typeof Model<any>) {
+    // const databaseName = modelWithNoGetter.getTableSchema().databaseName
+    // const database = modelRegistration.getDatabase(databaseName)
 
-    // currentModel[foreignKeyFieldName+"add"] = async function () {
+    const tableName = modelWithNoGetter.getTableSchema().name + modelWithGetter.getTableSchema().name
 
-    //   const TableSchema = foreignKeyModel.getTableSchema()
-    //   const obj = {}
+    return tableName
+    // const middleTable = database.getTable(tableName)
 
-    //   obj[TableSchema.id.keyPath] = this[FieldName]
-    //   return foreignKeyFieldModel.filter(obj).execute()
-    // }
-
-
-    // foreignKeyModel['prototype'][FunctionName+'_setAll'] = async function () {
-
-    //   const obj = {}
-    //   obj[FieldName] = this.getPrimaryKeyValue()
-
-    //   const currentModel: Model = models[modelName]
-
-    //   return await currentModel.filter(obj).execute()
-
-    // }
-
-    // foreignKeyFieldModel['prototype'][FunctionName+'_setAdd'] = async function (arg) {
-    //   const reporter = this
-    //   arg[FieldName] = reporter
-    //   return currentModel['create'](arg)
-    // }
-
-
+    // return middleTable.model.getTableSchema().name
   }
+
+  addToMiddleTable<T>(currentModel: Model<any>, otherModel : typeof Model<any>, toAdd:  Model<any>, middleTableModel: typeof Model<any>) {
+    const otherParameterName = otherModel.getTableSchema().name
+    const modelWithGetterTableName = capitalizeFirstLetter(currentModel.getModel().getTableSchema().name)
+    const parameters = {}
+
+    parameters["iD"+otherParameterName] = getArgIdWithT(otherModel, toAdd)
+    parameters["iD"+modelWithGetterTableName] = getArgIdWithT(currentModel, currentModel)
+
+    return middleTableModel.create<T>(parameters)
+  }
+
+
+  async getAll<T>(currentModel: Model<any>, otherModel : typeof Model<any>, middleTableModel: typeof Model<any>) {
+
+    const parameters = {}
+    const currentTableName = currentModel.getModel().getTableSchema().name
+    const otherParameterName = otherModel.getTableSchema().name
+
+    parameters["iD"+currentTableName] = getArgIdWithT(currentModel, currentModel)
+
+    const result: any[] =  await middleTableModel.filter<T>(parameters).execute() as any
+
+    const asyncOperations = result.map(async (e) => {
+      await e["iD" + otherParameterName].get();
+      return e["iD" + otherParameterName];
+    });
+
+
+    // Use Promise.all to wait for all asynchronous operations to complete
+    const resolvedResults = await Promise.all(asyncOperations);
+
+    return resolvedResults;
+  }
+
+
 }
 
 export const relationShip = new RelationShip()

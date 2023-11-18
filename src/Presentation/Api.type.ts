@@ -37,3 +37,10 @@ export declare class IModel<T> {
 
   static getTableSchema(): TableSchema;
 }
+
+export declare interface IModelStatic<T> {
+  all(): Promise<T[]>;
+  create(...params: any[]): Promise<T>;
+}
+
+export type self<T>  =  new () => T;

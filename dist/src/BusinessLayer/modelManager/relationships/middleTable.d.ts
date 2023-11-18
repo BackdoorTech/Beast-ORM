@@ -1,7 +1,7 @@
 import { Model } from "../../../Presentation/Api.js";
 import { ITableSchema } from "../../_interface/interface.type.js";
 export declare class MiddleTable {
-    addMiddleTable(foreignKeyFieldName: string, databaseName: any, currentModelName: string): ITableSchema;
+    addMiddleTable(foreignKeyFieldName: string, foreignKeyTableName: any, ArgCurrentModelName: string, databaseName: string): ITableSchema;
     generateGenericModel({ ModelName, middleTableSchema }: {
         ModelName: any;
         middleTableSchema: any;
@@ -26,6 +26,7 @@ export declare class MiddleTable {
             update: (params: any) => Promise<number | true>;
             delete: () => Promise<number | true>;
         };
+        magic(): Model<unknown>;
     };
 }
 export declare const middleTable: MiddleTable;

@@ -10,16 +10,17 @@ import { queryBuilderInsertHandler } from "./queryBuilderHandler/queryBuilderIns
 import { queryBuilderDeleteHandler } from "./queryBuilderHandler/queryBuilderDeletehandler.js";
 import { queryBuilderUpdateHandler } from "./queryBuilderHandler/queryBuilderUpdateHandler.js";
 import { queryBuilderSelectHandler } from "./queryBuilderHandler/queryBuilderSelectHandler.js";
+import { modelGeneration } from './modelManager/modelGenerator.js';
 class BeastORM {
     constructor() {
         this.register = (register) => {
             // generate schema
             const schema = schemaGenerator.generate(register);
-            // const middleTablesModels = modelGeneration.forMiddleTables(schema)
-            //schemaGenerator.attachMiddleTablesModel(schema, register, middleTablesModels);
             schemaGenerator.attachGeneratedTableSchemaToModel(schema, register);
-            modelRegistration.register(schema);
-            // relationShip.add(register)
+            const middleTablesModels = modelGeneration.forMiddleTables(schema, register);
+            schemaGenerator.attachMiddleTablesModel(schema, register, middleTablesModels);
+            const models = register.models.concat(middleTablesModels);
+            modelRegistration.register(schema, models);
             const database = modelRegistration.getDatabase(schema.databaseName);
             const DatabaseStrategy = database
                 .DBConnectionManager
@@ -163,6 +164,5 @@ class BeastORM {
             return await queryBuilderDeleteHandler.DELETEOne(DatabaseStrategy, QueryBuilder);
         }
     }
-    executeQueries() { }
 }
 export const ORM = new BeastORM();

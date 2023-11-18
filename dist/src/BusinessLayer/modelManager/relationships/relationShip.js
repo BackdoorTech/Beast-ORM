@@ -1,38 +1,43 @@
-import { GustPrototype, RealPrototype } from "../../../Presentation/Model/fields/fieldsWrappers.js";
+import { getArgIdWithT } from "../../../Utility/Model/utils.js";
+import { capitalizeFirstLetter } from "../../../Utility/utils.js";
+import { modelRegistration } from "../register/register.js";
 export class RelationShip {
-    add(register) {
-        for (const model of register.models) {
-            const tableSchema = model.getTableSchema();
-            RealPrototype();
-            const ExampleInstance = new model();
-            GustPrototype();
-            if (tableSchema.fieldTypes["ForeignKey"]) {
-                for (const FieldName of tableSchema.fieldTypes["ForeignKey"]) {
-                    const foreignKeyField = ExampleInstance[FieldName];
-                    // this.addMethodForeignKey(foreignKeyField.model, FieldName, model)
-                }
-            }
-        }
+    getMiddleTable(modelWithNoGetter, modelWithGetter) {
+        const databaseName = modelWithNoGetter.getTableSchema().databaseName;
+        const database = modelRegistration.getDatabase(databaseName);
+        const tableName = modelWithNoGetter.getTableSchema().name + modelWithGetter.getTableSchema().name;
+        const middleTable = database.getTable(tableName);
+        return middleTable.model;
     }
-    static addMethodForeignKey(foreignKeyModel, foreignKeyFieldName, currentModel) {
-        // const { middleTableSchema, model } = middleTable.addMiddleTable(foreignKeyModel,foreignKeyFieldName, currentModel)
-        // currentModel[foreignKeyFieldName+"add"] = async function () {
-        //   const TableSchema = foreignKeyModel.getTableSchema()
-        //   const obj = {}
-        //   obj[TableSchema.id.keyPath] = this[FieldName]
-        //   return foreignKeyFieldModel.filter(obj).execute()
-        // }
-        // foreignKeyModel['prototype'][FunctionName+'_setAll'] = async function () {
-        //   const obj = {}
-        //   obj[FieldName] = this.getPrimaryKeyValue()
-        //   const currentModel: Model = models[modelName]
-        //   return await currentModel.filter(obj).execute()
-        // }
-        // foreignKeyFieldModel['prototype'][FunctionName+'_setAdd'] = async function (arg) {
-        //   const reporter = this
-        //   arg[FieldName] = reporter
-        //   return currentModel['create'](arg)
-        // }
+    getMiddleTableName(modelWithNoGetter, modelWithGetter) {
+        // const databaseName = modelWithNoGetter.getTableSchema().databaseName
+        // const database = modelRegistration.getDatabase(databaseName)
+        const tableName = modelWithNoGetter.getTableSchema().name + modelWithGetter.getTableSchema().name;
+        return tableName;
+        // const middleTable = database.getTable(tableName)
+        // return middleTable.model.getTableSchema().name
+    }
+    addToMiddleTable(currentModel, otherModel, toAdd, middleTableModel) {
+        const otherParameterName = otherModel.getTableSchema().name;
+        const modelWithGetterTableName = capitalizeFirstLetter(currentModel.getModel().getTableSchema().name);
+        const parameters = {};
+        parameters["iD" + otherParameterName] = getArgIdWithT(otherModel, toAdd);
+        parameters["iD" + modelWithGetterTableName] = getArgIdWithT(currentModel, currentModel);
+        return middleTableModel.create(parameters);
+    }
+    async getAll(currentModel, otherModel, middleTableModel) {
+        const parameters = {};
+        const currentTableName = currentModel.getModel().getTableSchema().name;
+        const otherParameterName = otherModel.getTableSchema().name;
+        parameters["iD" + currentTableName] = getArgIdWithT(currentModel, currentModel);
+        const result = await middleTableModel.filter(parameters).execute();
+        const asyncOperations = result.map(async (e) => {
+            await e["iD" + otherParameterName].get();
+            return e["iD" + otherParameterName];
+        });
+        // Use Promise.all to wait for all asynchronous operations to complete
+        const resolvedResults = await Promise.all(asyncOperations);
+        return resolvedResults;
     }
 }
 export const relationShip = new RelationShip();

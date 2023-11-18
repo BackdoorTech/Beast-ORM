@@ -13,7 +13,6 @@ declare class BeastORM {
     executeUpdateQuery<PModel>(QueryBuilder: QueryBuilder, Model: PModel): Promise<Either<true | number, FormValidationError>>;
     deleteQuery<PModel>(QueryBuilder: QueryBuilder, Model: PModel): Promise<Either<true | number, FormValidationError>>;
     deleteQueryNoFormValidation(QueryBuilder: QueryBuilder, model: typeof Model): Promise<Either<true | number, FormValidationError>>;
-    executeQueries(): void;
 }
 export declare const ORM: BeastORM;
 export {};

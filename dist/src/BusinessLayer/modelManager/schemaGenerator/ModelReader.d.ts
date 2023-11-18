@@ -1,3 +1,4 @@
+import { AttributesMap, FieldsMap, field } from './ModalReader.type.js';
 export declare class ModelReader {
     /**
      * Reads the model class representation and extracts information about its fields, field types, attributes, and field names.
@@ -13,10 +14,13 @@ export declare class ModelReader {
      */
     static read(modelClassRepresentation: any): {
         modelName: string;
-        fields: {};
-        fieldTypes: {};
-        attributes: {};
-        fieldNames: any[];
+        fields: {
+            [key: string]: field;
+        };
+        fieldTypes: FieldsMap<"CharField" | "JsonField" | "AutoField" | "BigIntegerField" | "DateField" | "IntegerField" | "TextField" | "BooleanField" | "OneToOneField" | "ForeignKey" | "ManyToManyField" | "indexedDBJsonField" | "indexedDBArrayField" | "DateTimeField" | "Unknown", string[]>;
+        attributes: AttributesMap<"maxLength" | "minLength" | "choices" | "primaryKey" | "unique" | "autoIncrement" | "type" | "model" | "blank" | "default" | "onDelete" | "foreignKey", string[]>;
+        fieldNames: string[];
+        falseField: string[];
     };
     /**
      * Reads the model class representation and extracts information about class model name

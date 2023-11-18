@@ -6,8 +6,8 @@ import { Database } from './database.js'
 class ModelRegistration {
   databases: {[key: string]: Database} = {}
 
-  register(DatabaseSchema: IDatabaseSchema) {
-    const database = new Database(DatabaseSchema)
+  register(DatabaseSchema: IDatabaseSchema, Models: typeof Model<any>[]) {
+    const database = new Database(DatabaseSchema, Models)
     const databaseName = DatabaseSchema.databaseName
     this.databases[databaseName] = database
   }

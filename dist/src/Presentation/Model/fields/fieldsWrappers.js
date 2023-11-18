@@ -1,5 +1,7 @@
 import * as Fields from './allFields.js';
 import { equalModels, getIdObjectWithT } from '../../../Utility/Model/utils.js';
+import { RuntimeMethods as RM } from '../../../BusinessLayer/modelManager/runtimeMethods/runTimeMethods.js';
+import { relationShip } from '../../../BusinessLayer/modelManager/relationships/relationShip.js';
 const PrototypeGust = {
     CharField(data) { return null; },
     BooleanField(data) { return null; },
@@ -18,48 +20,26 @@ const PrototypeGust = {
     OneToOneField: (data) => {
         const modelInstance = new data.model();
         return modelInstance;
-        // return {
-        //   get object (): T {
-        //     return modelInstance as T
-        //   },
-        //   set object(value:any) {
-        //     if(typeof value == 'object') {
-        //       console.log("object")
-        //       Object.assign(modelInstance, value)
-        //     } else if(typeof value == 'number' || typeof value == 'string') {
-        //       console.log("number or string", value)
-        //       modelInstance.setPrimaryKey(value)
-        //     }
-        //   }
-        // }
     },
     ForeignKey(data) {
         return new data.model();
-        // return {
-        //   get object (): T {
-        //     return modelInstance as T
-        //   },
-        //   set object(value:any) {
-        //     if(typeof value == 'object') {
-        //       Object.assign(modelInstance, value)
-        //     } else if(typeof value == 'number' || typeof value == 'string') {
-        //       modelInstance.setPrimaryKey(value)
-        //     }
-        //   }
-        // }
     },
     ManyToManyField(data) {
         let modelInstance = [];
-        const _Model = data.model;
+        const foreignKeyModel = data.model;
         return {
             async add(args) {
-                try {
-                    _Model.create(args);
-                }
-                catch (error) { }
+                const currentModel = data.I.getModel();
+                const middleTableName = relationShip.getMiddleTableName(currentModel, foreignKeyModel);
+                const { fieldName } = currentModel.getTableSchema().middleTableRelatedFields[middleTableName];
+                return data.I[fieldName + RM.Add](args);
             },
-            async getAll() {
-                modelInstance = await _Model.all();
+            async all() {
+                const currentModel = data.I.getModel();
+                const middleTableName = relationShip.getMiddleTableName(currentModel, foreignKeyModel);
+                const { fieldName } = currentModel.getTableSchema().middleTableRelatedFields[middleTableName];
+                modelInstance = await data.I[fieldName + RM.All]();
+                return true;
             },
             get list() {
                 return modelInstance;
@@ -67,7 +47,7 @@ const PrototypeGust = {
         };
     },
 };
-const _RealPrototype = {
+export const _RealPrototype = {
     CharField(data) {
         return new Fields.CharField(data);
     },
@@ -179,6 +159,27 @@ export const getter = {
                         return true;
                     }
                 }
+            },
+            get list() {
+                return modelInstance;
+            }
+        };
+        return function () { return a; };
+    },
+    ManyToManyGetter(data) {
+        let modelInstance = [];
+        const foreignKeyModel = data.model;
+        const a = {
+            add(args) {
+                const currentModel = data.I.getModel();
+                const middleModel = relationShip.getMiddleTable(foreignKeyModel, currentModel);
+                return relationShip.addToMiddleTable(data.I, foreignKeyModel, args, middleModel);
+            },
+            async all() {
+                const currentModel = data.I.getModel();
+                const middleModel = relationShip.getMiddleTable(foreignKeyModel, currentModel);
+                modelInstance = await relationShip.getAll(data.I, foreignKeyModel, middleModel);
+                return true;
             },
             get list() {
                 return modelInstance;

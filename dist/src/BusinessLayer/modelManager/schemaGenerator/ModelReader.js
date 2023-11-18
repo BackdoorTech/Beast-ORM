@@ -1,5 +1,5 @@
 import { GustPrototype, RealPrototype } from '../../../Presentation/Model/fields/fieldsWrappers.js';
-import { FieldKeysArray } from './ModalReader.type.js';
+import { AllowedFieldKeysArray } from './ModalReader.type.js';
 export class ModelReader {
     /**
      * Reads the model class representation and extracts information about its fields, field types, attributes, and field names.
@@ -17,10 +17,10 @@ export class ModelReader {
         RealPrototype();
         const classInstance = new modelClassRepresentation();
         GustPrototype();
-        let { modelName, fields, fieldTypes, attributes, fieldNames, } = this.initializeDataStructures();
+        let { modelName, fields, fieldTypes, attributes, fieldNames, falseField } = this.initializeDataStructures();
         modelName = this.getModelName(modelClassRepresentation);
         for (const [fieldName, Field] of Object.entries(classInstance)) {
-            this.processField(classInstance, fieldName, Field, fieldTypes, attributes, fieldNames, fields);
+            this.processField(classInstance, fieldName, Field, fieldTypes, attributes, fieldNames, fields, falseField);
         }
         return {
             modelName,
@@ -28,6 +28,7 @@ export class ModelReader {
             fieldTypes,
             attributes,
             fieldNames,
+            falseField
         };
     }
     /**
@@ -57,6 +58,7 @@ export class ModelReader {
             fieldTypes: {},
             attributes: {},
             fieldNames: [],
+            falseField: []
         };
     }
     /**
@@ -70,7 +72,7 @@ export class ModelReader {
      * @param {string[]} fieldNames - An array of field names.
      * @param {Object} fields - An object containing field information.
      */
-    static processField(classInstance, fieldName, Field, fieldTypes, attributes, fieldNames, fields) {
+    static processField(classInstance, fieldName, Field, fieldTypes, attributes, fieldNames, fields, falseField) {
         const type = Field === null || Field === void 0 ? void 0 : Field.fieldName;
         const knownFieldType = this.isKnownFieldType(type);
         if (knownFieldType) {
@@ -80,6 +82,7 @@ export class ModelReader {
             this.processFieldAttributes(Field, attributes, fieldName);
         }
         else {
+            fields[fieldName] = Field;
         }
     }
     /**
@@ -89,7 +92,7 @@ export class ModelReader {
      * @returns {boolean} - True if the field type is known; false otherwise.
      */
     static isKnownFieldType(type) {
-        return FieldKeysArray.includes(type);
+        return AllowedFieldKeysArray.includes(type);
     }
     /**
      * Adds a field to the specified type in the fieldTypes map.

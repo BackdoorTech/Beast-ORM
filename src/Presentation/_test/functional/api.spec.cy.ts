@@ -422,4 +422,60 @@ describe('API', () => {
     });
   })
 
+
+  it('many-to-many relationships ', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+
+      class Publication extends wind.models.Model {
+        title = wind.models.CharField({maxLength:30})
+        articles = wind.models.getter.ManyToManyGetter({model: Article, I: this})
+      }
+      class Article extends wind.models.Model  {
+        headline = wind.models.CharField({maxLength:100})
+        pubDate = wind.models.DateField()
+        publications = wind.models.ManyToManyField({model:Publication, I: this})
+      }
+
+      wind.models.register({
+        databaseName:'jest-test-12',
+        type: 'indexedDB',
+        version: 1,
+        models: [Publication, Article]
+      })
+
+      await Publication.deleteAll()
+      await Article.deleteAll()
+
+      const r = await Publication.create({title:"John"})
+      const r1 = await Publication.create({title:"John"})
+      const a1 = await Article.create({headline:"This is a test", pubDate:"date(2005, 7, 27)"})
+
+      await a1.publications.add(r)
+      await a1.publications.add(r)
+      await a1.publications.add(r1)
+
+      const result = await a1.publications.all()
+      expect(true).to.equal(result)
+
+      expect(JSON.stringify([r,r,r1])).to.deep.equal(JSON.stringify(a1.publications.list))
+
+      const result1 = await r.articles().all()
+      expect(true).to.equal(result1)
+      expect(JSON.stringify([a1, a1])).to.deep.equal(JSON.stringify(await Promise.all(r.articles().list.map( async (e) => {
+        await e.publications.all()
+        return e
+      }))))
+
+      await r.articles().add(a1)
+      const result3 = await r.articles().all()
+      expect(true).to.equal(result3)
+      expect([a1, a1, a1].length).to.deep.equal(r.articles().list.length)
+
+    });
+  })
+
 })
