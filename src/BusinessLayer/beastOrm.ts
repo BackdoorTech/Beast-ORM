@@ -47,30 +47,6 @@ class BeastORM {
       .strategy
 
 
-    const modelsHolder: {[key:string]: typeof Model<any>} = {}
-
-    let a: {
-      fieldName: string,
-      model: typeof Model<any>
-    }[] = []
-
-    let count = 0
-    for( const tableSchema of schema.table) {
-      if(tableSchema.attributes.foreignKey) {
-        for(const fieldName of tableSchema.attributes.foreignKey) {
-          register.models[count]
-          modelsHolder[fieldName] = register.models[count]
-
-          a.push({
-            fieldName: fieldName,
-            model: register.models[count]
-          })
-        }
-      }
-
-      count++
-    }
-
     for(const model of register.models) {
 
       // const tableSchema = model[RM.getTableSchema]()

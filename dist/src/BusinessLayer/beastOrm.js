@@ -26,22 +26,6 @@ class BeastORM {
                 .DBConnectionManager
                 .driverAdapter
                 .strategy;
-            const modelsHolder = {};
-            let a = [];
-            let count = 0;
-            for (const tableSchema of schema.table) {
-                if (tableSchema.attributes.foreignKey) {
-                    for (const fieldName of tableSchema.attributes.foreignKey) {
-                        register.models[count];
-                        modelsHolder[fieldName] = register.models[count];
-                        a.push({
-                            fieldName: fieldName,
-                            model: register.models[count]
-                        });
-                    }
-                }
-                count++;
-            }
             for (const model of register.models) {
                 // const tableSchema = model[RM.getTableSchema]()
                 this.addMethods(model, RM.getModel, model);
