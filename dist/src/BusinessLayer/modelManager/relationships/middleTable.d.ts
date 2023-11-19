@@ -8,17 +8,17 @@ export declare class MiddleTable {
     }): {
         new (): {
             getModel(): typeof Model;
-            get(): Promise<boolean>;
             save(params?: any): Promise<boolean>;
             getPrimaryKeyValue(): string | number;
             setPrimaryKey(key: string | number): void;
             delete(): Promise<number | true>;
+            get(): Promise<boolean>;
         };
         getTableSchema(): ITableSchema;
         getModel(): typeof Model;
         getModelSchema(): any;
         get(value: Object): Promise<any>;
-        all<T>(): Promise<T[]>;
+        all<T>(): Promise<false | T[]>;
         deleteAll(): Promise<number | true>;
         create<T_1>(params: any): Promise<T_1>;
         filter<T_2>(value: Object): {

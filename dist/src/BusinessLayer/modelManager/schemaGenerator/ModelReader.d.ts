@@ -18,7 +18,7 @@ export declare class ModelReader {
             [key: string]: field;
         };
         fieldTypes: FieldsMap<"CharField" | "JsonField" | "AutoField" | "BigIntegerField" | "DateField" | "IntegerField" | "TextField" | "BooleanField" | "OneToOneField" | "ForeignKey" | "ManyToManyField" | "indexedDBJsonField" | "indexedDBArrayField" | "DateTimeField" | "Unknown", string[]>;
-        attributes: AttributesMap<"maxLength" | "minLength" | "choices" | "primaryKey" | "unique" | "autoIncrement" | "type" | "model" | "blank" | "default" | "onDelete" | "foreignKey", string[]>;
+        attributes: AttributesMap<"type" | "maxLength" | "minLength" | "choices" | "primaryKey" | "unique" | "autoIncrement" | "model" | "blank" | "default" | "onDelete" | "foreignKey", string[]>;
         fieldNames: string[];
         falseField: string[];
     };
