@@ -1,7 +1,7 @@
 import { Model } from "../../Presentation/Api.js";
 import { IDatabaseSchema, ITableSchema } from "../_interface/interface.type";
 import { RuntimeMethods as RM } from "./runtimeMethods/runTimeMethods.js";
-import { ok } from "../../Utility/Either/index.js";
+import { ok } from "../../Utility/Either/APIResponse.js";
 import { ForeignKey, _RealPrototype } from "../../Presentation/Model/fields/fieldsWrappers.js";
 import { IRegister } from "../beastOrm.type.js";
 

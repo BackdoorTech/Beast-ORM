@@ -1,6 +1,6 @@
 
 import { Model } from "../../../Presentation/Api.js"
-import { Either, error , ok } from "../../../Utility/Either/index.js"
+import { Either, error , ok } from "../../../Utility/Either/APIResponse.js"
 import { InvalidType, InvalidValue } from "../../error/class/validation.js"
 import { FieldKeys } from "../../fields/fields.type"
 

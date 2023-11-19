@@ -23,5 +23,9 @@ export declare class Model<Model> implements IModel<Model> {
     setPrimaryKey(key: number | string): void;
     delete(): Promise<number | true>;
     static magic(): import("./Api.js").Model<unknown>;
+    static transactionOnCommit(fn: Function): {
+        dispatchUID: string;
+        disconnect: () => void;
+    };
 }
 export declare const $B: <T>(model: self<T>) => IModelStatic<T>;

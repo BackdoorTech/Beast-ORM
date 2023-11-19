@@ -4,6 +4,12 @@ export class DriverAdapter {
     constructor(strategy) {
         this.strategy = strategy;
     }
+    addTrigger(table, data) {
+        throw new Error("Method not implemented.");
+    }
+    RemoveTrigger(table, data) {
+        throw new Error("Method not implemented.");
+    }
     insertMany(table, data) {
         return this.strategy.insertMany(table, data);
     }

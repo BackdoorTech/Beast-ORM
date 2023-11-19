@@ -18,6 +18,12 @@ export class IndexedDBWorkerStrategy implements IDatabaseStrategy {
       console.log('myWorker', error);
     };
 	}
+  addTrigger(table: any, data: any): (returnObject: IReturnObject) => void {
+    throw new Error("Method not implemented.");
+  }
+  RemoveTrigger(table: any, data: any): (returnObject: IReturnObject) => void {
+    throw new Error("Method not implemented.");
+  }
   updateMany(table: any, data: IQuery): (returnObject: IReturnObject) => void {
     throw new Error("Method not implemented.");
   }

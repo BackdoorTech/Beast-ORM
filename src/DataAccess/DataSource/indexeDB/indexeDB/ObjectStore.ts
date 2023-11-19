@@ -8,15 +8,18 @@ export class ObjectStore {
   transactionQueue = [];
   isTransactionInProgress = false;
   db:  IDBDatabase;
+  operation
 
   connect = () => {}
-  transactionFinish = (a: any) => {}
+  transactionFinish = (tableName: string, hasWriteTransaction:boolean) => {}
 
   txInstance: {
     IDBTransaction?: IDBTransaction,
     IDBTransactionMode?: IDBTransactionMode,
     active?: boolean
-   };
+  };
+
+  hasWriteTransaction = false
 
   constructor(tableSchema: ITableSchema) {
     this.schema = tableSchema
@@ -32,6 +35,7 @@ export class ObjectStore {
       if (!this.isTransactionInProgress) {
         this.processTransactionQueue();
       }
+
     })
   }
 
@@ -63,7 +67,8 @@ export class ObjectStore {
     this.isTransactionInProgress = false;
     this.commitTransaction()
     this.closeTransaction()
-    this.transactionFinish(this.schema.name)
+    this.transactionFinish(this.schema.name,  this.hasWriteTransaction)
+    this.clearVariables()
 
   }
 
@@ -122,7 +127,17 @@ export class ObjectStore {
       console.error(error)
       return false
     }
+
   }
+
+  clearVariables() {
+    this.hasWriteTransaction = false
+  }
+
+  writeTransactionFlag() {
+    this.hasWriteTransaction = true
+  }
+
   createTransaction() {
     this.txInstance = {}
     this.txInstance.IDBTransaction = this.db.transaction(this.schema.name, "readwrite");

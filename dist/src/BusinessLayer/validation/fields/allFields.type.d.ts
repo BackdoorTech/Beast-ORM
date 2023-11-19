@@ -1,5 +1,5 @@
 import { Model } from "../../../Presentation/Api.js";
-import { Either } from "../../../Utility/Either/index.js";
+import { Either } from "../../../Utility/Either/APIResponse.js";
 import { InvalidType, InvalidValue } from "../../error/class/validation.js";
 import { FieldKeys } from "../../fields/fields.type";
 declare class maxLengthError extends Error {

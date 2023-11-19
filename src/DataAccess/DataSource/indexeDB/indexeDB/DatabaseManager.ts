@@ -20,7 +20,6 @@ class DatabaseManager {
   getTableSchema(databaseName, tableName) {
     return this.databases[databaseName].objectStore[tableName].schema
   }
-
 }
 
 export const databaseManager = new DatabaseManager()

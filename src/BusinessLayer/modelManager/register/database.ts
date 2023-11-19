@@ -4,6 +4,7 @@ import { DBConnectionManager } from '../../../DataAccess/DBconnectionManager/DBC
 import { DataAccess, dataAccess } from '../../../DataAccess/dataAccess.js'
 import { IDatabaseSchema } from '../../_interface/interface.type.js'
 import { Model } from '../../../Presentation/Api.js'
+import { TriggerManager } from '../../trigger/trigger.js'
 export class Database {
 
   databaseName: string

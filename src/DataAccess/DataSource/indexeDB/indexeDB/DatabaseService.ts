@@ -1,5 +1,7 @@
-import { IDatabaseSchema } from "../../../../BusinessLayer/_interface/interface.type.js";
+import { DBEventsTrigger, IDatabaseSchema } from "../../../../BusinessLayer/_interface/interface.type.js";
+import { IReturnObject, IReturnTriggerObject } from "../../../DriverAdapters/DriverAdapter.type.js";
 import { DatabaseConnector } from "./DatabaseConnector.js";
+import { DatabaseTriggerService } from "./DatabaseTriggerService.js";
 import { ObjectStore } from './ObjectStore.js'
 export class DatabaseService {
   db:  IDBDatabase | null = null;
@@ -10,6 +12,8 @@ export class DatabaseService {
 
   objectStore: {[storeName: string]: ObjectStore }  = {}
   executingTransaction : {[ key: string]: boolean } = {}
+
+  tigers = new DatabaseTriggerService()
 
   constructor(schema: IDatabaseSchema) {
     this.schema = schema
@@ -81,14 +85,24 @@ export class DatabaseService {
     return objectStore
   }
 
-  transactionFinish = (TableName) => {
+  transactionFinish = (TableName, hasWriteTransaction:boolean) => {
     delete this.executingTransaction[TableName]
 
     if(Object.keys(this.executingTransaction).length == 0) {
-
       // this.db.close()
       delete this.db;
     }
+
+    if(hasWriteTransaction) {
+      this.tigers.executeTriggers(DBEventsTrigger.onCompleteReadTransaction, TableName)
+    }
   }
 
+  registerTrigger(tableName, data,  callback: IReturnTriggerObject) {
+    this.tigers.subscribe(DBEventsTrigger.onCompleteReadTransaction, tableName, callback)
+  }
+
+  UnRegisterTrigger(tableName, subscriptionId,  callback: IReturnTriggerObject) {
+    this.tigers.unsubscribe(DBEventsTrigger.onCompleteReadTransaction, tableName, subscriptionId, callback)
+  }
 }

@@ -4,6 +4,8 @@ export declare class IndexedDBWorkerStrategy implements IDatabaseStrategy {
     private myWorker;
     private Queue;
     constructor();
+    addTrigger(table: any, data: any): (returnObject: IReturnObject) => void;
+    RemoveTrigger(table: any, data: any): (returnObject: IReturnObject) => void;
     updateMany(table: any, data: IQuery): (returnObject: IReturnObject) => void;
     insertMany(table: any, data: any): (returnObject: IReturnObject) => void;
     deleteMany(table: any, data: IQuery): (returnObject: IReturnObject) => void;

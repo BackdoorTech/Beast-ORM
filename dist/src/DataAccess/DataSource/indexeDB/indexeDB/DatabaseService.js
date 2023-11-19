@@ -1,4 +1,6 @@
+import { DBEventsTrigger } from "../../../../BusinessLayer/_interface/interface.type.js";
 import { DatabaseConnector } from "./DatabaseConnector.js";
+import { DatabaseTriggerService } from "./DatabaseTriggerService.js";
 import { ObjectStore } from './ObjectStore.js';
 export class DatabaseService {
     constructor(schema) {
@@ -7,6 +9,7 @@ export class DatabaseService {
         this.isTransactionInProgress = false;
         this.objectStore = {};
         this.executingTransaction = {};
+        this.tigers = new DatabaseTriggerService();
         this.connect = async () => {
             this.db = await this.connector.openDatabase(this.schema);
             if (this.isSchemaHeathy() == false) {
@@ -20,11 +23,14 @@ export class DatabaseService {
                 };
             }
         };
-        this.transactionFinish = (TableName) => {
+        this.transactionFinish = (TableName, hasWriteTransaction) => {
             delete this.executingTransaction[TableName];
             if (Object.keys(this.executingTransaction).length == 0) {
                 // this.db.close()
                 delete this.db;
+            }
+            if (hasWriteTransaction) {
+                this.tigers.executeTriggers(DBEventsTrigger.onCompleteReadTransaction, TableName);
             }
         };
         this.schema = schema;
@@ -61,5 +67,11 @@ export class DatabaseService {
         }
         this.executingTransaction[objectStoreName] = true;
         return objectStore;
+    }
+    registerTrigger(tableName, data, callback) {
+        this.tigers.subscribe(DBEventsTrigger.onCompleteReadTransaction, tableName, callback);
+    }
+    UnRegisterTrigger(tableName, subscriptionId, callback) {
+        this.tigers.unsubscribe(DBEventsTrigger.onCompleteReadTransaction, tableName, subscriptionId, callback);
     }
 }

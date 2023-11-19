@@ -1,5 +1,5 @@
 import { ITableSchema } from '../_interface/interface.type';
-import { Either } from '../../Utility/Either/index.js';
+import { Either } from '../../Utility/Either/APIResponse.js';
 import { ValidationError } from './error/ValidationError.js';
 import { Model as ModelType } from '../../Presentation/Api';
 import { FormValidationError } from './fields/allFields.type';

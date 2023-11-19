@@ -374,4 +374,67 @@ describe('API', () => {
             expect([a1, a1, a1].length).to.deep.equal(r.articles().list.length);
         });
     });
+    it('trigger on commit', () => {
+        cy.visit('./index.html');
+        cy.window().should("have.property", "models");
+        cy.window().then(async (wind) => {
+            class Person extends wind.models.Model {
+                constructor() {
+                    super(...arguments);
+                    this.userId = wind.models.AutoField({ primaryKey: true });
+                    this.username = wind.models.CharField({ maxLength: 100 });
+                    this.email = wind.models.CharField({ blank: true, maxLength: 100 });
+                    this.age = wind.models.IntegerField({ blank: true });
+                }
+            }
+            wind.models.register({
+                databaseName: "jest-13",
+                type: "localStorage",
+                version: 1,
+                models: [Person],
+            });
+            await Person.deleteAll();
+            let result = false;
+            Person.transactionOnCommit(() => {
+                console.log("hello");
+                result = true;
+            });
+            await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
+            await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
+            await Person.all();
+            expect(result).to.deep.equal(true);
+        });
+    });
+    it('trigger on commit disconnect', () => {
+        cy.visit('./index.html');
+        cy.window().should("have.property", "models");
+        cy.window().then(async (wind) => {
+            class Person extends wind.models.Model {
+                constructor() {
+                    super(...arguments);
+                    this.userId = wind.models.AutoField({ primaryKey: true });
+                    this.username = wind.models.CharField({ maxLength: 100 });
+                    this.email = wind.models.CharField({ blank: true, maxLength: 100 });
+                    this.age = wind.models.IntegerField({ blank: true });
+                }
+            }
+            wind.models.register({
+                databaseName: "jest-14",
+                type: "localStorage",
+                version: 1,
+                models: [Person],
+            });
+            await Person.deleteAll();
+            let result = 0;
+            let subscription = Person.transactionOnCommit(() => {
+                result++;
+                subscription.disconnect();
+                console.log({ subscription });
+            });
+            await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
+            await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
+            await Person.all();
+            expect(1).to.deep.equal(result);
+        });
+    });
 });

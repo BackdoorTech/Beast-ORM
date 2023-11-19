@@ -8,6 +8,12 @@ export class DriverAdapter implements IDatabaseStrategy{
   constructor(strategy) {
     this.strategy = strategy;
   }
+  addTrigger(table: any, data: any): (returnObject: IReturnObject) => void {
+    throw new Error("Method not implemented.");
+  }
+  RemoveTrigger(table: any, data: any): (returnObject: IReturnObject) => void {
+    throw new Error("Method not implemented.");
+  }
   insertMany(table: any, data: any): (returnObject: IReturnObject) => void {
     return this.strategy.insertMany(table, data)
   }

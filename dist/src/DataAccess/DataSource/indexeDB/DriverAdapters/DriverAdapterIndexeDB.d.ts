@@ -1,9 +1,11 @@
-import { IDatabaseStrategy, IMigrations, IReturnObject } from "../../../DriverAdapters/DriverAdapter.type.js";
+import { IDatabaseStrategy, IMigrations, IReturnObject, IReturnTriggerObject } from "../../../DriverAdapters/DriverAdapter.type.js";
 import { IQuery } from "../../../../BusinessLayer/_interface/Apresentation/queryBuilder.js";
 export declare class IndexedDBStrategy implements IDatabaseStrategy {
     databaseName: string;
     tableName: string;
     constructor(databaseName: string);
+    addTrigger(table: any, data: any): (returnObject: IReturnTriggerObject) => void;
+    RemoveTrigger(table: any, subscriptionId: any): (returnObject: IReturnTriggerObject) => void;
     openDatabase(): (callbacks: IReturnObject) => Promise<void>;
     delete(table: any, Query: IQuery): (callbacks: IReturnObject) => Promise<void>;
     deleteMany(table: any, Query: IQuery): (returnObject: IReturnObject) => void;

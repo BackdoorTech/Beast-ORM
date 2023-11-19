@@ -198,6 +198,10 @@ export class Model<Model> implements IModel<Model>{
   static magic() {
     return new this()
   }
+
+  static transactionOnCommit( fn: Function ) {
+    return ORM.registerTrigger(this, fn)
+  }
 }
 
 export const  $B = <T>(model:  self<T>): IModelStatic<T> => {

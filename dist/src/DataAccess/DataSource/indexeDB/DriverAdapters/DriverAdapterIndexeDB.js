@@ -11,6 +11,19 @@ export class IndexedDBStrategy {
     constructor(databaseName) {
         this.databaseName = databaseName;
     }
+    addTrigger(table, data) {
+        return async (callbacks) => {
+            const database = await databaseManager.getDb(this.databaseName);
+            database.registerTrigger(table, data, callbacks);
+        };
+    }
+    RemoveTrigger(table, subscriptionId) {
+        return async (callbacks) => {
+            const database = await databaseManager.getDb(this.databaseName);
+            database.UnRegisterTrigger(table, subscriptionId, callbacks);
+            callbacks.done();
+        };
+    }
     openDatabase() {
         return async (callbacks) => {
             // return indexedDB.open(this.databaseName);
@@ -22,6 +35,7 @@ export class IndexedDBStrategy {
             const ObjectStore = await databaseManager.getDb(this.databaseName)
                 .executeOnObjectStore(table);
             const condition = Query.where.shift();
+            ObjectStore.writeTransactionFlag();
             const idIndex = Object.values(condition)[0];
             await ObjectStore.enqueueTransaction(Object.assign({ operation: "delete", data: idIndex }, callbacks));
             callbacks.done();
@@ -31,6 +45,7 @@ export class IndexedDBStrategy {
         return async (callbacks) => {
             const ObjectStore = await databaseManager.getDb(this.databaseName)
                 .executeOnObjectStore(table);
+            ObjectStore.writeTransactionFlag();
             if (Query.where.length == 0) {
                 await ObjectStore.enqueueTransaction(Object.assign({ operation: "clear" }, callbacks));
             }
@@ -63,6 +78,7 @@ export class IndexedDBStrategy {
         return async (callbacks) => {
             const ObjectStore = await databaseManager.getDb(this.databaseName)
                 .executeOnObjectStore(table);
+            ObjectStore.writeTransactionFlag();
             let index = 0;
             for (const item of data) {
                 delete item.userId;
@@ -77,6 +93,7 @@ export class IndexedDBStrategy {
         return async (callbacks) => {
             const ObjectStore = await databaseManager.getDb(this.databaseName)
                 .executeOnObjectStore(table);
+            ObjectStore.writeTransactionFlag();
             let index = 0;
             for (const item of data) {
                 delete item.userId;
@@ -91,6 +108,7 @@ export class IndexedDBStrategy {
         return async (callbacks) => {
             const ObjectStore = await databaseManager.getDb(this.databaseName)
                 .executeOnObjectStore(table);
+            ObjectStore.writeTransactionFlag();
             if (Query.hasIndex) {
                 if (Query.isParamsArray == false) {
                     const updateValues = Query.updateValues;
@@ -111,6 +129,7 @@ export class IndexedDBStrategy {
             const result = await ObjectStore.enqueueTransaction(Object.assign({ operation: "getAll", item: null }, emptyCallBacks));
             let filteredRow = [];
             if (result.isOk) {
+                ObjectStore.writeTransactionFlag();
                 const rows = result.value.data;
                 const sqlObject = new SqlObject(TableSchema, queryReader);
                 filteredRow = await sqlObject.run(rows);

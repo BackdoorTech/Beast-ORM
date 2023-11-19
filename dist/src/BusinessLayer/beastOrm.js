@@ -2,6 +2,7 @@ import { schemaGenerator } from './modelManager/schemaGenerator/schemaGenerator.
 import { modelRegistration } from './modelManager/register/register.js';
 import { MakeMigrations } from '../DataAccess/SchemaMigrations/MakeMigration.js';
 import { migrateMigrations } from '../DataAccess/SchemaMigrations/MigrateMigrations.js';
+import { DBEventsTrigger } from './_interface/interface.type.js';
 import { validator } from './validation/validator.js';
 import { dataParameters } from "./modelManager/dataParameters.js";
 import { RuntimeMethods as RM } from './modelManager/runtimeMethods/runTimeMethods.js';
@@ -144,6 +145,49 @@ class BeastORM {
         else {
             return await queryBuilderDeleteHandler.DELETEOne(DatabaseStrategy, QueryBuilder);
         }
+    }
+    registerTrigger(_Model, callBack) {
+        const tableSchema = _Model[RM.getTableSchema]();
+        const databaseName = tableSchema.databaseName;
+        const tableName = tableSchema.name;
+        const database = modelRegistration.getDatabase(databaseName);
+        const table = database.getTable(tableName);
+        const triggerEventName = DBEventsTrigger.onCompleteReadTransaction;
+        const hasSubscription = table.trigger.hasSubscription(triggerEventName);
+        let subscriptionIdFromDataLayer;
+        const DatabaseStrategy = database
+            .DBConnectionManager
+            .driverAdapter
+            .strategy;
+        const triggerRemove = () => {
+            DatabaseStrategy.RemoveTrigger(tableName, subscriptionIdFromDataLayer)({
+                onsuccess: ({ subscriptionId }) => { },
+                onerror: () => { },
+                done: () => { }
+            });
+        };
+        let returnObject = table.trigger.listeningToSubscription(triggerEventName, callBack, triggerRemove);
+        if (!hasSubscription) {
+            table.trigger.registerTrigger(triggerEventName);
+            DatabaseStrategy.addTrigger(tableName, {})({
+                onsuccess: ({ subscriptionId }) => {
+                    subscriptionIdFromDataLayer = subscriptionId;
+                    table.trigger.createShareSubscription(triggerEventName, subscriptionId);
+                    table.trigger.associateDispatchUIDToTrigger(triggerEventName, returnObject.dispatchUID, subscriptionIdFromDataLayer);
+                },
+                stream: (data) => {
+                    const subscriptionId = data.subscriptionId;
+                    table.trigger.executeTriggers(triggerEventName, subscriptionId);
+                },
+                onerror: () => { },
+                done: () => { }
+            });
+        }
+        else {
+            subscriptionIdFromDataLayer = table.trigger.findTriggerToShared(triggerEventName);
+            table.trigger.associateDispatchUIDToTrigger(triggerEventName, returnObject.dispatchUID, subscriptionIdFromDataLayer);
+        }
+        return returnObject;
     }
 }
 export const ORM = new BeastORM();

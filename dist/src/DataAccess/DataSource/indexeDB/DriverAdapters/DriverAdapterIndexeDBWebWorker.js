@@ -10,6 +10,12 @@ export class IndexedDBWorkerStrategy {
             console.log('myWorker', error);
         };
     }
+    addTrigger(table, data) {
+        throw new Error("Method not implemented.");
+    }
+    RemoveTrigger(table, data) {
+        throw new Error("Method not implemented.");
+    }
     updateMany(table, data) {
         throw new Error("Method not implemented.");
     }

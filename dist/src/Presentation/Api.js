@@ -153,6 +153,9 @@ export class Model {
     static magic() {
         return new this();
     }
+    static transactionOnCommit(fn) {
+        return ORM.registerTrigger(this, fn);
+    }
 }
 export const $B = (model) => {
     const _model = model;

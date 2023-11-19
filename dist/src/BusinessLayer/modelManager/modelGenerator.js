@@ -1,6 +1,6 @@
 import { Model } from "../../Presentation/Api.js";
 import { RuntimeMethods as RM } from "./runtimeMethods/runTimeMethods.js";
-import { ok } from "../../Utility/Either/index.js";
+import { ok } from "../../Utility/Either/APIResponse.js";
 import { ForeignKey, _RealPrototype } from "../../Presentation/Model/fields/fieldsWrappers.js";
 class ModelGeneration {
     forMiddleTables(schema, register) {

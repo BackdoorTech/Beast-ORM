@@ -7,7 +7,16 @@ export interface IReturnObject {
   done?: Function
 }
 
+
+export interface IReturnTriggerObject {
+  onsuccess?: Function
+  stream: Function
+  onerror?: Function
+  done?: Function
+}
+
 type returnFunction = (returnObject: IReturnObject) => void
+type returnStreamTriggerFunction = (returnObject: IReturnTriggerObject) => void
 
 export interface IDatabaseStrategy {
 
@@ -21,5 +30,8 @@ export interface IDatabaseStrategy {
   select(table,data:IQuery) : returnFunction
   selectMany(table,data:IQuery) : returnFunction
   prepare(migrate: IMigrations): returnFunction
+
+  addTrigger(table, data: any): returnStreamTriggerFunction
+  RemoveTrigger(table, data: any): returnFunction
 }
 export type IMigrations = IDatabaseSchema

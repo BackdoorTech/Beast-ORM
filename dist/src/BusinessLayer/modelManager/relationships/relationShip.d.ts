@@ -17,6 +17,10 @@ export declare class RelationShip {
             delete: () => Promise<number | true>;
         };
         magic(): Model<unknown>;
+        transactionOnCommit(fn: Function): {
+            dispatchUID: string;
+            disconnect: () => void;
+        };
     };
     getMiddleTableName(modelWithNoGetter: typeof Model<any>, modelWithGetter: typeof Model<any>): string;
     addToMiddleTable<T>(currentModel: Model<any>, otherModel: typeof Model<any>, toAdd: Model<any>, middleTableModel: typeof Model<any>): Promise<T>;

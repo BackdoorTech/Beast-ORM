@@ -1,6 +1,5 @@
-import { IDeleteQuery, IQuery, ISelectQuery, IUpdateQuery } from '../../BusinessLayer/_interface/Apresentation/queryBuilder.js';
+import { IQuery } from '../../BusinessLayer/_interface/Apresentation/queryBuilder.js';
 import { Model } from '../Api.js';
-import { IDeleteQueryStrategy, IInsertQueryStrategy, ISelectQueryStrategy, IUpdateQueryStrategy } from './queryBuilder.type.js';
 
 /**
  * Represents a query builder for creating Query instances.
@@ -21,6 +20,8 @@ export class QueryBuilder {
     isParamsArray: false
   }
   model: typeof Model
+
+  createdDate = new Date()
 
   constructor({isParamsArray}) {
     this.query.isParamsArray = isParamsArray
@@ -156,4 +157,9 @@ export class QueryBuilder {
   get hasNoCondition() {
     return this.query.where.length == 0
   }
+}
+
+
+function CreateQueryBuilder(arg) {
+  return new QueryBuilder(arg)
 }

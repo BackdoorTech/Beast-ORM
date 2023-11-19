@@ -1,4 +1,4 @@
-import { Either, error, ok } from '../../../Utility/Either/index.js'
+import { Either, error, ok } from '../../../Utility/Either/APIResponse.js'
 import { InvalidType, InvalidValue } from '../../error/class/validation.js'
 import { FormValidationError, field, sizeError } from './allFields.type.js'
 

@@ -1,4 +1,4 @@
-import { error, ok } from '../../../Utility/Either/index.js';
+import { error, ok } from '../../../Utility/Either/APIResponse.js';
 import { InvalidType, InvalidValue } from '../../error/class/validation.js';
 import { field, sizeError } from './allFields.type.js';
 function isString(field, value) {

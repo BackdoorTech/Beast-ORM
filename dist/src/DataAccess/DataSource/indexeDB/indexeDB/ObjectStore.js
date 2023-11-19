@@ -4,7 +4,8 @@ export class ObjectStore {
         this.transactionQueue = [];
         this.isTransactionInProgress = false;
         this.connect = () => { };
-        this.transactionFinish = (a) => { };
+        this.transactionFinish = (tableName, hasWriteTransaction) => { };
+        this.hasWriteTransaction = false;
         this.schema = tableSchema;
     }
     async enqueueTransaction(transaction) {
@@ -41,7 +42,8 @@ export class ObjectStore {
         this.isTransactionInProgress = false;
         this.commitTransaction();
         this.closeTransaction();
-        this.transactionFinish(this.schema.name);
+        this.transactionFinish(this.schema.name, this.hasWriteTransaction);
+        this.clearVariables();
     }
     async executeTransaction(transaction) {
         const { operation, data, onsuccess, onerror, index, finishRequest, retry } = transaction;
@@ -93,6 +95,12 @@ export class ObjectStore {
             console.error(error);
             return false;
         }
+    }
+    clearVariables() {
+        this.hasWriteTransaction = false;
+    }
+    writeTransactionFlag() {
+        this.hasWriteTransaction = true;
     }
     createTransaction() {
         this.txInstance = {};

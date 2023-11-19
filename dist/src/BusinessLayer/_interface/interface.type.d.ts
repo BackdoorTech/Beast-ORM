@@ -57,3 +57,7 @@ export interface IMethodWithModels {
         function: Function;
     }[];
 }
+export declare enum DBEventsTrigger {
+    onCompleteReadTransaction = "onCompleteReadTransaction",
+    onCompleteWrite = "onCompleteWrite"
+}

@@ -1,4 +1,4 @@
-import { IDatabaseStrategy, IMigrations, IReturnObject } from "../../../DriverAdapters/DriverAdapter.type.js";
+import { IDatabaseStrategy, IMigrations, IReturnObject, IReturnTriggerObject } from "../../../DriverAdapters/DriverAdapter.type.js";
 import { databaseManager } from "../indexeDB/DatabaseManager.js";
 import { IQuery } from "../../../../BusinessLayer/_interface/Apresentation/queryBuilder.js"
 import { CreateQueryReaderSelect } from "../../../QueryReader/queryReader.js";
@@ -20,6 +20,24 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
     this.databaseName = databaseName
   }
 
+  addTrigger(table, data): (returnObject: IReturnTriggerObject) => void {
+    return async (callbacks: IReturnTriggerObject) => {
+      const database = await databaseManager.getDb(this.databaseName)
+      database.registerTrigger(table, data, callbacks)
+    }
+  }
+
+  RemoveTrigger(table, subscriptionId): (returnObject: IReturnTriggerObject) => void {
+    return async (callbacks: IReturnTriggerObject) => {
+
+      const database = await databaseManager.getDb(this.databaseName)
+
+      database.UnRegisterTrigger(table, subscriptionId, callbacks)
+
+      callbacks.done()
+    }
+  }
+
   openDatabase() {
     return async (callbacks: IReturnObject) => {
       // return indexedDB.open(this.databaseName);
@@ -33,6 +51,7 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
       .executeOnObjectStore(table)
 
       const condition = Query.where.shift()
+      ObjectStore.writeTransactionFlag()
 
       const idIndex = Object.values(condition)[0]
       await ObjectStore.enqueueTransaction({operation:"delete", data:idIndex, ...callbacks})
@@ -45,6 +64,8 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
     return async (callbacks: IReturnObject) => {
       const ObjectStore = await databaseManager.getDb(this.databaseName)
       .executeOnObjectStore(table)
+
+      ObjectStore.writeTransactionFlag()
 
       if (Query.where.length == 0) {
 
@@ -91,6 +112,8 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
       const ObjectStore = await databaseManager.getDb(this.databaseName)
       .executeOnObjectStore(table)
 
+      ObjectStore.writeTransactionFlag()
+
       let index = 0
       for (const item of data) {
         delete item.userId
@@ -107,6 +130,8 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
     return async (callbacks: IReturnObject) => {
       const ObjectStore = await databaseManager.getDb(this.databaseName)
       .executeOnObjectStore(table)
+
+      ObjectStore.writeTransactionFlag()
 
       let index = 0
       for (const item of data) {
@@ -126,6 +151,7 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
       const ObjectStore = await databaseManager.getDb(this.databaseName)
       .executeOnObjectStore(table)
 
+      ObjectStore.writeTransactionFlag()
       if(Query.hasIndex) {
         if(Query.isParamsArray == false) {
 
@@ -156,6 +182,7 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
       let filteredRow = []
 
       if(result.isOk) {
+        ObjectStore.writeTransactionFlag()
         const rows = result.value.data
 
         const sqlObject =  new SqlObject(TableSchema, queryReader)

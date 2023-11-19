@@ -17,6 +17,7 @@ export class QueryBuilder {
             hasIndex: false,
             isParamsArray: false
         };
+        this.createdDate = new Date();
         this.query.isParamsArray = isParamsArray;
     }
     /**
@@ -138,4 +139,7 @@ export class QueryBuilder {
     get hasNoCondition() {
         return this.query.where.length == 0;
     }
+}
+function CreateQueryBuilder(arg) {
+    return new QueryBuilder(arg);
 }

@@ -27,6 +27,10 @@ export declare class MiddleTable {
             delete: () => Promise<number | true>;
         };
         magic(): Model<unknown>;
+        transactionOnCommit(fn: Function): {
+            dispatchUID: string;
+            disconnect: () => void;
+        };
     };
 }
 export declare const middleTable: MiddleTable;
