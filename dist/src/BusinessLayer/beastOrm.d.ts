@@ -1,4 +1,5 @@
 import { IRegister } from './beastOrm.type.js';
+import { ICallBackReactiveList } from './_interface/interface.type.js';
 import { QueryBuilder } from '../Presentation/queryBuilder/queryBuilder.js';
 import { Model } from '../Presentation/Api';
 import { Either } from '../Utility/Either/APIResponse.js';
@@ -14,6 +15,15 @@ declare class BeastORM {
     registerTrigger(_Model: typeof Model<any>, callBack: Function): {
         dispatchUID: string;
         disconnect: () => void;
+    };
+    ReactiveList(_Model: typeof Model<any>, callBack: ICallBackReactiveList): {
+        readonly value: any;
+        readonly subscribe: {
+            dispatchUID: string;
+            disconnect: () => void;
+        };
+        unsubscribe: () => Promise<void>;
+        setUpdateUi(func: any): void;
     };
 }
 export declare const ORM: BeastORM;

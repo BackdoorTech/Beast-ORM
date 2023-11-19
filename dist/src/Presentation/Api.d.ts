@@ -1,5 +1,5 @@
 import { IModel, IModelStatic, self } from "./Api.type.js";
-import { ITableSchema } from "../BusinessLayer/_interface/interface.type.js";
+import { ICallBackReactiveList, ITableSchema } from "../BusinessLayer/_interface/interface.type.js";
 /**
  * Represents a model for database operations.
  */
@@ -26,6 +26,15 @@ export declare class Model<Model> implements IModel<Model> {
     static transactionOnCommit(fn: Function): {
         dispatchUID: string;
         disconnect: () => void;
+    };
+    static ReactiveList(callback: ICallBackReactiveList): {
+        readonly value: any;
+        readonly subscribe: {
+            dispatchUID: string;
+            disconnect: () => void;
+        };
+        unsubscribe: () => Promise<void>;
+        setUpdateUi(func: any): void;
     };
 }
 export declare const $B: <T>(model: self<T>) => IModelStatic<T>;

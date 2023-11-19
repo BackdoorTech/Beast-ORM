@@ -156,6 +156,9 @@ export class Model {
     static transactionOnCommit(fn) {
         return ORM.registerTrigger(this, fn);
     }
+    static ReactiveList(callback) {
+        return ORM.ReactiveList(this, callback);
+    }
 }
 export const $B = (model) => {
     const _model = model;

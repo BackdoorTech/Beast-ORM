@@ -31,6 +31,15 @@ export declare class MiddleTable {
             dispatchUID: string;
             disconnect: () => void;
         };
+        ReactiveList(callback: import("../../_interface/interface.type.js").ICallBackReactiveList): {
+            readonly value: any;
+            readonly subscribe: {
+                dispatchUID: string;
+                disconnect: () => void;
+            };
+            unsubscribe: () => Promise<void>;
+            setUpdateUi(func: any): void;
+        };
     };
 }
 export declare const middleTable: MiddleTable;

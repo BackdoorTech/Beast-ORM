@@ -21,6 +21,15 @@ export declare class RelationShip {
             dispatchUID: string;
             disconnect: () => void;
         };
+        ReactiveList(callback: import("../../_interface/interface.type").ICallBackReactiveList): {
+            readonly value: any;
+            readonly subscribe: {
+                dispatchUID: string;
+                disconnect: () => void;
+            };
+            unsubscribe: () => Promise<void>;
+            setUpdateUi(func: any): void;
+        };
     };
     getMiddleTableName(modelWithNoGetter: typeof Model<any>, modelWithGetter: typeof Model<any>): string;
     addToMiddleTable<T>(currentModel: Model<any>, otherModel: typeof Model<any>, toAdd: Model<any>, middleTableModel: typeof Model<any>): Promise<T>;

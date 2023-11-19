@@ -4,7 +4,7 @@ import { modelRegistration } from './modelManager/register/register.js';
 import { MakeMigrations } from '../DataAccess/SchemaMigrations/MakeMigration.js';
 import { migrateMigrations } from '../DataAccess/SchemaMigrations/MigrateMigrations.js';
 import { IDatabaseStrategy } from '../DataAccess/DriverAdapters/DriverAdapter.type.js';
-import { DBEventsTrigger, IDatabaseSchema, ITableSchema } from './_interface/interface.type.js';
+import { DBEventsTrigger, ICallBackReactiveList, IDatabaseSchema, ITableSchema } from './_interface/interface.type.js';
 import { QueryBuilder } from '../Presentation/queryBuilder/queryBuilder.js'
 import { Model } from '../Presentation/Api';
 import { validator } from './validation/validator.js'
@@ -19,6 +19,7 @@ import { queryBuilderSelectHandler } from "./queryBuilderHandler/queryBuilderSel
 import { relationShip } from './modelManager/relationships/relationShip.js';
 import { modelGeneration } from './modelManager/modelGenerator.js';
 import { addRunTimeMethod } from './modelManager/runtimeMethods/addRuntimeMethod.js';
+import { ReactiveList } from './reactiveList/reactiveList.js';
 
 class BeastORM {
 
@@ -249,6 +250,14 @@ class BeastORM {
     }
 
     return returnObject
+  }
+
+  ReactiveList(_Model: typeof Model<any>, callBack:ICallBackReactiveList) {
+
+    const reactiveList = new ReactiveList()
+
+
+    return reactiveList.subscribe(_Model, callBack as any)
   }
 }
 

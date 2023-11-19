@@ -13,6 +13,7 @@ import { queryBuilderSelectHandler } from "./queryBuilderHandler/queryBuilderSel
 import { relationShip } from './modelManager/relationships/relationShip.js';
 import { modelGeneration } from './modelManager/modelGenerator.js';
 import { addRunTimeMethod } from './modelManager/runtimeMethods/addRuntimeMethod.js';
+import { ReactiveList } from './reactiveList/reactiveList.js';
 class BeastORM {
     constructor() {
         this.register = (register) => {
@@ -188,6 +189,10 @@ class BeastORM {
             table.trigger.associateDispatchUIDToTrigger(triggerEventName, returnObject.dispatchUID, subscriptionIdFromDataLayer);
         }
         return returnObject;
+    }
+    ReactiveList(_Model, callBack) {
+        const reactiveList = new ReactiveList();
+        return reactiveList.subscribe(_Model, callBack);
     }
 }
 export const ORM = new BeastORM();

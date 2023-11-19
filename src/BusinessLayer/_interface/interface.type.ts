@@ -52,3 +52,6 @@ export enum DBEventsTrigger {
   onCompleteReadTransaction = "onCompleteReadTransaction",
   onCompleteWrite = "onCompleteWrite",
 }
+
+
+export type ICallBackReactiveList = (model: typeof Model<any>) => Promise<Model<any> | Model<any>[]>

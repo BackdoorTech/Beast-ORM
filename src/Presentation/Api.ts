@@ -2,7 +2,7 @@ import { IModel, IModelStatic, self } from "./Api.type.js";
 import { QueryBuilder } from "./queryBuilder/queryBuilder.js" // Represents a query object that helps build and execute database queries.
 import { returnSelf } from "./returnSelf/returnSelf.js" // Represents a return object for query-related methods
 import { ORM } from "../BusinessLayer/beastOrm.js"
-import { ITableSchema } from "../BusinessLayer/_interface/interface.type.js";
+import { ICallBackReactiveList, ITableSchema } from "../BusinessLayer/_interface/interface.type.js";
 import { dataParameters } from "../BusinessLayer/modelManager/dataParameters.js";
 
 /**
@@ -202,6 +202,11 @@ export class Model<Model> implements IModel<Model>{
   static transactionOnCommit( fn: Function ) {
     return ORM.registerTrigger(this, fn)
   }
+
+  static ReactiveList (callback : ICallBackReactiveList) {
+    return ORM.ReactiveList(this, callback)
+  }
+
 }
 
 export const  $B = <T>(model:  self<T>): IModelStatic<T> => {
