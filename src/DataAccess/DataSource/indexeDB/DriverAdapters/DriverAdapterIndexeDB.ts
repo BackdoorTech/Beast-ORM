@@ -1,4 +1,4 @@
-import { IDatabaseStrategy, IMigrations, IReturnObject, IReturnTriggerObject } from "../../../DriverAdapters/DriverAdapter.type.js";
+import { IDatabaseStrategy, IMigrations, IReturnObject, IReturnSelectObject, IReturnTriggerObject } from "../../../DriverAdapters/DriverAdapter.type.js";
 import { databaseManager } from "../indexeDB/DatabaseManager.js";
 import { IQuery } from "../../../../BusinessLayer/_interface/Apresentation/queryBuilder.js"
 import { CreateQueryReaderSelect } from "../../../QueryReader/queryReader.js";
@@ -206,7 +206,7 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
   select(table, Query: IQuery) {
 
     // Implement IndexedDB select here
-    return async ( callbacks: IReturnObject) => {
+    return async ( callbacks: IReturnSelectObject) => {
       const queryReader = CreateQueryReaderSelect(Query)
       const ObjectStore = await databaseManager.getDb(this.databaseName)
       .executeOnObjectStore(table)
@@ -218,7 +218,12 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
         const rows = result.value.data
         const sqlObject =  new SqlObject(TableSchema, queryReader)
         const filteredRow = await sqlObject.run(rows)
-        callbacks.done(filteredRow)
+
+        if(filteredRow) {
+          callbacks.done(filteredRow)
+        } else {
+          callbacks.notFound()
+        }
         return
       }
       // callbacks.done()

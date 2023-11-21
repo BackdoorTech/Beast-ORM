@@ -1,4 +1,4 @@
-import { Either } from '../../../Utility/Either/APIResponse.js';
+import { Either } from '../../../Utility/Either/index.js';
 import { FormValidationError, field } from './allFields.type.js';
 /**
  * Represents an AutoField, an automatically incrementing field for primary keys.

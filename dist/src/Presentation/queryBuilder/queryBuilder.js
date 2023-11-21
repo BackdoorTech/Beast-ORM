@@ -1,3 +1,4 @@
+import { uniqueGenerator } from '../../Utility/utils.js';
 /**
  * Represents a query builder for creating Query instances.
  * This query builder service allows you to create INSERT, UPDATE, and DELETE queries
@@ -8,6 +9,7 @@ export class QueryBuilder {
          * Create a new QueryBuilder instance.
          */
         this.query = {
+            id: uniqueGenerator(),
             type: '',
             table: "",
             values: [],

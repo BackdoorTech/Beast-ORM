@@ -19,6 +19,8 @@ export class DataParameters {
     if(tableSchema.fieldTypes.OneToOneField) {
       for(const fieldName of tableSchema.fieldTypes.OneToOneField) {
 
+        console.log({data})
+
         const model : Model<any>=  data[fieldName]
         const KeyValue = model.getPrimaryKeyValue()
         filteredData[fieldName]= KeyValue
@@ -40,6 +42,33 @@ export class DataParameters {
         const model : Model<any> =  data[fieldName]
         const KeyValue = model.getPrimaryKeyValue()
         filteredData[fieldName]= KeyValue
+      }
+    }
+
+    return filteredData
+  }
+
+  getUniqueData(tableSchema: ITableSchema, data: Object) {
+
+    const uniqueFields = tableSchema.attributes.unique || []
+    uniqueFields.push(tableSchema.id.keyPath)
+
+    const filteredData = {}
+    for(const field of uniqueFields) {
+      if(field in data) {
+        filteredData[field]= data[field]
+      } else {
+        filteredData[field]= undefined
+      }
+    }
+
+    if(tableSchema.fieldTypes.OneToOneField) {
+      for(const fieldName of tableSchema.fieldTypes.OneToOneField) {
+
+        const model : Model<any>=  data[fieldName]
+        const KeyValue = model.getPrimaryKeyValue()
+        filteredData[fieldName]= KeyValue
+
       }
     }
 

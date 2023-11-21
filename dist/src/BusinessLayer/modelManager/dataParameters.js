@@ -12,6 +12,7 @@ export class DataParameters {
         }
         if (tableSchema.fieldTypes.OneToOneField) {
             for (const fieldName of tableSchema.fieldTypes.OneToOneField) {
+                console.log({ data });
                 const model = data[fieldName];
                 const KeyValue = model.getPrimaryKeyValue();
                 filteredData[fieldName] = KeyValue;
@@ -26,6 +27,27 @@ export class DataParameters {
         }
         if (tableSchema.fieldTypes.ManyToManyField) {
             for (const fieldName of tableSchema.fieldTypes.ManyToManyField) {
+                const model = data[fieldName];
+                const KeyValue = model.getPrimaryKeyValue();
+                filteredData[fieldName] = KeyValue;
+            }
+        }
+        return filteredData;
+    }
+    getUniqueData(tableSchema, data) {
+        const uniqueFields = tableSchema.attributes.unique || [];
+        uniqueFields.push(tableSchema.id.keyPath);
+        const filteredData = {};
+        for (const field of uniqueFields) {
+            if (field in data) {
+                filteredData[field] = data[field];
+            }
+            else {
+                filteredData[field] = undefined;
+            }
+        }
+        if (tableSchema.fieldTypes.OneToOneField) {
+            for (const fieldName of tableSchema.fieldTypes.OneToOneField) {
                 const model = data[fieldName];
                 const KeyValue = model.getPrimaryKeyValue();
                 filteredData[fieldName] = KeyValue;

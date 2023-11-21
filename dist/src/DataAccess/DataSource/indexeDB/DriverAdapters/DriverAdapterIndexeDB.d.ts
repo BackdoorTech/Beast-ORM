@@ -1,4 +1,4 @@
-import { IDatabaseStrategy, IMigrations, IReturnObject, IReturnTriggerObject } from "../../../DriverAdapters/DriverAdapter.type.js";
+import { IDatabaseStrategy, IMigrations, IReturnObject, IReturnSelectObject, IReturnTriggerObject } from "../../../DriverAdapters/DriverAdapter.type.js";
 import { IQuery } from "../../../../BusinessLayer/_interface/Apresentation/queryBuilder.js";
 export declare class IndexedDBStrategy implements IDatabaseStrategy {
     databaseName: string;
@@ -13,7 +13,7 @@ export declare class IndexedDBStrategy implements IDatabaseStrategy {
     insertMany(table: any, data: any): (returnObject: IReturnObject) => void;
     update(table: any, Query: IQuery): (callbacks: IReturnObject) => Promise<void>;
     updateMany(table: any, Query: IQuery): (returnObject: IReturnObject) => void;
-    select(table: any, Query: IQuery): (callbacks: IReturnObject) => Promise<void>;
+    select(table: any, Query: IQuery): (callbacks: IReturnSelectObject) => Promise<void>;
     selectMany(table: any, Query: IQuery): (callbacks: IReturnObject) => Promise<void>;
     migrate(migrate: IMigrations): ({ onerror, onsuccess }: IReturnObject) => Promise<void>;
     prepare(migrate: IMigrations): ({ onerror, onsuccess, done }: IReturnObject) => Promise<void>;

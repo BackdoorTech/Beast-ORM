@@ -3,32 +3,33 @@ let EitherPipe = new PipeService();
 export function registerPipe(f) {
     EitherPipe.register(f);
 }
-class OK {
-    constructor(isOk, isError, value) {
-        this.isOk = isOk;
-        this.isError = isError;
-        this.value = value;
-    }
-    runPipe({ createdDate }) {
-        EitherPipe.execute({ createdDate, THIS: this });
-        return this;
-    }
+export function APIOk(value) {
+    const pass = () => {
+        return [value, { isOk: true, isError: false, value, pass }];
+    };
+    const object = {
+        isOk: true,
+        isError: false,
+        value,
+        pass
+    };
+    return [
+        value,
+        object
+    ];
 }
-class Error {
-    constructor(isOk, isError, error, value) {
-        this.isOk = isOk;
-        this.isError = isError;
-        this.error = error;
-        this.value = value;
-    }
-    runPipe({ createdDate }) {
-        EitherPipe.execute({ createdDate, THIS: this });
-        return this;
-    }
-}
-export function ok(value) {
-    return new OK(true, false, value);
-}
-export function error(error) {
-    return new Error(false, true, error, null);
+export function APIError(error) {
+    const pass = () => {
+        return [null, { isOk: false, isError: true, value: null, error, pass }];
+    };
+    const object = {
+        isOk: false,
+        isError: true,
+        value: null, error,
+        pass
+    };
+    return [
+        null,
+        object
+    ];
 }

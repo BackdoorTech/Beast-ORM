@@ -1,6 +1,6 @@
-export type Either<T, E> = OK<T> | Error<E, T>;
+export type Either<T, E> = OK<T, E> | Error<E, T>;
 export declare function registerPipe(f: Function): void;
-declare class OK<T> {
+declare class OK<T, E> {
     isOk: true;
     isError: false;
     value: T;
@@ -19,6 +19,6 @@ declare class Error<E, T> {
         createdDate: any;
     }): this;
 }
-export declare function ok<T, E>(value: T): OK<T>;
+export declare function ok<T, E>(value: T): OK<T, E>;
 export declare function error<T, E>(error: E): Error<E, T>;
 export {};

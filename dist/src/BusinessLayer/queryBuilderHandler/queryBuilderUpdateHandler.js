@@ -1,4 +1,4 @@
-import { error, ok } from '../../Utility/Either/APIResponse.js';
+import { error, ok } from '../../Utility/Either/index.js';
 class QueryBuilderUpdateHandler {
     async UPDATEOne(DatabaseStrategy, QueryBuilder) {
         const tableName = QueryBuilder.query.table;
@@ -10,7 +10,7 @@ class QueryBuilderUpdateHandler {
                     resolve(error(false));
                 },
                 done: () => {
-                    resolve(ok(true));
+                    resolve(ok(1));
                 }
             });
         });
@@ -24,7 +24,7 @@ class QueryBuilderUpdateHandler {
                 onerror: () => {
                 },
                 done: () => {
-                    resolve(ok(true));
+                    resolve(ok(1));
                 }
             });
         });

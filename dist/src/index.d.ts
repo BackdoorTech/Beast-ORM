@@ -1,6 +1,4 @@
 import { Model } from './Presentation/Api.js';
-import "./Configuration/ResultsMeasurement.js";
-export { $B } from "./Presentation/Api.js";
 export declare const models: {
     ForeignKeyGetter<T>(data: {
         model: new () => T;
@@ -73,6 +71,5 @@ export declare const models: {
         }): import("./BusinessLayer/fields/fieldsParameters.type.js").ManyToManyGetterParams<T_1>;
     };
     Model: typeof Model;
-    $B: <T_6>(model: import("./Presentation/Api.type.js").self<T_6>) => import("./Presentation/Api.type.js").IModelStatic<T_6>;
     register: (register: import("./BusinessLayer/beastOrm.type.js").IRegister) => void;
 };

@@ -82,7 +82,7 @@ class BeastORM {
             return await queryBuilderInsertHandler.INSERTOne(DatabaseStrategy, QueryBuilder, arrayOfDataBackup);
         }
     }
-    async executeSelectQuery(QueryBuilder, Model) {
+    executeSelectQuery(QueryBuilder, Model) {
         const tableSchema = Model[RM.getTableSchema]();
         const databaseName = tableSchema.databaseName;
         const database = modelRegistration.getDatabase(databaseName);
@@ -90,12 +90,14 @@ class BeastORM {
             .DBConnectionManager
             .driverAdapter
             .strategy;
-        if (QueryBuilder.query.isParamsArray) {
-            return await queryBuilderSelectHandler.SELECTMany(DatabaseStrategy, QueryBuilder);
-        }
-        else {
-            return await queryBuilderSelectHandler.SELECTOne(DatabaseStrategy, QueryBuilder);
-        }
+        return {
+            one: () => {
+                return queryBuilderSelectHandler.SELECTOne(DatabaseStrategy, QueryBuilder);
+            },
+            many: () => {
+                return queryBuilderSelectHandler.SELECTMany(DatabaseStrategy, QueryBuilder);
+            }
+        };
     }
     async executeUpdateQuery(QueryBuilder, Model) {
         const tableSchema = Model[RM.getTableSchema]();

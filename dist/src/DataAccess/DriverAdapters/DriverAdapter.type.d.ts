@@ -5,6 +5,12 @@ export interface IReturnObject {
     onerror?: Function;
     done?: Function;
 }
+export interface IReturnSelectObject {
+    onsuccess?: Function;
+    onerror?: Function;
+    notFound?: Function;
+    done?: Function;
+}
 export interface IReturnTriggerObject {
     onsuccess?: Function;
     stream: Function;
@@ -12,6 +18,7 @@ export interface IReturnTriggerObject {
     done?: Function;
 }
 type returnFunction = (returnObject: IReturnObject) => void;
+type returnSelectFunction = (returnObject: IReturnSelectObject) => void;
 type returnStreamTriggerFunction = (returnObject: IReturnTriggerObject) => void;
 export interface IDatabaseStrategy {
     migrate(migrate: IMigrations): returnFunction;
@@ -21,7 +28,7 @@ export interface IDatabaseStrategy {
     insertMany(table: any, data: any): returnFunction;
     delete(table: any, data: IQuery): returnFunction;
     deleteMany(table: any, data: IQuery): returnFunction;
-    select(table: any, data: IQuery): returnFunction;
+    select(table: any, data: IQuery): returnSelectFunction;
     selectMany(table: any, data: IQuery): returnFunction;
     prepare(migrate: IMigrations): returnFunction;
     addTrigger(table: any, data: any): returnStreamTriggerFunction;

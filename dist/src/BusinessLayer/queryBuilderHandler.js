@@ -1,4 +1,4 @@
-import { error, ok } from '../Utility/Either/APIResponse.js';
+import { error, ok } from '../Utility/Either/index.js';
 import { RuntimeMethods as RM } from './modelManager/runtimeMethods/runTimeMethods.js';
 class QueryBuilderHandler {
     async INSERT(DatabaseStrategy, QueryBuilder) {

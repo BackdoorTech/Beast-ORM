@@ -1,4 +1,5 @@
 import { IQuery } from '../../BusinessLayer/_interface/Apresentation/queryBuilder.js';
+import { uniqueGenerator } from '../../Utility/utils.js';
 import { Model } from '../Api.js';
 
 /**
@@ -10,6 +11,7 @@ export class QueryBuilder {
    * Create a new QueryBuilder instance.
    */
   query: IQuery = {
+    id: uniqueGenerator(),
     type: '',
     table: "",
     values: [],

@@ -1,4 +1,4 @@
-import { error, ok } from '../../Utility/Either/APIResponse.js';
+import { error, ok } from '../../Utility/Either/index.js';
 class QueryBuilderDeleteHandler {
     async DELETEOne(DatabaseStrategy, QueryBuilder) {
         const tableName = QueryBuilder.query.table;
@@ -12,7 +12,7 @@ class QueryBuilderDeleteHandler {
                     resolve(error(false));
                 },
                 done: () => {
-                    resolve(ok(true));
+                    resolve(ok(1));
                 }
             });
         });

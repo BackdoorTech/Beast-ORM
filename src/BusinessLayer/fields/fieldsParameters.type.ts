@@ -1,5 +1,7 @@
 import { Model } from "../../Presentation/Api"
-import { field } from "../validation/fields/allFields.type"
+import { APIResponse } from "../../Utility/Either/APIResponse"
+import { Either } from "../../Utility/Either/index.js"
+import { FormValidationError, field } from "../validation/fields/allFields.type"
 
 export interface CharFieldParams {
 	maxLength?: number
@@ -100,8 +102,8 @@ export interface ForeignKeyParamsResult<T> {
 
 
 export type ForeignKeyGetterParams<T>  = () => {
-  add(args: Object): Promise<T>;
-  All(): Promise<boolean>;
+  add(args: Object):  Promise<APIResponse<T, FormValidationError>>
+  all(): Promise<boolean>;
   readonly list: T[];
 }
 
@@ -133,15 +135,15 @@ export interface ManyToManyFieldParams {
 
 
 export type ManyToManyGetterParams<T>  = () => {
-  add(args: T ): Promise<T>;
-  all(): Promise<boolean>;
+  add(args: T ):  Promise<APIResponse<T, any>>
+  all(): Promise<APIResponse<T[], any>>
   readonly list: T[];
 }
 
 export interface ManyToManyFieldParamsResult<T> {
   addMany(args: T[]): Promise<T[]>;
-  add(args: T ): Promise<T>;
-  all(): Promise<T[]>;
+  add(args: T ):  Promise<APIResponse<T, FormValidationError>>
+  all():  Promise<APIResponse<T, any>>
   readonly list: T[];
 }
 

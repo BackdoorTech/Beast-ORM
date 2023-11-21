@@ -1,22 +1,22 @@
-import { IModel, IModelStatic, self } from "./Api.type.js";
+import { IModel } from "./Api.type.js";
 import { QueryBuilder } from "./queryBuilder/queryBuilder.js" // Represents a query object that helps build and execute database queries.
 import { returnSelf } from "./returnSelf/returnSelf.js" // Represents a return object for query-related methods
 import { ORM } from "../BusinessLayer/beastOrm.js"
 import { ICallBackReactiveList, ITableSchema } from "../BusinessLayer/_interface/interface.type.js";
 import { dataParameters } from "../BusinessLayer/modelManager/dataParameters.js";
+import { APIError, APIOk, APIResponse } from "../Utility/Either/APIResponse.js";
+import { FormValidationError } from "../BusinessLayer/validation/fields/allFields.type.js";
 
 /**
  * Represents a model for database operations.
  */
-export class Model<Model> implements IModel<Model>{
-
+export class Model<Model> implements IModel<Model> {
 
   getModel(): typeof Model {
     throw("Register your Model before using the API") as any
   }
 
-
-  async save(params: any = false) {
+  async save(params): Promise<APIResponse<number, FormValidationError>> {
     const queryBuilder = new QueryBuilder({isParamsArray:false});
     const model = this.getModel()
     const tableSchema: ITableSchema = model.getTableSchema()
@@ -36,10 +36,11 @@ export class Model<Model> implements IModel<Model>{
     const result = await ORM.executeUpdateQuery(queryBuilder, model as any)
 
     if(result.isError) {
-      console.error(result.error)
+      return APIError(result.error)
     } else {
-      return true
+      return APIOk(result.value)
     }
+    
   }
 
   getPrimaryKeyValue(): number | string {
@@ -48,6 +49,7 @@ export class Model<Model> implements IModel<Model>{
 
     const idFieldName = tableSchema.id.keyPath
 
+    console.log(this)
     return this[idFieldName]
   }
 
@@ -61,7 +63,7 @@ export class Model<Model> implements IModel<Model>{
   }
 
   // delete one
-  async delete() {
+  async delete(): Promise<APIResponse<number, FormValidationError>> {
 
     const queryBuilder = new QueryBuilder({isParamsArray: false});
     const model = this.getModel()
@@ -73,22 +75,21 @@ export class Model<Model> implements IModel<Model>{
     filter[idFieldName] = this[idFieldName]
     queryBuilder.deleteFrom(model).where(filter).limit(1).hasIndex(true)
 
-    const result = await ORM.deleteQueryNoFormValidation(queryBuilder, model)
+    const result =  await ORM.deleteQueryNoFormValidation(queryBuilder, model)
+
 
     if(result.isError) {
-      console.error(result.error)
+      return APIError(result.error)
     } else {
-      return result.value
+      return APIOk(result.value)
     }
   }
-  async get() {
+  async get(): Promise<APIResponse<Model, FormValidationError>> {
     const queryBuilder = new QueryBuilder({isParamsArray:false});
     const model = this.getModel()
     const tableSchema: ITableSchema = model.getTableSchema()
 
-    const filter = {}
-    const idFieldName = tableSchema.id.keyPath
-    filter[idFieldName] = this[idFieldName]
+    const filter = dataParameters.getUniqueData(tableSchema, this)
 
     queryBuilder
       .select(model)
@@ -97,13 +98,13 @@ export class Model<Model> implements IModel<Model>{
       .hasIndex(true)
 
     // console.log({queryBuilder})
-    const result = await ORM.executeSelectQuery(queryBuilder, this as any)
+    const result = await ORM.executeSelectQuery<Model>(queryBuilder, this as any).one()
 
     if(result.isError) {
-      console.error(result.error)
+      return APIError(result.error)
     } else {
       Object.assign(this, result.value)
-      return true
+      return APIOk(result.value)
     }
   }
 
@@ -119,41 +120,42 @@ export class Model<Model> implements IModel<Model>{
     console.error("Register your Model before using the API") as any
   }
 
-    static async get(value:Object) {
-      const queryBuilder = new QueryBuilder({isParamsArray:false});
-      const model = this.getModel()
+  static async get<T>(value:Object): Promise<APIResponse<T, FormValidationError>> {
+    const queryBuilder = new QueryBuilder({isParamsArray:false});
+    const model = this.getModel()
+    const tableSchema: ITableSchema = model.getTableSchema()
+    const filter = dataParameters.getUniqueData(tableSchema, value)
 
-      queryBuilder
-        .select(model)
-        .where(value)
-        .limit(1)
-        .hasIndex(true)
+    queryBuilder
+      .select(model)
+      .where(filter)
+      .limit(1)
+      .hasIndex(true)
 
-      const result = await ORM.executeSelectQuery(queryBuilder, this as any)
+    const result = await ORM.executeSelectQuery<T>(queryBuilder, this as any).one()
 
-      if(result.isError) {
-        console.error(result.error)
-      } else {
-        return result.value
-      }
+    if(result.isError) {
+      return APIError(result.error)
+    } else {
+      return APIOk(result.value)
     }
+  }
 
-  static async all<T>() {
+  static async all<T>(): Promise<APIResponse<T[], FormValidationError>> {
     const model = this.getModel()
     const queryBuilder = new QueryBuilder({isParamsArray: true});
     queryBuilder.select(model)
 
-    const result = await ORM.executeSelectQuery(queryBuilder, this as any)
+    const result = await ORM.executeSelectQuery<T>(queryBuilder, this as any).many()
 
     if(result.isError) {
-      console.error(result.error)
-      return false
+      return APIError(result.error)
     } else {
-      return result.value as T[]
+      return APIOk(result.value)
     }
   }
 
-  static async deleteAll() {
+  static async deleteAll(): Promise<APIResponse<number, FormValidationError>> {
     const queryBuilder = new QueryBuilder({isParamsArray: true});
     const model = this.getModel()
 
@@ -162,13 +164,14 @@ export class Model<Model> implements IModel<Model>{
     const result = await ORM.deleteQueryNoFormValidation(queryBuilder, model)
 
     if(result.isError) {
-      console.error(result.error)
+      return APIError(result.error)
     } else {
-      return result.value
+      return APIOk(result.value)
     }
+
   }
 
-  static async create<T>(params) {
+  static async create<T>(params): Promise<APIResponse<T, FormValidationError>> {
 
     const isParamsArray = Array.isArray(params)? true : false
 
@@ -181,9 +184,9 @@ export class Model<Model> implements IModel<Model>{
     const result = await ORM.executeInsertionQuery<T>(queryBuilder, this as any)
 
     if(result.isError) {
-      console.error(result.error)
+      return APIError(result.error)
     } else {
-      return result.value
+      return APIOk(result.value)
     }
   }
 
@@ -209,12 +212,4 @@ export class Model<Model> implements IModel<Model>{
     return ORM.ReactiveList(this, callback)
   }
 
-}
-
-export const  $B = <T>(model:  self<T>): IModelStatic<T> => {
-  const _model: typeof  Model<any> = model as any
-  return {
-    create: (args) =>  _model.create<T>(args),
-    all: () =>  _model.all<T>()
-  }
 }

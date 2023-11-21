@@ -1,10 +1,10 @@
 import { QueryBuilder } from '../../Presentation/queryBuilder/queryBuilder.js'
 import { IDatabaseStrategy } from "../../DataAccess/DriverAdapters/DriverAdapter.type.js"
-import { Either, error, ok} from '../../Utility/Either/APIResponse.js'
+import { Either, error, ok} from '../../Utility/Either/index.js'
 
 class QueryBuilderDeleteHandler {
 
-  async DELETEOne(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder): Promise<Either<true , false | number>> {
+  async DELETEOne(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder): Promise<Either<number , false>> {
 
     const tableName = QueryBuilder.query.table
     let deleteCount = 0
@@ -18,7 +18,7 @@ class QueryBuilderDeleteHandler {
           resolve(error(false))
         },
         done:() => {
-          resolve(ok(true))
+          resolve(ok(1))
         }
       })
     })

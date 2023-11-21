@@ -2,6 +2,7 @@ import { QueryBuilder } from "./queryBuilder/queryBuilder.js"; // Represents a q
 import { returnSelf } from "./returnSelf/returnSelf.js"; // Represents a return object for query-related methods
 import { ORM } from "../BusinessLayer/beastOrm.js";
 import { dataParameters } from "../BusinessLayer/modelManager/dataParameters.js";
+import { APIError, APIOk } from "../Utility/Either/APIResponse.js";
 /**
  * Represents a model for database operations.
  */
@@ -9,7 +10,7 @@ export class Model {
     getModel() {
         throw ("Register your Model before using the API");
     }
-    async save(params = false) {
+    async save(params) {
         const queryBuilder = new QueryBuilder({ isParamsArray: false });
         const model = this.getModel();
         const tableSchema = model.getTableSchema();
@@ -24,16 +25,17 @@ export class Model {
         queryBuilder.update(model).set(this).where(filter).limit(1).hasIndex(true);
         const result = await ORM.executeUpdateQuery(queryBuilder, model);
         if (result.isError) {
-            console.error(result.error);
+            return APIError(result.error);
         }
         else {
-            return true;
+            return APIOk(result.value);
         }
     }
     getPrimaryKeyValue() {
         const model = this.getModel();
         const tableSchema = model.getTableSchema();
         const idFieldName = tableSchema.id.keyPath;
+        console.log(this);
         return this[idFieldName];
     }
     setPrimaryKey(key) {
@@ -53,32 +55,30 @@ export class Model {
         queryBuilder.deleteFrom(model).where(filter).limit(1).hasIndex(true);
         const result = await ORM.deleteQueryNoFormValidation(queryBuilder, model);
         if (result.isError) {
-            console.error(result.error);
+            return APIError(result.error);
         }
         else {
-            return result.value;
+            return APIOk(result.value);
         }
     }
     async get() {
         const queryBuilder = new QueryBuilder({ isParamsArray: false });
         const model = this.getModel();
         const tableSchema = model.getTableSchema();
-        const filter = {};
-        const idFieldName = tableSchema.id.keyPath;
-        filter[idFieldName] = this[idFieldName];
+        const filter = dataParameters.getUniqueData(tableSchema, this);
         queryBuilder
             .select(model)
             .where(filter)
             .limit(1)
             .hasIndex(true);
         // console.log({queryBuilder})
-        const result = await ORM.executeSelectQuery(queryBuilder, this);
+        const result = await ORM.executeSelectQuery(queryBuilder, this).one();
         if (result.isError) {
-            console.error(result.error);
+            return APIError(result.error);
         }
         else {
             Object.assign(this, result.value);
-            return true;
+            return APIOk(result.value);
         }
     }
     static getTableSchema() {
@@ -93,30 +93,31 @@ export class Model {
     static async get(value) {
         const queryBuilder = new QueryBuilder({ isParamsArray: false });
         const model = this.getModel();
+        const tableSchema = model.getTableSchema();
+        const filter = dataParameters.getUniqueData(tableSchema, value);
         queryBuilder
             .select(model)
-            .where(value)
+            .where(filter)
             .limit(1)
             .hasIndex(true);
-        const result = await ORM.executeSelectQuery(queryBuilder, this);
+        const result = await ORM.executeSelectQuery(queryBuilder, this).one();
         if (result.isError) {
-            console.error(result.error);
+            return APIError(result.error);
         }
         else {
-            return result.value;
+            return APIOk(result.value);
         }
     }
     static async all() {
         const model = this.getModel();
         const queryBuilder = new QueryBuilder({ isParamsArray: true });
         queryBuilder.select(model);
-        const result = await ORM.executeSelectQuery(queryBuilder, this);
+        const result = await ORM.executeSelectQuery(queryBuilder, this).many();
         if (result.isError) {
-            console.error(result.error);
-            return false;
+            return APIError(result.error);
         }
         else {
-            return result.value;
+            return APIOk(result.value);
         }
     }
     static async deleteAll() {
@@ -125,10 +126,10 @@ export class Model {
         queryBuilder.deleteFrom(model);
         const result = await ORM.deleteQueryNoFormValidation(queryBuilder, model);
         if (result.isError) {
-            console.error(result.error);
+            return APIError(result.error);
         }
         else {
-            return result.value;
+            return APIOk(result.value);
         }
     }
     static async create(params) {
@@ -139,10 +140,10 @@ export class Model {
         queryBuilder.insertInto(model).insert(params);
         const result = await ORM.executeInsertionQuery(queryBuilder, this);
         if (result.isError) {
-            console.error(result.error);
+            return APIError(result.error);
         }
         else {
-            return result.value;
+            return APIOk(result.value);
         }
     }
     static filter(value) {
@@ -161,10 +162,3 @@ export class Model {
         return ORM.ReactiveList(this, callback);
     }
 }
-export const $B = (model) => {
-    const _model = model;
-    return {
-        create: (args) => _model.create(args),
-        all: () => _model.all()
-    };
-};

@@ -1,10 +1,13 @@
 // @ts-nocheck
+// import { Model as IModel } from '../../../Presentation/Api.js';
+// import { Model} from '../../../Presentation/Api.js';
 describe('API', () => {
     it('passes', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then((wind) => {
-            class Mode1 extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Mode1 extends Model {
                 constructor() {
                     super(...arguments);
                     this.username = wind.models.CharField({});
@@ -24,7 +27,8 @@ describe('API', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            class Person extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Person extends Model {
                 constructor() {
                     super(...arguments);
                     this.username = wind.models.CharField({});
@@ -37,15 +41,16 @@ describe('API', () => {
                 models: [Person],
             });
             await Person.deleteAll();
-            const result = await Person.create({ username: 'Peter' });
-            expect(Object.assign({}, result)).to.deep.equal({ username: 'Peter', id: result.id }); // test fails
+            const [createdPerson] = await Person.create({ username: 'Peter' });
+            expect(Object.assign({}, createdPerson)).to.deep.equal({ username: 'Peter', id: createdPerson.id }); // test fails
         });
     });
     it('passes insert and delete', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            class Person extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Person extends Model {
                 constructor() {
                     super(...arguments);
                     this.username = wind.models.CharField({});
@@ -58,9 +63,9 @@ describe('API', () => {
                 models: [Person],
             });
             await Person.deleteAll();
-            const createdPerson = await Person.create({ username: 'Peter' });
+            const [createdPerson] = await Person.create({ username: 'Peter' });
             const deleteResult = await createdPerson.delete();
-            const all = await Person.all();
+            const [all] = await Person.all();
             expect(all.length).to.equal(0); // test fails
         });
     });
@@ -68,7 +73,8 @@ describe('API', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            class Person extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Person extends Model {
                 constructor() {
                     super(...arguments);
                     this.username = wind.models.CharField({});
@@ -84,7 +90,7 @@ describe('API', () => {
             await Person.create({ username: 'Peter' });
             await Person.create({ username: 'Peter' });
             await Person.create({ username: 'Peter' });
-            const all = await Person.all();
+            const [all] = await Person.all();
             expect(all.length).to.equal(3); // test fails
         });
     });
@@ -92,7 +98,8 @@ describe('API', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            class Person extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Person extends Model {
                 constructor() {
                     super(...arguments);
                     this.username = wind.models.CharField({});
@@ -105,11 +112,11 @@ describe('API', () => {
                 models: [Person],
             });
             await Person.deleteAll();
-            let createdPerson = await Person.create({ username: 'Peter' });
+            let [createdPerson] = await Person.create({ username: 'Peter' });
             createdPerson.username = "123";
-            const result = await createdPerson.save();
-            const all = await Person.all();
-            expect(result).to.equal(true); // test fails
+            const [result] = await createdPerson.save();
+            const [all] = await Person.all();
+            expect(result).to.equal(1);
             expect([Object.assign({}, all[0])]).to.deep.equal([{ username: '123', id: all[0].id }]); // test fails
         });
     });
@@ -117,7 +124,8 @@ describe('API', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            class Person extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Person extends Model {
                 constructor() {
                     super(...arguments);
                     this.username = wind.models.CharField({});
@@ -133,7 +141,7 @@ describe('API', () => {
             await Person.create({ username: 'Peter' });
             await Person.create({ username: 'Peter' });
             await Person.deleteAll();
-            const all = await Person.all();
+            const [all] = await Person.all();
             expect(0).to.deep.equal(all.length); // test fails
         });
     });
@@ -141,7 +149,8 @@ describe('API', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            class Person extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Person extends Model {
                 constructor() {
                     super(...arguments);
                     this.userId = wind.models.AutoField({ primaryKey: true });
@@ -157,8 +166,8 @@ describe('API', () => {
                 models: [Person],
             });
             const a = await Person.deleteAll();
-            const createdPerson = await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
-            const all = await Person.all();
+            const [createdPerson] = await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
+            const [all] = await Person.all();
             expect(Object.assign({}, all[0])).to.deep.equal({ username: 'kobe', email: 'kobe.bryant@lakers.com', age: undefined, userId: createdPerson.userId });
             expect(Object.assign({}, createdPerson)).to.deep.equal({ username: 'kobe', email: 'kobe.bryant@lakers.com', age: null, userId: createdPerson.userId });
         });
@@ -167,7 +176,8 @@ describe('API', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            class Person extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Person extends Model {
                 constructor() {
                     super(...arguments);
                     this.userId = wind.models.AutoField({ primaryKey: true });
@@ -183,8 +193,8 @@ describe('API', () => {
                 models: [Person],
             });
             await Person.deleteAll();
-            const createdPerson = await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
-            const person = await Person.get({ userId: createdPerson.userId });
+            const [createdPerson] = await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
+            const [person] = await Person.get({ userId: createdPerson.userId });
             delete createdPerson.age;
             delete person.age;
             expect(person).to.deep.equal(createdPerson);
@@ -194,7 +204,8 @@ describe('API', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            class Person extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Person extends Model {
                 constructor() {
                     super(...arguments);
                     this.username = wind.models.CharField({});
@@ -217,7 +228,7 @@ describe('API', () => {
             await Person.create({ username: 'Peter' });
             await Person.create({ username: 'Peter' });
             await Person.filter({ username: "Peter" }).update({ username: "michael jackson" });
-            const jackson = await Person.filter({ username: "michael jackson" }).execute();
+            const [jackson] = await Person.filter({ username: "michael jackson" }).execute();
             expect(jackson.length).to.equal(9); // test fails
         });
     });
@@ -225,7 +236,8 @@ describe('API', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            class Person extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Person extends Model {
                 constructor() {
                     super(...arguments);
                     this.username = wind.models.CharField({});
@@ -248,7 +260,7 @@ describe('API', () => {
             await Person.create({ username: 'Peter' });
             await Person.create({ username: 'Peter' });
             await Person.filter({ username: "Peter" }).delete();
-            const all = await Person.all();
+            const [all] = await Person.all();
             expect(all.length).to.equal(0); // test fails
         });
     });
@@ -256,8 +268,8 @@ describe('API', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            const models = wind.models;
-            class Place extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Place extends Model {
                 constructor() {
                     super(...arguments);
                     this.name = wind.models.CharField({ maxLength: 50 });
@@ -280,19 +292,19 @@ describe('API', () => {
             });
             await Place.deleteAll();
             await Restaurant.deleteAll();
-            const p1 = await Place.create({ name: 'Demon Dogs', address: '944 W. Fullerton' });
-            const r = await Restaurant.create({ place: p1, servesHotDogs: false, servesPizza: false });
-            const object = await r.place.get();
-            expect(p1).to.deep.equal(r.place);
-            expect(true).to.deep.equal(object);
+            const [p1] = await Place.create({ name: 'Demon Dogs', address: '944 W. Fullerton' });
+            const [r] = await Restaurant.create({ place: p1, servesHotDogs: false, servesPizza: false });
+            const [object] = await r.place.get();
+            expect(Object.assign({}, p1)).to.deep.equal(Object.assign({}, r.place));
+            expect(Object.assign({}, p1)).to.deep.equal(Object.assign({}, object));
         });
     });
     it('one-to-many relationships ', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            const models = wind.models;
-            class Reporter extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Reporter extends Model {
                 constructor() {
                     super(...arguments);
                     this.firstName = wind.models.CharField({ maxLength: 30 });
@@ -301,7 +313,7 @@ describe('API', () => {
                     this.articles = wind.models.getter.ForeignKeyGetter({ model: Article, I: this });
                 }
             }
-            class Article extends wind.models.Model {
+            class Article extends Model {
                 constructor() {
                     super(...arguments);
                     this.headline = wind.models.CharField({ maxLength: 100 });
@@ -317,12 +329,11 @@ describe('API', () => {
             });
             await Reporter.deleteAll();
             await Article.deleteAll();
-            const r = await Reporter.create({ firstName: "John", lastName: "Smith", email: "john@example.com" });
-            const a = await Article.create({ headline: "This is a test", pubDate: "date(2005, 7, 27)", reporter: r });
-            const object = await a.reporter.get();
+            const [r] = await Reporter.create({ firstName: "John", lastName: "Smith", email: "john@example.com" });
+            const [a] = await Article.create({ headline: "This is a test", pubDate: "date(2005, 7, 27)", reporter: r });
+            const [object] = await a.reporter.get();
             expect(r.firstName).to.deep.equal(a.reporter.firstName);
-            expect(true).to.deep.equal(object);
-            const a1 = await r.articles().add({ headline: "peter", pubDate: "dias", email: "john@example.com" });
+            const [a1] = await r.articles().add({ headline: "peter", pubDate: "dias", email: "john@example.com" });
             expect(r.firstName).to.deep.equal(a1.reporter.firstName);
         });
     });
@@ -330,14 +341,15 @@ describe('API', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            class Publication extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Publication extends Model {
                 constructor() {
                     super(...arguments);
                     this.title = wind.models.CharField({ maxLength: 30 });
                     this.articles = wind.models.getter.ManyToManyGetter({ model: Article, I: this });
                 }
             }
-            class Article extends wind.models.Model {
+            class Article extends Model {
                 constructor() {
                     super(...arguments);
                     this.headline = wind.models.CharField({ maxLength: 100 });
@@ -353,24 +365,21 @@ describe('API', () => {
             });
             await Publication.deleteAll();
             await Article.deleteAll();
-            const r = await Publication.create({ title: "John" });
-            const r1 = await Publication.create({ title: "John" });
-            const a1 = await Article.create({ headline: "This is a test", pubDate: "date(2005, 7, 27)" });
+            const [r] = await Publication.create({ title: "John" });
+            const [r1] = await Publication.create({ title: "John" });
+            const [a1] = await Article.create({ headline: "This is a test", pubDate: "date(2005, 7, 27)" });
             await a1.publications.add(r);
             await a1.publications.add(r);
             await a1.publications.add(r1);
-            const result = await a1.publications.all();
-            expect(true).to.equal(result);
+            const [result] = await a1.publications.all();
             expect(JSON.stringify([r, r, r1])).to.deep.equal(JSON.stringify(a1.publications.list));
-            const result1 = await r.articles().all();
-            expect(true).to.equal(result1);
+            const [result1] = await r.articles().all();
             expect(JSON.stringify([a1, a1])).to.deep.equal(JSON.stringify(await Promise.all(r.articles().list.map(async (e) => {
                 await e.publications.all();
                 return e;
             }))));
             await r.articles().add(a1);
-            const result3 = await r.articles().all();
-            expect(true).to.equal(result3);
+            const [result3] = await r.articles().all();
             expect([a1, a1, a1].length).to.deep.equal(r.articles().list.length);
         });
     });
@@ -378,7 +387,8 @@ describe('API', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            class Person extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Person extends Model {
                 constructor() {
                     super(...arguments);
                     this.userId = wind.models.AutoField({ primaryKey: true });
@@ -396,7 +406,6 @@ describe('API', () => {
             await Person.deleteAll();
             let result = false;
             Person.transactionOnCommit(() => {
-                console.log("hello");
                 result = true;
             });
             await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
@@ -409,7 +418,8 @@ describe('API', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            class Person extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Person extends Model {
                 constructor() {
                     super(...arguments);
                     this.userId = wind.models.AutoField({ primaryKey: true });
@@ -429,7 +439,6 @@ describe('API', () => {
             let subscription = Person.transactionOnCommit(() => {
                 result++;
                 subscription.disconnect();
-                console.log({ subscription });
             });
             await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
             await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
@@ -441,7 +450,8 @@ describe('API', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
-            class Person extends wind.models.Model {
+            const Model = wind.models.Model;
+            class Person extends Model {
                 constructor() {
                     super(...arguments);
                     this.userId = wind.models.AutoField({ primaryKey: true });

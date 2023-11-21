@@ -1,4 +1,4 @@
-import { error, ok } from "../../../Utility/Either/APIResponse.js";
+import { error, ok } from "../../../Utility/Either/index.js";
 class emptyError extends Error {
 }
 class maxLengthError extends Error {

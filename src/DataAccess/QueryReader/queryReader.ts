@@ -1,6 +1,7 @@
 import { IQuery } from "../../BusinessLayer/_interface/Apresentation/queryBuilder";
 
 export class QueryReaderSelect implements IQuery {
+  id: string
   type: string;
   table: string;
   values: any[];

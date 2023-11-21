@@ -1,6 +1,7 @@
 import { Model } from "../../Presentation/Api"
 import { AttributesMap, FieldAttributesKeys, FieldKeys, FieldType, FieldsMap } from "../fields/fields.type"
 import { PossibleFieldAttributes } from "../fields/fieldsParameters.type"
+import { Either } from '../../../dist/src/Utility/Either/APIResponse';
 
 export interface IFieldSchema {
 	name: string,
@@ -54,4 +55,4 @@ export enum DBEventsTrigger {
 }
 
 
-export type ICallBackReactiveList = (model: typeof Model<any>) => Promise<Model<any> | Model<any>[]>
+export type ICallBackReactiveList = (model: typeof Model<any>) => Promise< Either<Model<any>| Model<any>[], any>>

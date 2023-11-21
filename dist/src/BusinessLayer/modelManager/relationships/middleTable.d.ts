@@ -8,23 +8,23 @@ export declare class MiddleTable {
     }): {
         new (): {
             getModel(): typeof Model;
-            save(params?: any): Promise<boolean>;
+            save(params: any): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError>>;
             getPrimaryKeyValue(): string | number;
             setPrimaryKey(key: string | number): void;
-            delete(): Promise<number | true>;
-            get(): Promise<boolean>;
+            delete(): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError>>;
+            get(): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<any, import("../../validation/fields/allFields.type.js").FormValidationError>>;
         };
         getTableSchema(): ITableSchema;
         getModel(): typeof Model;
         getModelSchema(): any;
-        get(value: Object): Promise<any>;
-        all<T>(): Promise<false | T[]>;
-        deleteAll(): Promise<number | true>;
-        create<T_1>(params: any): Promise<T_1>;
-        filter<T_2>(value: Object): {
-            execute: () => Promise<T_2>;
-            update: (params: any) => Promise<number | true>;
-            delete: () => Promise<number | true>;
+        get<T>(value: Object): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<T, import("../../validation/fields/allFields.type.js").FormValidationError>>;
+        all<T_1>(): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<T_1[], import("../../validation/fields/allFields.type.js").FormValidationError>>;
+        deleteAll(): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError>>;
+        create<T_2>(params: any): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<T_2, import("../../validation/fields/allFields.type.js").FormValidationError>>;
+        filter<T_3>(value: Object): {
+            execute: () => Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<T_3[], import("../../validation/fields/allFields.type.js").FormValidationError>>;
+            update: (params: any) => Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError>>;
+            delete: () => Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError>>;
         };
         magic(): Model<unknown>;
         transactionOnCommit(fn: Function): {

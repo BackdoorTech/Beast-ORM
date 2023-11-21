@@ -1,6 +1,6 @@
 import { QueryBuilder } from '../../Presentation/queryBuilder/queryBuilder.js'
 import { IDatabaseStrategy } from "../../DataAccess/DriverAdapters/DriverAdapter.type.js"
-import { Either, error, ok} from '../../Utility/Either/APIResponse.js'
+import { Either, error, ok} from '../../Utility/Either/index.js'
 import { ITableSchema } from '../_interface/interface.type.js'
 import { RuntimeMethods as RM } from '../modelManager/runtimeMethods/runTimeMethods.js';
 

@@ -1,4 +1,5 @@
 export interface IQuery {
+  id: string,
   type: string,
   table: string,
   values: any[],

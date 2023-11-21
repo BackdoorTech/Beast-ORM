@@ -2,6 +2,7 @@ import { getArgIdWithT } from "../../../Utility/Model/utils.js";
 import { capitalizeFirstLetter } from "../../../Utility/utils.js";
 import { modelRegistration } from "../register/register.js";
 import { RuntimeMethods as RM } from "../runtimeMethods/runTimeMethods.js";
+import { APIOk } from '../../../Utility/Either/APIResponse.js';
 export class RelationShip {
     getMiddleTable(modelWithNoGetter, modelWithGetter) {
         const databaseName = modelWithNoGetter.getTableSchema().databaseName;
@@ -31,14 +32,14 @@ export class RelationShip {
         const currentTableName = currentModel.getModel().getTableSchema().name;
         const otherParameterName = otherModel.getTableSchema().name;
         parameters["iD" + currentTableName] = getArgIdWithT(currentModel, currentModel);
-        const result = await middleTableModel.filter(parameters).execute();
-        const asyncOperations = result.map(async (e) => {
+        const [list] = await middleTableModel.filter(parameters).execute();
+        const asyncOperations = list.map(async (e) => {
             await e["iD" + otherParameterName].get();
             return e["iD" + otherParameterName];
         });
         // Use Promise.all to wait for all asynchronous operations to complete
         const resolvedResults = await Promise.all(asyncOperations);
-        return resolvedResults;
+        return APIOk(resolvedResults);
     }
     generateRelationShipMethods(databaseSchema, entries, _MiddleModels) {
         const methodWithModels = [];
@@ -75,14 +76,14 @@ export class RelationShip {
                     const funcGetAll = async function () {
                         const parameters = {};
                         parameters["iD" + currentTableName] = getArgIdWithT(currentModel, this);
-                        const result = await middleTableModel.filter(parameters).execute();
+                        const [result] = await middleTableModel.filter(parameters).execute();
                         const asyncOperations = result.map(async (e) => {
                             await e["iD" + otherParameterName].get();
                             return e["iD" + otherParameterName];
                         });
                         // Use Promise.all to wait for all asynchronous operations to complete
                         const resolvedResults = await Promise.all(asyncOperations);
-                        return resolvedResults;
+                        return APIOk(resolvedResults);
                     };
                     methodWithModels[index - 1].func.push({
                         name: fieldName + RM.All,

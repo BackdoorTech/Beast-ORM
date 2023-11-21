@@ -1,44 +1,48 @@
 import { PipeService } from "../Pattern/Pipe.js";
 
-export type Either<T, E> = OK<T> | Error<E, T>;
+export type Either<T, E> = { isOk: true; isError: false, value: T, pass():APIResponse<T, E> } | { isOk: false; isError: true, value: null, error: E, pass():APIResponse<T, E> };
+export type APIResponse<T, E> = [T, Either<T, E> ] | [T, Either<T, E>];
+
 let EitherPipe: PipeService = new PipeService()
 
 export function registerPipe(f:Function) {
   EitherPipe.register(f)
 }
 
-class OK<T> {
-  constructor(
-    public isOk: true,
-    public isError: false,
-    public value:T
-  ) {}
+export function APIOk<T, E>(value: T): APIResponse<T, E> {
 
-  runPipe({createdDate}) {
-    EitherPipe.execute({createdDate, THIS: this})
-    return this
+  const pass = (): APIResponse<T, E> => {
+    return [value, {isOk: true, isError: false, value, pass}]
   }
-}
 
-class Error<E, T> {
-  constructor(
-    public isOk: false,
-    public isError: true,
-    public error: E,
-    public value: T
-  ) {}
-
-  runPipe({createdDate}) {
-    EitherPipe.execute({createdDate, THIS: this})
-    return this
+  const object = {
+    isOk: true, 
+    isError: false, 
+    value,
+    pass
   }
+
+  return [
+    value, 
+    object as any
+  ]
 }
 
+export  function APIError<T, E>(error: E): APIResponse<T, E> {
 
-export function ok<T, E>(value: T): OK<T> {
-  return new OK<T>(true, false, value );
-}
+  const pass = (): APIResponse<T, E> => {
+    return [null as T, {isOk: false, isError: true, value:  null, error, pass}]
+  }
 
-export  function error<T, E>(error: E): Error<E, T>{
-  return new Error(false, true, error, null )
+  const object = {
+    isOk: false, 
+    isError: true, 
+    value:  
+    null, error,
+    pass
+  }
+  return [
+    null as T, 
+    object as any
+  ]
 }

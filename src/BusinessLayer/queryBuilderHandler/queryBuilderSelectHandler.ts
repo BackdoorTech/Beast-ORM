@@ -1,10 +1,11 @@
 import { QueryBuilder } from '../../Presentation/queryBuilder/queryBuilder.js'
 import { IDatabaseStrategy } from "../../DataAccess/DriverAdapters/DriverAdapter.type.js"
-import { Either, error, ok} from '../../Utility/Either/APIResponse.js'
+import { ItemNotFound } from './queryErrorHandler.js'
+import { Either, error, ok } from '../../Utility/Either/index.js'
 
 class QueryBuilderSelectHandler {
 
-  async SELECTOne<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder): Promise<Either<T,any>> {
+  async SELECTOne<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder): Promise<Either<T, ItemNotFound>> {
 
     const tableName = QueryBuilder.query.table
     const model = QueryBuilder.model
@@ -14,7 +15,10 @@ class QueryBuilderSelectHandler {
       DatabaseStrategy.select(tableName, QueryBuilder.query)({
         onsuccess:(data:any) => {},
         onerror:() => {
-          resolve(error(false))
+          resolve(error(false as any))
+        },
+        notFound:() => {
+          resolve(error(new ItemNotFound(QueryBuilder.query)))
         },
         done:(data) => {
 
@@ -28,7 +32,7 @@ class QueryBuilderSelectHandler {
     })
   }
 
-  async SELECTMany<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder): Promise<Either<T,any>> {
+  async SELECTMany<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder): Promise<Either<T[],any>> {
 
     const tableName = QueryBuilder.query.table
     const model = QueryBuilder.model

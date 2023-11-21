@@ -1,4 +1,5 @@
-import { error, ok } from '../../Utility/Either/APIResponse.js';
+import { ItemNotFound } from './queryErrorHandler.js';
+import { error, ok } from '../../Utility/Either/index.js';
 class QueryBuilderSelectHandler {
     async SELECTOne(DatabaseStrategy, QueryBuilder) {
         const tableName = QueryBuilder.query.table;
@@ -8,6 +9,9 @@ class QueryBuilderSelectHandler {
                 onsuccess: (data) => { },
                 onerror: () => {
                     resolve(error(false));
+                },
+                notFound: () => {
+                    resolve(error(new ItemNotFound(QueryBuilder.query)));
                 },
                 done: (data) => {
                     const newInstanceOfModel = new model();

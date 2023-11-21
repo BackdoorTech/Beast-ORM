@@ -4,8 +4,8 @@ import { Model } from '../../Api.js'
 import { field } from '../../../BusinessLayer/validation/fields/allFields.type.js'
 import { equalModels, getIdObjectWithT } from '../../../Utility/Model/utils.js'
 import { RuntimeMethods as RM } from '../../../BusinessLayer/modelManager/runtimeMethods/runTimeMethods.js'
-import { modelRegistration } from '../../../BusinessLayer/modelManager/register/register.js'
 import { relationShip } from '../../../BusinessLayer/modelManager/relationships/relationShip.js'
+import { APIResponse } from '../../../Utility/Either/APIResponse.js'
 
 const PrototypeGust =  {
   CharField(data?: CharFieldParams): string {return null as any },
@@ -76,8 +76,13 @@ const PrototypeGust =  {
 
         const { fieldName } = currentModel.getTableSchema().middleTableRelatedFields[middleTableName]
 
-        modelInstance =  await data.I[fieldName+RM.All]()
-        return true
+        const [list, result]  =  await data.I[fieldName+RM.All]()
+
+        if(result.isOk) {
+          modelInstance = list
+        }
+
+        return result.pass()
       },
       get list(): T[] {
         return modelInstance
@@ -225,13 +230,11 @@ export const getter = {
             const params = {}
             params[fieldName] = data.I
 
-            const result = await foreignKeyModel.create<T>({...args, ...params})
-
-            return {...result, ...params}
+            return await foreignKeyModel.create<T>({...args, ...params})
           }
         }
       },
-      async All() {
+      async all() {
         const currentModel = data.I.getModel()
         const staticModel = foreignKeyModel.getModelSchema()
         const tableSchema = foreignKeyModel.getTableSchema()
@@ -240,8 +243,14 @@ export const getter = {
           const Field: field = staticModel[fieldName]
           if(equalModels(Field.model, currentModel)) {
             const filter = getIdObjectWithT(data.I, data.I)
-            modelInstance = await Field.model.filter<T[]>(filter).execute()
-            return true
+            const [list, result] = await Field.model.filter<T>(filter).execute()
+
+            if(result.isOk) {
+              modelInstance = list
+              return true
+            }
+            
+            result.pass()
           }
         }
       },
@@ -269,14 +278,18 @@ export const getter = {
         return relationShip.addToMiddleTable<T>(data.I, foreignKeyModel, args as Model<any>, middleModel)
 
       },
-      async all(): Promise<boolean> {
+      async all(): Promise<APIResponse<T[], any>> {
         const currentModel = data.I.getModel()
 
         const middleModel = relationShip.getMiddleTable(foreignKeyModel, currentModel)
 
-        modelInstance =  await relationShip.getAll<T>(data.I, foreignKeyModel, middleModel)
+        let [list, result] =  await relationShip.getAll<T>(data.I, foreignKeyModel, middleModel)
 
-        return true
+        if(result.isOk) {
+          modelInstance = list
+        }
+
+        return result.pass()
       },
       get list(): T[] {
         return modelInstance

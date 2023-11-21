@@ -38,8 +38,11 @@ const PrototypeGust = {
                 const currentModel = data.I.getModel();
                 const middleTableName = relationShip.getMiddleTableName(currentModel, foreignKeyModel);
                 const { fieldName } = currentModel.getTableSchema().middleTableRelatedFields[middleTableName];
-                modelInstance = await data.I[fieldName + RM.All]();
-                return true;
+                const [list, result] = await data.I[fieldName + RM.All]();
+                if (result.isOk) {
+                    modelInstance = list;
+                }
+                return result.pass();
             },
             get list() {
                 return modelInstance;
@@ -142,12 +145,11 @@ export const getter = {
                     if (equalModels(Field.model, currentModel)) {
                         const params = {};
                         params[fieldName] = data.I;
-                        const result = await foreignKeyModel.create(Object.assign(Object.assign({}, args), params));
-                        return Object.assign(Object.assign({}, result), params);
+                        return await foreignKeyModel.create(Object.assign(Object.assign({}, args), params));
                     }
                 }
             },
-            async All() {
+            async all() {
                 const currentModel = data.I.getModel();
                 const staticModel = foreignKeyModel.getModelSchema();
                 const tableSchema = foreignKeyModel.getTableSchema();
@@ -155,8 +157,12 @@ export const getter = {
                     const Field = staticModel[fieldName];
                     if (equalModels(Field.model, currentModel)) {
                         const filter = getIdObjectWithT(data.I, data.I);
-                        modelInstance = await Field.model.filter(filter).execute();
-                        return true;
+                        const [list, result] = await Field.model.filter(filter).execute();
+                        if (result.isOk) {
+                            modelInstance = list;
+                            return true;
+                        }
+                        result.pass();
                     }
                 }
             },
@@ -178,8 +184,11 @@ export const getter = {
             async all() {
                 const currentModel = data.I.getModel();
                 const middleModel = relationShip.getMiddleTable(foreignKeyModel, currentModel);
-                modelInstance = await relationShip.getAll(data.I, foreignKeyModel, middleModel);
-                return true;
+                let [list, result] = await relationShip.getAll(data.I, foreignKeyModel, middleModel);
+                if (result.isOk) {
+                    modelInstance = list;
+                }
+                return result.pass();
             },
             get list() {
                 return modelInstance;

@@ -158,7 +158,12 @@ export class IndexedDBStrategy {
                 const rows = result.value.data;
                 const sqlObject = new SqlObject(TableSchema, queryReader);
                 const filteredRow = await sqlObject.run(rows);
-                callbacks.done(filteredRow);
+                if (filteredRow) {
+                    callbacks.done(filteredRow);
+                }
+                else {
+                    callbacks.notFound();
+                }
                 return;
             }
             // callbacks.done()

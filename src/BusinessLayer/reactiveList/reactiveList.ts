@@ -1,4 +1,5 @@
 import { Model } from "../../Presentation/Api";
+import { Either } from "../../Utility/Either/index.js";
 import { ICallBackReactiveList } from "../_interface/interface.type";
 
 export  class ReactiveList {
@@ -8,7 +9,10 @@ export  class ReactiveList {
     let updateUi
 
     let subscription = model.transactionOnCommit(async () => {
-      value = await  callback(model)
+      const result = await  callback(model)
+      if(result.isOk) {
+        value = result.value
+      }
       if(updateUi) updateUi()
     })
 

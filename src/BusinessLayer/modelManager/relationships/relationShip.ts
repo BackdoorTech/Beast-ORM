@@ -4,8 +4,8 @@ import { capitalizeFirstLetter } from "../../../Utility/utils.js"
 import { IDatabaseSchema, IMethodWithModels } from "../../_interface/interface.type"
 import { IRegister } from "../../beastOrm.type.js"
 import { modelRegistration } from "../register/register.js"
-import { addRunTimeMethod } from "../runtimeMethods/addRuntimeMethod.js"
 import { RuntimeMethods as RM } from "../runtimeMethods/runTimeMethods.js"
+import { Either, APIOk, APIResponse } from '../../../Utility/Either/APIResponse.js';
 
 export class RelationShip {
 
@@ -44,7 +44,7 @@ export class RelationShip {
   }
 
 
-  async getAll<T>(currentModel: Model<any>, otherModel : typeof Model<any>, middleTableModel: typeof Model<any>) {
+  async getAll<T>(currentModel: Model<any>, otherModel : typeof Model<any>, middleTableModel: typeof Model<any>): Promise<APIResponse<T[], any>>  {
 
     const parameters = {}
     const currentTableName = currentModel.getModel().getTableSchema().name
@@ -52,18 +52,17 @@ export class RelationShip {
 
     parameters["iD"+currentTableName] = getArgIdWithT(currentModel, currentModel)
 
-    const result: any[] =  await middleTableModel.filter<T>(parameters).execute() as any
+    const [list] =  await middleTableModel.filter<T>(parameters).execute()
 
-    const asyncOperations = result.map(async (e) => {
+    const asyncOperations: Promise<T>[] = list.map(async (e) => {
       await e["iD" + otherParameterName].get();
       return e["iD" + otherParameterName];
     });
 
-
     // Use Promise.all to wait for all asynchronous operations to complete
     const resolvedResults = await Promise.all(asyncOperations);
 
-    return resolvedResults;
+    return APIOk(resolvedResults);
   }
 
 
@@ -125,18 +124,17 @@ export class RelationShip {
 
             parameters["iD"+currentTableName] = getArgIdWithT(currentModel, this)
 
-            const result: any[] =  await middleTableModel.filter(parameters).execute() as any
+            const [result] =  await middleTableModel.filter<Model<any>>(parameters).execute()
 
             const asyncOperations = result.map(async (e) => {
               await e["iD" + otherParameterName].get();
-              return e["iD" + otherParameterName];
+              return e["iD" + otherParameterName] as Model<any>
             });
 
             // Use Promise.all to wait for all asynchronous operations to complete
             const resolvedResults = await Promise.all(asyncOperations);
 
-            return resolvedResults;
-
+            return APIOk(resolvedResults);
           }
 
           methodWithModels[index - 1].func.push({

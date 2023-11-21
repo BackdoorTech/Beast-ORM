@@ -1,11 +1,11 @@
 import { QueryBuilder } from '../../Presentation/queryBuilder/queryBuilder.js'
 import { IDatabaseStrategy } from "../../DataAccess/DriverAdapters/DriverAdapter.type.js"
-import { Either, error, ok} from '../../Utility/Either/APIResponse.js'
+import { Either, error, ok} from '../../Utility/Either/index.js'
 
 
 class QueryBuilderUpdateHandler {
 
-  async UPDATEOne<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder): Promise<Either<true | number ,any>> {
+  async UPDATEOne<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder): Promise<Either<number ,any>> {
 
     const tableName = QueryBuilder.query.table
 
@@ -18,14 +18,14 @@ class QueryBuilderUpdateHandler {
           resolve(error(false))
         },
         done:() => {
-          resolve(ok(true))
+          resolve(ok(1))
         }
       })
     })
 
   }
 
-  async UPDATEMany<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder): Promise<Either<true | number ,any>> {
+  async UPDATEMany<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder): Promise<Either<number ,any>> {
 
     const tableName = QueryBuilder.query.table
 
@@ -38,7 +38,7 @@ class QueryBuilderUpdateHandler {
 
         },
         done:() => {
-          resolve(ok(true))
+          resolve(ok(1))
         }
       })
     })
