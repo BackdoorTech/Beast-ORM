@@ -1,5 +1,5 @@
 import { Model } from "../Api";
-import { APIResponse } from "../../Utility/Either/APIResponse.js";
+import { APIResponse } from "../../Utility/Either/APIresponse.js";
 import { FormValidationError } from "../../BusinessLayer/validation/fields/allFields.type.js";
 /**
  * @description Represents a return object for query-related methods

@@ -5,9 +5,17 @@ class maxLengthError extends Error {
 }
 class minLengthError extends Error {
 }
+class UniqueField {
+}
 export class sizeError extends Error {
 }
 export class field {
+    constructor() {
+        this.unique = false;
+        if (this.unique == false) {
+            delete this.unique;
+        }
+    }
     isNull(value) {
         if (value == undefined) {
             return true;

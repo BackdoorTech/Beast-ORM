@@ -10,7 +10,6 @@ export declare class QueryBuilder {
      */
     query: IQuery;
     model: typeof Model;
-    createdDate: Date;
     constructor({ isParamsArray }: {
         isParamsArray: any;
     });

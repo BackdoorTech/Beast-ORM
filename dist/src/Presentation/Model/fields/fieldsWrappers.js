@@ -36,9 +36,10 @@ const PrototypeGust = {
             },
             async all() {
                 const currentModel = data.I.getModel();
-                const middleTableName = relationShip.getMiddleTableName(currentModel, foreignKeyModel);
-                const { fieldName } = currentModel.getTableSchema().middleTableRelatedFields[middleTableName];
-                const [list, result] = await data.I[fieldName + RM.All]();
+                // const middleTableName = relationShip.getMiddleTableName(currentModel, foreignKeyModel)
+                const middleModel = relationShip.getMiddleTable(currentModel, foreignKeyModel);
+                let [list, result] = await relationShip.getAll(data.I, foreignKeyModel, middleModel);
+                // const [list, result]  =  await data.I[fieldName+RM.All]()
                 if (result.isOk) {
                     modelInstance = list;
                 }

@@ -88,7 +88,7 @@ class SchemaGenerator {
         name: fieldName,
         keyPath: fieldName,
         options: {
-          unique: false,
+          unique: Field.unique,
           type: null
         },
         className: Field.fieldName,

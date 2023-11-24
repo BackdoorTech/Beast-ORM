@@ -3,9 +3,10 @@ import { IDatabaseStrategy } from "../../DataAccess/DriverAdapters/DriverAdapter
 import { Either, error, ok} from '../../Utility/Either/index.js'
 import { ITableSchema } from '../_interface/interface.type.js'
 import { RuntimeMethods as RM } from '../modelManager/runtimeMethods/runTimeMethods.js';
+import { ConstraintError, TransactionAbortion } from '../../DataAccess/_interface/interface.type.js';
 
 class QueryBuilderInsertHandler {
-  async INSERTOne<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder, arrayOfDataBackup: Object[]): Promise<Either<T,any>> {
+  async INSERTOne<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder, arrayOfDataBackup: Object[]): Promise<Either<T,TransactionAbortion>> {
 
     const dataToInsert = QueryBuilder.query.values
     const tableName = QueryBuilder.query.table
@@ -30,20 +31,25 @@ class QueryBuilderInsertHandler {
 
           Object.assign(newInstanceOfModel, arrayOfDataBackup[index])
 
-
           resolve(ok(newInstanceOfModel as any))
         },
-        onerror:() => {
-          resolve(error(false))
+        onerror:(_error) => {
+          const errorCause = new ConstraintError({message: _error})
+          const errorFamily = new TransactionAbortion()
+
+          errorFamily.setCause(errorCause)
+          resolve(error(errorFamily))
         },
-        done:() => {}
+        done:() => {
+          // console.log("done")
+        }
       })
     })
 
   }
 
 
-  async INSERTMany<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder,  arrayOfDataBackup: Object[]): Promise<Either<T,any>> {
+  async INSERTMany<T>(DatabaseStrategy: IDatabaseStrategy, QueryBuilder: QueryBuilder,  arrayOfDataBackup: Object[]): Promise<Either<T,TransactionAbortion>> {
 
     const dataToInsert = QueryBuilder.query.values
     const result = []
@@ -63,7 +69,13 @@ class QueryBuilderInsertHandler {
           Object.assign(newInstanceOfModel, arrayOfDataBackup[index])
           result.push(newInstanceOfModel)
         },
-        onerror:() => {},
+        onerror:(_error) => {
+          const errorCause = new ConstraintError({message: _error})
+          const errorFamily = new TransactionAbortion()
+
+          errorFamily.setCause(errorCause)
+          resolve(error(errorFamily))
+        },
         done:() => {
           resolve(ok(result as any))
         }

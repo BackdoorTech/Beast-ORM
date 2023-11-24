@@ -23,8 +23,6 @@ export class QueryBuilder {
   }
   model: typeof Model
 
-  createdDate = new Date()
-
   constructor({isParamsArray}) {
     this.query.isParamsArray = isParamsArray
   }

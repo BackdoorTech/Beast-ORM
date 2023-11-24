@@ -1,28 +1,19 @@
 import { ITableSchema } from "../../../../BusinessLayer/_interface/interface.type.js";
-import { Either } from "../../../../Utility/Either/index.js";
-import { ObjectStoreRequestResult } from "./ObjectStore.type.js";
+import { DatabaseTransaction } from "./DatabaseTransaction.js";
 export declare class ObjectStore {
     schema: ITableSchema;
-    transactionQueue: any[];
-    isTransactionInProgress: boolean;
-    db: IDBDatabase;
-    operation: any;
-    connect: () => void;
+    private isTransactionInProgress;
+    private db;
+    private transactions;
     transactionFinish: (tableName: string, hasWriteTransaction: boolean) => void;
-    txInstance: {
-        IDBTransaction?: IDBTransaction;
-        IDBTransactionMode?: IDBTransactionMode;
-        active?: boolean;
-    };
-    hasWriteTransaction: boolean;
+    private currentTransaction;
     constructor(tableSchema: ITableSchema);
-    enqueueTransaction(transaction: any): Promise<Either<ObjectStoreRequestResult, false>>;
+    setDbInstance(db: IDBDatabase): void;
+    createDedicatedTransaction(): DatabaseTransaction;
+    addTransaction(transaction: DatabaseTransaction): void;
+    count: number;
+    findOrCreateNotDedicatedTransaction(): DatabaseTransaction;
     processTransactionQueue(): Promise<void>;
-    executeTransaction(transaction: any): Promise<unknown>;
-    commitTransaction(): boolean;
-    clearVariables(): void;
-    writeTransactionFlag(): void;
-    createTransaction(): void;
-    closeTransaction(): void;
-    hasActiveTransaction(): IDBTransaction;
+    endProcessTransactionQueue(lastTransaction: DatabaseTransaction): void;
+    hasActiveTransaction(): boolean;
 }

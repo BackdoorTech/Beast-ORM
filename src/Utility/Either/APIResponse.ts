@@ -1,7 +1,11 @@
 import { PipeService } from "../Pattern/Pipe.js";
 
-export type Either<T, E> = { isOk: true; isError: false, value: T, pass():APIResponse<T, E> } | { isOk: false; isError: true, value: null, error: E, pass():APIResponse<T, E> };
-export type APIResponse<T, E> = [T, Either<T, E> ] | [T, Either<T, E>];
+type Either<T, E> = { isOk: true; isError: false, value: T, pass():APIResponse<T, E> } | { isOk: false; isError: true, value: null, error: E, pass():APIResponse<T, E> };
+
+type OK<T, E> = [T, Either<T, E> ]
+type ERROR<T, E> = [T, Either<T, E>]
+
+export type APIResponse<T, E> = OK<T, E> | ERROR<T, E>;
 
 let EitherPipe: PipeService = new PipeService()
 

@@ -1,7 +1,7 @@
 var _a;
 import { ORM } from "../../BusinessLayer/beastOrm.js";
 import { dataParameters } from "../../BusinessLayer/modelManager/dataParameters.js";
-import { APIError, APIOk } from "../../Utility/Either/APIResponse.js";
+import { APIError, APIOk } from "../../Utility/Either/APIresponse.js";
 /**
  * @description Represents a return object for query-related methods
  */

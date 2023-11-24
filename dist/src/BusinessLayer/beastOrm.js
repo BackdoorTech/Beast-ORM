@@ -76,6 +76,7 @@ class BeastORM {
         }
         QueryBuilder.setCleanData(arrayOfData);
         if (QueryBuilder.query.isParamsArray) {
+            console.log("executeInsertionQuery");
             return await queryBuilderInsertHandler.INSERTMany(DatabaseStrategy, QueryBuilder, arrayOfDataBackup);
         }
         else {
@@ -96,6 +97,12 @@ class BeastORM {
             },
             many: () => {
                 return queryBuilderSelectHandler.SELECTMany(DatabaseStrategy, QueryBuilder);
+            },
+            decide: () => {
+                if (QueryBuilder.query.isParamsArray) {
+                    return queryBuilderSelectHandler.SELECTMany(DatabaseStrategy, QueryBuilder);
+                }
+                return queryBuilderSelectHandler.SELECTOne(DatabaseStrategy, QueryBuilder);
             }
         };
     }
@@ -135,7 +142,7 @@ class BeastORM {
         }
     }
     async deleteQueryNoFormValidation(QueryBuilder, model) {
-        const tableSchema = model[RM.getTableSchema]();
+        const tableSchema = model.getTableSchema();
         const databaseName = tableSchema.databaseName;
         const database = modelRegistration.getDatabase(databaseName);
         const DatabaseStrategy = database

@@ -9,8 +9,8 @@ export declare class IndexedDBStrategy implements IDatabaseStrategy {
     openDatabase(): (callbacks: IReturnObject) => Promise<void>;
     delete(table: any, Query: IQuery): (callbacks: IReturnObject) => Promise<void>;
     deleteMany(table: any, Query: IQuery): (returnObject: IReturnObject) => void;
-    insert(table: any, data: any[]): (callbacks: IReturnObject) => Promise<void>;
-    insertMany(table: any, data: any): (returnObject: IReturnObject) => void;
+    insert(table: any, rows: any[]): (callbacks: IReturnObject) => Promise<void>;
+    insertMany(table: any, rows: any): (returnObject: IReturnObject) => void;
     update(table: any, Query: IQuery): (callbacks: IReturnObject) => Promise<void>;
     updateMany(table: any, Query: IQuery): (returnObject: IReturnObject) => void;
     select(table: any, Query: IQuery): (callbacks: IReturnSelectObject) => Promise<void>;

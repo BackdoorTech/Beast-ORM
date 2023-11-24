@@ -6,6 +6,8 @@ declare class maxLengthError extends Error {
 }
 declare class minLengthError extends Error {
 }
+declare class UniqueField {
+}
 export declare class sizeError extends Error {
 }
 export declare class field {
@@ -17,14 +19,15 @@ export declare class field {
     type: number;
     blank: boolean;
     default?: any;
-    unique?: boolean;
+    unique: boolean;
     foreignKey?: boolean;
     model?: typeof Model<any>;
+    constructor();
     isNull(value: any): boolean;
     rules(field: field, value: any): EitherResultRule;
     valid(e: any): Either<true, FormValidationError>;
 }
 type EitherResultRule = Either<true, maxLengthError | minLengthError>;
-export type FormValidationError = InvalidType | InvalidValue | maxLengthError | minLengthError;
+export type FormValidationError = InvalidType | InvalidValue | maxLengthError | minLengthError | UniqueField;
 export type EitherFormValidationError = Either<true, FormValidationError>;
 export {};

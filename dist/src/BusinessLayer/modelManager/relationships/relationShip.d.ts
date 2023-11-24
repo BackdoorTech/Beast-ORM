@@ -6,12 +6,12 @@ export declare class RelationShip {
     getMiddleTable(modelWithNoGetter: typeof Model<any>, modelWithGetter: typeof Model<any>): {
         new (): Model<any>;
         getTableSchema(): import("../../_interface/interface.type").ITableSchema;
-        getModel(): typeof Model;
-        getModelSchema(): any;
-        get<T>(value: Object): Promise<APIResponse<T, import("../../validation/fields/allFields.type").FormValidationError>>;
+        getModel(): typeof Model<any>;
+        getModelSchema(): typeof Model<any>;
+        get<T>(value: Object): Promise<APIResponse<T, import("../../validation/fields/allFields.type").FormValidationError | import("../../queryBuilderHandler/queryErrorHandler").ItemNotFound>>;
         all<T_1>(): Promise<APIResponse<T_1[], import("../../validation/fields/allFields.type").FormValidationError>>;
         deleteAll(): Promise<APIResponse<number, import("../../validation/fields/allFields.type").FormValidationError>>;
-        create<T_2>(params: any): Promise<APIResponse<T_2, import("../../validation/fields/allFields.type").FormValidationError>>;
+        create<T_2>(params: any): Promise<APIResponse<T_2, import("../../validation/fields/allFields.type").FormValidationError | import("../../../DataAccess/_interface/interface.type").TransactionAbortion>>;
         filter<T_3>(value: Object): {
             execute: () => Promise<APIResponse<T_3[], import("../../validation/fields/allFields.type").FormValidationError>>;
             update: (params: any) => Promise<APIResponse<number, import("../../validation/fields/allFields.type").FormValidationError>>;
@@ -31,9 +31,10 @@ export declare class RelationShip {
             unsubscribe: () => Promise<void>;
             setUpdateUi(func: any): void;
         };
+        getOrCreate<T_4>(params: any): Promise<APIResponse<number, import("../../validation/fields/allFields.type").FormValidationError | import("../../queryBuilderHandler/queryErrorHandler").BulkDataUniqueFieldError>>;
     };
     getMiddleTableName(modelWithNoGetter: typeof Model<any>, modelWithGetter: typeof Model<any>): string;
-    addToMiddleTable<T>(currentModel: Model<any>, otherModel: typeof Model<any>, toAdd: Model<any>, middleTableModel: typeof Model<any>): Promise<APIResponse<T, import("../../validation/fields/allFields.type").FormValidationError>>;
+    addToMiddleTable<T>(currentModel: Model<any>, otherModel: typeof Model<any>, toAdd: Model<any>, middleTableModel: typeof Model<any>): Promise<APIResponse<T, import("../../validation/fields/allFields.type").FormValidationError | import("../../../DataAccess/_interface/interface.type").TransactionAbortion>>;
     getAll<T>(currentModel: Model<any>, otherModel: typeof Model<any>, middleTableModel: typeof Model<any>): Promise<APIResponse<T[], any>>;
     generateRelationShipMethods(databaseSchema: IDatabaseSchema, entries: IRegister, _MiddleModels: typeof Model<any>[]): IMethodWithModels[];
 }

@@ -7,7 +7,7 @@ export class field{
 	type: number
 	blank?: boolean
 	default?: any
-	unique?: boolean
+	unique: boolean
 	foreignKey?: boolean
 	model?: field
 }

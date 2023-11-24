@@ -1,5 +1,6 @@
 import { error, ok } from '../../Utility/Either/index.js';
 import { RuntimeMethods as RM } from '../modelManager/runtimeMethods/runTimeMethods.js';
+import { ConstraintError, TransactionAbortion } from '../../DataAccess/_interface/interface.type.js';
 class QueryBuilderInsertHandler {
     async INSERTOne(DatabaseStrategy, QueryBuilder, arrayOfDataBackup) {
         const dataToInsert = QueryBuilder.query.values;
@@ -20,10 +21,15 @@ class QueryBuilderInsertHandler {
                     Object.assign(newInstanceOfModel, arrayOfDataBackup[index]);
                     resolve(ok(newInstanceOfModel));
                 },
-                onerror: () => {
-                    resolve(error(false));
+                onerror: (_error) => {
+                    const errorCause = new ConstraintError({ message: _error });
+                    const errorFamily = new TransactionAbortion();
+                    errorFamily.setCause(errorCause);
+                    resolve(error(errorFamily));
                 },
-                done: () => { }
+                done: () => {
+                    // console.log("done")
+                }
             });
         });
     }
@@ -44,7 +50,12 @@ class QueryBuilderInsertHandler {
                     Object.assign(newInstanceOfModel, arrayOfDataBackup[index]);
                     result.push(newInstanceOfModel);
                 },
-                onerror: () => { },
+                onerror: (_error) => {
+                    const errorCause = new ConstraintError({ message: _error });
+                    const errorFamily = new TransactionAbortion();
+                    errorFamily.setCause(errorCause);
+                    resolve(error(errorFamily));
+                },
                 done: () => {
                     resolve(ok(result));
                 }

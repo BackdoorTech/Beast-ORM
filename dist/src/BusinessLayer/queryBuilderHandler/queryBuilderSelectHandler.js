@@ -24,15 +24,20 @@ class QueryBuilderSelectHandler {
     async SELECTMany(DatabaseStrategy, QueryBuilder) {
         const tableName = QueryBuilder.query.table;
         const model = QueryBuilder.model;
+        const result = [];
         return await new Promise((resolve, reject) => {
             DatabaseStrategy.selectMany(tableName, QueryBuilder.query)({
-                onsuccess: (data) => { },
+                onsuccess: (data) => {
+                    const modelInstances = data.map(e => Object.assign(new model(), e));
+                    for (const modelInstance of modelInstances) {
+                        result.push(modelInstance);
+                    }
+                },
                 onerror: () => {
                     resolve(error(false));
                 },
                 done: (data) => {
-                    data = data.map(e => Object.assign(new model(), e));
-                    resolve(ok(data));
+                    resolve(ok(result));
                 }
             });
         });

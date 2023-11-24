@@ -1,5 +1,5 @@
 import { DBEventsTrigger, IDatabaseSchema } from "../../../../BusinessLayer/_interface/interface.type.js";
-import { IReturnObject, IReturnTriggerObject } from "../../../DriverAdapters/DriverAdapter.type.js";
+import { IReturnTriggerObject } from "../../../DriverAdapters/DriverAdapter.type.js";
 import { DatabaseConnector } from "./DatabaseConnector.js";
 import { DatabaseTriggerService } from "./DatabaseTriggerService.js";
 import { ObjectStore } from './ObjectStore.js'
@@ -11,7 +11,8 @@ export class DatabaseService {
   schema: IDatabaseSchema
 
   objectStore: {[storeName: string]: ObjectStore }  = {}
-  executingTransaction : {[ key: string]: boolean } = {}
+
+  executingTransaction : {[ ObjectStoreName: string]: Boolean } = {}
 
   tigers = new DatabaseTriggerService()
 
@@ -21,7 +22,6 @@ export class DatabaseService {
 
     for (let tableSchema of schema.table.concat(schema.middleTables)) {
       this.objectStore[tableSchema.name] = new ObjectStore(tableSchema)
-      this.objectStore[tableSchema.name].connect = this.connect
       this.objectStore[tableSchema.name].transactionFinish = this.transactionFinish
     }
   }
@@ -65,7 +65,7 @@ export class DatabaseService {
   }
 
   hasConnectionToDatabase() {
-    return this.db
+    return this.db != null
   }
 
   async executeOnObjectStore(objectStoreName: string) {
@@ -76,8 +76,7 @@ export class DatabaseService {
     const objectStore = this.objectStore[objectStoreName]
 
     if(!objectStore.hasActiveTransaction()) {
-      objectStore.db = this.db
-      objectStore.createTransaction()
+      objectStore.setDbInstance(this.db)
     }
 
     this.executingTransaction[objectStoreName] = true
@@ -85,17 +84,17 @@ export class DatabaseService {
     return objectStore
   }
 
-  transactionFinish = (TableName, hasWriteTransaction:boolean) => {
+  transactionFinish = (TableName) => {
     delete this.executingTransaction[TableName]
 
     if(Object.keys(this.executingTransaction).length == 0) {
       // this.db.close()
-      delete this.db;
+      this.db = null;
     }
+  }
 
-    if(hasWriteTransaction) {
-      this.tigers.executeTriggers(DBEventsTrigger.onCompleteReadTransaction, TableName)
-    }
+  runTrigger (TableName, hasWriteTransaction:boolean) {
+    this.tigers.executeTriggers(DBEventsTrigger.onCompleteReadTransaction, TableName)
   }
 
   registerTrigger(tableName, data,  callback: IReturnTriggerObject) {

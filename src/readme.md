@@ -59,14 +59,14 @@ This example demonstrates how this library is organized into layers, separating 
 ### Web Worker Layer
 The Web worker layer enabled offload CPU-intensive tasks to a separate thread, enhancing performance and responsiveness.
 
-- Parallel Database Queries
-  - perform multiple queries simultaneously
+
 - Enhanced Scalability
   - utilize additional Web Workers to distribute the workload across multiple threads, taking full advantage of multi-core processors.
 - Data Synchronization and Serialization
   -  Establish data transfer protocols and serialization methods.
-- Triggers
-  - Implement triggers at the Web Worker Layer to execute custom logic in a parallelized environment.
+- Load the whole data access layer
+  - middleware to communicate between data access layer and Business layer
+
 
 By integrating a Web Worker, you can enhance the performance and scalability of your ORM library while providing a smoother user experience.
 

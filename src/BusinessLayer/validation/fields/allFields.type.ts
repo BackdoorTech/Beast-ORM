@@ -8,6 +8,7 @@ import { FieldKeys } from "../../fields/fields.type"
 class emptyError extends Error{}
 class maxLengthError extends Error{}
 class minLengthError extends Error{}
+class UniqueField {}
 export class sizeError extends Error{}
 
 
@@ -20,9 +21,15 @@ export class field {
 	type: number
 	blank: boolean
 	default?: any
-	unique?: boolean
+	unique: boolean = false
 	foreignKey?: boolean
 	model?: typeof Model<any>
+
+  constructor() {
+    if(this.unique == false) {
+      delete this.unique
+    }
+  }
 
 
   isNull(value) {
@@ -71,5 +78,5 @@ export class field {
 
 type EitherResultRule = Either<true, maxLengthError | minLengthError>
 
-export type FormValidationError =  InvalidType | InvalidValue | maxLengthError | minLengthError
+export type FormValidationError =  InvalidType | InvalidValue | maxLengthError | minLengthError | UniqueField
 export type EitherFormValidationError =  Either<true, FormValidationError>

@@ -2,16 +2,16 @@ import { IRegister } from './beastOrm.type.js';
 import { ICallBackReactiveList } from './_interface/interface.type.js';
 import { QueryBuilder } from '../Presentation/queryBuilder/queryBuilder.js';
 import { Model } from '../Presentation/Api';
-import { Either } from '../Utility/Either/APIResponse.js';
 import { FormValidationError } from './validation/fields/allFields.type.js';
-import { ItemNotFound } from './queryBuilderHandler/queryErrorHandler.js';
+import { Either } from '../Utility/Either/index.js';
 declare class BeastORM {
     register: (register: IRegister) => void;
     private prepareMigrations;
-    executeInsertionQuery<PModel>(QueryBuilder: QueryBuilder, Model: PModel): Promise<Either<PModel, FormValidationError>>;
-    executeSelectQuery<PModel>(QueryBuilder: QueryBuilder, Model: PModel): {
-        one: () => Promise<import("../Utility/Either/index.js").Either<PModel, ItemNotFound>>;
-        many: () => Promise<import("../Utility/Either/index.js").Either<PModel[], any>>;
+    executeInsertionQuery<PModel>(QueryBuilder: QueryBuilder, Model: Object): Promise<Either<PModel, FormValidationError>>;
+    executeSelectQuery<PModel>(QueryBuilder: QueryBuilder, Model: Object): {
+        one: () => Promise<Either<PModel, import("./queryBuilderHandler/queryErrorHandler.js").ItemNotFound>>;
+        many: () => Promise<Either<PModel[], any>>;
+        decide: () => Promise<Either<PModel, import("./queryBuilderHandler/queryErrorHandler.js").ItemNotFound>> | Promise<Either<PModel[], any>>;
     };
     executeUpdateQuery<PModel>(QueryBuilder: QueryBuilder, Model: PModel): Promise<Either<number, FormValidationError>>;
     deleteQuery<PModel>(QueryBuilder: QueryBuilder, Model: PModel): Promise<Either<number, FormValidationError>>;

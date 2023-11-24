@@ -15,12 +15,12 @@ export declare class MiddleTable {
             get(): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<any, import("../../validation/fields/allFields.type.js").FormValidationError>>;
         };
         getTableSchema(): ITableSchema;
-        getModel(): typeof Model;
-        getModelSchema(): any;
-        get<T>(value: Object): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<T, import("../../validation/fields/allFields.type.js").FormValidationError>>;
+        getModel(): typeof Model<any>;
+        getModelSchema(): typeof Model<any>;
+        get<T>(value: Object): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<T, import("../../validation/fields/allFields.type.js").FormValidationError | import("../../queryBuilderHandler/queryErrorHandler.js").ItemNotFound>>;
         all<T_1>(): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<T_1[], import("../../validation/fields/allFields.type.js").FormValidationError>>;
         deleteAll(): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError>>;
-        create<T_2>(params: any): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<T_2, import("../../validation/fields/allFields.type.js").FormValidationError>>;
+        create<T_2>(params: any): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<T_2, import("../../validation/fields/allFields.type.js").FormValidationError | import("../../../DataAccess/_interface/interface.type.js").TransactionAbortion>>;
         filter<T_3>(value: Object): {
             execute: () => Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<T_3[], import("../../validation/fields/allFields.type.js").FormValidationError>>;
             update: (params: any) => Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError>>;
@@ -40,6 +40,7 @@ export declare class MiddleTable {
             unsubscribe: () => Promise<void>;
             setUpdateUi(func: any): void;
         };
+        getOrCreate<T_4>(params: any): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError | import("../../queryBuilderHandler/queryErrorHandler.js").BulkDataUniqueFieldError>>;
     };
 }
 export declare const middleTable: MiddleTable;

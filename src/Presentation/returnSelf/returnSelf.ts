@@ -1,7 +1,7 @@
 import { ORM } from "../../BusinessLayer/beastOrm.js"
 import { Model } from "../Api"
 import { dataParameters } from "../../BusinessLayer/modelManager/dataParameters.js";
-import { APIError, APIOk, APIResponse } from "../../Utility/Either/APIResponse.js";
+import { APIError, APIOk, APIResponse } from "../../Utility/Either/APIresponse.js";
 import { FormValidationError } from "../../BusinessLayer/validation/fields/allFields.type.js";
 
 /**

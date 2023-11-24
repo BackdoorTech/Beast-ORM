@@ -13,16 +13,17 @@ export declare class DatabaseService {
         [storeName: string]: ObjectStore;
     };
     executingTransaction: {
-        [key: string]: boolean;
+        [ObjectStoreName: string]: Boolean;
     };
     tigers: DatabaseTriggerService;
     constructor(schema: IDatabaseSchema);
     connect: () => Promise<void>;
     isSchemaHeathy(): boolean;
     migrate(): Promise<void>;
-    hasConnectionToDatabase(): IDBDatabase;
+    hasConnectionToDatabase(): boolean;
     executeOnObjectStore(objectStoreName: string): Promise<ObjectStore>;
-    transactionFinish: (TableName: any, hasWriteTransaction: boolean) => void;
+    transactionFinish: (TableName: any) => void;
+    runTrigger(TableName: any, hasWriteTransaction: boolean): void;
     registerTrigger(tableName: any, data: any, callback: IReturnTriggerObject): void;
     UnRegisterTrigger(tableName: any, subscriptionId: any, callback: IReturnTriggerObject): void;
 }

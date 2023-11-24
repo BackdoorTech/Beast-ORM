@@ -1,6 +1,3 @@
-// @ts-nocheck
-// import { Model as IModel } from '../../../Presentation/Api.js';
-// import { Model} from '../../../Presentation/Api.js';
 describe('API', () => {
     it('passes', () => {
         cy.visit('./index.html');
@@ -42,6 +39,7 @@ describe('API', () => {
             });
             await Person.deleteAll();
             const [createdPerson] = await Person.create({ username: 'Peter' });
+            console.log({ createdPerson });
             expect(Object.assign({}, createdPerson)).to.deep.equal({ username: 'Peter', id: createdPerson.id }); // test fails
         });
     });
@@ -64,8 +62,11 @@ describe('API', () => {
             });
             await Person.deleteAll();
             const [createdPerson] = await Person.create({ username: 'Peter' });
+            console.log({ createdPerson });
             const deleteResult = await createdPerson.delete();
+            console.log({ deleteResult });
             const [all] = await Person.all();
+            console.log({ all });
             expect(all.length).to.equal(0); // test fails
         });
     });
@@ -228,7 +229,9 @@ describe('API', () => {
             await Person.create({ username: 'Peter' });
             await Person.create({ username: 'Peter' });
             await Person.filter({ username: "Peter" }).update({ username: "michael jackson" });
+            console.log("update alll");
             const [jackson] = await Person.filter({ username: "michael jackson" }).execute();
+            console.log("update list");
             expect(jackson.length).to.equal(9); // test fails
         });
     });
@@ -372,6 +375,7 @@ describe('API', () => {
             await a1.publications.add(r);
             await a1.publications.add(r1);
             const [result] = await a1.publications.all();
+            console.log({ result });
             expect(JSON.stringify([r, r, r1])).to.deep.equal(JSON.stringify(a1.publications.list));
             const [result1] = await r.articles().all();
             expect(JSON.stringify([a1, a1])).to.deep.equal(JSON.stringify(await Promise.all(r.articles().list.map(async (e) => {
@@ -446,7 +450,7 @@ describe('API', () => {
             expect(1).to.deep.equal(result);
         });
     });
-    it('pass reactive list', () => {
+    it('get or create', () => {
         cy.visit('./index.html');
         cy.window().should("have.property", "models");
         cy.window().then(async (wind) => {
@@ -461,20 +465,16 @@ describe('API', () => {
                 }
             }
             wind.models.register({
-                databaseName: "jest-15",
+                databaseName: "jest-151",
                 type: "localStorage",
                 version: 1,
                 models: [Person],
             });
             await Person.deleteAll();
-            let result = 0;
-            const reactive = Person.ReactiveList(async (model) => {
-                return await model.all();
-            });
-            await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
-            await Person.create({ username: 'kobe', email: 'kobe.bryant@lakers.com' });
-            await Person.all();
-            expect(2).to.deep.equal(reactive.value.length);
+            let a = await Person.getOrCreate([{ userId: 2, username: 'kobe', email: 'kobe.bryant@lakers.com' }, { userId: 1, username: 'kobe', email: 'kobe.bryant@lakers.com' }]);
+            console.log(a);
+            expect(1).to.deep.equal(a);
         });
     });
 });
+export {};

@@ -1,6 +1,6 @@
-import { FieldSchema } from "../../../../_src/models/register-modal.interface.js";
 import { ITableSchema } from "../../../BusinessLayer/_interface/interface.type.js";
 import { AttributesMap, FieldKeys, FieldsMap } from "../../../BusinessLayer/fields/fields.type.js";
+import { FieldSchema } from "../../DataSource/indexeDB/indexeDB/resource/type.js";
 import { OperatorKeys } from "./object-operator.js";
 export interface Field {
     fieldName: string;

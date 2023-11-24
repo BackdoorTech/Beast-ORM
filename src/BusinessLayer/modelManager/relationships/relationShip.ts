@@ -5,7 +5,7 @@ import { IDatabaseSchema, IMethodWithModels } from "../../_interface/interface.t
 import { IRegister } from "../../beastOrm.type.js"
 import { modelRegistration } from "../register/register.js"
 import { RuntimeMethods as RM } from "../runtimeMethods/runTimeMethods.js"
-import { Either, APIOk, APIResponse } from '../../../Utility/Either/APIResponse.js';
+import { APIOk, APIResponse } from '../../../Utility/Either/APIResponse.js';
 
 export class RelationShip {
 

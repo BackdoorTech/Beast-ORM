@@ -5,7 +5,7 @@ export class DataParameters {
   getFilteredData(tableSchema: ITableSchema, data: Object) {
 
     const filteredData = {}
-    delete filteredData[tableSchema.id.keyPath]
+
 
     for(const field of tableSchema.fieldNames) {
       if(field in data) {
@@ -13,13 +13,10 @@ export class DataParameters {
       } else {
         filteredData[field]= undefined
       }
-
     }
 
     if(tableSchema.fieldTypes.OneToOneField) {
       for(const fieldName of tableSchema.fieldTypes.OneToOneField) {
-
-        console.log({data})
 
         const model : Model<any>=  data[fieldName]
         const KeyValue = model.getPrimaryKeyValue()
@@ -45,8 +42,10 @@ export class DataParameters {
       }
     }
 
+    delete filteredData[tableSchema.id.keyPath]
     return filteredData
   }
+
 
   getUniqueData(tableSchema: ITableSchema, data: Object) {
 
@@ -54,11 +53,10 @@ export class DataParameters {
     uniqueFields.push(tableSchema.id.keyPath)
 
     const filteredData = {}
+
     for(const field of uniqueFields) {
       if(field in data) {
         filteredData[field]= data[field]
-      } else {
-        filteredData[field]= undefined
       }
     }
 
@@ -73,6 +71,10 @@ export class DataParameters {
     }
 
     return filteredData
+  }
+
+  hasField(data: Object) {
+    return Object.keys(data).length >= 1
   }
 
   getFilteredDataWithId(tableSchema: ITableSchema, data: Object) {

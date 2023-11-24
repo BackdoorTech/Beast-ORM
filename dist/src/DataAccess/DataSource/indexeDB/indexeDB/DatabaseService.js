@@ -23,21 +23,17 @@ export class DatabaseService {
                 };
             }
         };
-        this.transactionFinish = (TableName, hasWriteTransaction) => {
+        this.transactionFinish = (TableName) => {
             delete this.executingTransaction[TableName];
             if (Object.keys(this.executingTransaction).length == 0) {
                 // this.db.close()
-                delete this.db;
-            }
-            if (hasWriteTransaction) {
-                this.tigers.executeTriggers(DBEventsTrigger.onCompleteReadTransaction, TableName);
+                this.db = null;
             }
         };
         this.schema = schema;
         this.connector = new DatabaseConnector();
         for (let tableSchema of schema.table.concat(schema.middleTables)) {
             this.objectStore[tableSchema.name] = new ObjectStore(tableSchema);
-            this.objectStore[tableSchema.name].connect = this.connect;
             this.objectStore[tableSchema.name].transactionFinish = this.transactionFinish;
         }
     }
@@ -54,7 +50,7 @@ export class DatabaseService {
         await this.connector.migrate(this.schema);
     }
     hasConnectionToDatabase() {
-        return this.db;
+        return this.db != null;
     }
     async executeOnObjectStore(objectStoreName) {
         if (!this.hasConnectionToDatabase()) {
@@ -62,11 +58,13 @@ export class DatabaseService {
         }
         const objectStore = this.objectStore[objectStoreName];
         if (!objectStore.hasActiveTransaction()) {
-            objectStore.db = this.db;
-            objectStore.createTransaction();
+            objectStore.setDbInstance(this.db);
         }
         this.executingTransaction[objectStoreName] = true;
         return objectStore;
+    }
+    runTrigger(TableName, hasWriteTransaction) {
+        this.tigers.executeTriggers(DBEventsTrigger.onCompleteReadTransaction, TableName);
     }
     registerTrigger(tableName, data, callback) {
         this.tigers.subscribe(DBEventsTrigger.onCompleteReadTransaction, tableName, callback);

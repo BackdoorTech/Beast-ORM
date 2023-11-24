@@ -8,7 +8,6 @@ import { DBEventsTrigger, ICallBackReactiveList, IDatabaseSchema, ITableSchema }
 import { QueryBuilder } from '../Presentation/queryBuilder/queryBuilder.js'
 import { Model } from '../Presentation/Api';
 import { validator } from './validation/validator.js'
-import { APIResponse, Either } from '../Utility/Either/APIResponse.js'
 import { dataParameters } from "./modelManager/dataParameters.js"
 import { RuntimeMethods as RM } from './modelManager/runtimeMethods/runTimeMethods.js';
 import { EitherFormValidationError, FormValidationError } from './validation/fields/allFields.type.js';
@@ -20,7 +19,7 @@ import { relationShip } from './modelManager/relationships/relationShip.js';
 import { modelGeneration } from './modelManager/modelGenerator.js';
 import { addRunTimeMethod } from './modelManager/runtimeMethods/addRuntimeMethod.js';
 import { ReactiveList } from './reactiveList/reactiveList.js';
-import { ItemNotFound } from './queryBuilderHandler/queryErrorHandler.js';
+import { Either } from '../Utility/Either/index.js';
 
 class BeastORM {
 
@@ -79,7 +78,7 @@ class BeastORM {
     }
   }
 
-  async executeInsertionQuery<PModel>(QueryBuilder: QueryBuilder, Model:PModel):Promise<Either<PModel, FormValidationError>>   {
+  async executeInsertionQuery<PModel>(QueryBuilder: QueryBuilder, Model:Object):Promise<Either<PModel, FormValidationError>>   {
     const tableSchema: ITableSchema = Model[RM.getTableSchema]()
     const databaseName = tableSchema.databaseName
 
@@ -111,14 +110,16 @@ class BeastORM {
     QueryBuilder.setCleanData(arrayOfData)
 
     if(QueryBuilder.query.isParamsArray) {
+      
+    console.log("executeInsertionQuery")
       return await queryBuilderInsertHandler.INSERTMany(DatabaseStrategy, QueryBuilder, arrayOfDataBackup)
     } else {
       return await  queryBuilderInsertHandler.INSERTOne(DatabaseStrategy, QueryBuilder, arrayOfDataBackup)
-
     }
+    
   }
 
-  executeSelectQuery<PModel>(QueryBuilder: QueryBuilder, Model:PModel)   {
+  executeSelectQuery<PModel>(QueryBuilder: QueryBuilder, Model: Object)   {
     const tableSchema: ITableSchema = Model[RM.getTableSchema]()
     const databaseName = tableSchema.databaseName
 
@@ -136,6 +137,13 @@ class BeastORM {
       },
       many:() =>{
         return queryBuilderSelectHandler.SELECTMany<PModel>(DatabaseStrategy, QueryBuilder)
+      },
+      decide:() => {
+        if(QueryBuilder.query.isParamsArray) {
+          return queryBuilderSelectHandler.SELECTMany<PModel>(DatabaseStrategy, QueryBuilder)
+        }
+
+        return queryBuilderSelectHandler.SELECTOne<PModel>(DatabaseStrategy, QueryBuilder)
       }
     }
   }
@@ -186,7 +194,7 @@ class BeastORM {
   }
 
   async deleteQueryNoFormValidation(QueryBuilder: QueryBuilder, model: typeof Model):Promise<Either<number, FormValidationError>> {
-    const tableSchema: ITableSchema = model[RM.getTableSchema]()
+    const tableSchema: ITableSchema = model.getTableSchema()
     const databaseName = tableSchema.databaseName
 
     const database = modelRegistration.getDatabase(databaseName)
@@ -263,7 +271,7 @@ class BeastORM {
     const reactiveList = new ReactiveList()
 
 
-    return reactiveList.subscribe(_Model, callBack as any)
+    return reactiveList.subscribe(_Model, callBack)
   }
 }
 

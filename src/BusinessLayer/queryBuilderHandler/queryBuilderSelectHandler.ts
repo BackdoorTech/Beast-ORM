@@ -37,16 +37,24 @@ class QueryBuilderSelectHandler {
     const tableName = QueryBuilder.query.table
     const model = QueryBuilder.model
 
+    const result: T[] = []
     return await new Promise((resolve, reject) => {
       DatabaseStrategy.selectMany(tableName, QueryBuilder.query)({
-        onsuccess:(data:any) => {},
+        onsuccess:(data:[]) => {
+
+          const modelInstances: T[] = data.map( e => Object.assign(new model(),e))
+
+          for(const modelInstance of modelInstances) {
+            result.push(modelInstance)
+          }
+
+        },
         onerror:() => {
           resolve(error(false))
         },
         done:(data: any[]) => {
-
-          data = data.map( e => Object.assign(new model(),e))
-          resolve(ok(data as any))
+          
+          resolve(ok(result))
         }
       })
     })

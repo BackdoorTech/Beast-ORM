@@ -1,116 +1,83 @@
-import { ok, error as err } from "../../../../Utility/Either/index.js";
+import { DatabaseTransaction } from "./DatabaseTransaction.js";
 export class ObjectStore {
     constructor(tableSchema) {
-        this.transactionQueue = [];
         this.isTransactionInProgress = false;
-        this.connect = () => { };
+        this.transactions = [];
         this.transactionFinish = (tableName, hasWriteTransaction) => { };
-        this.hasWriteTransaction = false;
+        this.count = 0;
         this.schema = tableSchema;
     }
-    async enqueueTransaction(transaction) {
-        return new Promise((resolve, reject) => {
-            transaction.finishRequest = (result) => {
-                resolve(result);
-            };
-            this.transactionQueue.push(transaction);
-            if (!this.isTransactionInProgress) {
-                this.processTransactionQueue();
+    setDbInstance(db) {
+        this.db = db;
+    }
+    createDedicatedTransaction() {
+        this.count++;
+        const transaction = new DatabaseTransaction(this.schema, true, false);
+        transaction.db = this.db;
+        return transaction;
+    }
+    addTransaction(transaction) {
+        this.transactions.push(transaction);
+        this.processTransactionQueue();
+    }
+    findOrCreateNotDedicatedTransaction() {
+        var _a;
+        if (this.currentTransaction && ((_a = this.currentTransaction) === null || _a === void 0 ? void 0 : _a.dedicateTransaction) === false && this.currentTransaction.isTransactionInProgress) {
+            return this.currentTransaction;
+        }
+        else {
+            const findNotDedicateTransaction = this.transactions.find(e => e.dedicateTransaction === false);
+            if (findNotDedicateTransaction) {
+                return findNotDedicateTransaction;
             }
-        });
+            else {
+                this.count++;
+                const newTransaction = new DatabaseTransaction(this.schema, false, true);
+                newTransaction.db = this.db;
+                this.transactions.push(newTransaction);
+                return newTransaction;
+            }
+        }
     }
     async processTransactionQueue() {
         if (this.isTransactionInProgress) {
             return;
         }
-        this.isTransactionInProgress = true;
         const loop = async () => {
-            const nextTransaction = this.transactionQueue.shift();
-            if (nextTransaction) {
-                try {
-                    await this.executeTransaction(nextTransaction);
-                }
-                catch (error) {
-                    // console.error('Transaction failed:', error);
-                }
-                finally {
-                    await loop();
-                }
+            this.isTransactionInProgress = true;
+            const transaction = this.transactions.shift();
+            if (transaction) {
+                this.currentTransaction = transaction;
+                transaction.startExecution();
+                await transaction.waitToFinish();
+                await loop();
+            }
+            else {
+                const lastTransaction = this.currentTransaction;
+                this.currentTransaction = null;
+                this.isTransactionInProgress = false;
+                this.endProcessTransactionQueue(lastTransaction);
             }
         };
         await loop();
-        this.isTransactionInProgress = false;
-        this.commitTransaction();
-        this.closeTransaction();
-        this.transactionFinish(this.schema.name, this.hasWriteTransaction);
-        this.clearVariables();
+        //   // uncomment when  working in data access layer
+        // if(this.transactions.length >= 1) {
+        //   await loop()
+        // } else {
+        //   // uncomment when  working in data access layer
+        //   console.log("Creating transaction to early")
+        //   throw("Creating transaction to early")
+        // }
     }
-    async executeTransaction(transaction) {
-        const { operation, data, onsuccess, onerror, index, finishRequest, retry } = transaction;
-        this.txInstance.IDBTransaction = this.db.transaction(this.schema.name, "readwrite");
-        const objectStore = this.txInstance.IDBTransaction.objectStore(this.schema.name);
-        let request;
-        try {
-            request = objectStore[operation](data);
+    endProcessTransactionQueue(lastTransaction) {
+        const transactionResult = lastTransaction.transactionInto;
+        let transactionHasChangeDb = false;
+        if (transactionResult.isOk) {
+            transactionHasChangeDb = transactionResult.value.hasChangeDb;
         }
-        catch (error) {
-            if (onerror) {
-                onerror();
-            }
-            return new Promise(async (resolve, reject) => {
-                reject(error);
-                if (onerror) {
-                    onerror();
-                }
-                finishRequest(err(false));
-                console.error({ operation, data });
-                console.error(error);
-                console.error("ObjectStore not found", this.db, this.schema.name);
-            });
-        }
-        return new Promise(async (resolve, reject) => {
-            request.onsuccess = async () => {
-                const data = { data: request.result, index };
-                resolve(data);
-                onsuccess(data);
-                finishRequest(ok(data));
-            };
-            request.onerror = (error) => {
-                this.commitTransaction();
-                this.createTransaction();
-                reject(error);
-                if (onerror) {
-                    onerror();
-                }
-                finishRequest(err(false));
-            };
-        });
-    }
-    commitTransaction() {
-        try {
-            this.txInstance.IDBTransaction.commit();
-            return true;
-        }
-        catch (error) {
-            console.error(error);
-            return false;
-        }
-    }
-    clearVariables() {
-        this.hasWriteTransaction = false;
-    }
-    writeTransactionFlag() {
-        this.hasWriteTransaction = true;
-    }
-    createTransaction() {
-        this.txInstance = {};
-        this.txInstance.IDBTransaction = this.db.transaction(this.schema.name, "readwrite");
-    }
-    closeTransaction() {
-        delete this.txInstance.IDBTransaction;
+        this.transactionFinish(this.schema.name, transactionHasChangeDb);
     }
     hasActiveTransaction() {
-        var _a;
-        return (_a = this.txInstance) === null || _a === void 0 ? void 0 : _a.IDBTransaction;
+        return this.isTransactionInProgress;
     }
 }

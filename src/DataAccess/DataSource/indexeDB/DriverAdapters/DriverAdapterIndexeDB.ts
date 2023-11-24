@@ -3,6 +3,7 @@ import { databaseManager } from "../indexeDB/DatabaseManager.js";
 import { IQuery } from "../../../../BusinessLayer/_interface/Apresentation/queryBuilder.js"
 import { CreateQueryReaderSelect } from "../../../QueryReader/queryReader.js";
 import { SqlObject } from "../../../filter/sqlObject/sqlObject.js";
+import { DeleteOperation } from "../indexeDB/DatabaseOperations.js";
 // IndexedDB strategy
 
 const emptyCallBacks = {
@@ -50,13 +51,17 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
       const ObjectStore = await databaseManager.getDb(this.databaseName)
       .executeOnObjectStore(table)
 
+      const transaction = ObjectStore.findOrCreateNotDedicatedTransaction()
       const condition = Query.where.shift()
-      ObjectStore.writeTransactionFlag()
+      transaction.writeTransactionFlag()
 
       const idIndex = Object.values(condition)[0]
-      await ObjectStore.enqueueTransaction({operation:"delete", data:idIndex, ...callbacks})
+      transaction.enqueueOperation({operation:"delete", data:idIndex, ...callbacks}).finally( () => {
+        callbacks.done()
+      })
 
-      callbacks.done()
+      ObjectStore.processTransactionQueue()
+
     }
   }
 
@@ -65,82 +70,99 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
       const ObjectStore = await databaseManager.getDb(this.databaseName)
       .executeOnObjectStore(table)
 
-      ObjectStore.writeTransactionFlag()
+      const transaction1 = ObjectStore.findOrCreateNotDedicatedTransaction()
+
+      transaction1.writeTransactionFlag()
 
       if (Query.where.length == 0) {
 
-        await ObjectStore.enqueueTransaction({operation:"clear", ...callbacks})
+        const operation = new DeleteOperation({callBacks:callbacks})
+        transaction1.enqueueOperation(operation).finally( () => {
+          callbacks.done()
+        })
+
       } else {
 
         const TableSchema = databaseManager.getTableSchema(this.databaseName, table)
-        const result = await ObjectStore.enqueueTransaction({operation:"getAll", item: null, ...emptyCallBacks})
-        const queryReader = CreateQueryReaderSelect(Query)
+        transaction1.enqueueOperation({operation:"getAll", item: null, ...emptyCallBacks}).then( async (result)  => {
+   
+          const queryReader = CreateQueryReaderSelect(Query)
+  
+          let filteredRow = []
+  
+          if(result.isOk) {
+            const rows = result.value.data
+  
+            const sqlObject =  new SqlObject(TableSchema, queryReader)
+            filteredRow = await sqlObject.run(rows)
+  
+            const transaction2 = ObjectStore.findOrCreateNotDedicatedTransaction()
 
-        let filteredRow = []
-
-        if(result.isOk) {
-          const rows = result.value.data
-
-          const sqlObject =  new SqlObject(TableSchema, queryReader)
-          filteredRow = await sqlObject.run(rows)
-
-          for (const row of filteredRow) {
-
-            const idFieldName = TableSchema.id.keyPath
-            const id = row[idFieldName]
-
-            ObjectStore.enqueueTransaction({operation:"delete", data:id, ...callbacks})
+            for (const row of filteredRow) {
+  
+              const idFieldName = TableSchema.id.keyPath
+              const id = row[idFieldName]
+  
+              transaction2.enqueueOperation({operation:"delete", data:id, ...callbacks})
+            }
           }
 
           callbacks.done(filteredRow)
-          return
-
-        } else {
-          callbacks.done(filteredRow)
-        }
+        })
       }
 
-      callbacks.done()
+      ObjectStore.processTransactionQueue()
     }
   }
 
+  insert(table, rows: any[]) {
 
-  insert(table, data: any[]) {
+    // Implement IndexedDB insert here
+    return async (callbacks: IReturnObject) => {
+      
 
+      const ObjectStore = await databaseManager.getDb(this.databaseName)
+      .executeOnObjectStore(table)
+
+      const transaction = ObjectStore.findOrCreateNotDedicatedTransaction()
+
+      transaction.writeTransactionFlag()
+
+      let index = 0
+      for (const item of rows) {
+        delete item.userId
+        transaction.enqueueOperation({operation:"add",index, data: item, ...callbacks})
+      }
+
+      ObjectStore.processTransactionQueue()
+
+      transaction.onDone(()=> {
+        callbacks.done()
+      })
+      
+    }
+  }
+
+  insertMany(table: any, rows: any): (returnObject: IReturnObject) => void {
     // Implement IndexedDB insert here
     return async (callbacks: IReturnObject) => {
       const ObjectStore = await databaseManager.getDb(this.databaseName)
       .executeOnObjectStore(table)
 
-      ObjectStore.writeTransactionFlag()
+      const transaction = ObjectStore.createDedicatedTransaction()
+      transaction.writeTransactionFlag()
 
       let index = 0
-      for (const item of data) {
+      for (const item of rows) {
         delete item.userId
-        await ObjectStore.enqueueTransaction({operation:"add",index, data:item, ...callbacks})
-        index++
+        transaction.enqueueOperation({operation:"add",index, data:item, ...callbacks})
       }
 
-      callbacks.done()
-    }
-  }
+      transaction.onDone(() => {
+        callbacks.done()
+      })
 
-  insertMany(table: any, data: any): (returnObject: IReturnObject) => void {
-    // Implement IndexedDB insert here
-    return async (callbacks: IReturnObject) => {
-      const ObjectStore = await databaseManager.getDb(this.databaseName)
-      .executeOnObjectStore(table)
-
-      ObjectStore.writeTransactionFlag()
-
-      let index = 0
-      for (const item of data) {
-        delete item.userId
-        await ObjectStore.enqueueTransaction({operation:"add",index, data:item, ...callbacks})
-        index++
-      }
-
-      callbacks.done()
+      ObjectStore.addTransaction(transaction)
     }
   }
 
@@ -151,20 +173,24 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
       const ObjectStore = await databaseManager.getDb(this.databaseName)
       .executeOnObjectStore(table)
 
-      ObjectStore.writeTransactionFlag()
+      const transaction = ObjectStore.findOrCreateNotDedicatedTransaction()
+
+      transaction.writeTransactionFlag()
       if(Query.hasIndex) {
         if(Query.isParamsArray == false) {
 
           const updateValues = Query.updateValues
 
-          await ObjectStore.enqueueTransaction({operation:"put",updateValues, data:updateValues, ...callbacks})
+          transaction.enqueueOperation({operation:"put", data:updateValues, ...callbacks}).finally(() => {
+            callbacks.done()
+          }) 
         }
       }
 
-      callbacks.done()
+      ObjectStore.processTransactionQueue()
+      
     }
   }
-
 
   updateMany(table: any, Query: IQuery): (returnObject: IReturnObject) => void {
 
@@ -174,32 +200,40 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
       const ObjectStore = await databaseManager.getDb(this.databaseName)
       .executeOnObjectStore(table)
 
+      const transaction1 = ObjectStore.findOrCreateNotDedicatedTransaction()
+
       const TableSchema = databaseManager.getTableSchema(this.databaseName, table)
       const updateValues = Query.updateValues
 
-      const result = await ObjectStore.enqueueTransaction({operation:"getAll", item: null, ...emptyCallBacks})
+      transaction1.enqueueOperation({operation:"getAll", item: null, ...emptyCallBacks}).then( async(result) => {
+        let filteredRow = []
 
-      let filteredRow = []
+        if(result.isOk) {
 
-      if(result.isOk) {
-        ObjectStore.writeTransactionFlag()
-        const rows = result.value.data
+          const rows = result.value.data
+  
+          const sqlObject =  new SqlObject(TableSchema, queryReader)
+          filteredRow = await sqlObject.run(rows)
+          //const lastElement = filteredRow.pop()
+  
+          const transaction2 = ObjectStore.findOrCreateNotDedicatedTransaction()
+          transaction2.writeTransactionFlag()
+          const allRequest = filteredRow.map(
+            (row) => transaction2.enqueueOperation({operation:"put", data:Object.assign(row, updateValues), ...callbacks})  
+          )
+          let a = Promise.all(allRequest)
 
-        const sqlObject =  new SqlObject(TableSchema, queryReader)
-        filteredRow = await sqlObject.run(rows)
-        //const lastElement = filteredRow.pop()
-
-        for (const row of filteredRow) {
-          const updatedValues = Object.assign(row, updateValues)
-          ObjectStore.enqueueTransaction({operation:"put", data:updatedValues, ...callbacks})
+          ObjectStore.processTransactionQueue()
+          await a 
         }
-
         callbacks.done(filteredRow)
-        return
+        
+      })
 
-      } else {
-        callbacks.done(filteredRow)
-      }
+      ObjectStore.processTransactionQueue()
+
+      
+
     }
   }
 
@@ -211,23 +245,25 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
       const ObjectStore = await databaseManager.getDb(this.databaseName)
       .executeOnObjectStore(table)
 
+      const transaction = ObjectStore.findOrCreateNotDedicatedTransaction()
+
       const TableSchema = databaseManager.getTableSchema(this.databaseName, table)
-      const result = await ObjectStore.enqueueTransaction({operation:"getAll", item: null, ...emptyCallBacks})
-
-      if(result.isOk) {
-        const rows = result.value.data
-        const sqlObject =  new SqlObject(TableSchema, queryReader)
-        const filteredRow = await sqlObject.run(rows)
-
-        if(filteredRow) {
-          callbacks.done(filteredRow)
-        } else {
-          callbacks.notFound()
+      transaction.enqueueOperation({operation:"getAll", item: null, ...emptyCallBacks}).then(async (result)=> {
+        if(result.isOk) {
+          const rows = result.value.data
+          const sqlObject =  new SqlObject(TableSchema, queryReader)
+          const filteredRow = await sqlObject.run(rows)
+  
+          if(filteredRow) {
+            callbacks.done(filteredRow)
+          } else {
+            callbacks.notFound()
+          }
+          return
         }
-        return
-      }
-      // callbacks.done()
+      })
 
+      ObjectStore.processTransactionQueue()
     }
   }
 
@@ -240,37 +276,39 @@ export class IndexedDBStrategy implements IDatabaseStrategy {
       const ObjectStore = await databaseManager.getDb(this.databaseName)
       .executeOnObjectStore(table)
 
-
+      const transaction = ObjectStore.findOrCreateNotDedicatedTransaction()
 
       const TableSchema = databaseManager.getTableSchema(this.databaseName, table)
 
       if(queryReader.hasNoCondition) {
-        const result = await ObjectStore.enqueueTransaction({operation:"getAll", item: null, ...callbacks})
-        if(result.isOk) {
-          callbacks.done(result.value.data)
-        } else {
-          callbacks.done([])
-        }
+
+        transaction.enqueueOperation({operation:"getAll", item: null, ...emptyCallBacks}).then((result)=>{
+          if(result.isOk) {
+            callbacks.onsuccess(result.value.data)
+          }
+
+          callbacks.done()
+        })
+
       } else {
-        const result = await ObjectStore.enqueueTransaction({operation:"getAll", item: null, ...emptyCallBacks})
 
-        let filteredRow = []
+        transaction.enqueueOperation({operation:"getAll", item: null, ...emptyCallBacks}).then(async (result)=> {
+          let filteredRow = []
 
-        if(result.isOk) {
-          const rows = result.value.data
+          if(result.isOk) {
+            const rows = result.value.data
+            const sqlObject =  new SqlObject(TableSchema, queryReader)
+            filteredRow = await sqlObject.run(rows)
+  
+            callbacks.onsuccess(filteredRow)
+            callbacks.done()
+          }
+        })
 
-          const sqlObject =  new SqlObject(TableSchema, queryReader)
-          filteredRow = await sqlObject.run(rows)
-
-          callbacks.done(filteredRow)
-          return
-
-        } else {
-          callbacks.done(filteredRow)
-          return
-        }
       }
 
+      ObjectStore.processTransactionQueue()
+      
     }
   }
 

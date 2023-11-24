@@ -1,7 +1,6 @@
 export class DataParameters {
     getFilteredData(tableSchema, data) {
         const filteredData = {};
-        delete filteredData[tableSchema.id.keyPath];
         for (const field of tableSchema.fieldNames) {
             if (field in data) {
                 filteredData[field] = data[field];
@@ -12,7 +11,6 @@ export class DataParameters {
         }
         if (tableSchema.fieldTypes.OneToOneField) {
             for (const fieldName of tableSchema.fieldTypes.OneToOneField) {
-                console.log({ data });
                 const model = data[fieldName];
                 const KeyValue = model.getPrimaryKeyValue();
                 filteredData[fieldName] = KeyValue;
@@ -32,6 +30,7 @@ export class DataParameters {
                 filteredData[fieldName] = KeyValue;
             }
         }
+        delete filteredData[tableSchema.id.keyPath];
         return filteredData;
     }
     getUniqueData(tableSchema, data) {
@@ -42,9 +41,6 @@ export class DataParameters {
             if (field in data) {
                 filteredData[field] = data[field];
             }
-            else {
-                filteredData[field] = undefined;
-            }
         }
         if (tableSchema.fieldTypes.OneToOneField) {
             for (const fieldName of tableSchema.fieldTypes.OneToOneField) {
@@ -54,6 +50,9 @@ export class DataParameters {
             }
         }
         return filteredData;
+    }
+    hasField(data) {
+        return Object.keys(data).length >= 1;
     }
     getFilteredDataWithId(tableSchema, data) {
         const filteredData = {};

@@ -19,7 +19,6 @@ export class QueryBuilder {
             hasIndex: false,
             isParamsArray: false
         };
-        this.createdDate = new Date();
         this.query.isParamsArray = isParamsArray;
     }
     /**
