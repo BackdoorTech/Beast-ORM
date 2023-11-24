@@ -20,6 +20,7 @@ import { modelGeneration } from './modelManager/modelGenerator.js';
 import { addRunTimeMethod } from './modelManager/runtimeMethods/addRuntimeMethod.js';
 import { ReactiveList } from './reactiveList/reactiveList.js';
 import { Either } from '../Utility/Either/index.js';
+import { TransactionAbortion } from '../DataAccess/_interface/interface.type.js';
 
 class BeastORM {
 
@@ -78,7 +79,7 @@ class BeastORM {
     }
   }
 
-  async executeInsertionQuery<PModel>(QueryBuilder: QueryBuilder, Model:Object):Promise<Either<PModel, FormValidationError>>   {
+  async executeInsertionQuery<PModel>(QueryBuilder: QueryBuilder, Model:Object):Promise<Either<PModel, FormValidationError | TransactionAbortion>>   {
     const tableSchema: ITableSchema = Model[RM.getTableSchema]()
     const databaseName = tableSchema.databaseName
 
@@ -111,7 +112,6 @@ class BeastORM {
 
     if(QueryBuilder.query.isParamsArray) {
       
-    console.log("executeInsertionQuery")
       return await queryBuilderInsertHandler.INSERTMany(DatabaseStrategy, QueryBuilder, arrayOfDataBackup)
     } else {
       return await  queryBuilderInsertHandler.INSERTOne(DatabaseStrategy, QueryBuilder, arrayOfDataBackup)

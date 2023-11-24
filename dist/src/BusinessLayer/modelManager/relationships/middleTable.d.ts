@@ -40,7 +40,10 @@ export declare class MiddleTable {
             unsubscribe: () => Promise<void>;
             setUpdateUi(func: any): void;
         };
-        getOrCreate<T_4>(params: any): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError | import("../../queryBuilderHandler/queryErrorHandler.js").BulkDataUniqueFieldError>>;
+        getOrCreate<T_4>(params: any): Promise<import("../../../Utility/Either/APIResponse.js").APIResponse<{
+            created: T_4;
+            found: T_4;
+        }, import("../../validation/fields/allFields.type.js").FormValidationError | import("../../../DataAccess/_interface/interface.type.js").TransactionAbortion | import("../../queryBuilderHandler/queryErrorHandler.js").BulkDataUniqueFieldError>>;
     };
 }
 export declare const middleTable: MiddleTable;

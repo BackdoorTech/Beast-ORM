@@ -31,7 +31,10 @@ export declare class RelationShip {
             unsubscribe: () => Promise<void>;
             setUpdateUi(func: any): void;
         };
-        getOrCreate<T_4>(params: any): Promise<APIResponse<number, import("../../validation/fields/allFields.type").FormValidationError | import("../../queryBuilderHandler/queryErrorHandler").BulkDataUniqueFieldError>>;
+        getOrCreate<T_4>(params: any): Promise<APIResponse<{
+            created: T_4;
+            found: T_4;
+        }, import("../../validation/fields/allFields.type").FormValidationError | import("../../../DataAccess/_interface/interface.type").TransactionAbortion | import("../../queryBuilderHandler/queryErrorHandler").BulkDataUniqueFieldError>>;
     };
     getMiddleTableName(modelWithNoGetter: typeof Model<any>, modelWithGetter: typeof Model<any>): string;
     addToMiddleTable<T>(currentModel: Model<any>, otherModel: typeof Model<any>, toAdd: Model<any>, middleTableModel: typeof Model<any>): Promise<APIResponse<T, import("../../validation/fields/allFields.type").FormValidationError | import("../../../DataAccess/_interface/interface.type").TransactionAbortion>>;

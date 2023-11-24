@@ -4,10 +4,11 @@ import { QueryBuilder } from '../Presentation/queryBuilder/queryBuilder.js';
 import { Model } from '../Presentation/Api';
 import { FormValidationError } from './validation/fields/allFields.type.js';
 import { Either } from '../Utility/Either/index.js';
+import { TransactionAbortion } from '../DataAccess/_interface/interface.type.js';
 declare class BeastORM {
     register: (register: IRegister) => void;
     private prepareMigrations;
-    executeInsertionQuery<PModel>(QueryBuilder: QueryBuilder, Model: Object): Promise<Either<PModel, FormValidationError>>;
+    executeInsertionQuery<PModel>(QueryBuilder: QueryBuilder, Model: Object): Promise<Either<PModel, FormValidationError | TransactionAbortion>>;
     executeSelectQuery<PModel>(QueryBuilder: QueryBuilder, Model: Object): {
         one: () => Promise<Either<PModel, import("./queryBuilderHandler/queryErrorHandler.js").ItemNotFound>>;
         many: () => Promise<Either<PModel[], any>>;

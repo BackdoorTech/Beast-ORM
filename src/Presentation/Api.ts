@@ -52,7 +52,6 @@ export class Model<Model> implements IModel<Model> {
 
     const idFieldName = tableSchema.id.keyPath
 
-    console.log(this)
     return this[idFieldName]
   }
 
@@ -94,8 +93,7 @@ export class Model<Model> implements IModel<Model> {
 
     const filter = dataParameters.getUniqueData(tableSchema, this)
 
-    console.log({filter});
-    
+
     queryBuilder
       .select(model)
       .where(filter)
@@ -105,7 +103,6 @@ export class Model<Model> implements IModel<Model> {
     // console.log({queryBuilder})
     const result = await ORM.executeSelectQuery<Model>(queryBuilder, this).one()
 
-    console.log(result);
 
     if(result.isError) {
       return APIError(result.error)
@@ -218,8 +215,7 @@ export class Model<Model> implements IModel<Model> {
     return ORM.ReactiveList(this, callback)
   }
 
-  static async getOrCreate<T>(params: any): Promise<APIResponse<number, FormValidationError | BulkDataUniqueFieldError>> {
-
+  static async getOrCreate<T>(params: any): Promise<APIResponse<{ created: T; found: T}, FormValidationError | BulkDataUniqueFieldError | TransactionAbortion>> {
     
     const isParamsArray = Array.isArray(params)? true : false
     const paramsA: Object[] = params?.constructor?.name != 'Array'? [params]: params
@@ -237,7 +233,6 @@ export class Model<Model> implements IModel<Model> {
       }
     }
 
-
     const allRequestToPerform = paramsA.map( param => {
       const queryBuilderGet = new QueryBuilder({isParamsArray:false});
       queryBuilderGet
@@ -251,17 +246,13 @@ export class Model<Model> implements IModel<Model> {
 
     const allFindRequest = await Promise.all(allRequestToPerform)
 
-
-
-    const created:T[] = []
-    const found:T[] = []
-    const list :T[] = []
+    let created:T[] = []
+    let found:T[] = []
 
     const toCreate: {
       ItemNotFound: ItemNotFound,
       index: any
     }[] = []
-
 
     for (let i =0; i < allFindRequest.length; i++) {
       const findRequest : Either<T, ItemNotFound> = allFindRequest[i]
@@ -276,7 +267,6 @@ export class Model<Model> implements IModel<Model> {
     const queryBuilderCreate = new QueryBuilder({isParamsArray:true});
     queryBuilderCreate.insertInto(model)
 
-
     for (const { ItemNotFound, index } of toCreate) {
       const dataToInsert = paramsA[index]
       const ProcessedData = dataParameters.getFilteredData(tableSchema, dataToInsert)
@@ -285,19 +275,19 @@ export class Model<Model> implements IModel<Model> {
       queryBuilderCreate.insert(agr)
     }
 
-
-    const result = await ORM.executeInsertionQuery<T>(queryBuilderCreate, this)
+    const result = await ORM.executeInsertionQuery<T[]>(queryBuilderCreate, this)
   
+    if(result.isOk) {
+      created = result.value
+    }
 
-
-    // if(result.isError) {
-    //   return APIError(result.error)
-    // } else {
-    //   return APIOk(result.value)
-    // }
-
-    return 0 as any
-
+    if(result.isError) {
+      return APIError(result.error)
+    } else {
+      return APIOk({
+        created: isParamsArray? created as any: created[0] as any, 
+        found: isParamsArray? found as any: found[0] as any
+      })
+    }
   }
-
 }

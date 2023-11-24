@@ -35,13 +35,13 @@ export class IndexedDBStrategy {
         return async (callbacks) => {
             const ObjectStore = await databaseManager.getDb(this.databaseName)
                 .executeOnObjectStore(table);
-            const transaction = ObjectStore.findOrCreateNotDedicatedTransaction();
             const condition = Query.where.shift();
-            transaction.writeTransactionFlag();
             const idIndex = Object.values(condition)[0];
+            const transaction = ObjectStore.findOrCreateNotDedicatedTransaction();
             transaction.enqueueOperation(Object.assign({ operation: "delete", data: idIndex }, callbacks)).finally(() => {
                 callbacks.done();
             });
+            transaction.writeTransactionFlag();
             ObjectStore.processTransactionQueue();
         };
     }
@@ -50,7 +50,6 @@ export class IndexedDBStrategy {
             const ObjectStore = await databaseManager.getDb(this.databaseName)
                 .executeOnObjectStore(table);
             const transaction1 = ObjectStore.findOrCreateNotDedicatedTransaction();
-            transaction1.writeTransactionFlag();
             if (Query.where.length == 0) {
                 const operation = new DeleteOperation({ callBacks: callbacks });
                 transaction1.enqueueOperation(operation).finally(() => {
@@ -76,6 +75,7 @@ export class IndexedDBStrategy {
                     callbacks.done(filteredRow);
                 });
             }
+            transaction1.writeTransactionFlag();
             ObjectStore.processTransactionQueue();
         };
     }
@@ -167,8 +167,8 @@ export class IndexedDBStrategy {
             const queryReader = CreateQueryReaderSelect(Query);
             const ObjectStore = await databaseManager.getDb(this.databaseName)
                 .executeOnObjectStore(table);
-            const transaction = ObjectStore.findOrCreateNotDedicatedTransaction();
             const TableSchema = databaseManager.getTableSchema(this.databaseName, table);
+            const transaction = ObjectStore.findOrCreateNotDedicatedTransaction();
             transaction.enqueueOperation(Object.assign({ operation: "getAll", item: null }, emptyCallBacks)).then(async (result) => {
                 if (result.isOk) {
                     const rows = result.value.data;
@@ -192,8 +192,8 @@ export class IndexedDBStrategy {
             const queryReader = CreateQueryReaderSelect(Query);
             const ObjectStore = await databaseManager.getDb(this.databaseName)
                 .executeOnObjectStore(table);
-            const transaction = ObjectStore.findOrCreateNotDedicatedTransaction();
             const TableSchema = databaseManager.getTableSchema(this.databaseName, table);
+            const transaction = ObjectStore.findOrCreateNotDedicatedTransaction();
             if (queryReader.hasNoCondition) {
                 transaction.enqueueOperation(Object.assign({ operation: "getAll", item: null }, emptyCallBacks)).then((result) => {
                     if (result.isOk) {

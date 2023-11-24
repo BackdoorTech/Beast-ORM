@@ -36,7 +36,6 @@ export class Model {
         const model = this.getModel();
         const tableSchema = model.getTableSchema();
         const idFieldName = tableSchema.id.keyPath;
-        console.log(this);
         return this[idFieldName];
     }
     setPrimaryKey(key) {
@@ -67,7 +66,6 @@ export class Model {
         const model = this.getModel();
         const tableSchema = model.getTableSchema();
         const filter = dataParameters.getUniqueData(tableSchema, this);
-        console.log({ filter });
         queryBuilder
             .select(model)
             .where(filter)
@@ -75,7 +73,6 @@ export class Model {
             .hasIndex(true);
         // console.log({queryBuilder})
         const result = await ORM.executeSelectQuery(queryBuilder, this).one();
-        console.log(result);
         if (result.isError) {
             return APIError(result.error);
         }
@@ -187,9 +184,8 @@ export class Model {
             return ORM.executeSelectQuery(queryBuilderGet, this).one();
         });
         const allFindRequest = await Promise.all(allRequestToPerform);
-        const created = [];
-        const found = [];
-        const list = [];
+        let created = [];
+        let found = [];
         const toCreate = [];
         for (let i = 0; i < allFindRequest.length; i++) {
             const findRequest = allFindRequest[i];
@@ -209,11 +205,17 @@ export class Model {
             queryBuilderCreate.insert(agr);
         }
         const result = await ORM.executeInsertionQuery(queryBuilderCreate, this);
-        // if(result.isError) {
-        //   return APIError(result.error)
-        // } else {
-        //   return APIOk(result.value)
-        // }
-        return 0;
+        if (result.isOk) {
+            created = result.value;
+        }
+        if (result.isError) {
+            return APIError(result.error);
+        }
+        else {
+            return APIOk({
+                created: isParamsArray ? created : created[0],
+                found: isParamsArray ? found : found[0]
+            });
+        }
     }
 }

@@ -76,7 +76,6 @@ class BeastORM {
         }
         QueryBuilder.setCleanData(arrayOfData);
         if (QueryBuilder.query.isParamsArray) {
-            console.log("executeInsertionQuery");
             return await queryBuilderInsertHandler.INSERTMany(DatabaseStrategy, QueryBuilder, arrayOfDataBackup);
         }
         else {

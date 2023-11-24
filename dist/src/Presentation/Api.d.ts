@@ -40,5 +40,8 @@ export declare class Model<Model> implements IModel<Model> {
         unsubscribe: () => Promise<void>;
         setUpdateUi(func: any): void;
     };
-    static getOrCreate<T>(params: any): Promise<APIResponse<number, FormValidationError | BulkDataUniqueFieldError>>;
+    static getOrCreate<T>(params: any): Promise<APIResponse<{
+        created: T;
+        found: T;
+    }, FormValidationError | BulkDataUniqueFieldError | TransactionAbortion>>;
 }
