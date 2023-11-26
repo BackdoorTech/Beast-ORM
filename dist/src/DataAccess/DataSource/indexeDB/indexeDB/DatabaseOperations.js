@@ -1,141 +1,205 @@
+import { IIndexedDBOperations } from "../../../../BusinessLayer/_interface/DataAccess/interface.type.js";
 import { ok, error as err } from "../../../../Utility/Either/index.js";
-export class selectOperation {
+export class DatabaseOperation {
+    constructor() {
+        this.finishOperationCallback = [];
+    }
+    onDone(fn) {
+        if (this._result) {
+            fn(this._result);
+        }
+        else {
+            this.finishOperationCallback.push(fn);
+        }
+    }
+    runDoneCallBack(result) {
+        this._result = result;
+        for (const fn of this.finishOperationCallback) {
+            fn(this._result);
+        }
+    }
+}
+export class SelectOperation extends DatabaseOperation {
     constructor(data) {
+        super();
+        this.isProcessing = false;
+        this.operation = IIndexedDBOperations.getAll;
         this.data = data.data;
         this.callBacks = data.callBacks;
     }
-    async execute(request, operation) {
-        const { onsuccess, onerror, index, finishRequest } = operation;
+    async execute(request) {
+        this.isProcessing = true;
         return new Promise(async (resolve, reject) => {
             request.onsuccess = async () => {
-                const data = { data: request.result, index };
-                resolve(data);
-                onsuccess(data);
-                finishRequest(ok(data));
+                this.isProcessing = false;
+                this.result = { data: request.result, index: this.index };
+                resolve(this.result);
+                this.callBacks.onsuccess(this.result);
+                this.runDoneCallBack(ok(this.result));
             };
             request.onerror = (error) => {
+                var _a;
+                this.isProcessing = false;
                 reject(error);
-                if (onerror) {
-                    onerror(JSON.stringify(error));
+                if ((_a = this.callBacks) === null || _a === void 0 ? void 0 : _a.onerror) {
+                    this.callBacks.onerror(JSON.stringify(error));
                 }
-                finishRequest(err(false));
+                this.result = { data: request.result, index: this.index };
+                this.runDoneCallBack(err(false));
             };
         });
     }
 }
-export class insertOperationOperation {
+export class InsertOperation extends DatabaseOperation {
     constructor(data) {
+        super();
+        this.isProcessing = false;
+        this.operation = IIndexedDBOperations.add;
+        this.data = data.data;
+        this.callBacks = data.callBacks;
+        this.index = data.index;
+        this.proceedData(data);
+    }
+    proceedData(data) {
+        const tableSchema = data.ObjectStore.schema;
+        const idField = tableSchema.id.keyPath;
+        if (this.data.hasOwnProperty(idField)) {
+            if (this.data[idField] == null || this.data[idField] == undefined) {
+                delete this.data[idField];
+            }
+        }
+    }
+    async execute(request) {
+        this.isProcessing = true;
+        return new Promise(async (resolve, reject) => {
+            request.onsuccess = async () => {
+                this.isProcessing = false;
+                this.result = { data: request.result, index: 0 };
+                resolve(this.result);
+                this.callBacks.onsuccess(this.result);
+                this.runDoneCallBack(ok(this.result));
+            };
+            request.onerror = (error) => {
+                this.isProcessing = false;
+                reject(error);
+                if (this.callBacks.onerror) {
+                    this.callBacks.onerror(JSON.stringify(error));
+                }
+                this.runDoneCallBack(err(false));
+            };
+        });
+    }
+}
+export class UpdateOperation extends DatabaseOperation {
+    constructor(data) {
+        super();
+        this.isProcessing = false;
+        this.operation = IIndexedDBOperations.put;
         this.data = data.data;
         this.callBacks = data.callBacks;
     }
-    async execute(request, operation) {
-        const { onsuccess, onerror, index, finishRequest } = operation;
+    async execute(request) {
+        this.isProcessing = true;
         return new Promise(async (resolve, reject) => {
             request.onsuccess = async () => {
-                const data = { data: request.result, index };
-                resolve(data);
-                onsuccess(data);
-                finishRequest(ok(data));
+                this.isProcessing = false;
+                this.result = { data: request.result, index: 0 };
+                resolve(this.result);
+                this.callBacks.onsuccess(this.result);
+                this.runDoneCallBack(ok(this.result));
             };
             request.onerror = (error) => {
+                this.isProcessing = false;
                 reject(error);
-                if (onerror) {
-                    onerror(JSON.stringify(error));
+                if (this.callBacks.onerror) {
+                    this.callBacks.onerror((error.target["error"]));
                 }
-                finishRequest(err(false));
+                this.runDoneCallBack(err(false));
             };
         });
     }
 }
-export class UpdateOperation {
+export class DeleteOperation extends DatabaseOperation {
     constructor(data) {
-        this.data = data.data;
+        super();
+        this.isProcessing = false;
+        this.operation = IIndexedDBOperations.delete;
+        this.data = data.pk;
         this.callBacks = data.callBacks;
     }
-    async execute(request, operation) {
-        const { onsuccess, onerror, index, finishRequest } = operation;
+    async execute(request) {
+        this.isProcessing = true;
         return new Promise(async (resolve, reject) => {
             request.onsuccess = async () => {
-                const data = { data: request.result, index };
-                resolve(data);
-                onsuccess(data);
-                finishRequest(ok(data));
+                this.isProcessing = false;
+                this.result = { data: request.result, index: 0 };
+                resolve(this.result);
+                this.callBacks.onsuccess(this.result);
+                this.runDoneCallBack(ok(this.result));
             };
             request.onerror = (error) => {
+                this.isProcessing = false;
                 reject(error);
-                if (onerror) {
-                    onerror(JSON.stringify(error));
+                if (this.callBacks.onerror) {
+                    this.callBacks.onerror(error.target["error"]);
                 }
-                finishRequest(err(false));
+                this.runDoneCallBack(err(false));
             };
         });
     }
 }
-export class DeleteOperation {
+export class ClearAllOperation extends DatabaseOperation {
     constructor(data) {
-        this.operation = "clear";
-        Object.assign(this, data.callBacks);
-    }
-    async execute(request, operation) {
-        const { onsuccess, onerror, index, finishRequest } = operation;
-        return new Promise(async (resolve, reject) => {
-            request.onsuccess = async () => {
-                const data = { data: request.result, index };
-                resolve(data);
-                onsuccess(data);
-                finishRequest(ok(data));
-            };
-            request.onerror = (error) => {
-                reject(error);
-                if (onerror) {
-                    onerror(JSON.stringify(error));
-                }
-                finishRequest(err(false));
-            };
-        });
-    }
-}
-export class ClearAllOperation {
-    constructor(data) {
-        this.data = data.data;
+        super();
+        this.isProcessing = false;
+        this.operation = IIndexedDBOperations.clear;
         this.callBacks = data.callBacks;
     }
-    async execute(request, operation) {
-        const { onsuccess, onerror, index, finishRequest } = operation;
+    async execute(request) {
+        this.isProcessing = true;
         return new Promise(async (resolve, reject) => {
             request.onsuccess = async () => {
-                const data = { data: request.result, index };
-                resolve(data);
-                onsuccess(data);
-                finishRequest(ok(data));
+                this.isProcessing = false;
+                this.result = { data: request.result, index: 0 };
+                resolve(this.result);
+                this.callBacks.onsuccess(this.result);
+                this.runDoneCallBack(ok(this.result));
             };
             request.onerror = (error) => {
+                this.isProcessing = false;
                 reject(error);
-                if (onerror) {
-                    onerror(JSON.stringify(error));
+                if (this.callBacks.onerror) {
+                    this.callBacks.onerror(error.target["error"]);
                 }
-                finishRequest(err(false));
+                this.runDoneCallBack(err(false));
             };
         });
     }
 }
-export class GetAllOperation {
-    constructor() { }
-    async execute(request, operation) {
-        const { onsuccess, onerror, index, finishRequest } = operation;
+export class GetAllOperation extends DatabaseOperation {
+    constructor(data) {
+        super();
+        this.isProcessing = false;
+        this.operation = IIndexedDBOperations.getAll;
+        this.callBacks = data.callBacks;
+    }
+    async execute(request) {
+        this.isProcessing = true;
         return new Promise(async (resolve, reject) => {
             request.onsuccess = async () => {
-                const data = { data: request.result, index };
-                resolve(data);
-                onsuccess(data);
-                finishRequest(ok(data));
+                this.isProcessing = false;
+                this.result = { data: request.result, index: 0 };
+                resolve(this.result);
+                // this.callBacks.onsuccess(this.result);
+                this.runDoneCallBack(ok(this.result));
             };
             request.onerror = (error) => {
+                this.isProcessing = false;
                 reject(error);
-                if (onerror) {
-                    onerror(JSON.stringify(error));
+                if (this.callBacks.onerror) {
+                    this.callBacks.onerror(error.target["error"]);
                 }
-                finishRequest(err(false));
+                this.runDoneCallBack(err(false));
             };
         });
     }

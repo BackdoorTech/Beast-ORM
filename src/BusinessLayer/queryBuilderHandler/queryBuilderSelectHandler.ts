@@ -12,7 +12,7 @@ class QueryBuilderSelectHandler {
 
     return await new Promise((resolve, reject) => {
 
-      DatabaseStrategy.select(tableName, QueryBuilder.query)({
+      DatabaseStrategy.select({table: tableName, query: QueryBuilder.query})({
         onsuccess:(data:any) => {},
         onerror:() => {
           resolve(error(false as any))
@@ -39,7 +39,7 @@ class QueryBuilderSelectHandler {
 
     const result: T[] = []
     return await new Promise((resolve, reject) => {
-      DatabaseStrategy.selectMany(tableName, QueryBuilder.query)({
+      DatabaseStrategy.selectMany({table: tableName, query: QueryBuilder.query})({
         onsuccess:(data:[]) => {
 
           const modelInstances: T[] = data.map( e => Object.assign(new model(),e))
@@ -53,7 +53,7 @@ class QueryBuilderSelectHandler {
           resolve(error(false))
         },
         done:(data: any[]) => {
-          
+
           resolve(ok(result))
         }
       })

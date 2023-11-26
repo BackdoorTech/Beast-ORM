@@ -2,6 +2,10 @@ import { defineConfig } from "cypress";
 
 export default defineConfig({
   chromeWebSecurity: false,
+  "defaultCommandTimeout": 60000, // in milliseconds
+  "requestTimeout": 30000, // in milliseconds
+  "responseTimeout": 30000, // in milliseconds
+  "pageLoadTimeout": 60000, // in milliseconds
 
   e2e: {
     setupNodeEvents(on, config) {

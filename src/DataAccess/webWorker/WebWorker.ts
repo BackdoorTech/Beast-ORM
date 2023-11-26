@@ -1,5 +1,5 @@
 // postMessage("I\'m working before postMessage(\'ali\').");
-import { IndexedDBStrategy } from '../DataSource/indexeDB/DriverAdapters/DriverAdapterIndexeDB'
+import { IndexedDBStrategy } from '../DataSource/indexeDB/DriverAdapters/DriverAdapterIndexedDB'
 import { IReturnObject } from '../DriverAdapters/DriverAdapter.type';
 
 // const Strategy = new IndexedDBStrategy()

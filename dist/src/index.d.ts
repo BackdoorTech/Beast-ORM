@@ -1,4 +1,5 @@
 import { Model } from './Presentation/Api.js';
+import './Configuration/IndexedDbWorker.js';
 export declare const models: {
     ForeignKeyGetter<T>(data: {
         model: new () => T;

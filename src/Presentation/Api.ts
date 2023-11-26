@@ -4,11 +4,13 @@ import { returnSelf } from "./returnSelf/returnSelf.js" // Represents a return o
 import { ORM } from "../BusinessLayer/beastOrm.js"
 import { ICallBackReactiveList, ITableSchema } from "../BusinessLayer/_interface/interface.type.js";
 import { dataParameters } from "../BusinessLayer/modelManager/dataParameters.js";
-import { APIError, APIOk, APIResponse } from "../Utility/Either/APIResponse.js";
-import { FormValidationError } from "../BusinessLayer/validation/fields/allFields.type.js";
+import { EitherFormValidationError, FormValidationError } from "../BusinessLayer/validation/fields/allFields.type.js";
 import { BulkDataUniqueFieldError, ItemNotFound } from "../BusinessLayer/queryBuilderHandler/queryErrorHandler.js";
 import { Either } from "../Utility/Either/index.js";
 import { TransactionAbortion } from "../DataAccess/_interface/interface.type.js";
+import { APIError, APIOk, APIResponse } from "../Utility/Either/APIresponse.js";
+import { objectEqual } from "../BusinessLayer/modelManager/ObjectEqual.js";
+import { RuntimeMethods as RM } from "../BusinessLayer/modelManager/runtimeMethods/runTimeMethods.js";
 
 /**
  * Represents a model for database operations.
@@ -43,7 +45,7 @@ export class Model<Model> implements IModel<Model> {
     } else {
       return APIOk(result.value)
     }
-    
+
   }
 
   getPrimaryKeyValue(): number | string {
@@ -100,7 +102,7 @@ export class Model<Model> implements IModel<Model> {
       .limit(1)
       .hasIndex(true)
 
-    // console.log({queryBuilder})
+
     const result = await ORM.executeSelectQuery<Model>(queryBuilder, this).one()
 
 
@@ -216,7 +218,7 @@ export class Model<Model> implements IModel<Model> {
   }
 
   static async getOrCreate<T>(params: any): Promise<APIResponse<{ created: T; found: T}, FormValidationError | BulkDataUniqueFieldError | TransactionAbortion>> {
-    
+
     const isParamsArray = Array.isArray(params)? true : false
     const paramsA: Object[] = params?.constructor?.name != 'Array'? [params]: params
     const paramUnique:  Object[] = []
@@ -240,7 +242,7 @@ export class Model<Model> implements IModel<Model> {
         .where(param)
         .limit(1)
         .hasIndex(true)
-  
+
       return ORM.executeSelectQuery<T>(queryBuilderGet, this).one()
     })
 
@@ -276,7 +278,7 @@ export class Model<Model> implements IModel<Model> {
     }
 
     const result = await ORM.executeInsertionQuery<T[]>(queryBuilderCreate, this)
-  
+
     if(result.isOk) {
       created = result.value
     }
@@ -285,9 +287,114 @@ export class Model<Model> implements IModel<Model> {
       return APIError(result.error)
     } else {
       return APIOk({
-        created: isParamsArray? created as any: created[0] as any, 
+        created: isParamsArray? created as any: created[0] as any,
         found: isParamsArray? found as any: found[0] as any
       })
     }
   }
+
+
+  static async updateOrCreate<T>(params: any): Promise<APIResponse<{ updated: T; created: T}, FormValidationError | BulkDataUniqueFieldError | TransactionAbortion>> {
+
+    const isParamsArray = Array.isArray(params)? true : false
+    const paramsA: Object[] = params?.constructor?.name != 'Array'? [params]: params
+    const paramUnique:  Object[] = []
+    const model = this.getModel()
+    const tableSchema: ITableSchema = model.getTableSchema()
+    const validator: (value: Object) => EitherFormValidationError  = model[RM.validator]
+
+
+    for( const object in params) {
+      params[object] = dataParameters.getFilteredData(tableSchema, params[object])
+      const validationResult = validator(params[object])
+      if(validationResult.isError) {
+        return APIError(validationResult)
+      }
+    }
+
+    for( const i in paramsA) {
+      const ProcessedDataUniqueFieldOnly = dataParameters.getUniqueData(tableSchema, paramsA[i])
+
+      paramUnique[i] = ProcessedDataUniqueFieldOnly
+      if(!dataParameters.hasField(ProcessedDataUniqueFieldOnly)) {
+        return APIError(new BulkDataUniqueFieldError({data:ProcessedDataUniqueFieldOnly, index:i, rows: paramsA, table:tableSchema.name}))
+      }
+    }
+
+
+    const allRequestToPerform = paramUnique.map( param => {
+      const queryBuilderGet = new QueryBuilder({isParamsArray:false});
+      queryBuilderGet
+        .select(model)
+        .where(param)
+        .limit(1)
+        .hasIndex(true)
+
+      return ORM.executeSelectQuery<T>(queryBuilderGet, this).one()
+    })
+
+
+    const allFindRequest = await Promise.all(allRequestToPerform)
+
+
+    let created:T[] = []
+    let updated:T[] = []
+
+    const toCreate: {
+      ItemNotFound: ItemNotFound,
+      index: any
+    }[] = []
+
+    let i =0
+    for(const findRequest of  allFindRequest) {
+
+      if(findRequest.isError) {
+        toCreate.push({ItemNotFound:findRequest.error, index:i})
+      } else {
+        const foundItem = findRequest.value
+
+        const equal = objectEqual.same(allFindRequest[i].value, params[i])
+
+        if(!equal) {
+          Object.assign(foundItem, params[i]);
+          await (foundItem as any).save()
+        }
+
+        updated.push(foundItem)
+      }
+
+      i++
+    }
+
+    const queryBuilderCreate = new QueryBuilder({isParamsArray:true});
+    queryBuilderCreate.insertInto(model)
+
+    for (const { ItemNotFound, index } of toCreate) {
+      const dataToInsert = paramsA[index]
+      const ProcessedData = dataParameters.getFilteredData(tableSchema, dataToInsert)
+      const agr = ProcessedData
+
+      queryBuilderCreate.insert(agr)
+    }
+
+    const result = await ORM.executeInsertionManyQuery<T[]>(queryBuilderCreate, this)
+
+    if(result.isOk) {
+      created = result.value
+    }
+
+    if(result.isError) {
+      return APIError(result.error)
+    } else {
+      return APIOk({
+        created: isParamsArray? created as any: created[0] as any,
+        updated: isParamsArray? updated as any: updated[0] as any
+      })
+    }
+  }
+}
+
+
+const $Best = (model: typeof Model<any>) => {
+  getModel:(a) => model.getModel()
 }

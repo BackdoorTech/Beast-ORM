@@ -10,7 +10,7 @@ class QueryBuilderUpdateHandler {
     const tableName = QueryBuilder.query.table
 
     return await new Promise((resolve, reject) => {
-      DatabaseStrategy.update(tableName, QueryBuilder.query)({
+      DatabaseStrategy.update({table: tableName, query:QueryBuilder.query})({
         onsuccess:(data) => {
 
         },
@@ -30,7 +30,7 @@ class QueryBuilderUpdateHandler {
     const tableName = QueryBuilder.query.table
 
     return await new Promise((resolve, reject) => {
-      DatabaseStrategy.updateMany(tableName, QueryBuilder.query)({
+      DatabaseStrategy.updateMany({table: tableName, query:QueryBuilder.query})({
         onsuccess:(data) => {
 
         },

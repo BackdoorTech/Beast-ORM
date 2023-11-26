@@ -1,9 +1,10 @@
 import { ITableSchema } from "../../../../BusinessLayer/_interface/interface.type.js";
 import { Either } from "../../../../Utility/Either/index.js";
 import { ConstraintError, TransactionAbortion, TransactionInfo } from "../../../_interface/interface.type.js";
-import { ObjectStoreRequestResult } from "./ObjectStore.type.js";
+import { IAllDatabaseOperation } from "./DatabaseOperations.js";
+import { IOperationResult } from "./ObjectStore.type.js";
 export declare class DatabaseTransaction {
-    schema: ITableSchema;
+    private schema;
     operationQueue: any[];
     isTransactionInProgress: boolean;
     db: IDBDatabase;
@@ -19,14 +20,13 @@ export declare class DatabaseTransaction {
     onDone(fn: (result: Either<TransactionInfo, TransactionAbortion>) => void): void;
     startExecution(): void;
     waitToFinish(): Promise<Either<TransactionInfo, TransactionAbortion | ConstraintError>>;
-    enqueueOperation(transaction: any): Promise<Either<ObjectStoreRequestResult, false>>;
+    enqueueOperation(operation: IAllDatabaseOperation): Promise<Either<IOperationResult, false>>;
     private processOperationQueue;
     private finishWithSuccess;
     private runDoneCallBack;
-    private finishWithAbortion;
     private executeOperation;
-    abortTransaction(cause: ConstraintError): void;
-    commitTransaction(): TransactionInfo;
+    private abortTransaction;
+    private commitTransaction;
     private executeTrigger;
     private setTransactionInfo;
     private setTransactionErrorInfo;

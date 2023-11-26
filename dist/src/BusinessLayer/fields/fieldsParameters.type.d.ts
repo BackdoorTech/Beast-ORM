@@ -1,5 +1,5 @@
 import { Model } from "../../Presentation/Api";
-import { APIResponse } from "../../Utility/Either/APIResponse";
+import { APIResponse } from "../../Utility/Either/APIresponse.js";
 import { FormValidationError, field } from "../validation/fields/allFields.type";
 export interface CharFieldParams {
     maxLength?: number;

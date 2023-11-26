@@ -1,20 +1,24 @@
-import { IQuery } from "../../../../BusinessLayer/_interface/Apresentation/queryBuilder.js";
-import { IDatabaseStrategy, IMigrations, IReturnObject } from "../../../DriverAdapters/DriverAdapter.type.js";
+import { IDatabaseSchema } from "../../../../BusinessLayer/_interface/interface.type.js";
+import { IData, IDataInsert, IDatabaseStrategy, IReturnObject, IReturnSelectObject, IReturnTriggerObject } from "../../../DriverAdapters/DriverAdapter.type.js";
 export declare class IndexedDBWorkerStrategy implements IDatabaseStrategy {
+    databaseName: string;
+    tableName: string;
     private myWorker;
-    private Queue;
-    constructor();
-    addTrigger(table: any, data: any): (returnObject: IReturnObject) => void;
-    RemoveTrigger(table: any, data: any): (returnObject: IReturnObject) => void;
-    updateMany(table: any, data: IQuery): (returnObject: IReturnObject) => void;
-    insertMany(table: any, data: any): (returnObject: IReturnObject) => void;
-    deleteMany(table: any, data: IQuery): (returnObject: IReturnObject) => void;
-    selectMany(table: any, data: IQuery): (returnObject: IReturnObject) => void;
-    update(table: any, data: IQuery): (returnObject: IReturnObject) => void;
-    delete(table: any, data: any): (returnObject: IReturnObject) => void;
-    openDatabase(): (callbacks: IReturnObject) => Promise<void>;
-    insert(table: any, data: any): (callbacks: IReturnObject) => Promise<void>;
-    select(table: any, key: any): (callbacks: IReturnObject) => Promise<void>;
-    migrate(migrate: IMigrations): (callbacks: IReturnObject) => Promise<void>;
-    prepare(migrate: IMigrations): (callbacks: IReturnObject) => Promise<void>;
+    callbacks: {
+        [key: string]: Object;
+    };
+    constructor(databaseName: string);
+    static handler(instance: IndexedDBWorkerStrategy, callbacks: IReturnObject, data: any, methodName: any): void;
+    update(data: IData): (returnObject: IReturnObject) => void;
+    updateMany(data: IData): (returnObject: IReturnObject) => void;
+    insert(data: IDataInsert): (returnObject: IReturnObject) => void;
+    insertMany(data: IDataInsert): (returnObject: IReturnObject) => void;
+    delete(data: IData): (returnObject: IReturnObject) => void;
+    deleteMany(data: IData): (returnObject: IReturnObject) => void;
+    select(data: IData): (returnObject: IReturnSelectObject) => void;
+    selectMany(data: IData): (returnObject: IReturnObject) => void;
+    migrate(migrate: IDatabaseSchema): (returnObject: IReturnObject) => void;
+    prepare(migrate: IDatabaseSchema): (returnObject: IReturnObject) => void;
+    RemoveTrigger(data: any): (returnObject: IReturnObject) => void;
+    addTrigger(data: any): (returnObject: IReturnTriggerObject) => void;
 }

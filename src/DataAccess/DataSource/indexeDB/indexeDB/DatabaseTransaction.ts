@@ -2,11 +2,12 @@ import { ITableSchema } from "../../../../BusinessLayer/_interface/interface.typ
 import { Either, ok, error as err } from "../../../../Utility/Either/index.js";
 import { ConstraintError, TransactionAbortion, TransactionInfo } from "../../../_interface/interface.type.js";
 import { databaseManager } from "./DatabaseManager.js";
-import { ObjectStoreRequestResult } from "./ObjectStore.type.js";
+import { IAllDatabaseOperation } from "./DatabaseOperations.js";
+import { IOperationResult } from "./ObjectStore.type.js";
 
 export class DatabaseTransaction {
 
-  schema: ITableSchema
+  private schema: ITableSchema
   operationQueue = [];
   isTransactionInProgress = false;
   db:  IDBDatabase;
@@ -19,7 +20,7 @@ export class DatabaseTransaction {
   dedicateTransaction: Boolean = false
 
   transactionInto!: Either<TransactionInfo, TransactionAbortion>
-  
+
 
   constructor(tableSchema: ITableSchema, dedicateTransaction: Boolean, errorPassive: Boolean) {
     this.schema = tableSchema
@@ -34,10 +35,10 @@ export class DatabaseTransaction {
     } else {
       this.finishTransactionCallback.push(fn)
     }
-    
+
   }
 
-  startExecution() {      
+  startExecution() {
 
     this.createTransaction()
     this.processOperationQueue();
@@ -54,7 +55,7 @@ export class DatabaseTransaction {
 
   }
 
-  waitToFinish(): Promise<Either<TransactionInfo, TransactionAbortion | ConstraintError>> {     
+  waitToFinish(): Promise<Either<TransactionInfo, TransactionAbortion | ConstraintError>> {
     return new Promise((resolve, reject) => {
       if(this.isTransactionInProgress == false) {
         resolve(this.transactionInto)
@@ -66,18 +67,15 @@ export class DatabaseTransaction {
     })
   }
 
-  async enqueueOperation(transaction): Promise<Either<ObjectStoreRequestResult, false>> {
+  async enqueueOperation(operation: IAllDatabaseOperation): Promise<Either<IOperationResult, false>> {
     return new Promise((resolve, reject) => {
-      transaction.finishRequest = (result: Either<any, false>) => {
+
+      operation.onDone((result) => {
         resolve(result)
-      }
-      
-      this.operationQueue.push(transaction);
-      
-      //   // uncomment when  working in data access layer
-      // if(this.dead) {
-      //   throw("error")
-      // }
+      })
+
+      this.operationQueue.push(operation);
+
     })
   }
 
@@ -96,11 +94,12 @@ export class DatabaseTransaction {
         try {
           await this.executeOperation(nextTransaction);
         } catch (error) {
-          
+
           if(this.errorPassive) {
             this.commitTransaction()
             this.createTransaction()
           } else {
+            console.log(error)
             this.abortTransaction(new ConstraintError(error))
             this.runDoneCallBack()
           }
@@ -140,58 +139,29 @@ export class DatabaseTransaction {
     }
   }
 
-  private finishWithAbortion() {
-
-  }
-
-
-  private executeOperation(transaction) {
-    const { operation, data, onsuccess, onerror, index, finishRequest, retry } = transaction;
-    // this.IDBTransaction = this.db.transaction(this.schema.name, "readwrite");
+  private executeOperation(operationClass: IAllDatabaseOperation) {
+    const { operation, data } = operationClass;
     const objectStore = this.IDBTransaction.objectStore(this.schema.name);
 
-    let request: IDBOpenDBRequest;
+    let request: IDBRequest;
 
     try {
       request = objectStore[operation](data);
     } catch (error) {
-      console.error("retry", error)
-      // if(transaction.retry != true) {
-      //   transaction.retry = true
-      //   //this.commitTransaction()
-      //   // this.abortTransaction({} as any)
-      //   this.createTransaction()
-      //   return this.executeOperation(transaction);
-      // }
+      console.log(data,"retry", error)
     }
 
-    return new Promise(async (resolve, reject) => {
-      request.onsuccess = async () => {
-        const data: ObjectStoreRequestResult = {data:request.result, index}
-        resolve(data);
-        onsuccess(data);
-        finishRequest(ok(data))
-
-      };
-
-      request.onerror = (error) => {
-        reject(error);
-        if(onerror) {
-          onerror(error.target["error"])
-        }
-        finishRequest(err(false))
-      };
-    });
+    return operationClass.execute(request)
   }
 
-  abortTransaction(cause: ConstraintError) {
+  private abortTransaction(cause: ConstraintError) {
     const transactionAbortion = new TransactionAbortion()
     transactionAbortion.cause =  cause
     this.transactionInto =  err(transactionAbortion)
     this.IDBTransaction.abort();
   }
 
-  commitTransaction(): TransactionInfo {
+  private commitTransaction(): TransactionInfo {
 
     let transactionInfo = new TransactionInfo()
 
@@ -213,11 +183,11 @@ export class DatabaseTransaction {
   }
 
   private setTransactionInfo(TransactionInfo: TransactionInfo ) {
-    this.transactionInto = ok(TransactionInfo) 
+    this.transactionInto = ok(TransactionInfo)
   }
 
   private setTransactionErrorInfo(ConstraintError: TransactionAbortion) {
-    this.transactionInto = err(ConstraintError) 
+    this.transactionInto = err(ConstraintError)
   }
 
   private clearVariables() {

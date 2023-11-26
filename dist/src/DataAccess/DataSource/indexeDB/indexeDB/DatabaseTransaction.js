@@ -45,16 +45,12 @@ export class DatabaseTransaction {
             }
         });
     }
-    async enqueueOperation(transaction) {
+    async enqueueOperation(operation) {
         return new Promise((resolve, reject) => {
-            transaction.finishRequest = (result) => {
+            operation.onDone((result) => {
                 resolve(result);
-            };
-            this.operationQueue.push(transaction);
-            //   // uncomment when  working in data access layer
-            // if(this.dead) {
-            //   throw("error")
-            // }
+            });
+            this.operationQueue.push(operation);
         });
     }
     async processOperationQueue() {
@@ -74,6 +70,7 @@ export class DatabaseTransaction {
                         this.createTransaction();
                     }
                     else {
+                        console.log(error);
                         this.abortTransaction(new ConstraintError(error));
                         this.runDoneCallBack();
                     }
@@ -104,41 +101,17 @@ export class DatabaseTransaction {
             fn(this.transactionInto);
         }
     }
-    finishWithAbortion() {
-    }
-    executeOperation(transaction) {
-        const { operation, data, onsuccess, onerror, index, finishRequest, retry } = transaction;
-        // this.IDBTransaction = this.db.transaction(this.schema.name, "readwrite");
+    executeOperation(operationClass) {
+        const { operation, data } = operationClass;
         const objectStore = this.IDBTransaction.objectStore(this.schema.name);
         let request;
         try {
             request = objectStore[operation](data);
         }
         catch (error) {
-            console.error("retry", error);
-            // if(transaction.retry != true) {
-            //   transaction.retry = true
-            //   //this.commitTransaction()
-            //   // this.abortTransaction({} as any)
-            //   this.createTransaction()
-            //   return this.executeOperation(transaction);
-            // }
+            console.log(data, "retry", error);
         }
-        return new Promise(async (resolve, reject) => {
-            request.onsuccess = async () => {
-                const data = { data: request.result, index };
-                resolve(data);
-                onsuccess(data);
-                finishRequest(ok(data));
-            };
-            request.onerror = (error) => {
-                reject(error);
-                if (onerror) {
-                    onerror(error.target["error"]);
-                }
-                finishRequest(err(false));
-            };
-        });
+        return operationClass.execute(request);
     }
     abortTransaction(cause) {
         const transactionAbortion = new TransactionAbortion();

@@ -6,7 +6,6 @@ export class DataParameters {
 
     const filteredData = {}
 
-
     for(const field of tableSchema.fieldNames) {
       if(field in data) {
         filteredData[field]= data[field]
@@ -42,7 +41,6 @@ export class DataParameters {
       }
     }
 
-    delete filteredData[tableSchema.id.keyPath]
     return filteredData
   }
 
@@ -118,6 +116,10 @@ export class DataParameters {
 
     return filteredData
   }
+
+
+  setDataToInstance() {}
+
 }
 
 

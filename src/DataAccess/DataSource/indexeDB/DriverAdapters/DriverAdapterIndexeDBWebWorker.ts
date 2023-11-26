@@ -1,105 +1,107 @@
-import { IQuery } from "../../../../BusinessLayer/_interface/Apresentation/queryBuilder.js";
-import { IDatabaseStrategy, IMigrations, IReturnObject } from "../../../DriverAdapters/DriverAdapter.type.js";
+import { IDatabaseSchema } from "../../../../BusinessLayer/_interface/interface.type.js";
+import { uniqueGenerator } from "../../../../Utility/utils.js";
+import { IData, IDataInsert, IDatabaseStrategy, IMigrations, IReturnObject, IReturnSelectObject, IReturnTriggerObject } from "../../../DriverAdapters/DriverAdapter.type.js";
 // IndexedDB strategy
 export class IndexedDBWorkerStrategy implements IDatabaseStrategy {
 
+  databaseName: string
+  tableName: string
   private myWorker:  Worker
-  private Queue: {}
+  callbacks: {[key: string]: Object} = {}
 
-	constructor() {
+	constructor(databaseName: string) {
+    this.databaseName = databaseName
+
     this.myWorker = new Worker(new URL('./worker/worker.js', import.meta.url),{ type: "module" });
 
     this.myWorker.onmessage =  (oEvent) => {
       const data = oEvent.data
-      this.Queue[data.UUID][data.method](data.data)
+      console.log(JSON.stringify(data))
+      this.callbacks[data.UUID][data.callbackName](data.data)
     }
 
     this.myWorker.onerror = (error) => {
       console.log('myWorker', error);
     };
+
+    this.myWorker.postMessage({databaseName})
 	}
-  addTrigger(table: any, data: any): (returnObject: IReturnObject) => void {
-    throw new Error("Method not implemented.");
-  }
-  RemoveTrigger(table: any, data: any): (returnObject: IReturnObject) => void {
-    throw new Error("Method not implemented.");
-  }
-  updateMany(table: any, data: IQuery): (returnObject: IReturnObject) => void {
-    throw new Error("Method not implemented.");
-  }
-  insertMany(table: any, data: any): (returnObject: IReturnObject) => void {
-    throw new Error("Method not implemented.");
-  }
-  deleteMany(table: any, data: IQuery): (returnObject: IReturnObject) => void {
-    throw new Error("Method not implemented.");
-  }
-  selectMany(table: any, data: IQuery): (returnObject: IReturnObject) => void {
-    throw new Error("Method not implemented.");
-  }
-  update(table: any, data: IQuery): (returnObject: IReturnObject) => void {
-    throw new Error("Method not implemented.");
-  }
-  delete(table: any, data: any): (returnObject: IReturnObject) => void {
-    throw new Error("Method not implemented.");
+
+  static handler(instance: IndexedDBWorkerStrategy, callbacks:IReturnObject, data: any, methodName) {
+    const UUID =  uniqueGenerator()
+    const originalDone = callbacks.done
+
+    callbacks.done =  (dataFromWorker) => {
+      originalDone(dataFromWorker)
+      delete instance.callbacks[UUID]
+    }
+
+    instance.callbacks[UUID] = callbacks
+    instance.myWorker.postMessage({methodName, data, UUID})
   }
 
-  openDatabase() {
-    const UUID = ''
+  update(data: IData): (returnObject: IReturnObject) => void {
+    return async (callbacks: IReturnTriggerObject) => {
+
+      IndexedDBWorkerStrategy.handler(this, callbacks, data, "update")
+    }
+  }
+  updateMany(data: IData): (returnObject: IReturnObject) => void {
+    return async (callbacks: IReturnTriggerObject) => {
+      IndexedDBWorkerStrategy.handler(this, callbacks, data, "updateMany")
+    }
+  }
+  insert(data: IDataInsert): (returnObject: IReturnObject) => void {
+    return async (callbacks: IReturnTriggerObject) => {
+      IndexedDBWorkerStrategy.handler(this, callbacks, data, "insert")
+    }
+  }
+  insertMany(data: IDataInsert): (returnObject: IReturnObject) => void {
+    return async (callbacks: IReturnTriggerObject) => {
+      IndexedDBWorkerStrategy.handler(this, callbacks, data, "insertMany")
+    }
+  }
+  delete(data: IData): (returnObject: IReturnObject) => void {
+    return async (callbacks: IReturnTriggerObject) => {
+      IndexedDBWorkerStrategy.handler(this, callbacks, data, "delete")
+    }
+  }
+  deleteMany(data: IData): (returnObject: IReturnObject) => void {
+    return async (callbacks: IReturnTriggerObject) => {
+      IndexedDBWorkerStrategy.handler(this, callbacks, data, "deleteMany")
+    }
+  }
+  select(data: IData): (returnObject: IReturnSelectObject) => void {
+    return async (callbacks: IReturnTriggerObject) => {
+      IndexedDBWorkerStrategy.handler(this, callbacks, data, "select")
+    }
+  }
+  selectMany(data: IData): (returnObject: IReturnObject) => void {
+    return async (callbacks: IReturnTriggerObject) => {
+      IndexedDBWorkerStrategy.handler(this, callbacks, data, "selectMany")
+    }
+  }
+  migrate(migrate: IDatabaseSchema): (returnObject: IReturnObject) => void {
+    return async (callbacks: IReturnTriggerObject) => {
+      IndexedDBWorkerStrategy.handler(this, callbacks, migrate, "migrate")
+    }
+  }
+
+  prepare(migrate: IDatabaseSchema): (returnObject: IReturnObject) => void {
     return async (callbacks: IReturnObject) => {
-      const { done } = callbacks
-      callbacks.done = (...arg) => {
-        done(...arg)
-      }
-      this.myWorker.postMessage({method: 'openDatabase', UUID, ...callbacks})
+      IndexedDBWorkerStrategy.handler(this, callbacks, migrate, "prepare")
+    }
+  }
+  RemoveTrigger(data): (returnObject: IReturnObject) => void {
+    return async (callbacks: IReturnTriggerObject) => {
+      IndexedDBWorkerStrategy.handler(this, callbacks, data, "RemoveTrigger")
     }
   }
 
-  insert(table, data) {
-    const UUID = ''
-    return async (callbacks: IReturnObject) => {
-      const { done } = callbacks
-      callbacks.done = (...arg) => {
-        done(...arg)
-      }
-      this.Queue[UUID] = {...callbacks}
-      this.myWorker.postMessage({method: 'openDatabase', UUID, ...callbacks})
-    }
-  }
+  addTrigger(data): (returnObject: IReturnTriggerObject) => void {
+    return async (callbacks: IReturnTriggerObject) => {
 
-  select(table, key) {
-    const UUID = ''
-    return async ( callbacks: IReturnObject) => {
-      const { done } = callbacks
-      callbacks.done = (...arg) => {
-        done(...arg)
-      }
-      this.Queue[UUID] = {...callbacks}
-      this.myWorker.postMessage({method: 'openDatabase', UUID, ...callbacks})
+      IndexedDBWorkerStrategy.handler(this, callbacks, data, "addTrigger")
     }
-  }
-
-  migrate(migrate: IMigrations) {
-    const UUID = ''
-    return async (callbacks: IReturnObject) => {
-      const { done } = callbacks
-      callbacks.done = (...arg) => {
-        done(...arg)
-      }
-      this.Queue[UUID] = {...callbacks}
-      this.myWorker.postMessage({method: 'openDatabase', UUID, ...callbacks})
-    }
-  }
-
-  prepare(migrate: IMigrations) {
-    const UUID = ''
-    return async (callbacks: IReturnObject) => {
-      const { done } = callbacks
-      callbacks.done = (...arg) => {
-        done(...arg)
-      }
-      this.Queue[UUID] = {...callbacks}
-      this.myWorker.postMessage({method: 'openDatabase', UUID, ...callbacks})
-    }
-
   }
 }

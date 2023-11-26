@@ -14,13 +14,9 @@ class QueryBuilderInsertHandler {
     const schema: ITableSchema = model[RM.getTableSchema]()
     const idFieldName = schema.id.keyPath;
 
-    const relationship = (schema.fieldTypes["OneToOneField"] || []).concat(schema.fieldTypes["ForeignKey"] || [])
-    const fieldNames = schema.fieldNames.filter( e => !relationship.find(b => b==e))
-
-    fieldNames.push(idFieldName)
 
     return await new Promise((resolve, reject) => {
-      DatabaseStrategy.insert(tableName, dataToInsert)({
+      DatabaseStrategy.insert({table:tableName, rows:dataToInsert})({
         onsuccess:(data) => {
           const id = data.data;
           const index = data.index
@@ -59,7 +55,7 @@ class QueryBuilderInsertHandler {
     const idFieldName = schema.id.keyPath;
 
     return await new Promise((resolve, reject) => {
-      DatabaseStrategy.insertMany(tableName, dataToInsert)({
+      DatabaseStrategy.insertMany({table:tableName, rows:dataToInsert})({
         onsuccess:(data) => {
           const id = data.data;
           const index = data.index

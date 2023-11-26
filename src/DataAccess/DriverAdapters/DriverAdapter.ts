@@ -1,6 +1,5 @@
-import { IDatabaseStrategy, IMigrations, IReturnObject } from "./DriverAdapter.type.js";
-import { IndexedDBStrategy } from '../DataSource/indexeDB/DriverAdapters/DriverAdapterIndexeDB.js'
-import { IQuery } from "../../BusinessLayer/_interface/Apresentation/queryBuilder.js";
+import { IDatabaseStrategy, IMigrations, IReturnObject, IReturnTriggerObject, ITriggerParam } from "./DriverAdapter.type.js";
+import { IndexedDBStrategy } from '../DataSource/indexeDB/DriverAdapters/DriverAdapterIndexedDB.js'
 
  // Context that uses the strategy pattern
 export class DriverAdapter implements IDatabaseStrategy{
@@ -8,29 +7,30 @@ export class DriverAdapter implements IDatabaseStrategy{
   constructor(strategy) {
     this.strategy = strategy;
   }
-  addTrigger(table: any, data: any): (returnObject: IReturnObject) => void {
+  addTrigger(data: ITriggerParam): (returnObject: IReturnTriggerObject) => void {
     throw new Error("Method not implemented.");
   }
-  RemoveTrigger(table: any, data: any): (returnObject: IReturnObject) => void {
+  RemoveTrigger(data: ITriggerParam): (returnObject: IReturnObject) => void {
     throw new Error("Method not implemented.");
   }
-  insertMany(table: any, data: any): (returnObject: IReturnObject) => void {
-    return this.strategy.insertMany(table, data)
+
+  insertMany(data): (returnObject: IReturnObject) => void {
+    return this.strategy.insertMany(data)
   }
-  deleteMany(table: any, data: IQuery): (returnObject: IReturnObject) => void {
-    return this.strategy.deleteMany(table, data)
+  deleteMany(data): (returnObject: IReturnObject) => void {
+    return this.strategy.deleteMany(data)
   }
-  selectMany(table: any, data: IQuery): (returnObject: IReturnObject) => void {
-    return this.strategy.selectMany(table, data)
+  selectMany(data): (returnObject: IReturnObject) => void {
+    return this.strategy.selectMany(data)
   }
-  updateMany(table: any, data: IQuery): (returnObject: IReturnObject) => void {
-    return this.strategy.updateMany(table, data)
+  updateMany(data): (returnObject: IReturnObject) => void {
+    return this.strategy.updateMany(data)
   }
-  update(table: any, data: IQuery): (returnObject: IReturnObject) => void {
-    return this.strategy.update(table, data)
+  update(data): (returnObject: IReturnObject) => void {
+    return this.strategy.update(data)
   }
-  delete(table: any, data: IQuery): (returnObject: IReturnObject) => void {
-    return this.strategy.delete(table, data)
+  delete(data): (returnObject: IReturnObject) => void {
+    return this.strategy.delete(data)
   }
   prepare(migrate: IMigrations) {
     return this.strategy.prepare(migrate)
@@ -39,16 +39,24 @@ export class DriverAdapter implements IDatabaseStrategy{
     return this.strategy.migrate(migration)
   }
 
-  insert(table, data) {
-    return this.strategy.insert(table, data);
+  insert(data) {
+    return this.strategy.insert(data);
   }
 
-  select(table, data) {
-    return this.strategy.select(table, data);
+  select(data) {
+    return this.strategy.select(data);
   }
 }
 
-export function AdapterFactory (databaseName: string) {
 
-  return new IndexedDBStrategy(databaseName)
+
+
+let Strategy = IndexedDBStrategy
+
+export function setStrategy(strategy:any) {
+  Strategy = strategy as any
+}
+
+export function AdapterFactory (databaseName: string) {
+  return new Strategy(databaseName)
 }

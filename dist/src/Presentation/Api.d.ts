@@ -1,9 +1,9 @@
 import { IModel } from "./Api.type.js";
 import { ICallBackReactiveList, ITableSchema } from "../BusinessLayer/_interface/interface.type.js";
-import { APIResponse } from "../Utility/Either/APIResponse.js";
 import { FormValidationError } from "../BusinessLayer/validation/fields/allFields.type.js";
 import { BulkDataUniqueFieldError, ItemNotFound } from "../BusinessLayer/queryBuilderHandler/queryErrorHandler.js";
 import { TransactionAbortion } from "../DataAccess/_interface/interface.type.js";
+import { APIResponse } from "../Utility/Either/APIresponse.js";
 /**
  * Represents a model for database operations.
  */
@@ -43,5 +43,9 @@ export declare class Model<Model> implements IModel<Model> {
     static getOrCreate<T>(params: any): Promise<APIResponse<{
         created: T;
         found: T;
+    }, FormValidationError | BulkDataUniqueFieldError | TransactionAbortion>>;
+    static updateOrCreate<T>(params: any): Promise<APIResponse<{
+        updated: T;
+        created: T;
     }, FormValidationError | BulkDataUniqueFieldError | TransactionAbortion>>;
 }

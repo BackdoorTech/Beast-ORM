@@ -4,7 +4,7 @@ class QueryBuilderDeleteHandler {
         const tableName = QueryBuilder.query.table;
         let deleteCount = 0;
         return await new Promise((resolve, reject) => {
-            DatabaseStrategy.delete(tableName, QueryBuilder.query)({
+            DatabaseStrategy.delete({ table: tableName, query: QueryBuilder.query })({
                 onsuccess: () => {
                     deleteCount++;
                 },
@@ -21,7 +21,7 @@ class QueryBuilderDeleteHandler {
         const tableName = QueryBuilder.query.table;
         let deleteCount = 0;
         return await new Promise((resolve, reject) => {
-            DatabaseStrategy.deleteMany(tableName, QueryBuilder.query)({
+            DatabaseStrategy.deleteMany({ table: tableName, query: QueryBuilder.query })({
                 onsuccess: () => {
                     deleteCount++;
                 },

@@ -5,7 +5,7 @@ class QueryBuilderSelectHandler {
         const tableName = QueryBuilder.query.table;
         const model = QueryBuilder.model;
         return await new Promise((resolve, reject) => {
-            DatabaseStrategy.select(tableName, QueryBuilder.query)({
+            DatabaseStrategy.select({ table: tableName, query: QueryBuilder.query })({
                 onsuccess: (data) => { },
                 onerror: () => {
                     resolve(error(false));
@@ -26,7 +26,7 @@ class QueryBuilderSelectHandler {
         const model = QueryBuilder.model;
         const result = [];
         return await new Promise((resolve, reject) => {
-            DatabaseStrategy.selectMany(tableName, QueryBuilder.query)({
+            DatabaseStrategy.selectMany({ table: tableName, query: QueryBuilder.query })({
                 onsuccess: (data) => {
                     const modelInstances = data.map(e => Object.assign(new model(), e));
                     for (const modelInstance of modelInstances) {

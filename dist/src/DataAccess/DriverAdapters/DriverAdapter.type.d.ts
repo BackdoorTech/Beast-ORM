@@ -1,38 +1,64 @@
 import { IQuery } from "../../BusinessLayer/_interface/Apresentation/queryBuilder.js";
 import { IDatabaseSchema } from '../../BusinessLayer/_interface/interface.type.js';
 export interface IReturnObject {
-    onsuccess?: Function;
-    onerror?: Function;
-    done?: Function;
+    onsuccess: Function;
+    onerror: Function;
+    done: Function;
 }
 export interface IReturnSelectObject {
-    onsuccess?: Function;
-    onerror?: Function;
+    onsuccess: Function;
+    onerror: Function;
     notFound?: Function;
-    done?: Function;
+    done: Function;
 }
 export interface IReturnTriggerObject {
-    onsuccess?: Function;
+    onsuccess: Function;
     stream: Function;
-    onerror?: Function;
-    done?: Function;
+    onerror: Function;
+    done: Function;
 }
 type returnFunction = (returnObject: IReturnObject) => void;
 type returnSelectFunction = (returnObject: IReturnSelectObject) => void;
 type returnStreamTriggerFunction = (returnObject: IReturnTriggerObject) => void;
+export interface IData {
+    table: string;
+    query: IQuery;
+}
+export interface ITriggerParam {
+    table: string;
+    data: string;
+}
+export interface IDataInsert {
+    table: string;
+    rows: any[];
+}
 export interface IDatabaseStrategy {
     migrate(migrate: IMigrations): returnFunction;
-    update(table: any, data: IQuery): returnFunction;
-    updateMany(table: any, data: IQuery): returnFunction;
-    insert(table: any, data: any): returnFunction;
-    insertMany(table: any, data: any): returnFunction;
-    delete(table: any, data: IQuery): returnFunction;
-    deleteMany(table: any, data: IQuery): returnFunction;
-    select(table: any, data: IQuery): returnSelectFunction;
-    selectMany(table: any, data: IQuery): returnFunction;
+    update(data: IData): returnFunction;
+    updateMany(data: IData): returnFunction;
+    insert(data: IDataInsert): returnFunction;
+    insertMany(data: IDataInsert): returnFunction;
+    delete(data: IData): returnFunction;
+    deleteMany(data: IData): returnFunction;
+    select(data: IData): returnSelectFunction;
+    selectMany(data: IData): returnFunction;
     prepare(migrate: IMigrations): returnFunction;
-    addTrigger(table: any, data: any): returnStreamTriggerFunction;
-    RemoveTrigger(table: any, data: any): returnFunction;
+    addTrigger(data: ITriggerParam): returnStreamTriggerFunction;
+    RemoveTrigger(data: ITriggerParam): returnFunction;
 }
 export type IMigrations = IDatabaseSchema;
+export declare enum IDatabaseStrategyMethods {
+    migrate = "migrate",
+    update = "update",
+    updateMany = "updateMany",
+    insert = "insert",
+    insertMany = "insertMany",
+    DeleteOperation = "DeleteOperation",
+    deleteMany = "deleteMany",
+    select = "select",
+    selectMany = "selectMany",
+    prepare = "prepare",
+    addTrigger = "addTrigger",
+    RemoveTrigger = "RemoveTrigger"
+}
 export {};

@@ -1,91 +1,88 @@
+import { uniqueGenerator } from "../../../../Utility/utils.js";
 // IndexedDB strategy
 export class IndexedDBWorkerStrategy {
-    constructor() {
+    constructor(databaseName) {
+        this.callbacks = {};
+        this.databaseName = databaseName;
         this.myWorker = new Worker(new URL('./worker/worker.js', import.meta.url), { type: "module" });
         this.myWorker.onmessage = (oEvent) => {
             const data = oEvent.data;
-            this.Queue[data.UUID][data.method](data.data);
+            console.log(JSON.stringify(data));
+            this.callbacks[data.UUID][data.callbackName](data.data);
         };
         this.myWorker.onerror = (error) => {
             console.log('myWorker', error);
         };
+        this.myWorker.postMessage({ databaseName });
     }
-    addTrigger(table, data) {
-        throw new Error("Method not implemented.");
+    static handler(instance, callbacks, data, methodName) {
+        const UUID = uniqueGenerator();
+        const originalDone = callbacks.done;
+        callbacks.done = (dataFromWorker) => {
+            originalDone(dataFromWorker);
+            delete instance.callbacks[UUID];
+        };
+        instance.callbacks[UUID] = callbacks;
+        instance.myWorker.postMessage({ methodName, data, UUID });
     }
-    RemoveTrigger(table, data) {
-        throw new Error("Method not implemented.");
-    }
-    updateMany(table, data) {
-        throw new Error("Method not implemented.");
-    }
-    insertMany(table, data) {
-        throw new Error("Method not implemented.");
-    }
-    deleteMany(table, data) {
-        throw new Error("Method not implemented.");
-    }
-    selectMany(table, data) {
-        throw new Error("Method not implemented.");
-    }
-    update(table, data) {
-        throw new Error("Method not implemented.");
-    }
-    delete(table, data) {
-        throw new Error("Method not implemented.");
-    }
-    openDatabase() {
-        const UUID = '';
+    update(data) {
         return async (callbacks) => {
-            const { done } = callbacks;
-            callbacks.done = (...arg) => {
-                done(...arg);
-            };
-            this.myWorker.postMessage(Object.assign({ method: 'openDatabase', UUID }, callbacks));
+            IndexedDBWorkerStrategy.handler(this, callbacks, data, "update");
         };
     }
-    insert(table, data) {
-        const UUID = '';
+    updateMany(data) {
         return async (callbacks) => {
-            const { done } = callbacks;
-            callbacks.done = (...arg) => {
-                done(...arg);
-            };
-            this.Queue[UUID] = Object.assign({}, callbacks);
-            this.myWorker.postMessage(Object.assign({ method: 'openDatabase', UUID }, callbacks));
+            IndexedDBWorkerStrategy.handler(this, callbacks, data, "updateMany");
         };
     }
-    select(table, key) {
-        const UUID = '';
+    insert(data) {
         return async (callbacks) => {
-            const { done } = callbacks;
-            callbacks.done = (...arg) => {
-                done(...arg);
-            };
-            this.Queue[UUID] = Object.assign({}, callbacks);
-            this.myWorker.postMessage(Object.assign({ method: 'openDatabase', UUID }, callbacks));
+            IndexedDBWorkerStrategy.handler(this, callbacks, data, "insert");
+        };
+    }
+    insertMany(data) {
+        return async (callbacks) => {
+            IndexedDBWorkerStrategy.handler(this, callbacks, data, "insertMany");
+        };
+    }
+    delete(data) {
+        return async (callbacks) => {
+            IndexedDBWorkerStrategy.handler(this, callbacks, data, "delete");
+        };
+    }
+    deleteMany(data) {
+        return async (callbacks) => {
+            IndexedDBWorkerStrategy.handler(this, callbacks, data, "deleteMany");
+        };
+    }
+    select(data) {
+        return async (callbacks) => {
+            IndexedDBWorkerStrategy.handler(this, callbacks, data, "select");
+        };
+    }
+    selectMany(data) {
+        return async (callbacks) => {
+            IndexedDBWorkerStrategy.handler(this, callbacks, data, "selectMany");
         };
     }
     migrate(migrate) {
-        const UUID = '';
         return async (callbacks) => {
-            const { done } = callbacks;
-            callbacks.done = (...arg) => {
-                done(...arg);
-            };
-            this.Queue[UUID] = Object.assign({}, callbacks);
-            this.myWorker.postMessage(Object.assign({ method: 'openDatabase', UUID }, callbacks));
+            IndexedDBWorkerStrategy.handler(this, callbacks, migrate, "migrate");
         };
     }
     prepare(migrate) {
-        const UUID = '';
         return async (callbacks) => {
-            const { done } = callbacks;
-            callbacks.done = (...arg) => {
-                done(...arg);
-            };
-            this.Queue[UUID] = Object.assign({}, callbacks);
-            this.myWorker.postMessage(Object.assign({ method: 'openDatabase', UUID }, callbacks));
+            IndexedDBWorkerStrategy.handler(this, callbacks, migrate, "prepare");
+        };
+    }
+    RemoveTrigger(data) {
+        return async (callbacks) => {
+            IndexedDBWorkerStrategy.handler(this, callbacks, data, "RemoveTrigger");
+        };
+    }
+    addTrigger(data) {
+        return async (callbacks) => {
+            IndexedDBWorkerStrategy.handler(this, callbacks, data, "addTrigger");
         };
     }
 }

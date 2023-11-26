@@ -1,42 +1,42 @@
-import { IReturnObject } from "../../../../DriverAdapters/DriverAdapter.type";
-import { IndexedDBStrategy } from "../DriverAdapterIndexeDB";
+import { IndexedDBStrategy } from "../DriverAdapterIndexedDB.js";
 
-// const Strategy = new IndexedDBStrategy()
-type returnFunction = (returnObject: IReturnObject) => void
+let Strategy: IndexedDBStrategy
+
+function sendMessage(data) {
+  postMessage(data)
+}
+
+function generateCallbacks(UUID) {
+  return  {
+    onsuccess:(data) => { sendMessage({callbackName: 'onsuccess',UUID, data})  } ,
+    onerror:(data) => { sendMessage({callbackName: 'onerror',UUID, data}) } ,
+    notFound:(data) => { sendMessage ({callbackName: 'notFound',UUID, data})},
+    done:(data) => { sendMessage ({callbackName: 'done',UUID, data}) } ,
+    stream:(data) => { sendMessage ({callbackName: 'stream',UUID, data}) }
+  }
+}
+
+let onmessageHandler = (oEvent) => {}
+
+function onmessageHandlerFirstMessage(oEvent) {
+
+  const { databaseName } = oEvent.data
+
+  Strategy = new IndexedDBStrategy(databaseName)
+
+  onmessageHandler = mainOnmessageHandler
+}
+
+function mainOnmessageHandler(oEvent) {
+  const { UUID, methodName, data } = oEvent.data
+  const callbacks = generateCallbacks(UUID)
+
+  console.log({methodName, data})
+  Strategy[methodName](data)(callbacks)
+}
+
+onmessageHandler = onmessageHandlerFirstMessage
 
 onmessage = async (oEvent) => {
-
-  // const { UUID, method, data, action, arg } = oEvent.data
-
-  // let params: any = ["table", {}]
-  // const fun: Function = Strategy[method]
-
-  // const onsuccess = (data) => {
-  //   postMessage({
-  //     UUID,
-  //     method: 'onsuccess',
-  //     data,
-  //   })
-  // }
-  // const onerror = () => {
-  //   postMessage({
-  //     UUID,
-  //     method: 'onerror',
-  //     data,
-  //   })
-  // }
-  // const done = () => {
-  //   postMessage({
-  //     UUID,
-  //     method: 'done',
-  //     data,
-  //   })
-  // }
-
-  // fun(...params  as any)(
-  //   onsuccess,
-  //   onerror,
-  //   done
-  // )
-
+  onmessageHandler(oEvent)
 };

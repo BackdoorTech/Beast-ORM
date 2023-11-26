@@ -3,7 +3,7 @@ class QueryBuilderUpdateHandler {
     async UPDATEOne(DatabaseStrategy, QueryBuilder) {
         const tableName = QueryBuilder.query.table;
         return await new Promise((resolve, reject) => {
-            DatabaseStrategy.update(tableName, QueryBuilder.query)({
+            DatabaseStrategy.update({ table: tableName, query: QueryBuilder.query })({
                 onsuccess: (data) => {
                 },
                 onerror: () => {
@@ -18,7 +18,7 @@ class QueryBuilderUpdateHandler {
     async UPDATEMany(DatabaseStrategy, QueryBuilder) {
         const tableName = QueryBuilder.query.table;
         return await new Promise((resolve, reject) => {
-            DatabaseStrategy.updateMany(tableName, QueryBuilder.query)({
+            DatabaseStrategy.updateMany({ table: tableName, query: QueryBuilder.query })({
                 onsuccess: (data) => {
                 },
                 onerror: () => {

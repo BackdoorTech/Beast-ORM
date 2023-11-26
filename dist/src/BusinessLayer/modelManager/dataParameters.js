@@ -30,7 +30,6 @@ export class DataParameters {
                 filteredData[fieldName] = KeyValue;
             }
         }
-        delete filteredData[tableSchema.id.keyPath];
         return filteredData;
     }
     getUniqueData(tableSchema, data) {
@@ -82,5 +81,6 @@ export class DataParameters {
         }
         return filteredData;
     }
+    setDataToInstance() { }
 }
 export const dataParameters = new DataParameters();

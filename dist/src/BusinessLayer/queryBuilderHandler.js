@@ -9,7 +9,7 @@ class QueryBuilderHandler {
         const schema = model[RM.getTableSchema]();
         const idFieldName = schema.id.keyPath;
         return await new Promise((resolve, reject) => {
-            DatabaseStrategy.insert(tableName, dataToInsert)({
+            DatabaseStrategy.insert({ table: tableName, rows: dataToInsert })({
                 onsuccess: (data) => {
                     const id = data.data;
                     const index = data.index;
@@ -33,7 +33,7 @@ class QueryBuilderHandler {
         const tableName = QueryBuilder.query.table;
         let result = [];
         return await new Promise((resolve, reject) => {
-            DatabaseStrategy.select(tableName, QueryBuilder.query)({
+            DatabaseStrategy.select({ table: tableName, query: QueryBuilder.query })({
                 onsuccess: (data) => {
                     if (Array.isArray(data.data)) {
                         result = data.data; // get all with no condition `Model.all()`
@@ -58,7 +58,7 @@ class QueryBuilderHandler {
     async UPDATE(DatabaseStrategy, QueryBuilder) {
         const tableName = QueryBuilder.query.table;
         return await new Promise((resolve, reject) => {
-            DatabaseStrategy.update(tableName, QueryBuilder.query)({
+            DatabaseStrategy.update({ table: tableName, query: QueryBuilder.query })({
                 onsuccess: (data) => {
                 },
                 onerror: () => {
@@ -78,7 +78,7 @@ class QueryBuilderHandler {
         const tableName = QueryBuilder.query.table;
         let deleteCount = 0;
         return await new Promise((resolve, reject) => {
-            DatabaseStrategy.delete(tableName, QueryBuilder.query)({
+            DatabaseStrategy.delete({ table: tableName, query: QueryBuilder.query })({
                 onsuccess: () => {
                     deleteCount++;
                 },

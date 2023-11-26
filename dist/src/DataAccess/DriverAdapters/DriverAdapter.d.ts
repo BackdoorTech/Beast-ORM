@@ -1,20 +1,20 @@
-import { IDatabaseStrategy, IMigrations, IReturnObject } from "./DriverAdapter.type.js";
-import { IndexedDBStrategy } from '../DataSource/indexeDB/DriverAdapters/DriverAdapterIndexeDB.js';
-import { IQuery } from "../../BusinessLayer/_interface/Apresentation/queryBuilder.js";
+import { IDatabaseStrategy, IMigrations, IReturnObject, IReturnTriggerObject, ITriggerParam } from "./DriverAdapter.type.js";
+import { IndexedDBStrategy } from '../DataSource/indexeDB/DriverAdapters/DriverAdapterIndexedDB.js';
 export declare class DriverAdapter implements IDatabaseStrategy {
     strategy: IDatabaseStrategy;
     constructor(strategy: any);
-    addTrigger(table: any, data: any): (returnObject: IReturnObject) => void;
-    RemoveTrigger(table: any, data: any): (returnObject: IReturnObject) => void;
-    insertMany(table: any, data: any): (returnObject: IReturnObject) => void;
-    deleteMany(table: any, data: IQuery): (returnObject: IReturnObject) => void;
-    selectMany(table: any, data: IQuery): (returnObject: IReturnObject) => void;
-    updateMany(table: any, data: IQuery): (returnObject: IReturnObject) => void;
-    update(table: any, data: IQuery): (returnObject: IReturnObject) => void;
-    delete(table: any, data: IQuery): (returnObject: IReturnObject) => void;
+    addTrigger(data: ITriggerParam): (returnObject: IReturnTriggerObject) => void;
+    RemoveTrigger(data: ITriggerParam): (returnObject: IReturnObject) => void;
+    insertMany(data: any): (returnObject: IReturnObject) => void;
+    deleteMany(data: any): (returnObject: IReturnObject) => void;
+    selectMany(data: any): (returnObject: IReturnObject) => void;
+    updateMany(data: any): (returnObject: IReturnObject) => void;
+    update(data: any): (returnObject: IReturnObject) => void;
+    delete(data: any): (returnObject: IReturnObject) => void;
     prepare(migrate: IMigrations): (returnObject: IReturnObject) => void;
     migrate(migration: IMigrations): (returnObject: IReturnObject) => void;
-    insert(table: any, data: any): (returnObject: IReturnObject) => void;
-    select(table: any, data: any): (returnObject: import("./DriverAdapter.type.js").IReturnSelectObject) => void;
+    insert(data: any): (returnObject: IReturnObject) => void;
+    select(data: any): (returnObject: import("./DriverAdapter.type.js").IReturnSelectObject) => void;
 }
+export declare function setStrategy(strategy: any): void;
 export declare function AdapterFactory(databaseName: string): IndexedDBStrategy;

@@ -2,7 +2,6 @@ import { schemaGenerator } from './modelManager/schemaGenerator/schemaGenerator.
 import { IRegister } from './beastOrm.type.js'
 import { modelRegistration } from './modelManager/register/register.js';
 import { MakeMigrations } from '../DataAccess/SchemaMigrations/MakeMigration.js';
-import { migrateMigrations } from '../DataAccess/SchemaMigrations/MigrateMigrations.js';
 import { IDatabaseStrategy } from '../DataAccess/DriverAdapters/DriverAdapter.type.js';
 import { DBEventsTrigger, ICallBackReactiveList, IDatabaseSchema, ITableSchema } from './_interface/interface.type.js';
 import { QueryBuilder } from '../Presentation/queryBuilder/queryBuilder.js'
@@ -60,7 +59,12 @@ class BeastORM {
 
     }
 
-    DatabaseStrategy.prepare(schema)({done: () => {}})
+    DatabaseStrategy.prepare(schema)({
+      onerror:()=>{},
+      onsuccess:()=>{},
+      done: () => {}
+    })
+
     this.prepareMigrations(schema, DatabaseStrategy)
   }
 
@@ -72,8 +76,8 @@ class BeastORM {
 
     if(makeMigrations.needToMigrate) {
       // console.log("Migrate")
-      await migrateMigrations.prepareMigrate(schema, DatabaseStrategy)
-      await migrateMigrations.migrate(schema, DatabaseStrategy)
+      // await migrateMigrations.prepareMigrate(schema, DatabaseStrategy)
+      // await migrateMigrations.migrate(schema, DatabaseStrategy)
     } else {
       // console.log('no need to migrate')
     }
@@ -111,12 +115,30 @@ class BeastORM {
     QueryBuilder.setCleanData(arrayOfData)
 
     if(QueryBuilder.query.isParamsArray) {
-      
+
       return await queryBuilderInsertHandler.INSERTMany(DatabaseStrategy, QueryBuilder, arrayOfDataBackup)
     } else {
       return await  queryBuilderInsertHandler.INSERTOne(DatabaseStrategy, QueryBuilder, arrayOfDataBackup)
     }
-    
+
+  }
+
+
+
+  async executeInsertionManyQuery<PModel>(QueryBuilder: QueryBuilder, Model:Object):Promise<Either<PModel, FormValidationError | TransactionAbortion>>   {
+    const tableSchema: ITableSchema = Model[RM.getTableSchema]()
+    const databaseName = tableSchema.databaseName
+
+    const database = modelRegistration.getDatabase(databaseName)
+
+    const DatabaseStrategy = database
+      .DBConnectionManager
+      .driverAdapter
+      .strategy
+
+    const arrayOfData = QueryBuilder.query.values
+
+    return await queryBuilderInsertHandler.INSERTMany(DatabaseStrategy, QueryBuilder, arrayOfData)
   }
 
   executeSelectQuery<PModel>(QueryBuilder: QueryBuilder, Model: Object)   {
@@ -130,7 +152,7 @@ class BeastORM {
       .driverAdapter
       .strategy
 
-  
+
     return {
       one: () => {
         return queryBuilderSelectHandler.SELECTOne<PModel>(DatabaseStrategy, QueryBuilder)
@@ -147,7 +169,7 @@ class BeastORM {
       }
     }
   }
-  
+
 
 
   async executeUpdateQuery<PModel>(QueryBuilder: QueryBuilder, Model:PModel):Promise<Either<number, FormValidationError>>   {
@@ -231,7 +253,7 @@ class BeastORM {
     .strategy
 
     const triggerRemove = () => {
-      DatabaseStrategy.RemoveTrigger(tableName, subscriptionIdFromDataLayer)({
+      DatabaseStrategy.RemoveTrigger({table:tableName, data:subscriptionIdFromDataLayer})({
         onsuccess:({subscriptionId}) => {},
         onerror: () => {},
         done: () => {}
@@ -243,7 +265,7 @@ class BeastORM {
 
       table.trigger.registerTrigger(triggerEventName)
 
-      DatabaseStrategy.addTrigger(tableName, {})({
+      DatabaseStrategy.addTrigger({table:tableName, data:""})({
         onsuccess:({subscriptionId}) => {
           subscriptionIdFromDataLayer = subscriptionId
           table.trigger.createShareSubscription(triggerEventName, subscriptionId)

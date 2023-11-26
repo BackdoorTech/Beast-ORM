@@ -1,5 +1,5 @@
-import { IndexedDBStrategy } from "../DriverAdapterIndexedDB.js";
-let Strategy;
+import { IndexedDBStrategy } from "./DriverAdapterIndexedDB.js";
+const Strategy = new IndexedDBStrategy("databasename");
 function sendMessage(data) {
     postMessage(data);
 }
@@ -14,14 +14,13 @@ function generateCallbacks(UUID) {
 }
 let onmessageHandler = (oEvent) => { };
 function onmessageHandlerFirstMessage(oEvent) {
-    const { databaseName } = oEvent.data;
-    Strategy = new IndexedDBStrategy(databaseName);
+    const { UUID, methodName, data } = oEvent.data;
+    console.log("fist");
     onmessageHandler = mainOnmessageHandler;
 }
 function mainOnmessageHandler(oEvent) {
     const { UUID, methodName, data } = oEvent.data;
     const callbacks = generateCallbacks(UUID);
-    console.log({ methodName, data });
     Strategy[methodName](data)(callbacks);
 }
 onmessageHandler = onmessageHandlerFirstMessage;

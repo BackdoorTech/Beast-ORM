@@ -1,21 +1,32 @@
-import { databaseManager } from "../indexeDB/DatabaseManager.js";
-import { CreateQueryReaderSelect } from "../../../QueryReader/queryReader.js";
-import { SqlObject } from "../../../filter/sqlObject/sqlObject.js";
-import { ClearAllOperation, DeleteOperation, GetAllOperation, UpdateOperation, InsertOperation } from "../indexeDB/DatabaseOperations.js";
+import { databaseManager } from "../../indexeDB/DatabaseManager.js";
+import { CreateQueryReaderSelect } from "../../../../QueryReader/queryReader.js";
+import { SqlObject } from "../../../../filter/sqlObject/sqlObject.js";
+import { ClearAllOperation, DeleteOperation, GetAllOperation, UpdateOperation, InsertOperation } from "../../indexeDB/DatabaseOperations.js";
+import { uniqueGenerator } from "../../../../../Utility/utils.js";
 // IndexedDB strategy
-const emptyCallBacks = {
-    onsuccess: () => { },
-    onerror: () => { },
-    done: () => { }
-};
-export class IndexedDBStrategy {
+export class IndexedDBWorkerStrategy {
     constructor(databaseName) {
+        this.callbacks = {};
+        this.myWorker = new Worker(new URL("../worker.js", import.meta.url)); //NEW SYNTAX
         this.databaseName = databaseName;
+        this.myWorker = new Worker(new URL('./worker.js', import.meta.url), { type: "module" });
+        this.myWorker.onmessage = (oEvent) => {
+            const data = oEvent.data;
+            // this.onmessage(data);
+        };
+        this.myWorker.onerror = (error) => {
+            console.log('myWorker', error);
+        };
+        this.myWorker.postMessage({ databaseName });
     }
     addTrigger(table, data) {
         return async (callbacks) => {
-            const database = await databaseManager.getDb(this.databaseName);
-            database.registerTrigger(table, data, callbacks);
+            const UUID = uniqueGenerator();
+            callbacks.done = (dataFromWorker) => {
+                callbacks.done(dataFromWorker);
+                delete this.callbacks[UUID];
+            };
+            this.myWorker.postMessage({ methodName: "addTrigger", data, UUID });
         };
     }
     RemoveTrigger(table, subscriptionId) {

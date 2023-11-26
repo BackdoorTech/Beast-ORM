@@ -1,7 +1,6 @@
 import { schemaGenerator } from './modelManager/schemaGenerator/schemaGenerator.js';
 import { modelRegistration } from './modelManager/register/register.js';
 import { MakeMigrations } from '../DataAccess/SchemaMigrations/MakeMigration.js';
-import { migrateMigrations } from '../DataAccess/SchemaMigrations/MigrateMigrations.js';
 import { DBEventsTrigger } from './_interface/interface.type.js';
 import { validator } from './validation/validator.js';
 import { dataParameters } from "./modelManager/dataParameters.js";
@@ -37,7 +36,11 @@ class BeastORM {
                 const generateValidator = validator.ModelValidator(model, model[RM.getTableSchema]());
                 addRunTimeMethod.addStaticFunctionFWrap(model, RM.validator, generateValidator);
             }
-            DatabaseStrategy.prepare(schema)({ done: () => { } });
+            DatabaseStrategy.prepare(schema)({
+                onerror: () => { },
+                onsuccess: () => { },
+                done: () => { }
+            });
             this.prepareMigrations(schema, DatabaseStrategy);
         };
     }
@@ -48,8 +51,8 @@ class BeastORM {
         // console.log("===================================6")
         if (makeMigrations.needToMigrate) {
             // console.log("Migrate")
-            await migrateMigrations.prepareMigrate(schema, DatabaseStrategy);
-            await migrateMigrations.migrate(schema, DatabaseStrategy);
+            // await migrateMigrations.prepareMigrate(schema, DatabaseStrategy)
+            // await migrateMigrations.migrate(schema, DatabaseStrategy)
         }
         else {
             // console.log('no need to migrate')
@@ -81,6 +84,17 @@ class BeastORM {
         else {
             return await queryBuilderInsertHandler.INSERTOne(DatabaseStrategy, QueryBuilder, arrayOfDataBackup);
         }
+    }
+    async executeInsertionManyQuery(QueryBuilder, Model) {
+        const tableSchema = Model[RM.getTableSchema]();
+        const databaseName = tableSchema.databaseName;
+        const database = modelRegistration.getDatabase(databaseName);
+        const DatabaseStrategy = database
+            .DBConnectionManager
+            .driverAdapter
+            .strategy;
+        const arrayOfData = QueryBuilder.query.values;
+        return await queryBuilderInsertHandler.INSERTMany(DatabaseStrategy, QueryBuilder, arrayOfData);
     }
     executeSelectQuery(QueryBuilder, Model) {
         const tableSchema = Model[RM.getTableSchema]();
@@ -169,7 +183,7 @@ class BeastORM {
             .driverAdapter
             .strategy;
         const triggerRemove = () => {
-            DatabaseStrategy.RemoveTrigger(tableName, subscriptionIdFromDataLayer)({
+            DatabaseStrategy.RemoveTrigger({ table: tableName, data: subscriptionIdFromDataLayer })({
                 onsuccess: ({ subscriptionId }) => { },
                 onerror: () => { },
                 done: () => { }
@@ -178,7 +192,7 @@ class BeastORM {
         let returnObject = table.trigger.listeningToSubscription(triggerEventName, callBack, triggerRemove);
         if (!hasSubscription) {
             table.trigger.registerTrigger(triggerEventName);
-            DatabaseStrategy.addTrigger(tableName, {})({
+            DatabaseStrategy.addTrigger({ table: tableName, data: "" })({
                 onsuccess: ({ subscriptionId }) => {
                     subscriptionIdFromDataLayer = subscriptionId;
                     table.trigger.createShareSubscription(triggerEventName, subscriptionId);
