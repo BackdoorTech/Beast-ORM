@@ -1,323 +1,323 @@
 // @ts-nocheck
-import { Model as IModel } from '../../../Presentation/Api.js';
-import { Model} from '../../../Presentation/Api.js';
+import { Model as IModel, $B as  $BTYPE, KeyValueModel } from '../../../Presentation/Api.js';
 
- describe('API', () => {
-    it('passes', () => {
 
-      cy.visit('./index.html')
-      cy.window().should("have.property", "models");
+describe('API', () => {
+  it('passes', () => {
 
-      cy.window().then((wind ) => {
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
 
-        const Model: typeof IModel = wind.models.Model
+    cy.window().then((wind ) => {
 
-        class Mode1 extends Model<Mode1> {
-          username = wind.models.CharField({});
-        }
+      const Model: typeof IModel = wind.models.Model
 
-        wind.models.register({
-          databaseName: "jest-1",
-          type: "localStorage",
-          version: 1,
-          models: [Mode1],
-        });
+      class Mode1 extends Model<Mode1> {
+        username = wind.models.CharField({});
+      }
+
+      wind.models.register({
+        databaseName: "jest-1",
+        type: "localStorage",
+        version: 1,
+        models: [Mode1],
+      });
+    });
+
+
+    cy.get("h1").should('have.text',"Example")
+
+
+    expect(0).to.equal(0) // test fails
+  })
+
+  it('passes insert', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+      const Model: typeof IModel = wind.models.Model
+
+      class Person extends Model<Person> {
+        username = wind.models.CharField({});
+      }
+
+      wind.models.register({
+        databaseName: "jest-2",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
+      });
+
+      await Person.deleteAll()
+
+      const [createdPerson] = await Person.create<Person>({username: 'Peter'})
+
+      expect(Object.assign({},createdPerson)).to.deep.equal({username: 'Peter', id: createdPerson.id}) // test fails
+
+    });
+
+  })
+
+
+  it('passes insert and delete', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+
+      const Model: typeof IModel = wind.models.Model
+
+      class Person extends Model<Person> {
+        username = wind.models.CharField({});
+      }
+
+      wind.models.register({
+        databaseName: "jest-3",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
+      });
+
+      await Person.deleteAll()
+
+      const [createdPerson]  = await Person.create({username: 'Peter'})
+
+      const deleteResult = await createdPerson.delete()
+
+      const [all] = await Person.all()
+
+
+      expect(all.length).to.equal(0) // test fails
+    });
+
+
+  })
+
+  it('passes get all and delete', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+
+      const Model: typeof IModel = wind.models.Model
+
+      class Person extends Model<Person> {
+        username = wind.models.CharField({});
+      }
+
+      wind.models.register({
+        databaseName: "jest-4",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
+      });
+
+      await Person.deleteAll()
+
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+
+      const [all] = await Person.all()
+
+      expect(all.length).to.equal(3) // test fails
+    });
+
+  })
+
+  it('passes save changes', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+
+      const Model: typeof IModel = wind.models.Model
+
+      class Person extends Model<Person> {
+        username = wind.models.CharField({});
+      }
+
+      wind.models.register({
+        databaseName: "jest-5",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
+      });
+
+      await Person.deleteAll()
+      let [createdPerson] = await Person.create({username: 'Peter'})
+
+      createdPerson.username = "123"
+      const [result] = await createdPerson.save()
+      const [all] = await Person.all<Person>()
+
+      expect(result).to.equal(1)
+      expect([Object.assign({}, all[0])]).to.deep.equal([{ username: '123', id: all[0].id }]) // test fails
+
+
+    });
+
+  })
+
+
+  it('passes delete all', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+
+      const Model: typeof IModel = wind.models.Model
+
+      class Person extends Model<Person> {
+        username = wind.models.CharField({});
+      }
+
+      wind.models.register({
+        databaseName: "jest-5",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
       });
 
 
-      cy.get("h1").should('have.text',"Example")
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+
+      await Person.deleteAll()
+
+      const [all] = await Person.all()
+
+      expect(0).to.deep.equal(all.length) // test fails
+
+    });
+
+  })
 
 
-      expect(0).to.equal(0) // test fails
-    })
+  it('passes costume id field increment', () => {
 
-    it('passes insert', () => {
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
 
-      cy.visit('./index.html')
-      cy.window().should("have.property", "models");
+    cy.window().then(async (wind ) => {
 
-      cy.window().then(async (wind ) => {
-        const Model: typeof IModel = wind.models.Model
+      const Model: typeof IModel = wind.models.Model
 
-        class Person extends Model<Person> {
-          username = wind.models.CharField({});
-        }
+      class Person extends Model<Person> {
+        userId = wind.models.AutoField({primaryKey:true})
+        username = wind.models.CharField({maxLength: 100})
+        email = wind.models.CharField({blank: true, maxLength: 100})
+        age = wind.models.IntegerField({blank: true})
+      }
 
-        wind.models.register({
-          databaseName: "jest-2",
-          type: "localStorage",
-          version: 1,
-          models: [Person],
-        });
-
-        await Person.deleteAll()
-
-        const [createdPerson] = await Person.create<Person>({username: 'Peter'})
-
-        expect(Object.assign({},createdPerson)).to.deep.equal({username: 'Peter', id: createdPerson.id}) // test fails
-
+      wind.models.register({
+        databaseName: "jest-6",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
       });
 
-    })
+      const a = await Person.deleteAll()
+
+      const [createdPerson] = await Person.create({username:'kobe', email:'kobe.bryant@lakers.com'})
+
+      const [all] = await Person.all()
+
+      expect(Object.assign({}, all[0])).to.deep.equal({username: 'kobe', email: 'kobe.bryant@lakers.com', age: undefined, userId: createdPerson.userId})
+      expect(Object.assign({}, createdPerson)).to.deep.equal({username: 'kobe', email: 'kobe.bryant@lakers.com', age: null, userId: createdPerson.userId})
+
+    });
+
+  })
 
 
-    it('passes insert and delete', () => {
 
-      cy.visit('./index.html')
-      cy.window().should("have.property", "models");
+  it('passes get()', () => {
 
-      cy.window().then(async (wind ) => {
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
 
-        const Model: typeof IModel = wind.models.Model
+    cy.window().then(async (wind ) => {
 
-        class Person extends Model<Person> {
-          username = wind.models.CharField({});
-        }
+      const Model: typeof IModel = wind.models.Model
 
-        wind.models.register({
-          databaseName: "jest-3",
-          type: "localStorage",
-          version: 1,
-          models: [Person],
-        });
+      class Person extends Model<Person> {
+        userId = wind.models.AutoField({primaryKey:true})
+        username = wind.models.CharField({maxLength: 100})
+        email = wind.models.CharField({blank: true, maxLength: 100})
+        age = wind.models.IntegerField({blank: true})
+      }
 
-        await Person.deleteAll()
-
-        const [createdPerson]  = await Person.create({username: 'Peter'})
-
-        const deleteResult = await createdPerson.delete()
-
-        const [all] = await Person.all()
-
-
-        expect(all.length).to.equal(0) // test fails
+      wind.models.register({
+        databaseName: "jest-7",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
       });
 
+      await Person.deleteAll()
 
-    })
+      const [createdPerson] = await Person.create({username:'kobe', email:'kobe.bryant@lakers.com'})
 
-    it('passes get all and delete', () => {
+      const [person] = await Person.get({userId: createdPerson.userId})
 
-      cy.visit('./index.html')
-      cy.window().should("have.property", "models");
+      delete createdPerson.age
+      delete person.age
 
-      cy.window().then(async (wind ) => {
+      expect(person).to.deep.equal(createdPerson)
 
-        const Model: typeof IModel = wind.models.Model
+    });
 
-        class Person extends Model<Person> {
-          username = wind.models.CharField({});
-        }
+  })
 
-        wind.models.register({
-          databaseName: "jest-4",
-          type: "localStorage",
-          version: 1,
-          models: [Person],
-        });
 
-        await Person.deleteAll()
+  it('passes filter.update should update all', () => {
 
-        await Person.create({username: 'Peter'})
-        await Person.create({username: 'Peter'})
-        await Person.create({username: 'Peter'})
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
 
-        const [all] = await Person.all()
+    cy.window().then(async (wind ) => {
 
-        expect(all.length).to.equal(3) // test fails
+      const Model: typeof IModel = wind.models.Model
+
+      class Person extends Model<Person> {
+        username = wind.models.CharField({});
+      }
+
+      wind.models.register({
+        databaseName: "jest-8",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
       });
 
-    })
+      await Person.deleteAll()
 
-    it('passes save changes', () => {
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
+      await Person.create({username: 'Peter'})
 
-      cy.visit('./index.html')
-      cy.window().should("have.property", "models");
+      await Person.filter({username:"Peter"}).update({username:"michael jackson"})
 
-      cy.window().then(async (wind ) => {
+      const [jackson] = await Person.filter({username:"michael jackson"}).execute()
 
-        const Model: typeof IModel = wind.models.Model
+      expect(jackson.length).to.equal(9) // test fails
+    });
 
-        class Person extends Model<Person> {
-          username = wind.models.CharField({});
-        }
-
-        wind.models.register({
-          databaseName: "jest-5",
-          type: "localStorage",
-          version: 1,
-          models: [Person],
-        });
-
-        await Person.deleteAll()
-        let [createdPerson] = await Person.create({username: 'Peter'})
-
-        createdPerson.username = "123"
-        const [result] = await createdPerson.save()
-        const [all] = await Person.all<Person>()
-
-        expect(result).to.equal(1)
-        expect([Object.assign({}, all[0])]).to.deep.equal([{ username: '123', id: all[0].id }]) // test fails
-
-
-      });
-
-    })
-
-
-    it('passes delete all', () => {
-
-      cy.visit('./index.html')
-      cy.window().should("have.property", "models");
-
-      cy.window().then(async (wind ) => {
-
-        const Model: typeof IModel = wind.models.Model
-
-        class Person extends Model<Person> {
-          username = wind.models.CharField({});
-        }
-
-        wind.models.register({
-          databaseName: "jest-5",
-          type: "localStorage",
-          version: 1,
-          models: [Person],
-        });
-
-
-        await Person.create({username: 'Peter'})
-        await Person.create({username: 'Peter'})
-        await Person.create({username: 'Peter'})
-
-        await Person.deleteAll()
-
-        const [all] = await Person.all()
-
-        expect(0).to.deep.equal(all.length) // test fails
-
-      });
-
-    })
-
-
-    it('passes costume id field increment', () => {
-
-      cy.visit('./index.html')
-      cy.window().should("have.property", "models");
-
-      cy.window().then(async (wind ) => {
-
-        const Model: typeof IModel = wind.models.Model
-
-        class Person extends Model<Person> {
-          userId = wind.models.AutoField({primaryKey:true})
-          username = wind.models.CharField({maxLength: 100})
-          email = wind.models.CharField({blank: true, maxLength: 100})
-          age = wind.models.IntegerField({blank: true})
-        }
-
-        wind.models.register({
-          databaseName: "jest-6",
-          type: "localStorage",
-          version: 1,
-          models: [Person],
-        });
-
-        const a = await Person.deleteAll()
-
-        const [createdPerson] = await Person.create({username:'kobe', email:'kobe.bryant@lakers.com'})
-
-        const [all] = await Person.all()
-
-        expect(Object.assign({}, all[0])).to.deep.equal({username: 'kobe', email: 'kobe.bryant@lakers.com', age: undefined, userId: createdPerson.userId})
-        expect(Object.assign({}, createdPerson)).to.deep.equal({username: 'kobe', email: 'kobe.bryant@lakers.com', age: null, userId: createdPerson.userId})
-
-      });
-
-    })
-
-
-
-    it('passes get()', () => {
-
-      cy.visit('./index.html')
-      cy.window().should("have.property", "models");
-
-      cy.window().then(async (wind ) => {
-
-        const Model: typeof IModel = wind.models.Model
-
-        class Person extends Model<Person> {
-          userId = wind.models.AutoField({primaryKey:true})
-          username = wind.models.CharField({maxLength: 100})
-          email = wind.models.CharField({blank: true, maxLength: 100})
-          age = wind.models.IntegerField({blank: true})
-        }
-
-        wind.models.register({
-          databaseName: "jest-7",
-          type: "localStorage",
-          version: 1,
-          models: [Person],
-        });
-
-        await Person.deleteAll()
-
-        const [createdPerson] = await Person.create({username:'kobe', email:'kobe.bryant@lakers.com'})
-
-        const [person] = await Person.get({userId: createdPerson.userId})
-
-        delete createdPerson.age
-        delete person.age
-
-        expect(person).to.deep.equal(createdPerson)
-
-      });
-
-    })
-
-
-    it('passes filter.update should update all', () => {
-
-      cy.visit('./index.html')
-      cy.window().should("have.property", "models");
-
-      cy.window().then(async (wind ) => {
-
-        const Model: typeof IModel = wind.models.Model
-
-        class Person extends Model<Person> {
-          username = wind.models.CharField({});
-        }
-
-        wind.models.register({
-          databaseName: "jest-8",
-          type: "localStorage",
-          version: 1,
-          models: [Person],
-        });
-
-        await Person.deleteAll()
-
-        await Person.create({username: 'Peter'})
-        await Person.create({username: 'Peter'})
-        await Person.create({username: 'Peter'})
-        await Person.create({username: 'Peter'})
-        await Person.create({username: 'Peter'})
-        await Person.create({username: 'Peter'})
-        await Person.create({username: 'Peter'})
-        await Person.create({username: 'Peter'})
-        await Person.create({username: 'Peter'})
-
-        await Person.filter({username:"Peter"}).update({username:"michael jackson"})
-
-        const [jackson] = await Person.filter({username:"michael jackson"}).execute()
-
-        expect(jackson.length).to.equal(9) // test fails
-      });
-
-    })
+  })
 
 
   it('passes filter.delete ', () => {
@@ -594,6 +594,52 @@ import { Model} from '../../../Presentation/Api.js';
   })
 
 
+
+  it('ReactiveList', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+
+
+      const Model: typeof IModel = wind.models.Model
+      const $B: typeof $BTYPE = wind.models.$B
+
+      class Person extends Model<Person> {
+        userId = wind.models.AutoField({primaryKey:true})
+        username = wind.models.CharField({maxLength: 100})
+        email = wind.models.CharField({blank: true, maxLength: 100})
+        age = wind.models.IntegerField({blank: true})
+      }
+
+      wind.models.register({
+        databaseName: "jest-14",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
+      });
+
+      const $Person = $B<Person, typeof Person>(Person)
+
+      await $Person.deleteAll()
+
+      let subscription = $Person.ReactiveList(async (model) => {
+        return await model.all()
+      })
+
+      await $Person.create({username:'kobe', email:'kobe.bryant@lakers.com'})
+      await $Person.create({username:'kobe', email:'kobe.bryant@lakers.com'})
+      await $Person.all()
+
+
+      expect(2).to.deep.equal(subscription.value.length)
+
+    });
+
+  })
+
+
   it('get or create', () => {
 
     cy.visit('./index.html')
@@ -602,6 +648,7 @@ import { Model} from '../../../Presentation/Api.js';
     cy.window().then(async (wind ) => {
 
       const Model: typeof IModel = wind.models.Model
+      const $B: typeof $BTYPE = wind.models.$B
 
       class Person extends Model<Person> {
         userId = wind.models.AutoField({primaryKey:true})
@@ -725,6 +772,81 @@ import { Model} from '../../../Presentation/Api.js';
       let [ {updated} ] = await Person.updateOrCreate<Person[]>([{userId: 2,username:'kobe', email:'kobe.bryant@lakers.com'},{userId: 1,username:'kobe', email:'kobe.bryant@lakers.com'}])
 
       expect(2).to.deep.equal(updated.length)
+
+    });
+
+  })
+
+
+  it('$B', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+
+      const Model: typeof IModel = wind.models.Model
+      const $B: typeof $BTYPE = wind.models.$B
+
+      class Person extends Model<Person> {
+        userId = wind.models.AutoField({primaryKey:true})
+        username = wind.models.CharField({maxLength: 100})
+        email = wind.models.CharField({blank: true, maxLength: 100})
+        age = wind.models.IntegerField({blank: true})
+      }
+
+      wind.models.register({
+        databaseName: "jest-1511",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
+      });
+
+      const $Person =  await $B<Peter, typeof Person>(Person)
+
+      await Person.deleteAll()
+
+      const data = [{userId: 2,username:'kobe', email:'kobe.bryant@lakers.com'},{userId: 1,username:'kobe', email:'kobe.bryant@lakers.com'}]
+
+      let [ {created} ] = await $Person.updateOrCreate(data)
+
+      expect(2).to.deep.equal(created.length)
+
+
+      let [ {updated} ] = await $Person.updateOrCreate(data)
+
+      expect(2).to.deep.equal(updated.length)
+
+    });
+
+  })
+
+
+  it('KeyValueModel', () => {
+
+    cy.visit('./index.html')
+    cy.window().should("have.property", "models");
+
+    cy.window().then(async (wind ) => {
+
+      class Person extends KeyValueModel {
+        static username = wind.models.CharField({maxLength: 100})
+        static email = wind.models.CharField({blank: true, maxLength: 100})
+        static age = wind.models.IntegerField({blank: true})
+      }
+
+      wind.models.registerKeyValueStore({
+        databaseName: "jest-1511",
+        type: "localStorage",
+        version: 1,
+        models: [Person],
+      });
+
+      Person.username = '123'
+
+      Person.save()
+
+      expect({username: '123', email: null, age: null}).to.deep.equal(Object.assign({}, Person.get()))
 
     });
 

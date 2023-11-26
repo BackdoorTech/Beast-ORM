@@ -14,7 +14,7 @@ export class AddRunTimeMethod {
       GustPrototype()
 
       model.getModelSchema = () => {
-        return modelSchema
+        return modelSchema  as any
       }
 
     }

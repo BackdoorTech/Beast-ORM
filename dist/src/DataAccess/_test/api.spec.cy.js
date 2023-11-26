@@ -1,5 +1,3 @@
-// @ts-nocheck
-import { KeyValueModel } from '../../../Presentation/Api.js';
 describe('API', () => {
     it('passes', () => {
         cy.visit('./index.html');
@@ -608,24 +606,5 @@ describe('API', () => {
             expect(2).to.deep.equal(updated.length);
         });
     });
-    it('KeyValueModel', () => {
-        cy.visit('./index.html');
-        cy.window().should("have.property", "models");
-        cy.window().then(async (wind) => {
-            class Person extends KeyValueModel {
-            }
-            Person.username = wind.models.CharField({ maxLength: 100 });
-            Person.email = wind.models.CharField({ blank: true, maxLength: 100 });
-            Person.age = wind.models.IntegerField({ blank: true });
-            wind.models.registerKeyValueStore({
-                databaseName: "jest-1511",
-                type: "localStorage",
-                version: 1,
-                models: [Person],
-            });
-            Person.username = '123';
-            Person.save();
-            expect({ username: '123', email: null, age: null }).to.deep.equal(Object.assign({}, Person.get()));
-        });
-    });
 });
+export {};

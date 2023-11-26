@@ -6,6 +6,7 @@ import { BulkDataUniqueFieldError } from "../BusinessLayer/queryBuilderHandler/q
 import { APIError, APIOk } from "../Utility/Either/APIresponse.js";
 import { objectEqual } from "../BusinessLayer/modelManager/ObjectEqual.js";
 import { RuntimeMethods as RM } from "../BusinessLayer/modelManager/runtimeMethods/runTimeMethods.js";
+import { beastORMKeyValueStore } from "../BusinessLayer/besatOrmKeyValueStore.js";
 /**
  * Represents a model for database operations.
  */
@@ -152,9 +153,6 @@ export class Model {
         queryBuilder.where(value);
         return returnSelf.object(queryBuilder, model);
     }
-    static magic() {
-        return new this();
-    }
     static transactionOnCommit(fn) {
         return ORM.registerTrigger(this, fn);
     }
@@ -293,6 +291,67 @@ export class Model {
         }
     }
 }
-const $Best = (model) => {
-    getModel: (a) => model.getModel();
+export const $B = function (model) {
+    return {
+        get(value) {
+            return model.get(value);
+        },
+        all() {
+            return model.all();
+        },
+        deleteAll() {
+            return model.deleteAll();
+        },
+        create(params) {
+            return model.create(params);
+        },
+        filter(value) {
+            return model.filter(value);
+        },
+        transactionOnCommit(fn) {
+            return model.transactionOnCommit(fn);
+        },
+        ReactiveList(callback) {
+            return model.ReactiveList(callback);
+        },
+        getOrCreate(params) {
+            return model.getOrCreate(params);
+        },
+        updateOrCreate(params) {
+            return model.updateOrCreate(params);
+        }
+    };
 };
+export class KeyValueModel {
+    constructor() { }
+    static save(data = {}) {
+        const tableSchema = this.getTableSchema();
+        const dataToSave = dataParameters.getFilteredData(tableSchema, this);
+        Object.assign(this, dataToSave);
+        beastORMKeyValueStore.executeUpdate(dataToSave, this);
+    }
+    static get() {
+        const restedData = beastORMKeyValueStore.executeSelect(this);
+        Object.assign(this, Object.assign({}, restedData));
+        return restedData;
+    }
+    static getTableSchema() {
+        throw ("Register your Model before using the API");
+    }
+    static clear() {
+        this.clearStorage();
+    }
+    static clearComponent() {
+        const fieldNames = this.getTableSchema().fieldNames;
+        for (const fieldName of fieldNames) {
+            this[fieldName] = null;
+        }
+    }
+    static clearStorage() {
+        const key = this.getTableSchema().id;
+        localStorage.removeItem(key.keyPath);
+    }
+    static key() {
+        return this.getTableSchema().databaseName + "/" + this.getTableSchema().name;
+    }
+}

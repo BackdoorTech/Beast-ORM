@@ -1,4 +1,4 @@
-import { Model } from "../Presentation/Api.js"
+import { KeyValueModel, Model } from "../Presentation/Api.js"
 
 export interface IRegister {
   databaseName: string,
@@ -12,6 +12,18 @@ export interface IRegister {
   ignoreFieldsStartWidth?: string[]
 }
 
+
+export interface IRegisterKeyValueStore {
+  databaseName: string,
+  version: number,
+  type: 'localStorage'
+  models: typeof KeyValueModel[],
+  /**
+   * @description restore values from localStorage for LocalStorage Models
+   */
+  restore?: boolean,
+  ignoreFieldsStartWidth?: string[]
+}
 
 
 export interface IRegisterTransform {

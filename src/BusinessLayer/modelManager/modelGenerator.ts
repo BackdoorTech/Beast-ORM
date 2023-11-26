@@ -70,7 +70,7 @@ class ModelGeneration {
 
     }
 
-    GenericModel.getModelSchema = function () { return object }
+    GenericModel.getModelSchema = function () { return object as any }
 
     return GenericModel
   }

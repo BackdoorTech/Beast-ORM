@@ -1,11 +1,11 @@
-import { Model } from "../../../Presentation/Api"
+import { Model } from "../../../Presentation/Api.js"
+import { APIOk, APIResponse } from "../../../Utility/Either/APIresponse.js"
 import { getArgIdWithT } from "../../../Utility/Model/utils.js"
 import { capitalizeFirstLetter } from "../../../Utility/utils.js"
 import { IDatabaseSchema, IMethodWithModels } from "../../_interface/interface.type"
 import { IRegister } from "../../beastOrm.type.js"
 import { modelRegistration } from "../register/register.js"
 import { RuntimeMethods as RM } from "../runtimeMethods/runTimeMethods.js"
-import { APIOk, APIResponse } from '../../../Utility/Either/APIResponse.js';
 
 export class RelationShip {
 
@@ -83,7 +83,7 @@ export class RelationShip {
         for (const [fieldName, info] of  Object.entries(middleTablePK)) {
 
           let index = methodWithModels.push({
-            Model: currentModel,
+            Model: currentModel as any,
             func: []
           })
 

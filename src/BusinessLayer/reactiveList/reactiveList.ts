@@ -4,21 +4,24 @@ import { ICallBackReactiveList } from "../_interface/interface.type";
 
 export  class ReactiveList {
 
-  subscribe(model: typeof Model<any>, callback :ICallBackReactiveList) {
-    let value;
+  subscribe(model: typeof Model<any>, callback :ICallBackReactiveList<any>) {
+    let value: any[];
     let updateUi
 
     let subscription = model.transactionOnCommit(async () => {
-      const result = await  callback(model)
+      const [valueToUpdate, result] = await  callback(model as any)
       if(result.isOk) {
-        value = result.value
+        value = valueToUpdate
+        if(updateUi) updateUi()
       }
-      if(updateUi) updateUi()
+
     })
 
-    callback(model).then(result => {
-      value = result
-      if(updateUi) updateUi()
+    callback(model as any).then(([valueToUpdate, result]) => {
+      if(result.isOk) {
+        value = valueToUpdate
+        if(updateUi) updateUi()
+      }
     });
 
     return {

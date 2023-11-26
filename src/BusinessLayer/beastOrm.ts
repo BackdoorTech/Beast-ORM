@@ -98,7 +98,6 @@ class BeastORM {
       const arrayOfDataBackup = [...QueryBuilder.query.values]
 
 
-      // console.log("Model=============================", Model)
       const validator: (value: Object) => EitherFormValidationError  = Model[RM.validator]
 
       for( const object in arrayOfData) {
@@ -288,7 +287,7 @@ class BeastORM {
     return returnObject
   }
 
-  ReactiveList(_Model: typeof Model<any>, callBack:ICallBackReactiveList) {
+  ReactiveList<I>(_Model: typeof Model<any>, callBack:ICallBackReactiveList<I>) {
 
     const reactiveList = new ReactiveList()
 

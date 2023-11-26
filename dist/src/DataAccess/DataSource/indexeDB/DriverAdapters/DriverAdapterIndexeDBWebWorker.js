@@ -7,7 +7,6 @@ export class IndexedDBWorkerStrategy {
         this.myWorker = new Worker(new URL('./worker/worker.js', import.meta.url), { type: "module" });
         this.myWorker.onmessage = (oEvent) => {
             const data = oEvent.data;
-            console.log(JSON.stringify(data));
             this.callbacks[data.UUID][data.callbackName](data.data);
         };
         this.myWorker.onerror = (error) => {

@@ -1,29 +1,63 @@
-import { Model } from "../../../Presentation/Api";
+import { Model } from "../../../Presentation/Api.js";
+import { APIResponse } from "../../../Utility/Either/APIresponse.js";
 import { IDatabaseSchema, IMethodWithModels } from "../../_interface/interface.type";
 import { IRegister } from "../../beastOrm.type.js";
-import { APIResponse } from '../../../Utility/Either/APIResponse.js';
 export declare class RelationShip {
     getMiddleTable(modelWithNoGetter: typeof Model<any>, modelWithGetter: typeof Model<any>): {
         new (): Model<any>;
         getTableSchema(): import("../../_interface/interface.type").ITableSchema;
         getModel(): typeof Model<any>;
-        getModelSchema(): typeof Model<any>;
-        get<T>(value: Object): Promise<APIResponse<T, import("../../validation/fields/allFields.type").FormValidationError | import("../../queryBuilderHandler/queryErrorHandler").ItemNotFound>>;
-        all<T_1>(): Promise<APIResponse<T_1[], import("../../validation/fields/allFields.type").FormValidationError>>;
-        deleteAll(): Promise<APIResponse<number, import("../../validation/fields/allFields.type").FormValidationError>>;
-        create<T_2>(params: any): Promise<APIResponse<T_2, import("../../validation/fields/allFields.type").FormValidationError | import("../../../DataAccess/_interface/interface.type").TransactionAbortion>>;
-        filter<T_3>(value: Object): {
-            execute: () => Promise<APIResponse<T_3[], import("../../validation/fields/allFields.type").FormValidationError>>;
-            update: (params: any) => Promise<APIResponse<number, import("../../validation/fields/allFields.type").FormValidationError>>;
-            delete: () => Promise<APIResponse<number, import("../../validation/fields/allFields.type").FormValidationError>>;
+        getModelSchema<T>(): {
+            new (): Model<T>;
+            getTableSchema(): import("../../_interface/interface.type").ITableSchema;
+            getModel(): typeof Model<any>;
+            getModelSchema<T>(): any;
+            get<T_1>(value: Object): Promise<APIResponse<T_1, import("../../validation/fields/allFields.type.js").FormValidationError | import("../../queryBuilderHandler/queryErrorHandler.js").ItemNotFound>>;
+            all<T_2>(): Promise<APIResponse<T_2[], import("../../validation/fields/allFields.type.js").FormValidationError>>;
+            deleteAll(): Promise<APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError>>;
+            create<T_3>(params: any): Promise<APIResponse<T_3, import("../../validation/fields/allFields.type.js").FormValidationError | import("../../../DataAccess/_interface/interface.type.js").TransactionAbortion>>;
+            filter<T_4>(value: Object): {
+                execute: () => Promise<APIResponse<T_4[], import("../../validation/fields/allFields.type.js").FormValidationError>>;
+                update: (params: any) => Promise<APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError>>;
+                delete: () => Promise<APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError>>;
+            };
+            transactionOnCommit(fn: Function): {
+                dispatchUID: string;
+                disconnect: () => void;
+            };
+            ReactiveList<I>(callback: import("../../_interface/interface.type").ICallBackReactiveList<I>): {
+                readonly value: I[];
+                readonly subscribe: {
+                    dispatchUID: string;
+                    disconnect: () => void;
+                };
+                unsubscribe: () => Promise<void>;
+                setUpdateUi(func: any): void;
+            };
+            getOrCreate<T_5>(params: any): Promise<APIResponse<{
+                created: T_5;
+                found: T_5;
+            }, import("../../validation/fields/allFields.type.js").FormValidationError | import("../../../DataAccess/_interface/interface.type.js").TransactionAbortion | import("../../queryBuilderHandler/queryErrorHandler.js").BulkDataUniqueFieldError>>;
+            updateOrCreate<T_6>(params: any): Promise<APIResponse<{
+                updated: T_6;
+                created: T_6;
+            }, import("../../validation/fields/allFields.type.js").FormValidationError | import("../../../DataAccess/_interface/interface.type.js").TransactionAbortion | import("../../queryBuilderHandler/queryErrorHandler.js").BulkDataUniqueFieldError>>;
         };
-        magic(): Model<unknown>;
+        get<T_1>(value: Object): Promise<APIResponse<T_1, import("../../validation/fields/allFields.type.js").FormValidationError | import("../../queryBuilderHandler/queryErrorHandler.js").ItemNotFound>>;
+        all<T_2>(): Promise<APIResponse<T_2[], import("../../validation/fields/allFields.type.js").FormValidationError>>;
+        deleteAll(): Promise<APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError>>;
+        create<T_3>(params: any): Promise<APIResponse<T_3, import("../../validation/fields/allFields.type.js").FormValidationError | import("../../../DataAccess/_interface/interface.type.js").TransactionAbortion>>;
+        filter<T_4>(value: Object): {
+            execute: () => Promise<APIResponse<T_4[], import("../../validation/fields/allFields.type.js").FormValidationError>>;
+            update: (params: any) => Promise<APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError>>;
+            delete: () => Promise<APIResponse<number, import("../../validation/fields/allFields.type.js").FormValidationError>>;
+        };
         transactionOnCommit(fn: Function): {
             dispatchUID: string;
             disconnect: () => void;
         };
-        ReactiveList(callback: import("../../_interface/interface.type").ICallBackReactiveList): {
-            readonly value: any;
+        ReactiveList<I>(callback: import("../../_interface/interface.type").ICallBackReactiveList<I>): {
+            readonly value: I[];
             readonly subscribe: {
                 dispatchUID: string;
                 disconnect: () => void;
@@ -31,17 +65,17 @@ export declare class RelationShip {
             unsubscribe: () => Promise<void>;
             setUpdateUi(func: any): void;
         };
-        getOrCreate<T_4>(params: any): Promise<APIResponse<{
-            created: T_4;
-            found: T_4;
-        }, import("../../validation/fields/allFields.type").FormValidationError | import("../../../DataAccess/_interface/interface.type").TransactionAbortion | import("../../queryBuilderHandler/queryErrorHandler").BulkDataUniqueFieldError>>;
-        updateOrCreate<T_5>(params: any): Promise<APIResponse<{
-            updated: T_5;
+        getOrCreate<T_5>(params: any): Promise<APIResponse<{
             created: T_5;
-        }, import("../../validation/fields/allFields.type").FormValidationError | import("../../../DataAccess/_interface/interface.type").TransactionAbortion | import("../../queryBuilderHandler/queryErrorHandler").BulkDataUniqueFieldError>>;
+            found: T_5;
+        }, import("../../validation/fields/allFields.type.js").FormValidationError | import("../../../DataAccess/_interface/interface.type.js").TransactionAbortion | import("../../queryBuilderHandler/queryErrorHandler.js").BulkDataUniqueFieldError>>;
+        updateOrCreate<T_6>(params: any): Promise<APIResponse<{
+            updated: T_6;
+            created: T_6;
+        }, import("../../validation/fields/allFields.type.js").FormValidationError | import("../../../DataAccess/_interface/interface.type.js").TransactionAbortion | import("../../queryBuilderHandler/queryErrorHandler.js").BulkDataUniqueFieldError>>;
     };
     getMiddleTableName(modelWithNoGetter: typeof Model<any>, modelWithGetter: typeof Model<any>): string;
-    addToMiddleTable<T>(currentModel: Model<any>, otherModel: typeof Model<any>, toAdd: Model<any>, middleTableModel: typeof Model<any>): Promise<APIResponse<T, import("../../validation/fields/allFields.type").FormValidationError | import("../../../DataAccess/_interface/interface.type").TransactionAbortion>>;
+    addToMiddleTable<T>(currentModel: Model<any>, otherModel: typeof Model<any>, toAdd: Model<any>, middleTableModel: typeof Model<any>): Promise<APIResponse<T, import("../../validation/fields/allFields.type.js").FormValidationError | import("../../../DataAccess/_interface/interface.type.js").TransactionAbortion>>;
     getAll<T>(currentModel: Model<any>, otherModel: typeof Model<any>, middleTableModel: typeof Model<any>): Promise<APIResponse<T[], any>>;
     generateRelationShipMethods(databaseSchema: IDatabaseSchema, entries: IRegister, _MiddleModels: typeof Model<any>[]): IMethodWithModels[];
 }

@@ -1,8 +1,8 @@
+import { APIOk } from "../../../Utility/Either/APIresponse.js";
 import { getArgIdWithT } from "../../../Utility/Model/utils.js";
 import { capitalizeFirstLetter } from "../../../Utility/utils.js";
 import { modelRegistration } from "../register/register.js";
 import { RuntimeMethods as RM } from "../runtimeMethods/runTimeMethods.js";
-import { APIOk } from '../../../Utility/Either/APIResponse.js';
 export class RelationShip {
     getMiddleTable(modelWithNoGetter, modelWithGetter) {
         const databaseName = modelWithNoGetter.getTableSchema().databaseName;

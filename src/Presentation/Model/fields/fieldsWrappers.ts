@@ -5,7 +5,8 @@ import { field } from '../../../BusinessLayer/validation/fields/allFields.type.j
 import { equalModels, getIdObjectWithT } from '../../../Utility/Model/utils.js'
 import { RuntimeMethods as RM } from '../../../BusinessLayer/modelManager/runtimeMethods/runTimeMethods.js'
 import { relationShip } from '../../../BusinessLayer/modelManager/relationships/relationShip.js'
-import { APIResponse } from '../../../Utility/Either/APIResponse.js'
+import { APIResponse } from '../../../Utility/Either/APIresponse.js'
+
 
 const PrototypeGust =  {
   CharField(data?: CharFieldParams): string {return null as any },
@@ -250,7 +251,7 @@ export const getter = {
               modelInstance = list
               return true
             }
-            
+
             result.pass()
           }
         }

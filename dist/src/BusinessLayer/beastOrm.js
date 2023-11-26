@@ -68,7 +68,6 @@ class BeastORM {
             .strategy;
         const arrayOfData = QueryBuilder.query.values;
         const arrayOfDataBackup = [...QueryBuilder.query.values];
-        // console.log("Model=============================", Model)
         const validator = Model[RM.validator];
         for (const object in arrayOfData) {
             arrayOfData[object] = dataParameters.getFilteredData(tableSchema, arrayOfData[object]);

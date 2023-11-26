@@ -20,14 +20,14 @@ export function APIOk<T, E>(value: T): APIResponse<T, E> {
   }
 
   const object = {
-    isOk: true, 
-    isError: false, 
+    isOk: true,
+    isError: false,
     value,
     pass
   }
 
   return [
-    value, 
+    value,
     object as any
   ]
 }
@@ -39,14 +39,14 @@ export  function APIError<T, E>(error: E): APIResponse<T, E> {
   }
 
   const object = {
-    isOk: false, 
-    isError: true, 
-    value:  
+    isOk: false,
+    isError: true,
+    value:
     null, error,
     pass
   }
   return [
-    null as T, 
+    null as T,
     object as any
   ]
 }

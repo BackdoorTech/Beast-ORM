@@ -1,7 +1,9 @@
-import { Model } from "../../Presentation/Api"
 import { AttributesMap, FieldAttributesKeys, FieldKeys, FieldType, FieldsMap } from "../fields/fields.type"
 import { PossibleFieldAttributes } from "../fields/fieldsParameters.type"
-import { Either } from '../../../dist/src/Utility/Either/APIResponse';
+import { APIResponse } from "../../Utility/Either/APIresponse.js";
+import { FormValidationError } from "../validation/fields/allFields.type";
+import { BulkDataUniqueFieldError, ItemNotFound } from "../queryBuilderHandler/queryErrorHandler";
+import { TransactionAbortion } from "../../DataAccess/_interface/interface.type";
 
 export interface IFieldSchema {
 	name: string,
@@ -55,4 +57,36 @@ export enum DBEventsTrigger {
 }
 
 
-export type ICallBackReactiveList = (model: typeof Model<any>) => Promise< Either<Model<any>| Model<any>[], any>>
+
+class Model <I> {
+  get(): Promise<APIResponse<I, FormValidationError | ItemNotFound>> {
+    return {} as any
+  }
+  all(): Promise<APIResponse<I[], FormValidationError>> {
+    return {} as any
+  }
+  deleteAll(): Promise<APIResponse<number, FormValidationError>> {
+    return {} as any
+  }
+  create(): Promise<APIResponse<I, FormValidationError | TransactionAbortion>>  {
+    return {} as any
+  }
+  getOrCreate(): Promise<APIResponse<{ created: I; found: I}, FormValidationError | BulkDataUniqueFieldError | TransactionAbortion>> {
+    return {} as any
+  }
+  updateOrCreate(): Promise<APIResponse<{ updated: I; created: I}, FormValidationError | BulkDataUniqueFieldError | TransactionAbortion>> {
+    return {} as any
+  }
+
+  filter<I>() : {
+    execute: () => Promise<APIResponse<I[], FormValidationError>>;
+    update: (params: any) => Promise<APIResponse<number, FormValidationError>>;
+    delete: () =>  Promise<APIResponse<number, FormValidationError>>;
+  }  {
+    return {} as any
+  }
+
+}
+
+
+export type ICallBackReactiveList<I> = (model: Model<I>) => Promise< APIResponse< I[], any>>

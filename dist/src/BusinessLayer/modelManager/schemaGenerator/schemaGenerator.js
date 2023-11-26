@@ -19,7 +19,7 @@ class SchemaGenerator {
             type: entries.type,
             version: entries.version,
             table: [],
-            middleTables: []
+            middleTables: [],
         };
         if (this.hasBeenProcessedDb(entries.databaseName)) {
             return;

@@ -22,8 +22,8 @@ declare class BeastORM {
         dispatchUID: string;
         disconnect: () => void;
     };
-    ReactiveList(_Model: typeof Model<any>, callBack: ICallBackReactiveList): {
-        readonly value: any;
+    ReactiveList<I>(_Model: typeof Model<any>, callBack: ICallBackReactiveList<I>): {
+        readonly value: any[];
         readonly subscribe: {
             dispatchUID: string;
             disconnect: () => void;

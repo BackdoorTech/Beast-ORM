@@ -11,6 +11,7 @@ import { TransactionAbortion } from "../DataAccess/_interface/interface.type.js"
 import { APIError, APIOk, APIResponse } from "../Utility/Either/APIresponse.js";
 import { objectEqual } from "../BusinessLayer/modelManager/ObjectEqual.js";
 import { RuntimeMethods as RM } from "../BusinessLayer/modelManager/runtimeMethods/runTimeMethods.js";
+import { beastORMKeyValueStore } from "../BusinessLayer/besatOrmKeyValueStore.js";
 
 /**
  * Represents a model for database operations.
@@ -88,7 +89,7 @@ export class Model<Model> implements IModel<Model> {
       return APIOk(result.value)
     }
   }
-  async get(): Promise<APIResponse<Model, FormValidationError>> {
+  async get<Model>(): Promise<APIResponse<Model, FormValidationError>> {
     const queryBuilder = new QueryBuilder({isParamsArray:false});
     const model = this.getModel()
     const tableSchema: ITableSchema = model.getTableSchema()
@@ -122,7 +123,7 @@ export class Model<Model> implements IModel<Model> {
     throw("Register your Model before using the API") as any
   }
 
-  static getModelSchema(): typeof Model<any> {
+  static getModelSchema<T>(): typeof Model<T> {
     throw("Register your Model before using the API") as any
   }
 
@@ -205,15 +206,21 @@ export class Model<Model> implements IModel<Model> {
   }
 
 
-  static magic() {
-    return new this()
-  }
 
   static transactionOnCommit( fn: Function ) {
     return ORM.registerTrigger(this, fn)
   }
 
-  static ReactiveList (callback : ICallBackReactiveList) {
+  static ReactiveList <I>(callback : ICallBackReactiveList<I>): {
+    readonly value: I[];
+    readonly subscribe: {
+        dispatchUID: string;
+        disconnect: () => void;
+    };
+    unsubscribe: () => Promise<void>;
+    setUpdateUi(func: any): void;
+  }
+  {
     return ORM.ReactiveList(this, callback)
   }
 
@@ -394,7 +401,80 @@ export class Model<Model> implements IModel<Model> {
   }
 }
 
+export const $B =  function <I, S>(model:  S)  {
+  return {
+    get(value:Object) {
+      return (model as unknown as typeof Model<I>).get<I>(value)
+    },
+    all() {
+      return (model as unknown as typeof Model<I>).all<I>()
+    },
+    deleteAll() {
+      return (model as unknown as typeof Model<I>).deleteAll()
+    },
+    create(params) {
+      return (model as unknown as typeof Model<I>).create<I>(params)
+    },
+    filter(value:Object) {
+      return (model as unknown as typeof Model<I>).filter<I>(value)
+    },
+    transactionOnCommit(fn: Function) {
+     return (model as unknown as typeof Model<I>).transactionOnCommit(fn)
+    },
+    ReactiveList(callback: ICallBackReactiveList<I>) {
+     return (model as unknown as typeof Model<I>).ReactiveList<I>(callback)
+    },
+    getOrCreate(params: any) {
+     return (model as unknown as typeof Model<I>).getOrCreate<I>(params)
+    },
+    updateOrCreate(params: any) {
+     return (model as unknown as typeof Model<I>).updateOrCreate<I>(params)
+    }
+  }
+}
 
-const $Best = (model: typeof Model<any>) => {
-  getModel:(a) => model.getModel()
+
+
+export class KeyValueModel {
+
+  constructor() {}
+
+  static save(data: Object = {}) {
+    const tableSchema = this.getTableSchema()
+    const dataToSave = dataParameters.getFilteredData(tableSchema, this)
+    Object.assign(this, dataToSave)
+    beastORMKeyValueStore.executeUpdate(dataToSave, this as any)
+  }
+
+  static get() {
+    const restedData =  beastORMKeyValueStore.executeSelect(this as any)
+    Object.assign(this, {...restedData})
+
+    return restedData
+  }
+
+  static getTableSchema(): ITableSchema {
+    throw("Register your Model before using the API") as any
+  }
+
+  static clear() {
+    this.clearStorage()
+  }
+
+  static clearComponent() {
+    const fieldNames = this.getTableSchema().fieldNames
+
+    for(const fieldName of fieldNames) {
+      this[fieldName] = null
+    }
+  }
+
+  static clearStorage() {
+    const key = this.getTableSchema().id
+    localStorage.removeItem(key.keyPath)
+  }
+
+  static key(): string {
+    return this.getTableSchema().databaseName+"/"+this.getTableSchema().name
+  }
 }

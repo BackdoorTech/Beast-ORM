@@ -34,6 +34,12 @@ export class ModelReader {
       this.processField(classInstance, fieldName, Field as any, fieldTypes, attributes, fieldNames, fields, falseField);
     }
 
+    if(fieldNames.length == 0) {
+      for (const [fieldName, Field] of Object.entries(modelClassRepresentation)) {
+        this.processField(classInstance, fieldName, Field as any, fieldTypes, attributes, fieldNames, fields, falseField);
+      }
+    }
+
     return {
       modelName,
       fields,

@@ -2,13 +2,10 @@ import { ModelReader } from './ModelReader.js'
 import { IRegister } from '../../beastOrm.type.js'
 import { FieldType } from './ModalReader.type.js'
 import { IDatabaseSchema, ITableSchema } from '../../_interface/interface.type.js'
-import { RuntimeMethods as RM } from '../runtimeMethods/runTimeMethods.js'
-import { GustPrototype, RealPrototype } from '../../../Presentation/Model/fields/fieldsWrappers.js'
 import { ManyToManyField } from '../../../Presentation/Model/fields/allFields.js'
 import { middleTable } from '../relationships/middleTable.js'
 import { Model } from '../../../Presentation/Api.js'
-import { getArgIdWithT } from '../../../Utility/Model/utils.js'
-import { capitalizeFirstLetter, hashCode } from '../../../Utility/utils.js'
+import { hashCode } from '../../../Utility/utils.js'
 
 
 class SchemaGenerator {
@@ -32,7 +29,7 @@ class SchemaGenerator {
       type: entries.type,
       version: entries.version,
       table: [],
-      middleTables: []
+      middleTables: [],
     }
 
     if(this.hasBeenProcessedDb(entries.databaseName)) {

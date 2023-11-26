@@ -3,17 +3,19 @@ export class ReactiveList {
         let value;
         let updateUi;
         let subscription = model.transactionOnCommit(async () => {
-            const result = await callback(model);
+            const [valueToUpdate, result] = await callback(model);
             if (result.isOk) {
-                value = result.value;
+                value = valueToUpdate;
+                if (updateUi)
+                    updateUi();
             }
-            if (updateUi)
-                updateUi();
         });
-        callback(model).then(result => {
-            value = result;
-            if (updateUi)
-                updateUi();
+        callback(model).then(([valueToUpdate, result]) => {
+            if (result.isOk) {
+                value = valueToUpdate;
+                if (updateUi)
+                    updateUi();
+            }
         });
         return {
             get value() {

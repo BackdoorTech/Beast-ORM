@@ -1,6 +1,5 @@
 import { Model } from "../../Presentation/Api"
 import { APIResponse } from "../../Utility/Either/APIresponse.js"
-import { Either } from "../../Utility/Either/index.js"
 import { FormValidationError, field } from "../validation/fields/allFields.type"
 
 export interface CharFieldParams {

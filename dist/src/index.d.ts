@@ -1,5 +1,5 @@
-import { Model } from './Presentation/Api.js';
-import './Configuration/IndexedDbWorker.js';
+import { Model, KeyValueModel } from './Presentation/Api.js';
+export { $B } from './Presentation/Api.js';
 export declare const models: {
     ForeignKeyGetter<T>(data: {
         model: new () => T;
@@ -71,6 +71,40 @@ export declare const models: {
             I: Model<any>;
         }): import("./BusinessLayer/fields/fieldsParameters.type.js").ManyToManyGetterParams<T_1>;
     };
+    $B: <I, S>(model: S) => {
+        get(value: Object): Promise<import("./Utility/Either/APIresponse.js").APIResponse<I, import("./BusinessLayer/validation/fields/allFields.type.js").FormValidationError | import("./BusinessLayer/queryBuilderHandler/queryErrorHandler.js").ItemNotFound>>;
+        all(): Promise<import("./Utility/Either/APIresponse.js").APIResponse<I[], import("./BusinessLayer/validation/fields/allFields.type.js").FormValidationError>>;
+        deleteAll(): Promise<import("./Utility/Either/APIresponse.js").APIResponse<number, import("./BusinessLayer/validation/fields/allFields.type.js").FormValidationError>>;
+        create(params: any): Promise<import("./Utility/Either/APIresponse.js").APIResponse<I, import("./BusinessLayer/validation/fields/allFields.type.js").FormValidationError | import("./DataAccess/_interface/interface.type.js").TransactionAbortion>>;
+        filter(value: Object): {
+            execute: () => Promise<import("./Utility/Either/APIresponse.js").APIResponse<I[], import("./BusinessLayer/validation/fields/allFields.type.js").FormValidationError>>;
+            update: (params: any) => Promise<import("./Utility/Either/APIresponse.js").APIResponse<number, import("./BusinessLayer/validation/fields/allFields.type.js").FormValidationError>>;
+            delete: () => Promise<import("./Utility/Either/APIresponse.js").APIResponse<number, import("./BusinessLayer/validation/fields/allFields.type.js").FormValidationError>>;
+        };
+        transactionOnCommit(fn: Function): {
+            dispatchUID: string;
+            disconnect: () => void;
+        };
+        ReactiveList(callback: import("./BusinessLayer/_interface/interface.type.js").ICallBackReactiveList<I>): {
+            readonly value: I[];
+            readonly subscribe: {
+                dispatchUID: string;
+                disconnect: () => void;
+            };
+            unsubscribe: () => Promise<void>;
+            setUpdateUi(func: any): void;
+        };
+        getOrCreate(params: any): Promise<import("./Utility/Either/APIresponse.js").APIResponse<{
+            created: I;
+            found: I;
+        }, import("./BusinessLayer/validation/fields/allFields.type.js").FormValidationError | import("./DataAccess/_interface/interface.type.js").TransactionAbortion | import("./BusinessLayer/queryBuilderHandler/queryErrorHandler.js").BulkDataUniqueFieldError>>;
+        updateOrCreate(params: any): Promise<import("./Utility/Either/APIresponse.js").APIResponse<{
+            updated: I;
+            created: I;
+        }, import("./BusinessLayer/validation/fields/allFields.type.js").FormValidationError | import("./DataAccess/_interface/interface.type.js").TransactionAbortion | import("./BusinessLayer/queryBuilderHandler/queryErrorHandler.js").BulkDataUniqueFieldError>>;
+    };
     Model: typeof Model;
+    KeyValueModel: typeof KeyValueModel;
     register: (register: import("./BusinessLayer/beastOrm.type.js").IRegister) => void;
+    registerKeyValueStore: (register: import("./BusinessLayer/beastOrm.type.js").IRegisterKeyValueStore) => void;
 };

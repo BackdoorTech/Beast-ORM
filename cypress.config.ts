@@ -2,7 +2,7 @@ import { defineConfig } from "cypress";
 
 export default defineConfig({
   chromeWebSecurity: false,
-  "defaultCommandTimeout": 60000, // in milliseconds
+  "defaultCommandTimeout": 20000, // in milliseconds
   "requestTimeout": 30000, // in milliseconds
   "responseTimeout": 30000, // in milliseconds
   "pageLoadTimeout": 60000, // in milliseconds

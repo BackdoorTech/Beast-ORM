@@ -1,4 +1,3 @@
-import { error } from '../Utility/Either/APIResponse';
 
 class Logger {
   log() {}

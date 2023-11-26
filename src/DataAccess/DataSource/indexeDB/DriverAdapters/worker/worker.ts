@@ -31,7 +31,6 @@ function mainOnmessageHandler(oEvent) {
   const { UUID, methodName, data } = oEvent.data
   const callbacks = generateCallbacks(UUID)
 
-  console.log({methodName, data})
   Strategy[methodName](data)(callbacks)
 }
 

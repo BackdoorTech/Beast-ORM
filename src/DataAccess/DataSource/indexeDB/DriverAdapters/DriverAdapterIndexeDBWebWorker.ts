@@ -16,7 +16,6 @@ export class IndexedDBWorkerStrategy implements IDatabaseStrategy {
 
     this.myWorker.onmessage =  (oEvent) => {
       const data = oEvent.data
-      console.log(JSON.stringify(data))
       this.callbacks[data.UUID][data.callbackName](data.data)
     }
 
