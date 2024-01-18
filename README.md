@@ -839,8 +839,6 @@ The delete method, conveniently, is named delete(). This method immediately dele
 Session.delete();
 ```
 
-## Menggunakan Beast ORM pada Vite
-
 ## Using Beast ORM with Vite
 
 Exclude Beast ORM from optimizeDeps
